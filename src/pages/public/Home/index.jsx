@@ -1,5 +1,6 @@
 import Header from '../../../components/Header';
 import Hero from './Hero';
+import FAQs from './FAQs';
 import Footer from '../../../components/Footer';
 
 function Home() {
@@ -10,7 +11,7 @@ function Home() {
       {/*<Perks />*/}
       {/*<Testimonials />*/}
       {/*<Subscriptions />*/}
-      {/*<FAQs />*/}
+      <FAQs />
       <Footer />
     </div>
   )
