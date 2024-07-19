@@ -23,7 +23,7 @@ const NavBar = ({ content }) => {
       <div
         className={
           `flex flex-row justify-between items-center
-          pr-12 pl-16 bg-white fixed w-full ${height}`
+          pr-12 pl-16 bg-white fixed w-full z-50 ${height}`
         }
       >
         {logo}

@@ -12,7 +12,7 @@ const AuthBar = ({ content }) => {
       <div
         className={
           `flex flex-row gap-4 items-center justify-end
-          fixed w-full pr-12 ${height}`
+          fixed z-50 w-full pr-12 ${height}`
         }
         style={{ backgroundColor: PrimaryColor }}
       >
