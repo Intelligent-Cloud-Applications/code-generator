@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { fetchInstitutionData } from "./redux/store/institutionSlice";
 import { fetchUserData } from "./redux/store/userSlice";
 import RoutesContainer from './routes';
+import { fetchProductData } from "./redux/store/productSlice";
 
 
 // Code
@@ -15,6 +16,7 @@ const App = () => {
   useEffect(() => {
     dispatch(fetchInstitutionData());
     dispatch(fetchUserData());
+    dispatch(fetchProductData());
   }, []);
   
   return (
