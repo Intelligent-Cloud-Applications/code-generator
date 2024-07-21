@@ -1,11 +1,14 @@
 // Packages
-import { useSelector } from "react-redux";
+//import { useSelector } from "react-redux";
 import { Link } from 'react-router-dom';
+import {useContext} from "react";
+import institutionContext from "../../Context/InstitutionContext";
 
 
 // Code
 const SocialSection = ({ content }) => {
-  const { PrimaryColor } = useSelector((state) => state.institutionData.data);
+  const { PrimaryColor } = useContext(institutionContext).institutionData;
+//  const { PrimaryColor } = useSelector((state) => state.institutionData.data);
   
   return (
     <div

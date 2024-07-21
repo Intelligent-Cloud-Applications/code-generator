@@ -1,10 +1,12 @@
 // Packages
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSelector } from "react-redux";
+import institutionContext from "../../Context/InstitutionContext";
+//import { useSelector } from "react-redux";
 
 const AuthBar = ({ content }) => {
-  const { PrimaryColor } = useSelector((state) => state.institutionData.data);
+  const { PrimaryColor } = useContext(institutionContext).institutionData;
+//  const { PrimaryColor } = useSelector((state) => state.institutionData.data);
   const height = 'h-8';
     
   return (

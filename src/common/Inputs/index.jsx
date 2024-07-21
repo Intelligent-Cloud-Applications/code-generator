@@ -1,9 +1,10 @@
 // Packages
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 
 // Local
 import countries from './countries.json';
-import {useSelector} from "react-redux";
+import institutionContext from "../../Context/InstitutionContext";
+//import {useSelector} from "react-redux";
 
 export const CountrySelect = (props) => {
   const { country, setCountry } = useState(91);
@@ -27,11 +28,23 @@ export const CountrySelect = (props) => {
 export const PhoneInput = (props) => {
   return (
     <input
-      type='text'
-      placeholder='Enter your Phone Number...'
+      type='tel'
+      placeholder='Phone Number'
       required
       pattern='[0-9]{9,10}'
       title='Phone Numbers are 9 or 10 digits'
+      {...props}
+    />
+  )
+}
+
+
+export const EmailInput = (props) => {
+  return (
+    <input
+      type='email'
+      placeholder='Email Address'
+      required
       {...props}
     />
   )
@@ -42,7 +55,7 @@ export const OtpInput = (props) => {
   return (
     <input
       type='text'
-      placeholder='Enter the OTP...'
+      placeholder='OTP'
       required
       pattern='[0-9]{6}'
       title='OTP is 6 digits'
@@ -53,7 +66,8 @@ export const OtpInput = (props) => {
 
 
 export const PrimaryButton = ({ children, ...props }) => {
-  const { PrimaryColor } = useSelector((state) => state.institutionData.data);
+  const { PrimaryColor } = useContext(institutionContext).institutionData;
+//  const { PrimaryColor } = useSelector((state) => state.institutionData.data);
   
   return (
     <button

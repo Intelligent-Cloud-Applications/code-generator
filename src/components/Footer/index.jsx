@@ -1,13 +1,16 @@
 // Packages
-import { useSelector } from "react-redux";
+//import { useSelector } from "react-redux";
 
 // Local
 import UpperFooter from "./UpperFooter";
 import SocialSection from './SocialSection';
 import PolicySection from './PolicySection';
+import {useContext} from "react";
+import institutionContext from "../../Context/InstitutionContext";
 
 const Footer = () => {
-  const { logoUrl, Facebook, Instagram, Footer_Link_1, Footer_Link_2 } = useSelector((state) => state.institutionData.data);
+  const { logoUrl, Facebook, Instagram, Footer_Link_1, Footer_Link_2 } = useContext(institutionContext).institutionData;
+//  const { logoUrl, Facebook, Instagram, Footer_Link_1, Footer_Link_2 } = useSelector((state) => state.institutionData.data);
   
   const SocialIcon = ({ name, url }) =>
     <img

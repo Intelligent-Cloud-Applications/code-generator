@@ -1,12 +1,14 @@
 import {CountrySelect, PhoneInput, PrimaryButton} from "../../../common/Inputs";
 import {Link, useNavigate, useSearchParams} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {useState} from "react";
+//import {useSelector} from "react-redux";
+import {useContext, useState} from "react";
 import { Auth, API } from "aws-amplify";
+import institutionContext from "../../../Context/InstitutionContext";
 
 
 const LoginForm = ({ setSigninResponse }) => {
-  const { InstitutionId } = useSelector((state) => state.institutionData.data);
+  const { InstitutionId } = useContext(institutionContext).institutionData;
+//  const { InstitutionId } = useSelector((state) => state.institutionData.data);
   const [errorText, setErrorText] = useState('');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

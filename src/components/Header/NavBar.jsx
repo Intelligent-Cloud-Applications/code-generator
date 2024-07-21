@@ -1,10 +1,12 @@
 // Packages
-import React from 'react';
+import React, {useContext} from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { useSelector } from "react-redux";
+import institutionContext from "../../Context/InstitutionContext";
+//import { useSelector } from "react-redux";
 
 const NavBar = ({ content }) => {
-  const { logoUrl, PrimaryColor } = useSelector((state) => state.institutionData.data);
+  const { logoUrl, PrimaryColor } = useContext(institutionContext).institutionData;
+//  const { logoUrl, PrimaryColor } = useSelector((state) => state.institutionData.data);
 
   const height = 'h-16';
   

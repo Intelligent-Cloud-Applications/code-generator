@@ -1,6 +1,6 @@
 import {OtpInput, PrimaryButton} from "../../../common/Inputs";
 import {Auth} from 'aws-amplify';
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {fetchUserData} from "../../../redux/store/userSlice";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {useState} from "react";

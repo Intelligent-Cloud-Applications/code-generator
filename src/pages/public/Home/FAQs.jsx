@@ -1,13 +1,16 @@
-import { useSelector } from "react-redux";
+//import { useSelector } from "react-redux";
 import {
   Accordion,
   AccordionContent,
   AccordionPanel,
   AccordionTitle,
 } from "flowbite-react";
+import {useContext} from "react";
+import institutionContext from "../../../Context/InstitutionContext";
 
 const FAQs = () => {
-  const { FAQ } = useSelector((state) => state.institutionData.data);
+  const { FAQ } = useContext(institutionContext).institutionData;
+//  const { FAQ } = useSelector((state) => state.institutionData.data);
   return (
     <div className="container h-screen mx-auto py-24 px- flex justify-center items-center flex-col gap-8">
       <h2 className="text-3xl font-bold text-center mb-12 text-[2.5rem]">

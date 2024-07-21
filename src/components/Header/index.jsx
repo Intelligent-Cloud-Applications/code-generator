@@ -1,16 +1,20 @@
 // Packages
-import { useSelector } from 'react-redux';
+//import { useSelector } from 'react-redux';
 
 // Local
 import AuthBar from './AuthBar';
 import NavBar from './NavBar';
 import { defaultProfileImageUrl } from '../../utils/constants';
+import {useContext} from "react";
+import institutionContext from "../../Context/InstitutionContext";
+import Context from "../../Context/Context";
 
 
 // Code
 const Header = () => {
-  const { isAuth, data } = useSelector((state) => state.userData);
-  const { profileImageUrl, userName } = data;
+  const { isAuth, userData } = useContext(Context);
+//  const { isAuth, data } = useSelector((state) => state.userData);
+  const { profileImageUrl, userName } = userData;
   
   const profileImage =
     <img
