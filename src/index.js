@@ -12,6 +12,8 @@ import config from './config';
 import './index.css';
 import {ContextProvider} from "./Context/ContextProvider";
 import {InstitutionContextProvider} from "./Context/InstitutionContextProvider";
+import {ToastContainer} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 
 // Code
@@ -25,6 +27,19 @@ root.render(
     <ContextProvider>
       <InstitutionContextProvider>
         <App />
+        <ToastContainer
+          position="top-right"
+          autoClose={3500}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          bodyClassName="toastBody"
+        />
       </InstitutionContextProvider>
     </ContextProvider>
     {/*</Provider>*/}

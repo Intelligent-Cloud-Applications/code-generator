@@ -84,3 +84,30 @@ export const PrimaryButton = ({ children, ...props }) => {
     </button>
   )
 }
+
+
+export const Button1 = ({ data, fn, w = 'auto', h = 'auto' }) => {
+  return (
+    <button
+      className={`sans-serif tracking-wider bg-[#2f2f2f] text-[#e1e1e1] h-[${h}] rounded-lg py-2 px-2 w-[${w}]`}
+      onClick={fn}
+    >
+      {data}
+    </button>
+  )
+}
+
+export const Button2 = ({ data, fn, w = 'auto', h = 'auto', className = '' }) => {
+  const InstitutionData = useContext(institutionContext).institutionData
+  return (
+    <button
+      className={`sans-serif tracking-wider font-semibold rounded-lg py-2 px-2 text-white h-[${h}] w-[${w}] ${className}`}
+      style={{
+        backgroundColor: InstitutionData.PrimaryColor
+      }}
+      onClick={fn}
+    >
+      {data}
+    </button>
+  )
+}

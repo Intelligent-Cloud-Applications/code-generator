@@ -4,10 +4,12 @@ import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import {useContext, useState} from "react";
 import { Auth, API } from "aws-amplify";
 import institutionContext from "../../../Context/InstitutionContext";
+import Context from "../../../Context/Context";
 
 
 const LoginForm = ({ setSigninResponse }) => {
   const { InstitutionId } = useContext(institutionContext).institutionData;
+  const { util } = useContext(Context);
 //  const { InstitutionId } = useSelector((state) => state.institutionData.data);
   const [errorText, setErrorText] = useState('');
   const navigate = useNavigate();
@@ -17,6 +19,7 @@ const LoginForm = ({ setSigninResponse }) => {
 
   const sendOtp = async (event) => {
     event.preventDefault()
+    util.setLoader(true);
     const countryCode = event.target.country.value;
     const phoneNumber = event.target.phone.value;
     
@@ -44,9 +47,12 @@ const LoginForm = ({ setSigninResponse }) => {
     } catch (e) {
       if (e.message === 'Unexpected Lambda Output') {
         alert('Sign Up First')
+        util.setLoader(false);
         navigate(`/signup${redirect ? `?redirect=${redirect}` : ''}`)
       }
       setErrorText(e.message)
+    } finally {
+      util.setLoader(false);
     }
   }
 

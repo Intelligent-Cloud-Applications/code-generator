@@ -43,7 +43,7 @@ const Header = () => {
   
   
   return (
-    <header className='z-50 border-b-2 border-b-black'>
+    <header className='z-50'>
       <AuthBar content={ authBarContent } />
       <NavBar content={ navBarContent } />
     </header>

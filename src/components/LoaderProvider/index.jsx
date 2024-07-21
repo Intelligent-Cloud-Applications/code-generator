@@ -9,7 +9,7 @@ const LoaderProvider = (props) => {
     <div>
       {UtilCtx.loader && (
         <div
-          className={`fixed top-0 left-0 w-screen h-screen bg-[#0000006e] z-[20]`}
+          className={`fixed top-0 left-0 w-screen h-screen bg-[#0000006e] z-[100]`}
         >
           <div className={`flex items-center justify-center w-screen h-screen`}>
             <div className="loader-container">
