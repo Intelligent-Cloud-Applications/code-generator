@@ -20,6 +20,11 @@ import Schedule from '../pages/public/Schedule';
 import PrivacyPolicy from '../pages/public/PrivacyPolicy';
 import Terms from '../pages/public/Terms';
 import Refund from '../pages/public/Refund';
+import Attendance from "../pages/private/Attendance";
+import Subscriptions from '../pages/private/Subscriptions';
+import PaymentSuccessful from "../pages/private/PaymentSuccessful";
+import PaymentFailed from "../pages/private/PaymentFailed";
+import Rating from '../pages/private/Rating';
 
 
 //const Navigate = ({to}) => {
@@ -54,6 +59,11 @@ const RoutesContainer = () => {
       <Route path='*' element={ <Error /> } />
       <Route path='/meeting' element={ <Meeting /> } />
       <Route path='/query' element={ <Query /> } />
+      <Route path="/qr" element={<Attendance />} />
+      <Route path='/subscription' element={<Subscriptions />} />
+      <Route path='/paymentsuccessful' element={<PaymentSuccessful />} />
+      <Route path='/paymentfailed' element={<PaymentFailed />} />
+      <Route path='/rating' element={<Rating />} />
     </Routes>
   )
 }

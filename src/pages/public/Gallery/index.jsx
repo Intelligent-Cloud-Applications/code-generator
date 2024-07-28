@@ -128,7 +128,7 @@ const Gallery = () => {
         imgLink: selectedFile,
       };
 
-      await API.post("user", `/admin/upload-image/${institution}`, {
+      await API.post("main", `/admin/upload-image/${institution}`, {
         body: data,
       });
       setTitle("");
@@ -173,7 +173,7 @@ const Gallery = () => {
   const dataDelete = async (tempImgSrc) => {
     console.log(tempImgSrc);
     try {
-      await API.del("user", `/admin/delete-image/${institution}`, {
+      await API.del("main", `/admin/delete-image/${institution}`, {
         body: {
           imageUrl: tempImgSrc,
         },

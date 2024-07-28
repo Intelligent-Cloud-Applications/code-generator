@@ -166,27 +166,27 @@ const LeftBanner = ({ displayAfterClick }) => {
               Rating
             </p>
           </li>
-          {UserCtx.userData.userType === 'admin' && (
-            <>
-              <li
-                className={`flex flex-col gap-1 items-center text-[1.1rem] w-[86%] mt-2 p-2 font-bold text-white rounded-md cursor-pointer max1050:w-[auto]`}
+          {/*{UserCtx.userData.userType === 'admin' && (*/}
+          {/*  <>*/}
+          {/*    <li*/}
+          {/*      className={`flex flex-col gap-1 items-center text-[1.1rem] w-[86%] mt-2 p-2 font-bold text-white rounded-md cursor-pointer max1050:w-[auto]`}*/}
 
-                onClick={() => {
-                  const baseUrl = process.env.REACT_APP_STAGE === 'PROD'
-                    ? 'http://awsaiapp.com'
-                    : 'http://beta.awsaiapp.com';
+          {/*      onClick={() => {*/}
+          {/*        const baseUrl = process.env.REACT_APP_STAGE === 'PROD'*/}
+          {/*          ? 'http://awsaiapp.com'*/}
+          {/*          : 'http://beta.awsaiapp.com';*/}
 
-                  const url = `${baseUrl}/allpayment/${web.InstitutionId}/${UserCtx.userData.cognitoId}/${UserCtx.userData.emailId}`;
-                  window.open(url, '_blank', 'noopener,noreferrer');
-                }}
-              >
-                <img src={`https://institution-utils.s3.amazonaws.com/public/institution/Colorful_Web_Domain_Price_List_Instagram_Post-removebg-preview.png`} alt="" style={{ width: '5.9rem', minWidth: '3.4rem' }} className="max1050:mr-0 md:mb-[-30px] max1050:mb-0" />
-                <p className="max1050:text-[9.5px] max1050:font-[400] ">
-                  Pricing
-                </p>
-              </li>
-            </>
-          )}
+          {/*        const url = `${baseUrl}/allpayment/${web.InstitutionId}/${UserCtx.userData.cognitoId}/${UserCtx.userData.emailId}`;*/}
+          {/*        window.open(url, '_blank', 'noopener,noreferrer');*/}
+          {/*      }}*/}
+          {/*    >*/}
+          {/*      <img src={`https://institution-utils.s3.amazonaws.com/public/institution/Colorful_Web_Domain_Price_List_Instagram_Post-removebg-preview.png`} alt="" style={{ width: '5.9rem', minWidth: '3.4rem' }} className="max1050:mr-0 md:mb-[-30px] max1050:mb-0" />*/}
+          {/*      <p className="max1050:text-[9.5px] max1050:font-[400] ">*/}
+          {/*        Pricing*/}
+          {/*      </p>*/}
+          {/*    </li>*/}
+          {/*  </>*/}
+          {/*)}*/}
         </ul>
         <div className={`w-[80%] h-20 rounded-3xl flex flex-col justify-center items-center max1050:hidden bg-[#ffffff79]`}>
           <p className={`font-semibold text-center mb-0`}>

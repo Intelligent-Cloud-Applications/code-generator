@@ -45,7 +45,7 @@ export default function Query() {
 //        process.env.REACT_APP_EMAILJS_PUBLICKEY
 //      )
 
-      const apiName = "user";
+      const apiName = "main";
       const path = "/any/create-query";
       const myInit = {
         body: {

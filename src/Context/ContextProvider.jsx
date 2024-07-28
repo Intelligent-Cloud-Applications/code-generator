@@ -2,6 +2,7 @@ import { API } from 'aws-amplify'
 import React, { useState, useMemo, useEffect } from 'react'
 import Context from './Context';
 import web from '../utils/data.json';
+import apiPaths from '../utils/api-paths';
 
 const ContextProvider = (props) => {
   const [isAuth, setIsAuth] = useState(false)
@@ -17,7 +18,7 @@ const ContextProvider = (props) => {
 
   const onAuthLoad = async (auth, id) => {
     if (auth) {
-      API.get('main', `/any/products/${id}`)
+      API.get('main', apiPaths.getProducts, {})
         .then((list) => {
           let newList = []
           let tempProduct
@@ -36,7 +37,7 @@ const ContextProvider = (props) => {
           setUserList([])
         })
 
-      API.get('main', `/any/instructor-list/${id}`)
+      API.get('main', apiPaths.getInstructors, {})
         .then((data) => {
           setInstructorList(data)
         })
@@ -45,7 +46,7 @@ const ContextProvider = (props) => {
         })
 
       try {
-        const classes = await API.get('main', `/user/upcoming-schedule/${id}`)
+        const classes = await API.get('main',  apiPaths.getUpcomingSchedule, {})
         setUpcomingClasses(classes)
       } catch (e) {
         setUpcomingClasses([])
@@ -53,7 +54,7 @@ const ContextProvider = (props) => {
       }
 
       try {
-        const classes = await API.get('main', `/user/previous-schedule/${id}`)
+        const classes = await API.get('main', apiPaths.getPreviousScedule, {})
         setPreviousClasses(classes)
       } catch (e) {
         setPreviousClasses([])
@@ -61,7 +62,7 @@ const ContextProvider = (props) => {
       }
 
       try {
-        const list = await API.get('main', `/admin/profile-list/${id}`)
+        const list = await API.get('main', apiPaths.getMembers)
         setUserList(list)
       } catch (e) {
         console.log(e)
@@ -70,7 +71,7 @@ const ContextProvider = (props) => {
 
       try {
         // Add the API call for fetching streak data
-        const streakResponse = await API.get('main', `/user/streak-get/${id}`)
+        const streakResponse = await API.get('main', apiPaths.getStreak)
         setStreakData(streakResponse)
       } catch (e) {
         console.log(e)
@@ -78,7 +79,7 @@ const ContextProvider = (props) => {
       }
 
       try {
-        const response = await API.put('main', `/admin/rating-fetch/${id}`, {
+        const response = await API.put('main', apiPaths.getRating, {
           body: {}
         })
         console.log(response)
@@ -135,7 +136,7 @@ const ContextProvider = (props) => {
   }
 
   const onUnauthLoad = async (id) => {
-    API.get('main', `/any/products/${id}`)
+    API.get('main', apiPaths.getProducts)
       .then((list) => {
         setProductList(list)
       })
