@@ -57,7 +57,7 @@ const OtpForm = ({ signinResponse, setSigninResponse }) => {
         w-full`
       }
     >
-      <OtpInput name='otp' />
+      <OtpInput name='otp' className='w-full rounded'/>
       <PrimaryButton>Login</PrimaryButton>
       <p className='text-red-400'>{errorText}</p>
     </form>

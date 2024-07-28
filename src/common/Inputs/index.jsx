@@ -73,7 +73,7 @@ export const PrimaryButton = ({ children, ...props }) => {
     <button
       style={{
         backgroundColor: PrimaryColor,
-        width: '150px',
+        width: '100%',
         height: '40px',
         color: 'white',
         borderRadius: '10px'

@@ -23,7 +23,7 @@ const Login = () => {
           }
         >
           <h2 className='font-bold text-2xl'>Login</h2>
-          <p className='text-center w-48'>Hey, Enter your details to sign in to your account</p>
+          <p className='text-center w-full'>Hey, Enter your details to sign in to your account</p>
           { signinResponse ?
             <OtpForm signinResponse={signinResponse} setSigninResponse={setSigninResponse} /> :
             <LoginForm setSigninResponse={setSigninResponse} />

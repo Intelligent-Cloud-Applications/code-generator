@@ -1,44 +1,75 @@
 // Packages
-import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Contexts
-import Context from '../context/Context';
-import InstitutionContext from '../context/InstitutionContext';
+import Context from "../../../Context/Context";
+import InstitutionContext from "../../../Context/InstitutionContext";
 
 // Components
-import NavBar from '../components/NavBar';
-import Footer from '../components/Footer';
-
+import NavBar from "../../../components/Header";
+import Footer from "../../../components/Footer";
+import { PrimaryButton } from "../../../common/Inputs";
 
 // Code
 const AboutUs = () => {
-  const { AboutUs, LightPrimaryColor } = useContext(InstitutionContext)?.institutionData;
+  const institutionData = useContext(InstitutionContext)?.institutionData;
   const navigate = useNavigate();
   const { isAuth } = useContext(Context);
-  
-  
-  const paragraphs = AboutUs.map((item, index) =>
-    <div key={index}>
-      <h2 className='font-bold text-left text-xl max450:text-base'>{ item.title }</h2>
-      <p className='text-justify text-lg'>{ item.content }</p>
-    </div>
-  )
-  
+
+  const handleButtonClick = () => {
+    if (isAuth) {
+      // If user is already authenticated, redirect to dashboard
+      navigate("/dashboard");
+    } else {
+      // If user is not authenticated, redirect to signup
+      navigate("/SignUp");
+    }
+  };
+
   return (
     <div>
       <NavBar />
-      <div className='flex flex-column gap-8 px-48 py-16'>
-        <h1 className='text-center text-7xl'>About Us</h1>
-        {paragraphs}
-        <button
-          className='w-60 py-2 self-center rounded-lg text-white text-xl'
-          style={{ backgroundColor: LightPrimaryColor }}
-          onClick={ () => isAuth ? navigate('/dashboard') : navigate('/signup') }
-        >
-          {isAuth ? 'Dashboard' : 'Sign Up Now'}
-        </button>
+      <div className="flex flex-col items-center justify-center">
+        <div className="w-[82vw] mt-4">
+          <h1 className="nor sans-serif text-[4rem] text-centerr">
+            About Us
+          </h1>
+          {institutionData?.AboutUs.map((item, index) => (
+            <div key={index} className="w-full sm:ml-0 ml-5">
+              {index === 0 ? (
+                <h1 className="text-center text-[4rem] font-bebas-neue">
+                  {item.title}
+                </h1>
+              ) : (
+                <h4 className="text-[1.2rem] max450:text-[1rem] text-left mt-8 font-bold w-full">
+                  {item.title}
+                </h4>
+              )}
+              {item.content && (
+                <p className="text-justify mt-8 sm:ml-0 ml-5 mr-5">
+                  {item.content}
+                </p>
+              )}
+              {item.additionalContent1 && (
+                <p className="text-justify mt-2">{item.additionalContent1}</p>
+              )}
+              {item.additionalContent2 && (
+                <p className="text-justify mt-2">{item.additionalContent2}</p>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-center mt-5 w-[10rem] mb-4">
+          <PrimaryButton
+            classes="w-[15rem] h-[3rem]"
+            onClick={handleButtonClick}
+          >
+            {isAuth ? "Dashboard" : "Sign Up Now"}
+          </PrimaryButton>
+        </div>
       </div>
+
       <Footer />
     </div>
   );
