@@ -46,7 +46,7 @@ export default function Query() {
 //      )
 
       const apiName = "main";
-      const path = "/any/create-query";
+      const path = `/any/create-query/${InstitutionData.institutionId}`;
       const myInit = {
         body: {
           fullName: name,
