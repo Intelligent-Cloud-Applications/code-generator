@@ -29,8 +29,9 @@ const Header = () => {
       { label: 'Dashboard', path: '/dashboard' },
       { label: profileImage, path: '/dashboard' },
     ] : [
-      { label: 'Login', path: '/login' },
-      { label: 'Join Now', path: '/signup' },
+      // { label: 'Login', path: '/login' },
+      // { label: 'Join Now', path: '/signup' },
+      { label: 'Login/Signup', path: '/auth'},
     ]
   
   let navBarContent = [

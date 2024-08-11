@@ -3,15 +3,13 @@ import {Routes, Route, Navigate} from 'react-router-dom';
 
 // Local
 import Home from '../pages/public/Home';
-import Login from '../pages/auth/Login';
 import About from '../pages/public/AboutUs';
 import Instructor from '../pages/public/Instructors';
 import Error from '../pages/Error';
-import Logout from "../pages/auth/Logout";
+import Logout from "../pages/Auth/Logout";
 import DashBoard from "../pages/private/Dashboard";
 import {useContext, useEffect} from "react";
 import Context from "../Context/Context";
-import Signup from "../pages/auth/Signup";
 import { useNavigate } from 'react-router-dom';
 import Meeting from "../pages/private/Meeting";
 import Query from "../pages/public/Query";
@@ -25,6 +23,7 @@ import Subscriptions from '../pages/private/Subscriptions';
 import PaymentSuccessful from "../pages/private/PaymentSuccessful";
 import PaymentFailed from "../pages/private/PaymentFailed";
 import Rating from '../pages/private/Rating';
+import Auth from "../pages/Auth";
 
 
 //const Navigate = ({to}) => {
@@ -52,9 +51,9 @@ const RoutesContainer = () => {
       <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
       <Route path='/terms' element={<Terms/>}/>
       <Route path='/refund' element={<Refund/>}/>
-      <Route path='/login' element={ <Login /> } />
+      {/*<Route path='/login' element={ <Login /> } />*/}
       <Route path='/logout' element={ <Logout /> } />
-      <Route path='/signup' element={ <Signup /> } />
+      {/*<Route path='/signup' element={ <Signup /> } />*/}
       <Route path='/dashboard' element={ <DashBoard /> } />
       <Route path='*' element={ <Error /> } />
       <Route path='/meeting' element={ <Meeting /> } />
@@ -64,6 +63,7 @@ const RoutesContainer = () => {
       <Route path='/paymentsuccessful' element={<PaymentSuccessful />} />
       <Route path='/paymentfailed' element={<PaymentFailed />} />
       <Route path='/rating' element={<Rating />} />
+      <Route path='/auth' element={<Auth />} />
     </Routes>
   )
 }

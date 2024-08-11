@@ -21,29 +21,12 @@ export default function Query() {
   const [address, setAddress] = useState('')
   const [message, setMessage] = useState('')
 
-  console.log(
-    process.env.REACT_APP_EMAILJS_SERVICEID,
-    process.env.REACT_APP_EMAILJS_TEMPLATEID
-  )
   const onSubmit = async (e) => {
     e.preventDefault()
 
     UtilCtx.setLoader(true)
 
-//    const params = {
-//      name: name,
-//      user_email: email,
-//      address: address,
-//      message: message
-//    }
-
     try {
-//      await emailJs.send(
-//        process.env.REACT_APP_EMAILJS_SERVICEID,
-//        process.env.REACT_APP_EMAILJS_TEMPLATEID,
-//        params,
-//        process.env.REACT_APP_EMAILJS_PUBLICKEY
-//      )
 
       const apiName = "main";
       const path = `/any/create-query/${InstitutionData.institutionId}`;

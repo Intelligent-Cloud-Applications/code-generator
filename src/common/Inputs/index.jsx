@@ -1,16 +1,18 @@
 // Packages
 import React, {useContext, useState} from 'react';
+import { Select, TextInput } from "flowbite-react";
 
 // Local
 import countries from './countries.json';
 import institutionContext from "../../Context/InstitutionContext";
+import {LuHash, LuMail, LuPhone, LuText} from "react-icons/lu";
 //import {useSelector} from "react-redux";
 
 export const CountrySelect = (props) => {
   const { country, setCountry } = useState(91);
   
   return (
-    <select
+    <Select
       value={country}
       onChange={setCountry}
       {...props}
@@ -20,16 +22,17 @@ export const CountrySelect = (props) => {
           { item.name }
         </option>
       )}
-    </select>
+    </Select>
   )
 }
 
 
 export const PhoneInput = (props) => {
   return (
-    <input
+    <TextInput
       type='tel'
       placeholder='Phone Number'
+      icon={LuPhone}
       required
       pattern='[0-9]{9,10}'
       title='Phone Numbers are 9 or 10 digits'
@@ -41,9 +44,10 @@ export const PhoneInput = (props) => {
 
 export const EmailInput = (props) => {
   return (
-    <input
+    <TextInput
       type='email'
       placeholder='Email Address'
+      icon={LuMail}
       required
       {...props}
     />
@@ -53,12 +57,26 @@ export const EmailInput = (props) => {
 
 export const OtpInput = (props) => {
   return (
-    <input
+    <TextInput
       type='text'
       placeholder='OTP'
+      icon={LuHash}
       required
       pattern='[0-9]{6}'
       title='OTP is 6 digits'
+      {...props}
+    />
+  )
+}
+
+
+export const BaseTextInput = (props) => {
+  return (
+    <TextInput
+      type='text'
+      placeholder='Enter text here...'
+      icon={LuText}
+      required
       {...props}
     />
   )
@@ -85,6 +103,8 @@ export const PrimaryButton = ({ children, ...props }) => {
   )
 }
 
+
+// Components used in old components
 
 export const Button1 = ({ data, fn, w = 'auto', h = 'auto' }) => {
   return (
