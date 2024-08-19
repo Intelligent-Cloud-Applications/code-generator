@@ -6,6 +6,7 @@ import ProfileUpdate from './ProfileUpdate'
 import UpcomingSessions from './UpcomingSessions'
 import UsersList from './UsersList'
 import DashboardRating from './DashboardRating'
+import Billing from './Billing'
 import NavBar from '../../../components/Header'
 import Context from '../../../Context/Context'
 import { useNavigate } from 'react-router-dom'
@@ -49,6 +50,9 @@ const DashBoard = () => {
             <DashboardRating />
           </div>
         )
+
+      case 6:
+        return <Billing />
 
       default:
         return <div></div>

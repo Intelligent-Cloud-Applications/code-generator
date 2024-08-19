@@ -5,6 +5,12 @@ module.exports = {
   content: ["./src/**/*.{jsx,js,tsx,ts}",flowbite.content(),],
   theme: {
     extend: {
+      colors: {
+        "primary": "var(--color-primary)",
+        "secondary": "var(--color-secondary)",
+        "light-primary": "var(--color-light-primary)",
+        "lightest-primary": "var(--color-lightest-primary)",
+      },
       screens: {
         max950: { max: "950px" },
         max980: { max: "980px" },

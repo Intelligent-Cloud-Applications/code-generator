@@ -98,72 +98,90 @@ const LeftBanner = ({ displayAfterClick }) => {
       <div className={`w-[100%] h-[80%] rounded-r-[7rem] rounded-b-[0] max1050:mb-[2rem] flex flex-col items-center justify-between py-12 max1050:p-0 max1050:max-w-[20rem] max1050:rounded-[6rem] max536:w-[90vw]`} style={{ backgroundColor: window.innerWidth > 1050 ? '#d9d9d944' : 'black' }}>
         <ul className={`w-[90%] gap-2 text-center flex flex-col items-center max1050:flex-row max1050:justify-between max1050:px-2 max1050:w-[104%]`}>
           <li
-            className={`flex flex-col gap-1 py-[0.3rem] items-center text-[1.1rem] w-[98%] ${click === 0 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} p-2 font-bold text-white rounded-md cursor-pointer max1050:w-auto`}
-            style={{ backgroundColor: click === 0 ? InstitutionData.PrimaryColor : '' }}
-            onClick={() => {
-              setClick(0);
-              displayAfterClick(0);
-            }}
+              className={`flex flex-col gap-1 py-[0.3rem] items-center text-[1.1rem] w-[98%] ${click === 0 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} p-2 font-bold text-white rounded-md cursor-pointer max1050:w-auto`}
+              style={{backgroundColor: click === 0 ? InstitutionData.PrimaryColor : ''}}
+              onClick={() => {
+                setClick(0);
+                displayAfterClick(0);
+              }}
           >
-            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/images/LeftBanner/upcoming.png`} alt="" style={{ width: '1.9rem', minWidth: '1.9rem', filter: 'invert(1)' }} className={`max1050:mr-0`} />
+            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/images/LeftBanner/upcoming.png`}
+                 alt="" style={{width: '1.9rem', minWidth: '1.9rem', filter: 'invert(1)'}} className={`max1050:mr-0`}/>
             <p className={`max1050:text-[9.5px] max1050:font-[400] mb-0`}>
               Upcoming Classes
             </p>
           </li>
           <li
-            className={`flex flex-col gap-1 py-[0.3rem] items-center text-[1.1rem] w-[98%] p-2 font-bold text-white rounded-md ${click === 1 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} cursor-pointer max1050:w-auto`}
-            style={{ backgroundColor: click === 1 ? InstitutionData.PrimaryColor : '' }}
-            onClick={() => {
-              setClick(1);
-              displayAfterClick(1);
-            }}
+              className={`flex flex-col gap-1 py-[0.3rem] items-center text-[1.1rem] w-[98%] p-2 font-bold text-white rounded-md ${click === 1 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} cursor-pointer max1050:w-auto`}
+              style={{backgroundColor: click === 1 ? InstitutionData.PrimaryColor : ''}}
+              onClick={() => {
+                setClick(1);
+                displayAfterClick(1);
+              }}
           >
-            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/images/LeftBanner/previous.png`} alt="" style={{ width: '1.9rem', minWidth: '1.9rem', filter: 'invert(1)' }} className={`max1050:mr-0`} />
+            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/images/LeftBanner/previous.png`}
+                 alt="" style={{width: '1.9rem', minWidth: '1.9rem', filter: 'invert(1)'}} className={`max1050:mr-0`}/>
             <p className={`max1050:text-[9.5px] max1050:font-[400] mb-0`}>
               Previous Classes
             </p>
           </li>
           <li
-            className={`flex flex-col gap-1 items-center text-[1.1rem] w-[86%] p-2 font-bold text-white rounded-md ${click === 2 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} cursor-pointer max1050:w-auto`}
-            style={{ backgroundColor: click === 2 ? InstitutionData.PrimaryColor : '' }}
-            onClick={() => {
-              setClick(2);
-              displayAfterClick(2);
-            }}
+              className={`flex flex-col gap-1 items-center text-[1.1rem] w-[86%] p-2 font-bold text-white rounded-md ${click === 2 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} cursor-pointer max1050:w-auto`}
+              style={{backgroundColor: click === 2 ? InstitutionData.PrimaryColor : ''}}
+              onClick={() => {
+                setClick(2);
+                displayAfterClick(2);
+              }}
           >
-            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/images/LeftBanner/youtube.png`} alt="" style={{ width: '1.9rem', minWidth: '1.9rem', filter: 'invert(1)' }} className={`max1050:mr-0`} />
+            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/images/LeftBanner/youtube.png`}
+                 alt="" style={{width: '1.9rem', minWidth: '1.9rem', filter: 'invert(1)'}} className={`max1050:mr-0`}/>
             <p className={`max1050:text-[9.5px] max1050:font-[400] mb-0`}>
               Video
             </p>
           </li>
           {UserCtx.userData.userType === 'admin' && (
-            <>
-              <li
-                className={`flex flex-col gap-1 items-center text-[1.1rem] w-[86%] mt-2 p-2 font-bold text-white rounded-md ${click === 4 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} cursor-pointer max1050:w-[auto]`}
-                style={{ backgroundColor: click === 4 ? InstitutionData.PrimaryColor : '' }}
-                onClick={() => {
-                  setClick(4);
-                  displayAfterClick(4);
-                }}
-              >
-                <BsPeopleFill color="white" size={'1.9rem'} className={`mr-2 min-w-[1.9rem] max1050:mr-0`} />
-                <p className={`max1050:text-[9.5px] max1050:font-[400] mb-0`}>
-                  Members
-                </p>
-              </li>
-            </>
+              <>
+                <li
+                    className={`flex flex-col gap-1 items-center text-[1.1rem] w-[86%] mt-2 p-2 font-bold text-white rounded-md ${click === 4 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} cursor-pointer max1050:w-[auto]`}
+                    style={{backgroundColor: click === 4 ? InstitutionData.PrimaryColor : ''}}
+                    onClick={() => {
+                      setClick(4);
+                      displayAfterClick(4);
+                    }}
+                >
+                  <BsPeopleFill color="white" size={'1.9rem'} className={`mr-2 min-w-[1.9rem] max1050:mr-0`}/>
+                  <p className={`max1050:text-[9.5px] max1050:font-[400] mb-0`}>
+                    Members
+                  </p>
+                </li>
+              </>
           )}
           <li
-            className={`flex flex-col gap-1 items-center text-[1.1rem] w-[86%] mt-2 p-2 font-bold text-white rounded-md ${click === 5 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} cursor-pointer max1050:w-[auto]`}
-            style={{ backgroundColor: click === 5 ? InstitutionData.PrimaryColor : '' }}
-            onClick={() => {
-              setClick(5);
-              displayAfterClick(5);
-            }}
+              className={`flex flex-col gap-1 items-center text-[1.1rem] w-[86%] mt-2 p-2 font-bold text-white rounded-md ${click === 5 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} cursor-pointer max1050:w-[auto]`}
+              style={{backgroundColor: click === 5 ? InstitutionData.PrimaryColor : ''}}
+              onClick={() => {
+                setClick(5);
+                displayAfterClick(5);
+              }}
           >
-            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/Assests/rating.png`} alt="" style={{ width: '1.9rem', minWidth: '1.9rem' }} className="max1050:mr-0" />
+            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/Assests/rating.png`} alt=""
+                 style={{width: '1.9rem', minWidth: '1.9rem'}} className="max1050:mr-0"/>
             <p className="max1050:text-[9.5px] max1050:font-[400] mb-0">
               Rating
+            </p>
+          </li>
+          <li
+              className={`flex flex-col gap-1 items-center text-[1.1rem] w-[86%] mt-2 p-2 font-bold text-white rounded-md ${click === 5 && 'p-2 max1050:bg-[#181818] max1050:rounded-[20%]'} cursor-pointer max1050:w-[auto]`}
+              style={{backgroundColor: click === 6 ? InstitutionData.PrimaryColor : ''}}
+              onClick={() => {
+                setClick(6);
+                displayAfterClick(6);
+              }}
+          >
+            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/Assests/rating.png`} alt=""
+                 style={{width: '1.9rem', minWidth: '1.9rem'}} className="max1050:mr-0"/>
+            <p className="max1050:text-[9.5px] max1050:font-[400] mb-0">
+              Billing
             </p>
           </li>
           {/*{UserCtx.userData.userType === 'admin' && (*/}
@@ -188,11 +206,14 @@ const LeftBanner = ({ displayAfterClick }) => {
           {/*  </>*/}
           {/*)}*/}
         </ul>
-        <div className={`w-[80%] h-20 rounded-3xl flex flex-col justify-center items-center max1050:hidden bg-[#ffffff79]`}>
+        <div
+            className={`w-[80%] h-20 rounded-3xl flex flex-col justify-center items-center max1050:hidden bg-[#ffffff79]`}>
           <p className={`font-semibold text-center mb-0`}>
             Having some Trouble?
           </p>
-          <p className={`font-bold cursor-pointer`} onClick={() => { Navigate('/query'); }}>
+          <p className={`font-bold cursor-pointer`} onClick={() => {
+            Navigate('/query');
+          }}>
             contact us
           </p>
         </div>

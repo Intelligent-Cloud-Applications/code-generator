@@ -20,6 +20,11 @@ function App() {
         )
         data.InstitutionId = data.institutionid
 
+        document.documentElement.style.setProperty('--color-primary', data.PrimaryColor);
+        document.documentElement.style.setProperty('--color-secondary', data.SecondaryColor);
+        document.documentElement.style.setProperty('--color-light-primary', data.LightPrimaryColor);
+        document.documentElement.style.setProperty('--color-lightest-primary', data.LightestPrimaryColor);
+
         RefInstitutionCtx.current.setInstitutionData(data)
         RefCtx.current.onUnauthLoad(data.InstitutionId)
 

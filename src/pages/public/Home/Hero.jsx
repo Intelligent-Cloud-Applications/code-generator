@@ -1,13 +1,15 @@
 // Packages
 //import { useSelector } from "react-redux";
-
-
 import {useContext} from "react";
+
+// Context
 import institutionContext from "../../../Context/InstitutionContext";
 
+
+// Code
 const Hero = () => {
-  const { TagLine, videoUrl } = useContext(institutionContext).institutionData;
 //  const { TagLine, videoUrl } = useSelector((state) => console.log(state) || state.institutionData.data);
+  const { TagLine, videoUrl } = useContext(institutionContext).institutionData;
   const defaultSubText =
     'Online Live & In-person Bollywood Dance & Yoga Sessions at Affordable Price';
   
