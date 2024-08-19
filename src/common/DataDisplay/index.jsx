@@ -26,7 +26,7 @@ export const PaginatedTable = ({ head, data, itemsPerPage = 10, ...props }) => {
           {head.map((item, i) => (
             <TableHeadCell
               key={i}
-              className={`bg-lightest-primary border-lightest-primary text-left`}
+              // className={`bg-lightest-primary border-lightest-primary text-left`}
             >
               {item}
             </TableHeadCell>
@@ -39,7 +39,8 @@ export const PaginatedTable = ({ head, data, itemsPerPage = 10, ...props }) => {
               {array.map((item, index) => (
                 <TableCell
                   key={index}
-                  className={`bg-lightest-primary border-lightest-primary text-left text-black py-2`}
+                  className='bg-white'
+                  // className={`bg-lightest-primary border-lightest-primary text-left text-black py-2`}
                 >
                   {item}
                 </TableCell>

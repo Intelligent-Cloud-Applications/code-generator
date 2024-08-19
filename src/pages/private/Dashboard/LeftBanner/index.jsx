@@ -4,6 +4,7 @@ import Context from '../../../../Context/Context';
 import { useNavigate } from 'react-router-dom';
 import InstitutionContext from '../../../../Context/InstitutionContext';
 import web from '../../../../utils/data.json'
+import {FaMoneyBill} from "react-icons/fa6";
 const LeftBanner = ({ displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const [click, setClick] = useState(0);
@@ -178,8 +179,9 @@ const LeftBanner = ({ displayAfterClick }) => {
                 displayAfterClick(6);
               }}
           >
-            <img src={`https://institution-utils.s3.amazonaws.com/institution-common/Assests/rating.png`} alt=""
-                 style={{width: '1.9rem', minWidth: '1.9rem'}} className="max1050:mr-0"/>
+            {/*<img src={`https://institution-utils.s3.amazonaws.com/institution-common/Assests/rating.png`} alt=""*/}
+            {/*     style={{width: '1.9rem', minWidth: '1.9rem'}} className="max1050:mr-0"/>*/}
+              <FaMoneyBill size={40} />
             <p className="max1050:text-[9.5px] max1050:font-[400] mb-0">
               Billing
             </p>
