@@ -24,20 +24,15 @@ const Billing = () => {
           {}
         );
         const data = response.payments
-            .map((object, index) => [
-              (new Date(object.paymentDate)).toDateString(),
-              object.productType,
-              object.paymentMethod,
-              `${object.currency === 'USD' ? '$' : '₹'}${object.amount / 100}`
-            ]);
+          .map((object, index) => [
+            (new Date(object.paymentDate)).toDateString(),
+            response.profile.products[index].S,
+            // 'hello',
+            object.paymentMode,
+            `${object.currency === 'USD' ? '$' : '₹'}${object.amount / 100}`
+          ]);
         setOrderHistory(data);
-
-        for (let product of productList) {
-          if (product.productId === userData.productIds[0]) {
-            setAmount(`${product.currency === 'USD' ? '$' : '₹'}${product.amount / 100}`);
-            break;
-          }
-        }
+        setAmount(data.slice(-1)[0][3]);
       } catch (error) {
         console.error('Error fetching payment history:', error);
       } finally {
@@ -55,7 +50,7 @@ const Billing = () => {
       <div className='flex flex-row flex-wrap justify-center items-center'>
         <div style={{backgroundColor: PrimaryColor}} className='w-max-xl rounded-3xl p-4 mt-8 mx-4 text-white'>
           <h2>Your Subscription</h2>
-          <p className='text-xl font-bold'>{userData.products[0].S}</p>
+          <p className='text-xl font-bold'>{userData.products.slice(-1)[0].S}</p>
           <br/>
           <p>Renews on {(new Date(userData.renewDate)).toDateString()}</p>
         </div>
