@@ -8,9 +8,9 @@ import Context from "../../../../Context/Context";
 import { institution } from "../../../../utils/constants";
 
 const Billing = () => {
-  const {PrimaryColor} = useContext(institutionContext).institutionData;
+  // const {PrimaryColor} = useContext(institutionContext).institutionData;
   const {userData, productList, util} = useContext(Context);
-  const [renewDate, setRenewDate] = useState('');
+  // const [renewDate, setRenewDate] = useState('');
   const [amount, setAmount] = useState('$0');
   const [orderHistory, setOrderHistory] = useState([]);
 
