@@ -31,7 +31,7 @@ const Header = () => {
     ] : [
       // { label: 'Login', path: '/login' },
       // { label: 'Join Now', path: '/signup' },
-      { label: 'Login/Signup', path: '/auth'},
+      { label: 'Auth', path: '/auth'},
     ]
   
   let navBarContent = [

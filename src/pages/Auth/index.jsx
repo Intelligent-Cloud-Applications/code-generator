@@ -156,7 +156,7 @@ const AuthPage = () => {
             shadow-xl px-20 py-12 w-[480px] rounded-xl`
           }
         >
-          <h2 className='font-bold text-2xl'>Login/Signup</h2>
+          <h2 className='font-bold text-2xl'>Auth</h2>
           <p className='text-center w-64'>{
             formState === 'login' ? 'Please enter your Phone Number for verification.' :
             formState === 'signup' ? 'Please enter your data to create your account' :
