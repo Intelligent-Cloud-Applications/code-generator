@@ -23,6 +23,11 @@ export const dsProd = {
                 name: 'prod',
                 endpoint: 'https://7sh8wrjmm2.execute-api.us-east-1.amazonaws.com/dev',
                 region: 'us-east-1',
+            },
+            {
+                name: 'awsaiapp',
+                endpoint: 'https://er9zh7i7md.execute-api.us-east-1.amazonaws.com/dev',
+                region: 'us-east-1',
             }
         ]
     }
@@ -53,6 +58,11 @@ export const dsDev = {
                 name: 'prod',
                 endpoint: 'https://7sh8wrjmm2.execute-api.us-east-1.amazonaws.com/dev',
                 region: 'us-east-1',
+            },
+            {
+                name: 'awsaiapp',
+                endpoint: "https://i8k00gfjyf.execute-api.us-east-2.amazonaws.com/dev",
+                region: 'us-east-2',
             }
         ]
     }

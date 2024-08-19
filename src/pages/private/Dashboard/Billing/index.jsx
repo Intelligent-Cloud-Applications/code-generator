@@ -5,6 +5,7 @@ import {API} from "aws-amplify";
 import { PaginatedTable } from "../../../../common/DataDisplay";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import Context from "../../../../Context/Context";
+import { institution } from "../../../../utils/constants";
 
 const Billing = () => {
   const {PrimaryColor} = useContext(institutionContext).institutionData;
@@ -18,12 +19,11 @@ const Billing = () => {
       util.setLoader(true);
       try {
         const response = await API.get(
-          'main',
-          '/payment-history/happyprancer',
-          {institution: 'happyprancer'}
+          'awsaiapp',
+          `/getReciept/${institution}/${userData.cognitoId}`,
+          {}
         );
         const data = response.payments
-            .filter(object => object.emailId === userData.emailId)
             .map((object, index) => [
               (new Date(object.paymentDate)).toDateString(),
               object.productType,
