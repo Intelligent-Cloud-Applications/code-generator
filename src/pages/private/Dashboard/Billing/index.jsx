@@ -30,7 +30,8 @@ const Billing = () => {
             // 'hello',
             object.paymentMode,
             `${object.currency === 'USD' ? '$' : '₹'}${object.amount / 100}`
-          ]).flatMap(item => Array(6).fill(item));
+          ])
+          // .flatMap(item => Array(6).fill(item));
         setOrderHistory(data);
         setAmount(data.slice(-1)[0][3]);
       } catch (error) {
@@ -44,7 +45,7 @@ const Billing = () => {
   }, []);
 
   return (
-    <div className='mx-8 p-8 bg-gray-100'>
+    <div className='mx-8 p-8 bg-gray-100 font-family'>
       <h2 className='text-2xl font-bold'>Membership Details</h2>
       <div className='bg-white my-4 p-4'>
         <p className='bg-light-primary text-white font-bold w-fit -ml-6 my-2 py-2 px-4 rounded-r-full'>Member since {(new Date(userData.joiningDate).toDateString())}</p>
