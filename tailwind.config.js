@@ -2,14 +2,14 @@ const flowbite = require("flowbite-react/tailwind");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{jsx,js,tsx,ts}",flowbite.content(),],
+  content: ["./src/**/*.{jsx,js,tsx,ts}"],
   theme: {
     extend: {
       colors: {
-        "primary": "var(--color-primary)",
-        "secondary": "var(--color-secondary)",
-        "light-primary": "var(--color-light-primary)",
-        "lightest-primary": "var(--color-lightest-primary)",
+        primaryColor: '#1b7571',
+        lightPrimaryColor: '#225c59',
+        lighestPrimaryColor: '#c3f3f1',
+        inputBgColor: '#c2bfbf81'
       },
       screens: {
         max950: { max: "950px" },

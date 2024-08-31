@@ -203,7 +203,7 @@ const ContextProvider = (props) => {
       const response = await API.get('main', `/user/get-imageUrl/${web.InstitutionId}`);
       console.log(response);
       setImageUrls(response.GalleryImagesLinks || []);
-      if (tempImgSrc) {
+      if (imageUrl) {
         const filename = imageUrl.split('/').pop();
         console.log(filename)
         if (response.gallery && response.gallery[filename]) {
