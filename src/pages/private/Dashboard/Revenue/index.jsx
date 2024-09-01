@@ -20,6 +20,7 @@ function PaymentDetails() {
 
   const [selectedMonth, setSelectedMonth] = useState(months[currentMonth]);
 
+  console.log(userData)
   const years = useMemo(() => {
     return [currentYear, currentYear - 1, currentYear - 2];
   }, [currentYear]);
@@ -27,7 +28,8 @@ function PaymentDetails() {
   useEffect(() => {
     const fetchCashoutAmount = async () => {
       try {
-        const response = await API.get('user', `/cashCollected/${userData.institution}`);
+        const response = await API.get('main', `/cashCollected/${userData.institution}`);
+        console.log(response)
         setCashoutAmount(response.cashout);
       } catch (error) {
         console.error('Error fetching cashout amount:', error);
