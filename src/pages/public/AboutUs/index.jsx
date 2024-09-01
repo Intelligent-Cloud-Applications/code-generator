@@ -1,17 +1,10 @@
-// Packages
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
-
-// Contexts
-import Context from "../../../Context/Context";
-import InstitutionContext from "../../../Context/InstitutionContext";
-
-// Components
 import NavBar from "../../../components/Header";
 import Footer from "../../../components/Footer";
-import { PrimaryButton } from "../../../common/Inputs";
+import Context from "../../../Context/Context";
+import { useNavigate } from "react-router-dom";
+import InstitutionContext from "../../../Context/InstitutionContext";
 
-// Code
 const AboutUs = () => {
   const institutionData = useContext(InstitutionContext)?.institutionData;
   const navigate = useNavigate();
@@ -28,13 +21,18 @@ const AboutUs = () => {
   };
 
   return (
-    <div>
+    <>
       <NavBar />
-      <div className="flex flex-col items-center justify-center">
-        <div className="w-[82vw] mt-4">
-          <h1 className="nor sans-serif text-[4rem] text-centerr">
-            About Us
-          </h1>
+      <div className="flex flex-col items-center">
+        <div className="w-[82vw] mt-[2rem]">
+          <div className="flex justify-center items-center">
+            <h1
+              className="text-[3rem] max600:text-[2rem] font-bold text-center text-white rounded-lg px-4 py-2 galindo-regular"
+              style={{ backgroundColor: institutionData.PrimaryColor }}
+            >
+              About Us
+            </h1>
+          </div>
           {institutionData?.AboutUs.map((item, index) => (
             <div key={index} className="w-full sm:ml-0 ml-5">
               {index === 0 ? (
@@ -60,18 +58,20 @@ const AboutUs = () => {
             </div>
           ))}
         </div>
-        <div className="flex justify-center mt-5 w-[10rem] mb-4">
-          <PrimaryButton
-            classes="w-[15rem] h-[3rem]"
+        <div className="flex justify-center mt-5">
+          <button
+            className="w-[15rem] text-white px-12 py-2 rounded-[8px] mb-4 h-[3rem] text-[1.2rem] tracking-[0.8px]"
+            style={{
+              backgroundColor: institutionData?.LightPrimaryColor,
+            }}
             onClick={handleButtonClick}
           >
             {isAuth ? "Dashboard" : "Sign Up Now"}
-          </PrimaryButton>
+          </button>
         </div>
+        <Footer />
       </div>
-
-      <Footer />
-    </div>
+    </>
   );
 };
 

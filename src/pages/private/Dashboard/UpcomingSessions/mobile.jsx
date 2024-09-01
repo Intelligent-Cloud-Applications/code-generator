@@ -423,7 +423,7 @@ const UpcomingSessionsMobile = () => {
   }, [UserCtx]);
 
   return (
-    <div className={`w-full px-2 pb-4 mt-[-3rem]`}>
+    <div className={`w-full px-2 pb-4`}>
       {(Ctx.userData.userType === 'admin' ||
         Ctx.userData.userType === 'instructor') && (
           <div className={`container`}>
@@ -528,11 +528,11 @@ const UpcomingSessionsMobile = () => {
 
         <div className="flex justify-between relative">
           <h2
-            className={`text-[1.4rem] mb-5 font-bold text-black-700 ml-14 text-center`}
+            className={`text-[1.4rem] mb-5 font-bold text-black-700 w-full text-center`}
           >
             Upcoming Sessions
           </h2>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(27, 117, 113)" className={`w-10 h-[2rem] ${!openedOnce ? '' : 'shake'} cursor-pointer`} onClick={handleSvgClick}>
+          {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(27, 117, 113)" className={`w-10 h-[2rem] ${!openedOnce ? '' : 'shake'} cursor-pointer`} onClick={handleSvgClick}>
             <path d="M5.85 3.5a.75.75 0 0 0-1.117-1 9.719 9.719 0 0 0-2.348 4.876.75.75 0 0 0 1.479.248A8.219 8.219 0 0 1 5.85 3.5ZM19.267 2.5a.75.75 0 1 0-1.118 1 8.22 8.22 0 0 1 1.987 4.124.75.75 0 0 0 1.48-.248A9.72 9.72 0 0 0 19.266 2.5Z" />
             <path fillRule="evenodd" d="M12 2.25A6.75 6.75 0 0 0 5.25 9v.75a8.217 8.217 0 0 1-2.119 5.52.75.75 0 0 0 .298 1.206c1.544.57 3.16.99 4.831 1.243a3.75 3.75 0 1 0 7.48 0 24.583 24.583 0 0 0 4.83-1.244.75.75 0 0 0 .298-1.205 8.217 8.217 0 0 1-2.118-5.52V9A6.75 6.75 0 0 0 12 2.25ZM9.75 18c0-.034 0-.067.002-.1a25.05 25.05 0 0 0 4.496 0l.002.1a2.25 2.25 0 1 1-4.5 0Z" clipRule="evenodd" />
           </svg>
@@ -540,8 +540,8 @@ const UpcomingSessionsMobile = () => {
             <p className="absolute w-[1rem] h-[1rem] text-center rounded-[100%] text-[12px] font-bold bg-[#f81818e0] top-[-9%] right-[0%]">
               1
             </p>
-          )}
-          {showForm && (
+          )} */}
+          {/* {showForm && (
             <div className="animate-slide-in absolute flex flex-col items-center w-[90vw] bg-white bg-opacity-50 p-4 rounded right-5 top-2 z-20" style={{ backdropFilter: 'blur(10px)', boxShadow: 'rgba(0, 0, 0, 0.1) 0px 0px 8px 6px' }}>
               <div className='flex items-center justify-center'>
                 <p className='mt-2 ml-10 text-[1.1rem] font-bold'>🕺 Don't Miss a Step! Get Reminders on WhatsApp!</p>
@@ -552,7 +552,7 @@ const UpcomingSessionsMobile = () => {
               <p className='mt-2 text-[1.2rem] text-[#125b43] font-bold'>OR</p>
               <button className='bg-[#2b7f7b] rounded-[4px] w-full p-2 text-white font-[600]' onClick={() => { window.open(whatsappLink, '_blank') }}>Click Here</button>
             </div>
-          )}
+          )} */}
         </div>
         {!attendanceList ? (
           <div>

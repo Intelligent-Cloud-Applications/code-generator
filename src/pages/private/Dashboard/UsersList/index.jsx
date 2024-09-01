@@ -1,272 +1,216 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import { useMediaQuery } from "../../../../utils/helpers";
-import UsersListMobile from './moblie'
-import { useContext } from 'react'
-import Context from '../../../../Context/Context'
-import './index.css'
-import {Pagination} from "flowbite-react";
-import 'bootstrap/dist/css/bootstrap.min.css'
+import UsersListMobile from "./moblie";
+import { useContext } from "react";
+import Context from "../../../../Context/Context";
+import "./index.css";
+import { Pagination } from "flowbite-react";
+import "bootstrap/dist/css/bootstrap.min.css";
 // import LeftBanner from "./LeftBanner";
-import { API } from 'aws-amplify'
-import { FaEye } from 'react-icons/fa6'
-import Modal from './UserProfile'
-import UserProfile from './UserProfile'
-import {Button2} from "../../../../common/Inputs";
-import InstitutionContext from '../../../../Context/InstitutionContext'
-import { toast } from 'react-toastify'
+import { API } from "aws-amplify";
+import { FaEye } from "react-icons/fa6";
+import Modal from "./UserProfile";
+import UserProfile from "./UserProfile";
+import { Button2 } from "../../../../common/Inputs";
+import InstitutionContext from "../../../../Context/InstitutionContext";
+import Country from "../../../../components_old/Country";
+import { toast } from "react-toastify";
+import { X } from "lucide-react";
 
 const UsersList = ({ userCheck, setUserCheck }) => {
-  const InstitutionData = useContext(InstitutionContext).institutionData
-  const Ctx = useContext(Context)
-  const [isUserAdd, setIsUserAdd] = useState(false)
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const InstitutionData = useContext(InstitutionContext).institutionData;
+  const Ctx = useContext(Context);
+  const [isUserAdd, setIsUserAdd] = useState(false);
+  const [showUserAdd, setShowUserAdd] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [countryCode, setCountryCode] = useState("+91");
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState("Active");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [balance, setBalance] = useState("");
+
   // eslint-disable-next-line
   // const [country, setCountry] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [status, setStatus] = useState('Active')
-  const [balance, setBalance] = useState('')
-  const UtilCtx = useContext(Context).util
+
+  const UtilCtx = useContext(Context).util;
   // eslint-disable-next-line
-  const [cognitoId, setCognitoId] = useState('')
-  const [userStatus, setUserStatus] = useState('all')
+  const [cognitoId, setCognitoId] = useState("");
+  // eslint-disable-next-line
+  const [name, setName] = useState("");
+  const [userStatus, setUserStatus] = useState("all");
   // eslint-disable-next-line
   // const [selectedUser, setSelectedUser] = useState(null);
 
   const filterUsersByStatus = (status) => {
-    if (status === 'all') {
-      return Ctx.userList
+    if (status === "all") {
+      return Ctx.userList;
     }
-    return Ctx.userList.filter((user) => user.status === status)
-  }
+    return Ctx.userList.filter((user) => user.status === status);
+  };
 
   const availableStatuses = [
-    'all',
-    ...Array.from(new Set(Ctx.userList.map((user) => user.status)))
-  ]
+    "all",
+    ...Array.from(new Set(Ctx.userList.map((user) => user.status))),
+  ];
 
-  const isMobileScreen = useMediaQuery('(max-width: 600px)')
+  const isMobileScreen = useMediaQuery("(max-width: 600px)");
 
-  const itemsPerPage = 10
-  const [currentPage, setCurrentPage] = useState(1)
-//  let totalPages = Math.ceil(Ctx.userList.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' })
-  const [searchQuery, setSearchQuery] = useState('') // Step 1: Add state for the search query
+  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  //  let totalPages = Math.ceil(Ctx.userList.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
+  const [searchQuery, setSearchQuery] = useState(""); // Step 1: Add state for the search query
 
   const formatDate = (epochDate) => {
-    const date = new Date(epochDate)
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const year = date.getFullYear()
-    return `${day}/${month}/${year}`
-  }
+    const date = new Date(epochDate);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
   const requestSort = (key) => {
-    let direction = 'ascending'
+    let direction = "ascending";
     if (
       sortConfig &&
       sortConfig.key === key &&
-      sortConfig.direction === 'ascending'
+      sortConfig.direction === "ascending"
     ) {
-      direction = 'descending'
+      direction = "descending";
     }
-    setSortConfig({ key, direction })
-  }
+    setSortConfig({ key, direction });
+  };
 
   // Step 2: Implement the search functionality
-  const filter2 = filterUsersByStatus(userStatus)
-  const searchedUserList = filter2
-    .filter((user) => {
-      return (
-        user?.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user?.emailId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user?.phoneNumber?.includes(searchQuery)
-      )
-    })
-  const filteredUserList = searchedUserList.slice(startIndex, endIndex)
+  const filter2 = filterUsersByStatus(userStatus);
+  const searchedUserList = filter2.filter((user) => {
+    return (
+      user?.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user?.emailId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user?.phoneNumber?.includes(searchQuery)
+    );
+  });
+  const filteredUserList = searchedUserList.slice(startIndex, endIndex);
 
-  // const selectedUser = null;
-  // eslint-disable-next-line
-//  const onUpdateUser = async (e) => {
-//    e.preventDefault()
-//
-//    if (
-//      !(
-//        name &&
-//        email &&
-//        phoneNumber &&
-//        status &&
-//        balance &&
-//        cognitoId &&
-//        country
-//      )
-//    ) {
-//      toast.warn('Fill all Fields')
-//      return
-//    }
-//    if (!name) {
-//      toast.warn('Fill Name')
-//      return
-//    } else if (!email) {
-//      toast.warn('Fill email')
-//      return
-//    } else if (!phoneNumber) {
-//      toast.warn('Fill Phone Number')
-//      return
-//    } else if (!status) {
-//      toast.warn('Fill Status')
-//      return
-//    } else if (!balance) {
-//      toast.warn('Fill Balance')
-//      return
-//    } else if (!phoneNumber.startsWith('+') || phoneNumber.length < 10 || isNaN(phoneNumber)) {
-//      toast.warn('Please enter valid Phone Number')
-//      return
-//    } else if (isNaN(balance)) {
-//      toast.warn('Please enter valid balance')
-//      return
-//    } else if (!email.includes('@')) {
-//      toast.warn('Please enter valid email')
-//      return
-//    }
-//
-//    UtilCtx.setLoader(true)
-//
-//    try {
-//      await API.put(
-//        'main',
-//        `/admin/create-user`,
-//        {
-//          body: {
-//            cognitoId: cognitoId,
-//            emailId: email,
-//            userName: name,
-//            phoneNumber: phoneNumber,
-//            status: status,
-//            balance: balance
-//          }
-//        }
-//      )
-//
-//      alert('User Updated')
-//
-//      setName('')
-//      setEmail('')
-//      setPhoneNumber('')
-//      setStatus('')
-//      setBalance('')
-//
-//      Ctx.onreload()
-//
-//      UtilCtx.setLoader(false)
-//    } catch (e) {
-//      console.log(e)
-//      UtilCtx.setLoader(false)
-//    }
-//  }
   const updateUserInList = (updatedUser) => {
     // Update the user data in the userList
     const updatedList = Ctx.userList.map((user) => {
       if (user.cognitoId === updatedUser.cognitoId) {
-        return updatedUser
+        return updatedUser;
       }
-      return user
-    })
-    Ctx.setUserList(updatedList)
-  }
+      return user;
+    });
+    Ctx.setUserList(updatedList);
+  };
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
-    setIsModalOpen(true)
-  }
+    setIsModalOpen(true);
+  };
 
   const closeModal = () => {
-    setIsModalOpen(false)
+    setIsModalOpen(false);
+  };
+
+  const [modalUserData, setModalUserData] = useState();
+  // Other state variables for user data like cognitoId, name, email, etc.
+
+  function generateUniqueEmail(name) {
+    const timestamp = Math.floor(Math.random() * 90000) + 10000; // Generate a 5-digit timestamp
+    return `${name}${timestamp}@gmail.com`;
   }
 
-  const [modalUserData, setModalUserData] = useState()
-  // Other state variables for user data like cognitoId, name, email, etc.
+  const conversion = (localTime) => {
+    return new Date(localTime).getTime();
+  };
 
   const onCreateUser = async (e) => {
     e.preventDefault();
-  
-    if (!(name && email && phoneNumber && status && balance)) {
-      toast.warn('Fill all Fields');
+    setShowUserAdd(false);
+    let generatedEmail;
+    let fullName = firstName + " " + lastName;
+    let fullPhoneNumber = countryCode + phoneNumber;
+    if (!(fullName && fullPhoneNumber && status && balance)) {
+      toast.warn("Fill all Fields");
       return;
     }
-    if (!name) {
-      toast.warn('Fill Name');
+    if (!firstName) {
+      toast.warn("Fill first name");
+      return;
+    } else if (!lastName) {
+      toast.warn("Fill last name");
       return;
     } else if (!email) {
-      toast.warn('Fill email');
-      return;
+      generatedEmail = generateUniqueEmail(firstName);
     } else if (!phoneNumber) {
-      toast.warn('Fill Phone Number');
+      toast.warn("Fill Phone Number");
       return;
     } else if (!status) {
-      toast.warn('Fill Status');
+      toast.warn("Fill Status");
       return;
     } else if (!balance) {
-      toast.warn('Fill Balance');
+      toast.warn("Fill Balance");
       return;
-    } else if (!phoneNumber.startsWith('+') || phoneNumber.length < 10 || isNaN(phoneNumber)) {
-      toast.warn('Please enter valid Phone Number');
+    } else if (
+      phoneNumber.length > 15 ||
+      phoneNumber.length < 10 ||
+      isNaN(phoneNumber)
+    ) {
+      toast.warn("Please enter valid Phone Number");
       return;
     } else if (isNaN(balance)) {
-      toast.warn('Please enter valid balance');
-      return;
-    } else if (!email.includes('@')) {
-      toast.warn('Please enter valid email');
+      toast.warn("Please enter valid balance");
       return;
     }
-  
     UtilCtx.setLoader(true);
-  
+    console.log(email);
+    
+
     try {
-      const response = await API.post(
-        'main',
-        `/admin/create-user`,
-        {
-          body: {
-            institution: InstitutionData.InstitutionId,
-            emailId: email,
-            userName: name,
-            name: name,
-            phoneNumber: phoneNumber,
-            status: status,
-            balance: balance,
-            userType: 'member'
-          }
-        }
-      );
-      
-      console.log('User created successfully:', response);
-      Ctx.setUserList([
-        ...Ctx.userList,
-        {
-          emailId: email,
-          userName: name,
-          phoneNumber: phoneNumber,
+      const response = await API.post("main", `/admin/create-user`, {
+        body: {
+          institution: InstitutionData.InstitutionId,
+          emailId: email ? email : generatedEmail,
+          userName: fullName,
+          name: fullName,
+          phoneNumber: fullPhoneNumber,
           status: status,
-          balance: balance
-        }
+          balance: balance,
+          userType: "member",
+        },
+      });
+
+      console.log("User created successfully:", response);
+      Ctx.setUserList([
+        {
+          emailId: email ? email : generatedEmail,
+          userName: fullName,
+          phoneNumber: fullPhoneNumber,
+          status: status,
+          balance: balance,
+          joiningDate: conversion(new Date().toISOString()?.split("T")[0]),
+        },
+        ...Ctx.userList,
       ]);
-  
-      toast.success('User Added');
-  
-      setName('');
-      setEmail('');
-      setPhoneNumber('');
-      setStatus('');
-      setBalance('');
-  
+
+      toast.success("User Added");
+
+      setFirstName("");
+      setLastName("");
+      setCountryCode("+91");
+      setEmail("");
+      setStatus("Active");
+      setPhoneNumber("");
+      setBalance("");
+
       UtilCtx.setLoader(false);
     } catch (e) {
-      console.error('Error creating user:', e);
-      toast.error('Error creating user. Please try again later.');
+      console.error("Error creating user:", e);
+      toast.error("Error creating user. Please try again later.");
       UtilCtx.setLoader(false);
     }
   };
@@ -281,21 +225,22 @@ const UsersList = ({ userCheck, setUserCheck }) => {
         >
           <div className={`w-[100%] pt-6 max536:pt-0`}>
             <div className={`flex justify-between items-start ml-[9%] mb-0`}>
-              {!isUserAdd && (
-                <Button2
-                  data={'Add New User'}
-                  fn={() => {
-                    setUserCheck(1)
-                    setName('')
-                    setEmail('')
-                    setPhoneNumber('')
-                    setStatus('Active')
-                    setBalance('')
-                    setIsUserAdd(true)
-                  }}
-                  w={'12rem'}
-                />
-              )}
+              <Button2
+                data={"Add New User"}
+                fn={() => {
+                  setUserCheck(1);
+                  setFirstName("");
+                  setLastName("");
+                  setCountryCode("+91");
+                  setEmail("");
+                  setStatus("Active");
+                  setPhoneNumber("");
+                  setBalance("");
+                  setShowUserAdd(true);
+                }}
+                w={"12rem"}
+              />
+
               <div className={`flex gap-3 items-center mr-[8rem] mb-0`}>
                 <label className={`font-bold" htmlFor="userStatusFilter`}>
                   User Status:
@@ -303,7 +248,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 <select
                   className={`rounded-[0.51rem] px-4 `}
                   style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor
+                    backgroundColor: InstitutionData.LightestPrimaryColor,
                   }}
                   id="userStatusFilter"
                   value={userStatus}
@@ -311,13 +256,255 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 >
                   {availableStatuses.map((status) => (
                     <option key={status} value={status}>
-                      {status === 'all' ? 'All' : status}
+                      {status === "all" ? "All" : status}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
-            {isUserAdd && userCheck === 1 && (
+
+            <div className={showUserAdd ? "showInput open" : "showInput"}>
+              <div className="h-auto w-[40vw] bg-white px-5 py-4 rounded-md flex flex-col justify-center items-center gap-4 max800:w-[90vw] relative">
+                
+                <span
+                  className="absolute top-5 right-5 cursor-pointer"
+                  onClick={() => setShowUserAdd(false)}
+                >
+                  <X size={25} />
+                </span>
+
+                <div className="w-[80%] flex flex-col gap-3 mt-6">
+                  <div className="w-full flex justify-center items-center gap-2">
+                    <input
+                      type="text"
+                      required
+                      placeholder="First Name"
+                      className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
+                      value={firstName}
+                      onChange={(e) => {
+                        setFirstName(e.target.value);
+                      }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Last Name"
+                      required
+                      className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
+                      value={lastName}
+                      onChange={(e) => {
+                        setLastName(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <select
+                    value={countryCode}
+                    name="countryCode"
+                    required
+                    id=""
+                    className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-full border-gray-300`}
+                    onChange={(e) => {
+                      setCountryCode(e.target.value.toString());
+                    }}
+                  >
+                    {<Country />}
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Phone Number"
+                    required
+                    className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
+                    value={phoneNumber}
+                    onChange={(e) => {
+                      setPhoneNumber(e.target.value);
+                    }}
+                  />
+                  <div className="w-full flex justify-center items-center gap-2">
+                    <select
+                      required
+                      className={`w-full border-[1px] px-[1.5rem] py-2 rounded-2 border-gray-300`}
+                      value={status}
+                      onChange={(e) => {
+                        setStatus(e.target.value);
+                      }}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Balance"
+                      className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
+                      value={balance}
+                      onChange={(e) => {
+                        setBalance(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Email (Optional)"
+                    className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                  />
+                </div>
+
+                {/* <div className="w-[80%] flex flex-col gap-4">
+                  <ValidatorForm>
+                    <div className="flex flex-row gap-3">
+                      <div>
+                        <TextValidator
+                          label={<span>First Name</span>}
+                          className={`border-[2px]  rounded-2`}
+                          style={{
+                            height: '2.5rem'
+                          }}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          validators={['required']}
+                          errorMessages={[
+                            'This field is required',
+                            'First name cannot exceed 15 characters'
+                          ]}
+                          value={firstName}
+                          onChange={(e) => {
+                            const inputValue = e.target.value
+                            if (inputValue.length <= 15) {
+                              setFirstName(inputValue)
+                            }
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <TextValidator
+                          label={<span>Last Name</span>}
+                          className={`border-[2px] rounded-2`}
+                          style={{
+                            height: '2.5rem'
+                          }}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          validators={['required']}
+                          errorMessages={[
+                            'This field is required',
+                            'Last name cannot exceed 15 characters',
+                            'Only alphabets are allowed'
+                          ]}
+                          value={lastName}
+                          onChange={(e) => {
+                            const inputValue = e.target.value
+                            const regex = /^[A-Za-z]*$/ // Regex to allow only alphabets
+                            if (
+                              inputValue.length <= 15 &&
+                              regex.test(inputValue)
+                            ) {
+                              setLastName(inputValue)
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </ValidatorForm>
+                  <select
+                    value={countryCode}
+                    name="countryCode"
+                    id=""
+                    className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-full border-gray-300`}
+                    onChange={(e) => {
+                      setCountryCode(e.target.value.toString())
+                    }}
+                  >
+                    {<Country />}
+                  </select>
+                  <ValidatorForm>
+                    <TextValidator
+                      label={<span>Phone Number</span>}
+                      className={`w-full`}
+                      variant="outlined"
+                      size="small"
+                      type="text"
+                      validators={['required']}
+                      errorMessages={[
+                        'This field is required',
+                        'Please enter a valid phone number'
+                      ]}
+                      value={phoneNumber}
+                      onChange={(e) => {
+                        setPhoneNumber(e.target.value)
+                      }}
+                    />
+                  </ValidatorForm>
+                  <div className="flex flex-row gap-3 w-full justify-between">
+                    <select
+                      required
+                      className={`w-[50%] border-[1px] px-[1.5rem] py-2 rounded-2 border-gray-300`}
+                      value={status}
+                      onChange={(e) => {
+                        setStatus(e.target.value)
+                      }}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                    <ValidatorForm>
+                      <TextValidator
+                        label={<span>Balance</span>}
+                        className={`border-[2px]  rounded-2`}
+                        style={{
+                          height: '2.5rem'
+                        }}
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        validators={['required']}
+                        errorMessages={[
+                          'This field is required',
+                          'Balance cannot exceed 15 characters'
+                        ]}
+                        value={balance}
+                        onChange={(e) => {
+                          const inputValue = e.target.value
+                          if (inputValue.length <= 10) {
+                            setBalance(inputValue)
+                          }
+                        }}
+                      />
+                    </ValidatorForm>
+                  </div>
+                  <ValidatorForm>
+                    <TextValidator
+                      label={<span>Email (Optional)</span>}
+                      className={`w-full`}
+                      variant="outlined"
+                      size="small"
+                      type="email"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value)
+                      }}
+                    />
+                  </ValidatorForm>
+                </div> */}
+
+                <button
+                  className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center"
+                  style={{ backgroundColor: InstitutionData.PrimaryColor }}
+                  onClick={onCreateUser}
+                >
+                  {/* <FaUserPlus size={20} /> */}
+                  Create
+                </button>
+              </div>
+            </div>
+
+            {/* {showUserAdd && userCheck === 1 && (
+              
+
               <form
                 className={`flex flex-wrap gap-6 items-center justify-center max1250:w-[90%] max900:w-[auto] Sansita mt-4`}
               >
@@ -335,7 +522,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                   }}
                 />
                 <input
-                  required
                   placeholder="Email Address"
                   className={` sans-sarif px-4 py-1 rounded-lg w-[13rem]`}
                   style={{
@@ -401,12 +587,12 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                   <Button2 data={'Create'} fn={onCreateUser} w={'5rem'} />
                 </div>
               </form>
-            )}
+            )} */}
           </div>
           <div
             className={`w-[85%]  max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%]`}
             style={{
-              backgroundColor: InstitutionData.LightestPrimaryColor
+              backgroundColor: InstitutionData.LightestPrimaryColor,
             }}
           >
             <h2
@@ -419,7 +605,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
             <div
               className={`flex w-[94.5%]  rounded-md overflow-hidden gap-2`}
               style={{
-                backgroundColor: InstitutionData.LightestPrimaryColor
+                backgroundColor: InstitutionData.LightestPrimaryColor,
               }}
             >
               <input
@@ -427,12 +613,18 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 type="text"
                 placeholder="Search members by name, email or phone no."
                 value={searchQuery}
-                onChange={(e) =>{setCurrentPage(1); setSearchQuery(e.target.value)}}
+                onChange={(e) => {
+                  setCurrentPage(1);
+                  setSearchQuery(e.target.value);
+                }}
               />
               <Button2
-                data={'Clear'}
-                fn={() => {setCurrentPage(1); setSearchQuery('')}}
-                w={'5rem'}
+                data={"Clear"}
+                fn={() => {
+                  setCurrentPage(1);
+                  setSearchQuery("");
+                }}
+                w={"5rem"}
               />
             </div>
 
@@ -449,8 +641,8 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                     <div className={`w-[15%]`}>Name</div>
                     <div
                       className={`w-[13%] email-hover`}
-                      onClick={() => requestSort('email')}
-                      style={{ cursor: 'pointer' }}
+                      onClick={() => requestSort("email")}
+                      style={{ cursor: "pointer" }}
                     >
                       Email
                     </div>
@@ -508,11 +700,11 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                           </div>
                           <div
                             className={`w-[16%] font-[400] font-sans email-hover `}
-                            onClick={() => requestSort('email')}
-                            style={{ cursor: 'pointer' }}
+                            onClick={() => requestSort("email")}
+                            style={{ cursor: "pointer" }}
                             title={user.emailId}
                           >
-                            {user.emailId.split('@')[0]}@
+                            {user.emailId?.split("@")[0]}@
                           </div>
                           <div
                             className={`w-[18%] font-[400] font-sans ml-[3.2rem]`}
@@ -537,28 +729,31 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                           </div>
                           <div
                             className={`w-[7%] h-7 rounded px-2 text-center `}
-                            style={{ color: parseFloat(user.balance) < 0 ? 'red' : 'black' }}
+                            style={{
+                              color:
+                                parseFloat(user.balance) < 0 ? "red" : "black",
+                            }}
                           >
-                            {user.balance}{' '}
+                            {user.balance}{" "}
                           </div>
 
                           <button
                             className={`pl-[0.4rem]`}
                             onClick={() => {
                               console.log(
-                                'User data before opening modal:',
+                                "User data before opening modal:",
                                 user
-                              )
-                              setIsUserAdd(false)
-                              openModal()
-                              setCognitoId(user.cognitoId)
-                              setName(user.userName)
-                              setEmail(user.emailId)
-                              setPhoneNumber(user.phoneNumber)
+                              );
+                              setIsUserAdd(false);
+                              openModal();
+                              setCognitoId(user.cognitoId);
+                              setName(user.userName);
+                              setEmail(user.emailId);
+                              setPhoneNumber(user.phoneNumber);
                               // setCountry(user.country)
-                              setStatus(user.status)
-                              setBalance(user.balance)
-                              setModalUserData(user)
+                              setStatus(user.status);
+                              setBalance(user.balance);
+                              setModalUserData(user);
                             }}
                           >
                             <FaEye size={20} />
@@ -581,16 +776,18 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                           </Modal>
                         </div>
                       </li>
-                    )
+                    );
                   })}
                   <div
                     className={`absolute bottom-0 flex justify-center items-center w-full`}
                   >
                     <Pagination
-                      totalPages={Math.ceil(searchedUserList.length / itemsPerPage)}
+                      totalPages={Math.ceil(
+                        searchedUserList.length / itemsPerPage
+                      )}
                       currentPage={currentPage}
                       onPageChange={(value) => setCurrentPage(value)}
-                      style={{ margin: '0 auto' }}
+                      style={{ margin: "0 auto" }}
                     />
                   </div>
                 </div>
@@ -600,7 +797,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default UsersList
+export default UsersList;
