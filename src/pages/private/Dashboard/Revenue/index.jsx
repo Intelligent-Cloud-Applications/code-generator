@@ -1,28 +1,28 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Pagination, Table, Dropdown } from "flowbite-react";
-import Context from '../../../../Context/Context';
 import { API } from 'aws-amplify';
-
+import Context from '../../../../Context/Context';
+import InstitutionContext from '../../../../Context/InstitutionContext';
 function PaymentDetails() {
   const [currentPage, setCurrentPage] = useState(1);
   const [cashoutAmount, setCashoutAmount] = useState(0);
   const { userData, revenue } = useContext(Context);
+  const InstitutionData = useContext(InstitutionContext).institutionData;
   const date = new Date();
   const currentYear = date.getFullYear();
   const currentMonth = date.getMonth() + 1;
-  const months = ['All time', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  
+  const months = useMemo(() => [
+    'All time', 'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ], []);
+
   const [selectedMonth, setSelectedMonth] = useState(months[currentMonth]);
 
-  // Get unique years from revenue data
   const years = useMemo(() => {
-    const uniqueYears = new Set();
-    revenue?.forEach(payment => {
-      const year = new Date(payment.paymentDate).getFullYear();
-      uniqueYears.add(year);
-    });
-    return [...uniqueYears];
-  }, [revenue]);
+    return [currentYear, currentYear - 1, currentYear - 2];
+  }, [currentYear]);
 
   useEffect(() => {
     const fetchCashoutAmount = async () => {
@@ -53,8 +53,7 @@ function PaymentDetails() {
 
       return isYearMatch && isMonthMatch;
     });
-    // eslint-disable-next-line
-  }, [revenue, selectedYear, selectedMonth]);
+  }, [revenue, selectedYear, selectedMonth, months]);
 
   // Calculate total amounts based on filtered payments
   const totalOnlineAmount = useMemo(() => {
@@ -88,11 +87,21 @@ function PaymentDetails() {
 
   const currency = revenue?.length > 0 ? revenue[0].currency : 'USD';
 
+  // Determine the available months based on the selected year
+  const availableMonths = useMemo(() => {
+    if (selectedYear === currentYear) {
+      // If current year is selected, show months up to the current month
+      return months.slice(0, currentMonth + 1);
+    }
+    // If a previous year is selected, show all months
+    return months;
+  }, [selectedYear, currentYear, currentMonth, months]);
+
   return (
     <div className='p-4 Inter max850:p-1'>
       <div className='w-full h-screen'>
         {/* Year and Month Filter Section */}
-        <div className="w-full flex justify-center gap-2 flex-wrap mt-2">
+        <div className="w-full flex justify-center gap-2 flex-wrap">
           <div className='border flex items-center justify-center w-[8rem] py-1 rounded-md'>
             <Dropdown label={selectedYear} inline>
               <div className=" ml-[-1rem] flex flex-col items-left">
@@ -108,7 +117,7 @@ function PaymentDetails() {
           {selectedYear !== 'All time' && (
             <div className='border flex items-center justify-center w-[8rem] rounded-md'>
               <Dropdown label={selectedMonth} inline>
-                {months?.map((month, index) => (
+                {availableMonths?.map((month, index) => (
                   <Dropdown.Item key={index} onClick={() => setSelectedMonth(month)}>{month}</Dropdown.Item>
                 ))}
               </Dropdown>
@@ -117,23 +126,35 @@ function PaymentDetails() {
         </div>
 
         {/* Totals Section */}
-        <div className='flex w-full justify-center flex-wrap min850:px-5 max850:gap-4 p-3'>
+        <div className='flex w-full justify-center flex-wrap min850:px-5 max850:gap-4'>
           <div className="flex flex-col w-1/2 max850:w-full">
             <div className='w-full'>
-              <div className='w-fit p-1 px-2 text-start text-white bg-[#005B50]'>Online Collection</div>
+              <div className='w-fit p-1 px-2 text-start text-white'
+                style={{
+                  backgroundColor: InstitutionData.PrimaryColor
+                }}
+              >
+                Online Collection
+              </div>
             </div>
             <div className='p-4 border'>
               <div className='text-[2rem] font-[700]'>
                 {formatAmountWithCurrency(totalOnlineAmount, currency)}
               </div>
               <div className='text-[0.9rem] font-[500] text-[gray]'>
-                Last Cashout amount is <span className='text-green-600 text-bold'>₹{cashoutAmount.amount}</span> on date {cashoutAmount.paymentDate}
+                Last Cashout amount is <span className='text-green-600 text-bold'>₹{cashoutAmount?.amount}</span> on date {cashoutAmount?.paymentDate}
               </div>
             </div>
           </div>
           <div className="flex flex-col w-1/2 max850:w-full">
             <div className='w-full flex justify-end max800:justify-start'>
-              <div className='w-fit p-1 px-2 text-start text-white bg-[#005B50]'>Offline Collection</div>
+              <div className='w-fit p-1 px-2 text-start text-white'
+                style={{
+                  backgroundColor: InstitutionData.PrimaryColor
+                }}
+              >
+                Offline Collection
+              </div>
             </div>
             <div className='p-4 h-full border'>
               <div className='text-[2rem] font-[700]'>
@@ -144,7 +165,7 @@ function PaymentDetails() {
         </div>
 
         {/* Table Section */}
-        <div className='mt-6 bg-white max-w-full mx-auto rounded-b-md min800:px-4'>
+        <div className='mt-6 bg-white max-w-full mx-auto rounded-b-md'>
           <div className='overflow-x-auto border rounded-[1rem]'>
             <Table hoverable className='min-w-full'>
               <Table.Head>
@@ -172,28 +193,22 @@ function PaymentDetails() {
                     <Table.Cell className='whitespace-nowrap text-sm text-gray-500 text-center bg-white'>
                       {payment.userDetails?.products?.length > 0 ? (
                         payment.userDetails.products?.map((product, index) => (
-                          <span key={index}>
-                            {product.S}
-                            <br />
-                          </span>
+                          <p key={index}>{product.S}
+                          </p>
                         ))
-                      ) : (
-                        <span>No Products</span>
-                      )}
+                      ) : 'N/A'}
                     </Table.Cell>
-                    <Table.Cell className='whitespace-nowrap text-[0.79rem] font-medium text-gray-500 text-center bg-white uppercase'>
+                    <Table.Cell className='whitespace-nowrap text-sm text-gray-500 text-center bg-white'>
                       {payment.subscriptionType}
                     </Table.Cell>
                     <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
                       <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${payment.paymentMode === "offline" ? "bg-purple-100 text-purple-600" : "bg-green-100 text-green-600"
-                          } `}
-                      >
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${payment.paymentMode === "offline" ? "bg-purple-100 text-purple-600" : "bg-green-100 text-green-600"}`}>
                         {payment.paymentMode === "offline" ? "Offline" : "Razorpay"}
                       </span>
                     </Table.Cell>
                     <Table.Cell className='whitespace-nowrap text-sm text-gray-500 text-center bg-white'>
-                      {payment.paymentDate ? formatEpochToReadableDate(payment.paymentDate) : ''}
+                      {formatEpochToReadableDate(payment.paymentDate)}
                     </Table.Cell>
                     <Table.Cell className='whitespace-nowrap text-sm text-gray-500 text-center bg-white'>
                       {formatAmountWithCurrency(payment.amount, payment.currency)}
@@ -203,19 +218,19 @@ function PaymentDetails() {
               </Table.Body>
             </Table>
           </div>
+        </div>
 
-          {/* Pagination */}
-          <div className='py-2 flex justify-between items-center px-4'>
-            <div className='text-sm text-gray-600'>
+        {/* Pagination */}
+        <div className='py-2 flex justify-between items-center px-4'>
+          <div className='text-sm text-gray-600'>
             Showing {(currentPage - 1) * 7 + 1}-{Math.min(currentPage * (selectedPayments?.length || 0), filteredPayments?.length || 0)} of {filteredPayments?.length || 0}
-            </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={Math.ceil((filteredPayments?.length || 0) / 7)}
-              onPageChange={setCurrentPage}
-              className='flex justify-end'
-            />
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil((filteredPayments?.length || 0) / 7)}
+            onPageChange={setCurrentPage}
+            className='flex justify-end'
+          />
         </div>
       </div>
     </div>
