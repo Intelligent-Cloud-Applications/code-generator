@@ -168,11 +168,11 @@ const LeftBanner = ({ displayAfterClick }) => {
 
       {/* for Desktop view */}
       <div
-        className="text-[#E4E4E4] w-[17.5rem] relative max800:hidden"
+        className="text-[#E4E4E4] w-[18rem] relative max800:hidden"
         style={{ backgroundColor: InstitutionData.PrimaryColor }}
       >
         <nav>
-          <div className="h-auto flex items-center gap-3 px-4 py-3">
+          <div className="h-auto flex items-center gap-3 px-3 py-3">
             {UserCtx.userData.imgUrl ? (
               <img
                 className="h-12 w-12 rounded-full bg-white"
@@ -181,7 +181,7 @@ const LeftBanner = ({ displayAfterClick }) => {
               />
             ) : (
               <div
-                className={`rounded-full p-2 bg-gray-600 flex items-center justify-center text-[1rem] text-white`}
+                className={`rounded-full p-2 h-12 w-12 bg-gray-600 flex items-center justify-center text-[1rem] text-white`}
                 style={{ backgroundColor: getColor(UserCtx.userData.userName) }}
               >
                 {getInitials(UserCtx.userData.userName)}

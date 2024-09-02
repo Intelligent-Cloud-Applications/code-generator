@@ -102,7 +102,7 @@ const NavBar = ({ content }) => {
                     [
                       "font-semibold text-decoration-none",
                       isActive && "text-primaryColor",
-                      "hover:text-primary",
+                      "hover:text-primaryColor",
                     ].join(" ")
                   }
                 >
