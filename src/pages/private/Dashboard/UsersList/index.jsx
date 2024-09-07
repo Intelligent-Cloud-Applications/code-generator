@@ -21,7 +21,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const Ctx = useContext(Context);
   const [isUserAdd, setIsUserAdd] = useState(false);
   const [showUserAdd, setShowUserAdd] = useState(false);
-  const [firstName, setFirstName] = useState("");
+  const [userName, setuserName] = useState("");
   const [lastName, setLastName] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
   const [email, setEmail] = useState("");
@@ -123,11 +123,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   //   return `${name}${timestamp}@gmail.com`;
   // }
 
-  // const conversion = (localTime) => {
-  //   return new Date(localTime).getTime();
-  // };
-
-
   return (
     <>
       {isMobileScreen ? (
@@ -142,11 +137,11 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 data={"Add New User"}
                 fn={() => {
                   setUserCheck(1);
-                  setFirstName("");
+                  setuserName("");
                   setLastName("");
                   setCountryCode("+91");
                   setEmail("");
-                  setStatus("Active");
+                  setStatus("InActive");
                   setPhoneNumber("");
                   setBalance("");
                   setShowUserAdd(true);
@@ -176,24 +171,26 @@ const UsersList = ({ userCheck, setUserCheck }) => {
               </div>
             </div>
 
-            <div className={showUserAdd ? "show open" : " hidden"}>
-                <CreateUser
-                  phoneNumber={phoneNumber}
-                  balance={balance}
-                  status={status}
-                  email={email}
-                  countryCode={countryCode}
-                  firstName={firstName}
-                  lastName={lastName}
-                  setPhoneNumber={setPhoneNumber}
-                  setBalance={setBalance}
-                  setStatus={setStatus}
-                  setEmail={setEmail}
-                  setCountryCode={setCountryCode}
-                  setFirstName={setFirstName}
-                  setLastName={setLastName}
-                  setShowUserAdd={setShowUserAdd}
-                />
+            <div className={(showUserAdd || isModalOpen) ? "show open" : " hidden"}>
+              <CreateUser
+                phoneNumber={phoneNumber}
+                cognitoId={cognitoId}
+                balance={balance}
+                status={status}
+                email={email}
+                countryCode={countryCode}
+                userName={name}
+                lastName={lastName}
+                setPhoneNumber={setPhoneNumber}
+                setBalance={setBalance}
+                setStatus={setStatus}
+                setEmail={setEmail}
+                setCountryCode={setCountryCode}
+                setuserName={setuserName}
+                setLastName={setLastName}
+                setShowUserAdd={setShowUserAdd}
+                setIsModalOpen={setIsModalOpen}
+              />
             </div>
           </div>
           <div
@@ -365,22 +362,24 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                           >
                             <FaEye size={20} />
                           </button>
-                          <Modal
-                            isOpen={isModalOpen}
-                            userCheck={userCheck}
-                            setUserCheck={setUserCheck}
-                            user={modalUserData}
-                            onClose={closeModal}
-                          >
-                            <UserProfile
-                              isUserAdd={isUserAdd}
-                              userCheck={userCheck}
-                              isOpen={isModalOpen}
-                              onClose={closeModal}
-                              user={modalUserData}
-                              updateUserInList={updateUserInList} // Pass the function
+                          {/* <div className={isModalOpen ? "show open" : " hidden"}>
+                            <CreateUser
+                              phoneNumber={phoneNumber}
+                              balance={balance}
+                              status={status}
+                              email={email}
+                              countryCode={countryCode}
+                              userName={name}
+                              setPhoneNumber={setPhoneNumber}
+                              setBalance={setBalance}
+                              setStatus={setStatus}
+                              setEmail={setEmail}
+                              setCountryCode={setCountryCode}
+                              setuserName={setuserName}
+                              setShowUserAdd={setShowUserAdd}
+                              setIsModalOpen={setIsModalOpen}
                             />
-                          </Modal>
+                          </div> */}
                         </div>
                       </li>
                     );

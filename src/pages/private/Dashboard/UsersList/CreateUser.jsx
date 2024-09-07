@@ -3,25 +3,31 @@ import { X } from "lucide-react";
 import Country from "../../../../components_old/Country";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import Context from '../../../../Context/Context';
+import { toast } from 'react-toastify';
 import InputComponent from '../../../../common/InputComponent';
 import { API } from 'aws-amplify';
 
 function CreateUser({
-  phoneNumber, lastName, firstName, countryCode, email, balance, setShowUserAdd,
-  setPhoneNumber, setEmail, setCountryCode, setLastName, setFirstName, setBalance
+  phoneNumber, userName, email, status,cognitoId, setStatus, balance, setShowUserAdd,
+  setPhoneNumber, setIsModalOpen, setEmail, setCountryCode, setLastName, setuserName, setBalance
 }) {
   const [userType, setUserType] = useState('member')
   const [instructorPaymentType, setInstructorPaymentType] = useState('');
   const [instructorPaymentAmount, setInstructorPaymentAmount] = useState('');
-  const [status, setStatus] = useState("InActive");
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const Ctx = useContext(Context);
+  const UtilCtx = useContext(Context).util;
 
   // State for product type and amount
   const [productType, setProductType] = useState('Product Type');
   const [selectedProductAmount, setSelectedProductAmount] = useState('');
 
   const [productDetails, setProductDetails] = useState([]);
+
+  const conversion = (localTime) => {
+    return new Date(localTime).getTime();
+  };
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -46,65 +52,37 @@ function CreateUser({
 
   const onCreateUser = async (e) => {
     e.preventDefault();
-    setShowUserAdd(false);
-    let generatedEmail;
-    let fullName = firstName + " " + lastName;
-    let fullPhoneNumber = countryCode + phoneNumber;
-    if (!(fullName && fullPhoneNumber && status && balance)) {
-      toast.warn("Fill all Fields");
-      return;
-    }
-    if (!firstName) {
-      toast.warn("Fill first name");
-      return;
-    } else if (!lastName) {
-      toast.warn("Fill last name");
-      return;
-    } else if (!email) {
-      generatedEmail = generateUniqueEmail(firstName);
-    } else if (!phoneNumber) {
-      toast.warn("Fill Phone Number");
-      return;
-    } else if (!status) {
-      toast.warn("Fill Status");
-      return;
-    } else if (!balance) {
-      toast.warn("Fill Balance");
-      return;
-    } else if (
-      phoneNumber.length > 15 ||
-      phoneNumber.length < 10 ||
-      isNaN(phoneNumber)
-    ) {
-      toast.warn("Please enter valid Phone Number");
-      return;
-    } else if (isNaN(balance)) {
-      toast.warn("Please enter valid balance");
-      return;
-    }
     UtilCtx.setLoader(true);
-    console.log(email);
+    const data = {
+      institution: InstitutionData.InstitutionId,
+          cognitoId,
+          emailId: email,
+          userName: userName,
+          name: userName,
+          phoneNumber,
+          status,
+          productType,
+          amount: selectedProductAmount,
+          userType,
+          instructorPaymentType: userType === 'instructor' ? instructorPaymentType : '',
+          instructorPaymentAmount: userType === 'instructor' ? instructorPaymentAmount : ''
+    }
 
     try {
       const response = await API.post("main", `/admin/create-user`, {
-        body: {
-          institution: InstitutionData.InstitutionId,
-          emailId: email,
-          userName: fullName,
-          name: fullName,
-          phoneNumber: fullPhoneNumber,
-          status: status,
-          balance: balance,
-          userType: "member",
-        },
+        body: data
       });
-
+      if (userType === 'instructor') {
+        await API.put('main', '/admin/member-to-instructor', {
+          body: data
+        })
+      }
       console.log("User created successfully:", response);
       Ctx.setUserList([
         {
           emailId: email,
-          userName: fullName,
-          phoneNumber: fullPhoneNumber,
+          userName: userName,
+          phoneNumber,
           status: status,
           balance: balance,
           joiningDate: conversion(new Date().toISOString()?.split("T")[0]),
@@ -115,20 +93,22 @@ function CreateUser({
       toast.success("User Added");
 
       // Reset form fields
-      setFirstName("");
+      setuserName("");
       setLastName("");
       setCountryCode("+91");
       setEmail("");
-      setStatus("Active");
+      setStatus("InActive");
       setPhoneNumber("");
       setBalance("");
       setProductType('');
       setSelectedProductAmount('');
 
-      UtilCtx.setLoader(false);
     } catch (e) {
       console.error("Error creating user:", e);
       toast.error("Error creating user. Please try again later.");
+    } finally {
+      setShowUserAdd(false);
+      setIsModalOpen(false);
       UtilCtx.setLoader(false);
     }
   };
@@ -139,7 +119,10 @@ function CreateUser({
 
         <span
           className="absolute top-5 right-5 cursor-pointer"
-          onClick={() => setShowUserAdd(false)}
+          onClick={() => {
+            setShowUserAdd(false);
+            setIsModalOpen(false);
+          }}
         >
           <X size={25} />
         </span>
@@ -149,8 +132,8 @@ function CreateUser({
             <InputComponent
               width={100}
               label="Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={userName}
+              onChange={(e) => setuserName(e.target.value)}
             />
             <InputComponent
               width={100}
@@ -198,7 +181,7 @@ function CreateUser({
         </div>
 
         {/* Conditionally render product type and amount fields */}
-        {status === "Active" && (
+        {(status === "Active" && userType !== 'instructor') && (
           <div className='w-[80%]'>
             <div className="w-full flex justify-center items-center gap-2">
               <div className="w-full flex flex-col -mt-3 mb-3">
@@ -283,7 +266,7 @@ function CreateUser({
           style={{ backgroundColor: InstitutionData.PrimaryColor }}
           onClick={onCreateUser}
         >
-          Create
+          Create / Update
         </button>
       </div>
     </div>
