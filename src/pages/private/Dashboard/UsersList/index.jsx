@@ -6,15 +6,12 @@ import Context from "../../../../Context/Context";
 import "./index.css";
 import { Pagination } from "flowbite-react";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import LeftBanner from "./LeftBanner";
-import { API } from "aws-amplify";
 import { FaEye } from "react-icons/fa6";
-import Modal from "./UserProfile";
-import UserProfile from "./UserProfile";
 import { Button2 } from "../../../../common/Inputs";
 import InstitutionContext from "../../../../Context/InstitutionContext";
-import { toast } from "react-toastify";
 import CreateUser from "./CreateUser";
+import { toast } from 'react-toastify';
+import { API } from "aws-amplify";
 
 const UsersList = ({ userCheck, setUserCheck }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -94,34 +91,50 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   });
   const filteredUserList = searchedUserList.slice(startIndex, endIndex);
 
-  const updateUserInList = (updatedUser) => {
-    // Update the user data in the userList
-    const updatedList = Ctx.userList.map((user) => {
-      if (user.cognitoId === updatedUser.cognitoId) {
-        return updatedUser;
-      }
-      return user;
-    });
-    Ctx.setUserList(updatedList);
-  };
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
     setIsModalOpen(true);
   };
+  const ConfirmToast = ({ onConfirm, onCancel }) => (
+    <div className="font-bold">
+      <p>Are you sure you want to delete?</p>
+      <div>
+        <button onClick={onConfirm} className="bg-red-400 text-black font-[500] p-2 px-3 rounded w-[40%]">
+          Yes
+        </button>
+        <button onClick={onCancel} className="bg-green-400 text-black font-[500] p-2 px-3 rounded w-[40%] ml-2">No</button>
+      </div>
+    </div>
+  );
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const handleDelete = async (institution, cognitoId) => {
+    // console.log(institution)
+    const response = await API.put('main', '/admin/delete-user', {
+      body: {
+        institution: institution,
+        cognitoId
+      }
+    })
+    toast.success('Deleted successfully!', { autoClose: 3000 });
   };
 
-  const [modalUserData, setModalUserData] = useState();
-  // Other state variables for user data like cognitoId, name, email, etc.
+  const handleCancel = () => {
+    toast.dismiss();
+  };
 
-  // function generateUniqueEmail(name) {
-  //   const timestamp = Math.floor(Math.random() * 90000) + 10000; // Generate a 5-digit timestamp
-  //   return `${name}${timestamp}@gmail.com`;
-  // }
+  const handleDeleteUser = (institution, cognitoId) => {
+    // console.log(institution)
+    toast(
+      <ConfirmToast
+        onConfirm={() => {
+          handleDelete(institution, cognitoId);
+          toast.dismiss();
+        }}
+        onCancel={handleCancel}
+      />,
+    );
+  };
 
   return (
     <>
@@ -291,98 +304,77 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 </li>
                 <div className={`overflow-auto max536:w-[96%] w-full`}>
                   {filteredUserList.map((user, i) => {
-                    return (
-                      <li
-                        key={user.cognitoId}
-                        className={`w-full flex flex-col gap-[4px] items-center justify-center p-2 max536:bg-primaryColor  max536:pt-6 max536:rounded-2xl Sansita max536:text-[0.8rem]`}
-                      >
-                        <div className={`flex justify-between w-[100%]`}>
-                          <div
-                            className={`w-[18%] font-[400] mr-2 font-sans truncate`}
-                          >
-                            {user.userName}
-                          </div>
-                          <div
-                            className={`w-[16%] font-[400] font-sans email-hover `}
-                            onClick={() => requestSort("email")}
-                            style={{ cursor: "pointer" }}
-                            title={user.emailId}
-                          >
-                            {user.emailId?.split("@")[0]}@
-                          </div>
-                          <div
-                            className={`w-[18%] font-[400] font-sans ml-[3.2rem]`}
-                          >
-                            {user.phoneNumber}
-                          </div>
-                          {/* <div
-                            className={`w-[14%] ml-[4rem] font-[400] font-sans max536:hidden`}
-                          >
-                            {user.country}
-                          </div> */}
-                          <div className={`w-[12%] font-[400] font-sans `}>
-                            {formatDate(user.joiningDate)}
-                          </div>
-                          <div
-                            className={`w-[15%] font-[400] font-sans overflow-hidden text-center mr-2`}
-                          >
-                            {user.currentMonthZPoints
-                              ? user.currentMonthZPoints
-                              : 0}
-                            /{user.lastMonthZPoints ? user.lastMonthZPoints : 0}
-                          </div>
-                          <div
-                            className={`w-[7%] h-7 rounded px-2 text-center `}
-                            style={{
-                              color:
-                                parseFloat(user.balance) < 0 ? "red" : "black",
-                            }}
-                          >
-                            {user.balance}{" "}
-                          </div>
+                    if (!user.isArchived) {
+                      return (
+                        <li
+                          key={user.cognitoId}
+                          className={`w-full flex flex-col gap-[4px] items-center justify-center p-2 max536:bg-primaryColor max536:pt-6 max536:rounded-2xl Sansita max536:text-[0.8rem]`}
+                        >
+                          <div className={`flex justify-between w-[100%]`}>
+                            <div className={`w-[18%] font-[400] mr-2 font-sans truncate`}>
+                              {user.userName}
+                            </div>
+                            <div
+                              className={`w-[16%] font-[400] font-sans email-hover`}
+                              onClick={() => requestSort("email")}
+                              style={{ cursor: "pointer" }}
+                              title={user.emailId}
+                            >
+                              {user.emailId?.split("@")[0]}@
+                            </div>
+                            <div className={`w-[18%] font-[400] font-sans ml-[3.2rem]`}>
+                              {user.phoneNumber}
+                            </div>
+                            {/* <div className={`w-[14%] ml-[4rem] font-[400] font-sans max536:hidden`}>{user.country}</div> */}
+                            <div className={`w-[12%] font-[400] font-sans `}>
+                              {formatDate(user.joiningDate)}
+                            </div>
+                            <div className={`w-[15%] font-[400] font-sans overflow-hidden text-center mr-2`}>
+                              {user.currentMonthZPoints ? user.currentMonthZPoints : 0}/{user.lastMonthZPoints ? user.lastMonthZPoints : 0}
+                            </div>
+                            <div
+                              className={`w-[7%] h-7 rounded px-2 text-center`}
+                              style={{
+                                color: parseFloat(user.balance) < 0 ? "red" : "black",
+                              }}
+                            >
+                              {user.balance}
+                            </div>
 
-                          <button
-                            className={`pl-[0.4rem]`}
-                            onClick={() => {
-                              console.log(
-                                "User data before opening modal:",
-                                user
-                              );
-                              setIsUserAdd(false);
-                              openModal();
-                              setCognitoId(user.cognitoId);
-                              setName(user.userName);
-                              setEmail(user.emailId);
-                              setPhoneNumber(user.phoneNumber);
-                              // setCountry(user.country)
-                              setStatus(user.status);
-                              setBalance(user.balance);
-                              setModalUserData(user);
-                            }}
-                          >
-                            <FaEye size={20} />
-                          </button>
-                          {/* <div className={isModalOpen ? "show open" : " hidden"}>
-                            <CreateUser
-                              phoneNumber={phoneNumber}
-                              balance={balance}
-                              status={status}
-                              email={email}
-                              countryCode={countryCode}
-                              userName={name}
-                              setPhoneNumber={setPhoneNumber}
-                              setBalance={setBalance}
-                              setStatus={setStatus}
-                              setEmail={setEmail}
-                              setCountryCode={setCountryCode}
-                              setuserName={setuserName}
-                              setShowUserAdd={setShowUserAdd}
-                              setIsModalOpen={setIsModalOpen}
-                            />
-                          </div> */}
-                        </div>
-                      </li>
-                    );
+                            <button
+                              className={`pl-[0.4rem]`}
+                              onClick={() => {
+                                console.log("User data before opening modal:", user);
+                                setIsUserAdd(false);
+                                openModal();
+                                setCognitoId(user.cognitoId);
+                                setName(user.userName);
+                                setEmail(user.emailId);
+                                setPhoneNumber(user.phoneNumber);
+                                // setCountry(user.country)
+                                setStatus(user.status);
+                                setBalance(user.balance);
+                              }}
+                            >
+                              <FaEye size={20} />
+                            </button>
+                            <button
+                              className="absolute -right-6 mt-1"
+                              onClick={() => handleDeleteUser(user.institution, user.cognitoId)}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5">
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </li>
+                      );
+                    }
+                    return null; // Ensure a return in the else case
                   })}
                   <div
                     className={`absolute bottom-0 flex justify-center items-center w-full`}
