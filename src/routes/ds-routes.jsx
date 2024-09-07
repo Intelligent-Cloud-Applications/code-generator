@@ -25,6 +25,7 @@ import PaymentFailed from "../pages/private/PaymentFailed";
 import Rating from '../pages/private/Rating';
 import Auth from "../pages/Auth";
 import PutAttendance from "../pages/private/PutAttendance";
+import DevAuth from "../pages/Auth/dev";
 
 
 //const Navigate = ({to}) => {
@@ -64,7 +65,7 @@ const RoutesContainer = () => {
       <Route path='/paymentsuccessful' element={<PaymentSuccessful />} />
       <Route path='/paymentfailed' element={<PaymentFailed />} />
       <Route path='/rating' element={<Rating />} />
-      <Route path='/auth' element={<Auth />} />
+      <Route path='/auth' element={ process.env.REACT_APP_STAGE === 'PROD' ? <Auth /> : <DevAuth /> } />
       <Route path='/put-attendance/:classId' element={ <PutAttendance /> } />
     </Routes>
   )

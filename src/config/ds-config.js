@@ -37,10 +37,13 @@ export const dsDev = {
     Auth: {
         mandatorySignIn: true,
         region: 'us-east-2',
-        userPoolId: 'us-east-2_L3E5BSjIf',
-        identityPoolId: 'us-east-2:9b1fda39-3231-4606-b32f-7ba24edcb53d',
-        userPoolWebClientId: '5pqia04a65b3ef6fbmpoccj4vl',
-        oauth: { responseType: 'token' },
+        // userPoolId: 'us-east-2_L3E5BSjIf',
+        userPoolId: 'us-east-2_J02pfxenV',
+        // identityPoolId: 'us-east-2:9b1fda39-3231-4606-b32f-7ba24edcb53d',
+        identityPoolId: 'us-east-2:2966c931-c163-4682-89d6-9bf8c491e5b7',
+        // userPoolWebClientId: '5pqia04a65b3ef6fbmpoccj4vl',
+        userPoolWebClientId: '1oui8eijud46ajipjeg01h4i3m',
+        // oauth: { responseType: 'token' },
     },
     Storage: {
         region: 'us-east-1',
