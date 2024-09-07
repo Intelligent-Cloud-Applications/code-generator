@@ -218,7 +218,29 @@ const ContextProvider = (props) => {
   useEffect(() => {
     getImagesFromAPI()
 // eslint-disable-next-line 
-  },[])
+  }, [])
+  
+  const [revenue, setRevenue] = useState([]); // Initialize with an empty array
+
+  useEffect(() => {
+    const paymentDetailsAdmin = async () => {
+      try {
+        const response = await API.get('main', `/payment-history/${userData.institution}`);
+        const payments = response?.payments || [];
+        console.log(response);
+        setRevenue(Array.isArray(payments) ? payments : []); // Ensure revenue is an array
+      } catch (error) {
+        console.error('Error getting payment history from API: ', error);
+      }
+    };
+
+    // Only run the function if userData.institution is available
+    if (userData.institution) {
+      paymentDetailsAdmin();
+    }
+  }, [userData.institution]); // Dependency on userData.institution
+
+  console.log(revenue);
 
   const ContextData = {
     onAuthLoad: onAuthLoad,
@@ -254,7 +276,8 @@ const ContextProvider = (props) => {
     title: title,
     setTitle: setTitle,
     description: description,
-    setDescription:setDescription
+    setDescription: setDescription,
+    revenue
   }
 
   return (
