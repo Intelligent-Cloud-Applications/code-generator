@@ -13,9 +13,8 @@ import Modal from "./UserProfile";
 import UserProfile from "./UserProfile";
 import { Button2 } from "../../../../common/Inputs";
 import InstitutionContext from "../../../../Context/InstitutionContext";
-import Country from "../../../../components_old/Country";
 import { toast } from "react-toastify";
-import { X } from "lucide-react";
+import CreateUser from "./CreateUser";
 
 const UsersList = ({ userCheck, setUserCheck }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -26,7 +25,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [lastName, setLastName] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("Active");
+  const [status, setStatus] = useState("InActive");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [balance, setBalance] = useState("");
 
@@ -119,101 +118,15 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [modalUserData, setModalUserData] = useState();
   // Other state variables for user data like cognitoId, name, email, etc.
 
-  function generateUniqueEmail(name) {
-    const timestamp = Math.floor(Math.random() * 90000) + 10000; // Generate a 5-digit timestamp
-    return `${name}${timestamp}@gmail.com`;
-  }
+  // function generateUniqueEmail(name) {
+  //   const timestamp = Math.floor(Math.random() * 90000) + 10000; // Generate a 5-digit timestamp
+  //   return `${name}${timestamp}@gmail.com`;
+  // }
 
-  const conversion = (localTime) => {
-    return new Date(localTime).getTime();
-  };
+  // const conversion = (localTime) => {
+  //   return new Date(localTime).getTime();
+  // };
 
-  const onCreateUser = async (e) => {
-    e.preventDefault();
-    setShowUserAdd(false);
-    let generatedEmail;
-    let fullName = firstName + " " + lastName;
-    let fullPhoneNumber = countryCode + phoneNumber;
-    if (!(fullName && fullPhoneNumber && status && balance)) {
-      toast.warn("Fill all Fields");
-      return;
-    }
-    if (!firstName) {
-      toast.warn("Fill first name");
-      return;
-    } else if (!lastName) {
-      toast.warn("Fill last name");
-      return;
-    } else if (!email) {
-      generatedEmail = generateUniqueEmail(firstName);
-    } else if (!phoneNumber) {
-      toast.warn("Fill Phone Number");
-      return;
-    } else if (!status) {
-      toast.warn("Fill Status");
-      return;
-    } else if (!balance) {
-      toast.warn("Fill Balance");
-      return;
-    } else if (
-      phoneNumber.length > 15 ||
-      phoneNumber.length < 10 ||
-      isNaN(phoneNumber)
-    ) {
-      toast.warn("Please enter valid Phone Number");
-      return;
-    } else if (isNaN(balance)) {
-      toast.warn("Please enter valid balance");
-      return;
-    }
-    UtilCtx.setLoader(true);
-    console.log(email);
-    
-
-    try {
-      const response = await API.post("main", `/admin/create-user`, {
-        body: {
-          institution: InstitutionData.InstitutionId,
-          emailId: email ? email : generatedEmail,
-          userName: fullName,
-          name: fullName,
-          phoneNumber: fullPhoneNumber,
-          status: status,
-          balance: balance,
-          userType: "member",
-        },
-      });
-
-      console.log("User created successfully:", response);
-      Ctx.setUserList([
-        {
-          emailId: email ? email : generatedEmail,
-          userName: fullName,
-          phoneNumber: fullPhoneNumber,
-          status: status,
-          balance: balance,
-          joiningDate: conversion(new Date().toISOString()?.split("T")[0]),
-        },
-        ...Ctx.userList,
-      ]);
-
-      toast.success("User Added");
-
-      setFirstName("");
-      setLastName("");
-      setCountryCode("+91");
-      setEmail("");
-      setStatus("Active");
-      setPhoneNumber("");
-      setBalance("");
-
-      UtilCtx.setLoader(false);
-    } catch (e) {
-      console.error("Error creating user:", e);
-      toast.error("Error creating user. Please try again later.");
-      UtilCtx.setLoader(false);
-    }
-  };
 
   return (
     <>
@@ -263,331 +176,25 @@ const UsersList = ({ userCheck, setUserCheck }) => {
               </div>
             </div>
 
-            <div className={showUserAdd ? "showInput open" : "showInput"}>
-              <div className="h-auto w-[40vw] bg-white px-5 py-4 rounded-md flex flex-col justify-center items-center gap-4 max800:w-[90vw] relative">
-                
-                <span
-                  className="absolute top-5 right-5 cursor-pointer"
-                  onClick={() => setShowUserAdd(false)}
-                >
-                  <X size={25} />
-                </span>
-
-                <div className="w-[80%] flex flex-col gap-3 mt-6">
-                  <div className="w-full flex justify-center items-center gap-2">
-                    <input
-                      type="text"
-                      required
-                      placeholder="First Name"
-                      className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
-                      value={firstName}
-                      onChange={(e) => {
-                        setFirstName(e.target.value);
-                      }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Last Name"
-                      required
-                      className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
-                      value={lastName}
-                      onChange={(e) => {
-                        setLastName(e.target.value);
-                      }}
-                    />
-                  </div>
-                  <select
-                    value={countryCode}
-                    name="countryCode"
-                    required
-                    id=""
-                    className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-full border-gray-300`}
-                    onChange={(e) => {
-                      setCountryCode(e.target.value.toString());
-                    }}
-                  >
-                    {<Country />}
-                  </select>
-                  <input
-                    type="text"
-                    placeholder="Phone Number"
-                    required
-                    className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
-                    value={phoneNumber}
-                    onChange={(e) => {
-                      setPhoneNumber(e.target.value);
-                    }}
-                  />
-                  <div className="w-full flex justify-center items-center gap-2">
-                    <select
-                      required
-                      className={`w-full border-[1px] px-[1.5rem] py-2 rounded-2 border-gray-300`}
-                      value={status}
-                      onChange={(e) => {
-                        setStatus(e.target.value);
-                      }}
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Balance"
-                      className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
-                      value={balance}
-                      onChange={(e) => {
-                        setBalance(e.target.value);
-                      }}
-                    />
-                  </div>
-                  <input
-                    type="email"
-                    placeholder="Email (Optional)"
-                    className="border-[2px] px-4 py-2 rounded-2 w-full border-gray-300"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                    }}
-                  />
-                </div>
-
-                {/* <div className="w-[80%] flex flex-col gap-4">
-                  <ValidatorForm>
-                    <div className="flex flex-row gap-3">
-                      <div>
-                        <TextValidator
-                          label={<span>First Name</span>}
-                          className={`border-[2px]  rounded-2`}
-                          style={{
-                            height: '2.5rem'
-                          }}
-                          variant="outlined"
-                          size="small"
-                          type="text"
-                          validators={['required']}
-                          errorMessages={[
-                            'This field is required',
-                            'First name cannot exceed 15 characters'
-                          ]}
-                          value={firstName}
-                          onChange={(e) => {
-                            const inputValue = e.target.value
-                            if (inputValue.length <= 15) {
-                              setFirstName(inputValue)
-                            }
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <TextValidator
-                          label={<span>Last Name</span>}
-                          className={`border-[2px] rounded-2`}
-                          style={{
-                            height: '2.5rem'
-                          }}
-                          variant="outlined"
-                          size="small"
-                          type="text"
-                          validators={['required']}
-                          errorMessages={[
-                            'This field is required',
-                            'Last name cannot exceed 15 characters',
-                            'Only alphabets are allowed'
-                          ]}
-                          value={lastName}
-                          onChange={(e) => {
-                            const inputValue = e.target.value
-                            const regex = /^[A-Za-z]*$/ // Regex to allow only alphabets
-                            if (
-                              inputValue.length <= 15 &&
-                              regex.test(inputValue)
-                            ) {
-                              setLastName(inputValue)
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </ValidatorForm>
-                  <select
-                    value={countryCode}
-                    name="countryCode"
-                    id=""
-                    className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-full border-gray-300`}
-                    onChange={(e) => {
-                      setCountryCode(e.target.value.toString())
-                    }}
-                  >
-                    {<Country />}
-                  </select>
-                  <ValidatorForm>
-                    <TextValidator
-                      label={<span>Phone Number</span>}
-                      className={`w-full`}
-                      variant="outlined"
-                      size="small"
-                      type="text"
-                      validators={['required']}
-                      errorMessages={[
-                        'This field is required',
-                        'Please enter a valid phone number'
-                      ]}
-                      value={phoneNumber}
-                      onChange={(e) => {
-                        setPhoneNumber(e.target.value)
-                      }}
-                    />
-                  </ValidatorForm>
-                  <div className="flex flex-row gap-3 w-full justify-between">
-                    <select
-                      required
-                      className={`w-[50%] border-[1px] px-[1.5rem] py-2 rounded-2 border-gray-300`}
-                      value={status}
-                      onChange={(e) => {
-                        setStatus(e.target.value)
-                      }}
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                    <ValidatorForm>
-                      <TextValidator
-                        label={<span>Balance</span>}
-                        className={`border-[2px]  rounded-2`}
-                        style={{
-                          height: '2.5rem'
-                        }}
-                        variant="outlined"
-                        size="small"
-                        type="text"
-                        validators={['required']}
-                        errorMessages={[
-                          'This field is required',
-                          'Balance cannot exceed 15 characters'
-                        ]}
-                        value={balance}
-                        onChange={(e) => {
-                          const inputValue = e.target.value
-                          if (inputValue.length <= 10) {
-                            setBalance(inputValue)
-                          }
-                        }}
-                      />
-                    </ValidatorForm>
-                  </div>
-                  <ValidatorForm>
-                    <TextValidator
-                      label={<span>Email (Optional)</span>}
-                      className={`w-full`}
-                      variant="outlined"
-                      size="small"
-                      type="email"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value)
-                      }}
-                    />
-                  </ValidatorForm>
-                </div> */}
-
-                <button
-                  className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center"
-                  style={{ backgroundColor: InstitutionData.PrimaryColor }}
-                  onClick={onCreateUser}
-                >
-                  {/* <FaUserPlus size={20} /> */}
-                  Create
-                </button>
-              </div>
+            <div className={showUserAdd ? "show open" : " hidden"}>
+                <CreateUser
+                  phoneNumber={phoneNumber}
+                  balance={balance}
+                  status={status}
+                  email={email}
+                  countryCode={countryCode}
+                  firstName={firstName}
+                  lastName={lastName}
+                  setPhoneNumber={setPhoneNumber}
+                  setBalance={setBalance}
+                  setStatus={setStatus}
+                  setEmail={setEmail}
+                  setCountryCode={setCountryCode}
+                  setFirstName={setFirstName}
+                  setLastName={setLastName}
+                  setShowUserAdd={setShowUserAdd}
+                />
             </div>
-
-            {/* {showUserAdd && userCheck === 1 && (
-              
-
-              <form
-                className={`flex flex-wrap gap-6 items-center justify-center max1250:w-[90%] max900:w-[auto] Sansita mt-4`}
-              >
-                <input
-                  required
-                  placeholder="Name"
-                  className={` sans-sarif px-4 py-1 rounded-lg w-[13rem]`}
-                  style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor
-                  }}
-                  type={'text'}
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value)
-                  }}
-                />
-                <input
-                  placeholder="Email Address"
-                  className={` sans-sarif px-4 py-1 rounded-lg w-[13rem]`}
-                  style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor
-                  }}
-                  type={'email'}
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value)
-                  }}
-                />
-
-                <input
-                  required
-                  className={` sans-sarif px-4 py-1 rounded-lg w-[13rem`}
-                  style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor
-                  }}
-                  placeholder="Phone Number"
-                  type={'text'}
-                  value={phoneNumber}
-                  onChange={(e) => {
-                    setPhoneNumber(e.target.value)
-                  }}
-                />
-                <select
-                  className={` sans-sarif px-4 py-1 rounded-lg w-[13rem]`}
-                  style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor
-                  }}
-                  onChange={(e) => {
-                    setStatus(e.target.value)
-                  }}
-                  value={status}
-                >
-                  <option value={'Active'}>Active</option>
-                  <option value={'InActive'}>InActive</option>
-                </select>
-                <input
-                  required
-                  className={` sans-sarif px-4 py-1 rounded-lg w-[13rem]`}
-                  style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor
-                  }}
-                  placeholder="Balance"
-                  type={'text'}
-                  value={balance}
-                  onChange={(e) => {
-                    setBalance(e.target.value)
-                  }}
-                />
-                <div
-                  className={`flex  gap-3 w-full justify-center items-center`}
-                >
-                  <Button2
-                    data={'Cancel'}
-                    fn={() => {
-                      setIsUserAdd(false)
-                      setUserCheck(0)
-                    }}
-                    w={'5rem'}
-                  />
-                  <Button2 data={'Create'} fn={onCreateUser} w={'5rem'} />
-                </div>
-              </form>
-            )} */}
           </div>
           <div
             className={`w-[85%]  max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%]`}
