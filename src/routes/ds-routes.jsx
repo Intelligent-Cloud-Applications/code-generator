@@ -24,6 +24,7 @@ import PaymentSuccessful from "../pages/private/PaymentSuccessful";
 import PaymentFailed from "../pages/private/PaymentFailed";
 import Rating from '../pages/private/Rating';
 import Auth from "../pages/Auth";
+import PutAttendance from "../pages/private/PutAttendance";
 
 
 //const Navigate = ({to}) => {
@@ -64,6 +65,7 @@ const RoutesContainer = () => {
       <Route path='/paymentfailed' element={<PaymentFailed />} />
       <Route path='/rating' element={<Rating />} />
       <Route path='/auth' element={<Auth />} />
+      <Route path='/put-attendance/:classId' element={ <PutAttendance /> } />
     </Routes>
   )
 }
