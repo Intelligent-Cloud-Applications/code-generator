@@ -255,6 +255,7 @@ const Instructor = () => {
     setName("");
     setPosition("");
     setEmail("");
+    setImageURL("");
   }
 
   return (
