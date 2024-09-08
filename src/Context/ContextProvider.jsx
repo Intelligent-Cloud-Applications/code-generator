@@ -60,15 +60,7 @@ const ContextProvider = (props) => {
         setPreviousClasses([])
         console.log(e)
       }
-
-      try {
-        const list = await API.get('main', apiPaths.getMembers)
-        setUserList(list)
-      } catch (e) {
-        console.log(e)
-        setUserList([])
-      }
-
+      getUserList();
       try {
         // Add the API call for fetching streak data
         const streakResponse = await API.get('main', apiPaths.getStreak)
@@ -134,7 +126,15 @@ const ContextProvider = (props) => {
       // }
     }
   }
-
+  const getUserList = async() => {
+    try {
+      const list = await API.get('main', apiPaths.getMembers)
+      setUserList(list)
+    } catch (e) {
+      console.log(e)
+      setUserList([])
+    }
+  }
   const onUnauthLoad = async (id) => {
     API.get('main', apiPaths.getProducts)
       .then((list) => {
@@ -259,6 +259,7 @@ const ContextProvider = (props) => {
     setPreviousClasses: setPreviousClassesFn,
     userList: userList,
     setUserList: setUserListFn,
+    getUserList:getUserList,
     productList: productList,
     instructorList: instructorList,
     setInstructorList: () => {},

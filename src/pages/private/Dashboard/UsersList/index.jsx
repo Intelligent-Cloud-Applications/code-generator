@@ -19,6 +19,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const Ctx = useContext(Context);
   const [isUserAdd, setIsUserAdd] = useState(false);
   const [showUserAdd, setShowUserAdd] = useState(false);
+  const { getUserList } = useContext(Context)
   const [userName, setuserName] = useState("");
   const [lastName, setLastName] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
@@ -83,6 +84,8 @@ const UsersList = ({ userCheck, setUserCheck }) => {
 
   // Step 2: Implement the search functionality
   const filter2 = filterUsersByStatus(userStatus);
+
+  // Filter based on search query
   const searchedUserList = filter2.filter((user) => {
     return (
       user?.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -90,7 +93,13 @@ const UsersList = ({ userCheck, setUserCheck }) => {
       user?.phoneNumber?.includes(searchQuery)
     );
   });
-  const filteredUserList = searchedUserList.slice(startIndex, endIndex);
+  
+  // Further filter the searched list to exclude archived users
+  const activeUserList = searchedUserList.filter((user) => !user.isArchived);
+  
+  // Paginate the filtered list
+  const filteredUserList = activeUserList.slice(startIndex, endIndex);
+  
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -118,6 +127,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
       }
     })
     toast.success('Deleted successfully!', { autoClose: 3000 });
+    getUserList();
   };
 
   const handleCancel = () => {
