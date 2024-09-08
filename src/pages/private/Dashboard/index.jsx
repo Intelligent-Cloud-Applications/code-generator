@@ -79,7 +79,7 @@ const DashBoard = () => {
             }}
           />
           <div
-            className={`flex flex-col w-[100%] pt-3 pb-4 max536:pt-0 justify-start min-h-[90vh] max-h-[90vh] overflow-y-auto`}
+            className={`flex flex-col w-[100%] pb-4 max536:pt-0 justify-start min-h-[90vh] max-h-[90vh] overflow-y-auto`}
           >
             {Ctx.userData.status === "InActive" &&
             Ctx.userData.userType === "member" &&

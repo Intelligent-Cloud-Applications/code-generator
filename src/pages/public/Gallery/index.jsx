@@ -69,8 +69,6 @@ const Gallery = () => {
     const file = event.target.files[0]
     console.log('File selected:', file)
 
-    console.log(file)
-
     if (file.size > 30 * 1024 * 1024) {
       toast.error('Please upload an image/video of less than 30MB size.', {
         className: 'custom-toast'
@@ -141,7 +139,7 @@ const Gallery = () => {
         imgLink: selectedFile
       }
 
-      await API.post('user', `/admin/upload-image/${institution}`, {
+      await API.post('main', `/admin/upload-image/${institution}`, {
         body: data
       })
       setTitle('')
@@ -189,7 +187,7 @@ const Gallery = () => {
     console.log(tempImgSrc)
     setIsDeleteing(true)
     try {
-      await API.del('user', `/admin/delete-image/${institution}`, {
+      await API.del('main', `/admin/delete-image/${institution}`, {
         body: {
           imageUrl: tempImgSrc
         }
