@@ -6,6 +6,8 @@ import PreviousSessionsMobile from "./mobile";
 import { useMediaQuery } from "../../../../utils/helpers";
 import { Button2 } from "../../../../common/Inputs";
 import InstitutionContext from "../../../../Context/InstitutionContext";
+import { toast } from "react-toastify";
+
 // import { useNavigate } from "react-router-dom";
 
 const formatDate = (epochDate) => {
@@ -113,7 +115,7 @@ const PreviousSessions = () => {
             },
           }
         );
-        alert("Updated");
+        toast.success("Recording Link Updated Successfully");
 
         setClassId("");
 

@@ -171,7 +171,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
               </div>
             </div>
 
-            <div className={(showUserAdd || isModalOpen) ? "show open" : " hidden"}>
+            <div className={(showUserAdd || isModalOpen) ? "showBox open" : " hidden"}>
               <CreateUser
                 phoneNumber={phoneNumber}
                 cognitoId={cognitoId}
