@@ -11,6 +11,7 @@ import Header from "../../../components/Header";
 const devAuth = () => {
   const options = [
     { userType: 'admin', email: 'admin@tester.com' },
+    { userType: 'instructor', email: 'instructor@tester.com' },
     { userType: 'user', email: 'user@tester.com' },
   ]
 
