@@ -8,7 +8,7 @@ import InputComponent from '../../../../common/InputComponent';
 import { API } from 'aws-amplify';
 
 function CreateUser({
-  phoneNumber, userName, email, status,cognitoId, setStatus, balance, setShowUserAdd,
+  phoneNumber, userName, email, status, cognitoId, setStatus, balance, setShowUserAdd,
   setPhoneNumber, setIsModalOpen, setEmail, setCountryCode, setLastName, setuserName, setBalance
 }) {
   const [userType, setUserType] = useState('member')
@@ -16,6 +16,7 @@ function CreateUser({
   const [instructorPaymentAmount, setInstructorPaymentAmount] = useState('');
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const Ctx = useContext(Context);
+  const { getUserList } = useContext(Context)
   const UtilCtx = useContext(Context).util;
 
   // State for product type and amount
@@ -55,17 +56,17 @@ function CreateUser({
     UtilCtx.setLoader(true);
     const data = {
       institution: InstitutionData.InstitutionId,
-          cognitoId,
-          emailId: email,
-          userName: userName,
-          name: userName,
-          phoneNumber,
-          status,
-          productType,
-          amount: selectedProductAmount,
-          userType,
-          instructorPaymentType: userType === 'instructor' ? instructorPaymentType : '',
-          instructorPaymentAmount: userType === 'instructor' ? instructorPaymentAmount : ''
+      cognitoId,
+      emailId: email,
+      userName: userName,
+      name: userName,
+      phoneNumber,
+      status,
+      productType,
+      amount: selectedProductAmount,
+      userType,
+      instructorPaymentType: userType === 'instructor' ? instructorPaymentType : '',
+      instructorPaymentAmount: userType === 'instructor' ? instructorPaymentAmount : ''
     }
 
     try {
@@ -92,6 +93,7 @@ function CreateUser({
 
       toast.success("User Added");
 
+      getUserList();
       // Reset form fields
       setuserName("");
       setLastName("");
