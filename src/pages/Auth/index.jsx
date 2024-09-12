@@ -7,13 +7,14 @@ import institutionContext from "../../Context/InstitutionContext";
 import Context from "../../Context/Context";
 import {API, Auth} from "aws-amplify";
 import {toast} from "react-toastify";
-import {redirect, useNavigate} from "react-router-dom";
+import {redirect, useNavigate, useParams} from "react-router-dom";
 import countries from "../../common/Inputs/countries.json";
 
 const AuthPage = () => {
   const { InstitutionId } = useContext(institutionContext).institutionData;
   const { util, setUserData, setIsAuth, onAuthLoad } = useContext(Context);
   const { setLoader } = util;
+  const { "*": link } = useParams();
 
   const navigate = useNavigate();
 
@@ -100,7 +101,7 @@ const AuthPage = () => {
 
       toast.info('Logged in');
       onAuthLoad(true, InstitutionId);
-      navigate('/dashboard');
+      navigate(`/${link}`);
     } catch (error) {
       if (error === 'The user is not authenticated')
         toast.error('Incorrect OTP. Try again');

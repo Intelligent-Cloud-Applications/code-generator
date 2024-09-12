@@ -54,7 +54,8 @@ export const dsDev = {
         endpoints: [
             {
                 name: 'main',
-                endpoint: 'https://r5dp21mb28.execute-api.us-east-2.amazonaws.com/dev',
+                // endpoint: 'https://r5dp21mb28.execute-api.us-east-2.amazonaws.com/dev',
+                endpoint: ' https://ikticbkaxh.execute-api.us-east-2.amazonaws.com/dev',
                 region: 'us-east-2',
             },
             {

@@ -57,7 +57,6 @@ const RoutesContainer = () => {
       <Route path='/logout' element={ <Logout /> } />
       {/*<Route path='/signup' element={ <Signup /> } />*/}
       <Route path='/dashboard' element={ <DashBoard /> } />
-      <Route path='*' element={ <Error /> } />
       <Route path='/meeting' element={ <Meeting /> } />
       <Route path='/query' element={ <Query /> } />
       <Route path="/qr" element={<Attendance />} />
@@ -65,8 +64,9 @@ const RoutesContainer = () => {
       <Route path='/paymentsuccessful' element={<PaymentSuccessful />} />
       <Route path='/paymentfailed' element={<PaymentFailed />} />
       <Route path='/rating' element={<Rating />} />
-      <Route path='/auth' element={ process.env.REACT_APP_STAGE === 'PROD' ? <Auth /> : <DevAuth /> } />
+      <Route path='/auth/*' element={ process.env.REACT_APP_STAGE === 'PROD' ? <Auth /> : <DevAuth /> } />
       <Route path='/put-attendance/:classId' element={ <PutAttendance /> } />
+      <Route path='*' element={ <Error /> } />
     </Routes>
   )
 }
