@@ -17,32 +17,32 @@ const PutAttendance = () => {
 
   useEffect(() => {
     const putAttendance = async () => {
-      if (!emailId) return;
+      if (!userData) return;
       util.setLoader(true);
       let response;
       try {
         await Auth.currentAuthenticatedUser();
+        try {
+          response = await API.post('main', `/user/put-attendance/${InstitutionId}`, { body: { classId, emailId } });
+          setInstructorData(response);
+          toast.success("Attendance marked successfully");
+          if (response.message) toast.info(response.message);
+        } catch (error) {
+          toast.error(error.response.data.message || "An unknown error occurred");
+          util.setLoader(false);
+          navigate('/dashboard');
+        } finally {
+          util.setLoader(false);
+        }
       }
       catch {
         util.setLoader(false);
         navigate(`/auth/put-attendance/${classId}`);
       }
-      try {
-        response = await API.post('main', `/user/put-attendance/${InstitutionId}`, { body: { classId, emailId } });
-        setInstructorData(response);
-        toast.success("Attendance marked successfully");
-        if (response.message) toast.info(response.message);
-      } catch (error) {
-        toast.error(error.response.data.message || "An unknown error occurred");
-        util.setLoader(false);
-        navigate('/dashboard');
-      } finally {
-        util.setLoader(false);
-      }
     }
 
     putAttendance();
-  }, [emailId]);
+  }, [userData]);
 
   return <SubmitRating instructorData={instructorData} />
 }
