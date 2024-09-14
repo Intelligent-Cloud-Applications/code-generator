@@ -1,60 +1,59 @@
-import { API, Auth, Storage } from 'aws-amplify'
-import React, { useRef, useState } from 'react'
-import { useContext } from 'react'
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'
-import { FaArrowLeft } from 'react-icons/fa'
-import Context from '../../../../Context/Context'
-import {Button2} from "../../../../common/Inputs";
-import InstitutionContext from '../../../../Context/InstitutionContext'
-import AvatarEditor from 'react-avatar-editor'
-import './index.css'
-import { toast } from 'react-toastify'
-import EditableInput from './EditableInput';
+import { API, Auth, Storage } from "aws-amplify";
+import React, { useRef, useState } from "react";
+import { useContext } from "react";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { FaArrowLeft } from "react-icons/fa";
+import Context from "../../../../Context/Context";
+import { Button2 } from "../../../../common/Inputs";
+import InstitutionContext from "../../../../Context/InstitutionContext";
+import AvatarEditor from "react-avatar-editor";
+import "./index.css";
+import { toast } from "react-toastify";
+import EditableInput from "./EditableInput";
+import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
-  const InstitutionData = useContext(InstitutionContext).institutionData
-  const Ctx = useContext(Context)
-  const UserCtx = useContext(Context).userData
-  const UtilCtx = useContext(Context).util
-  const { userData, setUserData } = useContext(Context)
-  const [name, setName] = useState(UserCtx.userName)
-  const [country] = useState(UserCtx.country)
-  const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId)
+  const InstitutionData = useContext(InstitutionContext).institutionData;
+  const Ctx = useContext(Context);
+  const UserCtx = useContext(Context).userData;
+  const UtilCtx = useContext(Context).util;
+  const { userData, setUserData } = useContext(Context);
+  const [name, setName] = useState(UserCtx.userName);
+  const [country] = useState(UserCtx.country);
+  const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId);
   const formatDate = (epochDate) => {
-    const date = new Date(epochDate)
-    const day = date.getDate()
-    const month = date.getMonth() + 1
-    const year = date.getFullYear()
+    const date = new Date(epochDate);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
 
     // Format day and month with leading zeros if necessary
-    const formattedDay = day < 10 ? `0${day}` : day
-    const formattedMonth = month < 10 ? `0${month}` : month
+    const formattedDay = day < 10 ? `0${day}` : day;
+    const formattedMonth = month < 10 ? `0${month}` : month;
 
-    return `${formattedDay}/${formattedMonth}/${year}`
-  }
+    return `${formattedDay}/${formattedMonth}/${year}`;
+  };
 
-  const [image, setImage] = useState(null)
-  const [editor, setEditor] = useState(null)
-  const [scale, setScale] = useState(1)
+  const [image, setImage] = useState(null);
+  const [editor, setEditor] = useState(null);
+  const [scale, setScale] = useState(1);
   const getInitials = (name) => {
-    const names = name.split(' ')
-    const initials = names.map(name => name.charAt(0).toUpperCase()).join('')
-    return initials
-  }
-  const fileInputRef = useRef(null)
-  const [joiningDate] = useState(
-    formatDate(UserCtx.joiningDate)
-  )
-  const [oldPassword, setOldPassword] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [passwordVisible, setPasswordVisible] = useState(false)
-  const [isChangePassword, setIsChangePassword] = useState(false)
-  const [err, setErr] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState(UserCtx.phoneNumber)
-  const [phoneCode, setPhoneCode] = useState('')
-  const [isPhoneChange, setIsPhoneChange] = useState(false)
-  const [isPhoneCode, setIsPhoneCode] = useState(false)
+    const names = name.split(" ");
+    const initials = names.map((name) => name.charAt(0).toUpperCase()).join("");
+    return initials;
+  };
+  const fileInputRef = useRef(null);
+  const [joiningDate] = useState(formatDate(UserCtx.joiningDate));
+  const [oldPassword, setOldPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isChangePassword, setIsChangePassword] = useState(false);
+  const [err, setErr] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(UserCtx.phoneNumber);
+  const [phoneCode, setPhoneCode] = useState("");
+  const [isPhoneChange, setIsPhoneChange] = useState(false);
+  const [isPhoneCode, setIsPhoneCode] = useState(false);
 
   const ifDataChanged = () => {
     if (
@@ -63,97 +62,97 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
       country.trim() === UserCtx.country &&
       joiningDate.trim() === UserCtx.joiningDate
     ) {
-      return false
+      return false;
     } else {
-      return true
+      return true;
     }
-  }
+  };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    setImage(file)
-  }
+    const file = e.target.files[0];
+    setImage(file);
+  };
 
   const handleEditClick = () => {
-    fileInputRef.current.click()
-  }
+    fileInputRef.current.click();
+  };
 
   const handleSave = () => {
     if (editor) {
-      const canvasScaled = editor.getImageScaledToCanvas()
-      const croppedImage = canvasScaled.toDataURL()
+      const canvasScaled = editor.getImageScaledToCanvas();
+      const croppedImage = canvasScaled.toDataURL();
       // Save the cropped image to your state or send it to the server
-      handleFileUpload(croppedImage)
+      handleFileUpload(croppedImage);
       // Now you can use croppedImage as needed
     }
-  }
+  };
 
   const handleCancel = () => {
     // Reset state variables and close the modal
-    setImage(null)
-    setEditor(null)
-  }
+    setImage(null);
+    setEditor(null);
+  };
 
   const handleFileUpload = async (base64File) => {
-    UtilCtx.setLoader(true)
+    UtilCtx.setLoader(true);
     try {
       // Validate file size (less than 5MB)
       if (base64File.size > 5 * 1024 * 1024) {
-        throw new Error('File size exceeds 5MB limit.')
+        throw new Error("File size exceeds 5MB limit.");
       }
 
       // Get the current authenticated user
-      const currentUser = await Auth.currentAuthenticatedUser()
-      const cognitoId = currentUser.attributes.sub // Cognito User ID
+      const currentUser = await Auth.currentAuthenticatedUser();
+      const cognitoId = currentUser.attributes.sub; // Cognito User ID
 
-      const blob = await fetch(base64File).then((res) => res.blob())
+      const blob = await fetch(base64File).then((res) => res.blob());
       // Upload the file to S3 with the filename as Cognito User ID
       const response = await Storage.vault.put(
         `${InstitutionData.InstitutionId}/${cognitoId}/profile.jpg?v=` +
           new Date().getTime(),
         blob,
         {
-          level: 'public', // or "protected" depending on your access needs
-          region: 'us-east-1',
+          level: "public", // or "protected" depending on your access needs
+          region: "us-east-1",
           contentType: blob.type,
-          ACL: 'public-read'
+          ACL: "public-read",
         }
-      )
+      );
 
       // Get the URL of the uploaded file
-      let imageUrl = await Storage.get(response.key)
-      imageUrl = imageUrl.split('?')[0]
+      let imageUrl = await Storage.get(response.key);
+      imageUrl = imageUrl.split("?")[0];
 
       await API.put(
-        'main',
+        "main",
         `/user/profile/img/${InstitutionData.InstitutionId}`,
         {
           body: {
-            imgUrl: imageUrl
-          }
+            imgUrl: imageUrl,
+          },
         }
-      )
+      );
       // setProfileImageUrl(imageUrl);
-      const tempUser = { ...UserCtx, imgUrl: imageUrl }
-      Ctx.setUserData(tempUser)
+      const tempUser = { ...UserCtx, imgUrl: imageUrl };
+      Ctx.setUserData(tempUser);
       // setImageKey(Date.now());
     } catch (error) {
-      console.error('Error uploading profile picture: ', error)
+      console.error("Error uploading profile picture: ", error);
     } finally {
-      UtilCtx.setLoader(false)
-      setImage(null)
+      UtilCtx.setLoader(false);
+      setImage(null);
     }
-  }
+  };
 
   const onProfileUpdate = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    UtilCtx.setLoader(true)
+    UtilCtx.setLoader(true);
     if (ifDataChanged()) {
       if (phoneNumber.length >= 10) {
         try {
           const userdata = await API.put(
-            'main',
+            "main",
             `/user/profile/${InstitutionData.InstitutionId}`,
             {
               body: {
@@ -161,92 +160,94 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 userName: name,
                 phoneNumber: phoneNumber,
                 country: country,
-                joiningDate: joiningDate
-              }
+                joiningDate: joiningDate,
+              },
             }
-          )
+          );
 
-          Ctx.setUserData(userdata.Attributes)
-          toast.info('Updated')
-          UtilCtx.setLoader(false)
+          Ctx.setUserData(userdata.Attributes);
+          toast.info("Updated");
+          UtilCtx.setLoader(false);
         } catch (e) {
-          console.log(e)
-          toast.warn(e.message)
-          UtilCtx.setLoader(false)
+          console.log(e);
+          toast.warn(e.message);
+          UtilCtx.setLoader(false);
         }
       } else {
-        toast.warn('Entered Phone Number is Not Valid')
-        UtilCtx.setLoader(false)
+        toast.warn("Entered Phone Number is Not Valid");
+        UtilCtx.setLoader(false);
       }
     } else {
-      toast.warn('Nothing is to be changed')
-      UtilCtx.setLoader(false)
+      toast.warn("Nothing is to be changed");
+      UtilCtx.setLoader(false);
     }
-  }
+  };
 
   const passwordValidator = () => {
     if (password.length < 8) {
-      setErr('Password is too Short')
-      return false
+      setErr("Password is too Short");
+      return false;
     } else if (password !== confirmPassword) {
-      setErr("Password Doesn't Match")
-      return false
+      setErr("Password Doesn't Match");
+      return false;
     } else {
-      setErr('')
-      return true
+      setErr("");
+      return true;
     }
-  }
+  };
 
   const passwordVisibilityChange = () => {
-    setPasswordVisible((prevState) => !prevState)
-  }
+    setPasswordVisible((prevState) => !prevState);
+  };
 
   const onPasswordChange = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    UtilCtx.setLoader(true)
+    UtilCtx.setLoader(true);
     if (passwordValidator()) {
       try {
-        const currentUser = await Auth.currentAuthenticatedUser()
-        await Auth.changePassword(currentUser, oldPassword, password)
+        const currentUser = await Auth.currentAuthenticatedUser();
+        await Auth.changePassword(currentUser, oldPassword, password);
 
-        toast.info('Password Changed')
-        setIsChangePassword(false)
-        UtilCtx.setLoader(false)
+        toast.info("Password Changed");
+        setIsChangePassword(false);
+        UtilCtx.setLoader(false);
       } catch (e) {
-        setErr(e.message)
-        UtilCtx.setLoader(false)
+        setErr(e.message);
+        UtilCtx.setLoader(false);
       }
     }
-    UtilCtx.setLoader(false)
-  }
+    UtilCtx.setLoader(false);
+  };
 
   // Function to handle the phone number change
   const onPhoneChange = async (e) => {
-    e.preventDefault()
-    UtilCtx.setLoader(true)
+    e.preventDefault();
+    UtilCtx.setLoader(true);
     try {
-      const currentUser = await Auth.currentAuthenticatedUser()
+      const currentUser = await Auth.currentAuthenticatedUser();
       // Send verification code to the new phone number
-      await Auth.updateUserAttributes(currentUser, { phone_number: phoneNumber })
-      setIsPhoneCode(true)
-      UtilCtx.setLoader(false)
+      await Auth.updateUserAttributes(currentUser, {
+        phone_number: phoneNumber,
+      });
+      setIsPhoneCode(true);
+      UtilCtx.setLoader(false);
     } catch (e) {
-      console.error(e)
-      setErr(e.message)
-      UtilCtx.setLoader(false)
+      console.error(e);
+      setErr(e.message);
+      UtilCtx.setLoader(false);
     }
-  }
+  };
 
   // Function to confirm the phone number with the code
   const onPhoneCodeConfirm = async (e) => {
-    e.preventDefault()
-    UtilCtx.setLoader(true)
+    e.preventDefault();
+    UtilCtx.setLoader(true);
     if (phoneCode.length !== 0) {
       try {
-        await Auth.verifyCurrentUserAttributeSubmit('phone_number', phoneCode)
+        await Auth.verifyCurrentUserAttributeSubmit("phone_number", phoneCode);
         await API.put(
-          'main',
+          "main",
           `/user/profile/${InstitutionData.InstitutionId}`,
           {
             body: {
@@ -254,30 +255,30 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
               userName: UserCtx.userName,
               phoneNumber: phoneNumber,
               country: UserCtx.country,
-              joiningDate: UserCtx.joiningDate
-            }
+              joiningDate: UserCtx.joiningDate,
+            },
           }
-        )
+        );
         setUserData({
           ...userData,
-          phoneNumber: phoneNumber
-        })
-        toast.info('Phone Number Updated')
-        setIsPhoneChange(false)
-        setIsPhoneCode(false)
-        UtilCtx.setLoader(false)
+          phoneNumber: phoneNumber,
+        });
+        toast.info("Phone Number Updated");
+        setIsPhoneChange(false);
+        setIsPhoneCode(false);
+        UtilCtx.setLoader(false);
       } catch (e) {
-        console.error(e)
-        setErr(e.message)
-        UtilCtx.setLoader(false)
+        console.error(e);
+        setErr(e.message);
+        UtilCtx.setLoader(false);
       } finally {
-        setPhoneCode("")
+        setPhoneCode("");
       }
     } else {
-      UtilCtx.setLoader(false)
-      setErr('Please enter the code')
+      UtilCtx.setLoader(false);
+      setErr("Please enter the code");
     }
-  }
+  };
 
   return (
     <div
@@ -288,11 +289,11 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
       >
         <FaArrowLeft
           className="absolute left-2 top-2 min1050:hidden"
-          size={'1.7rem'}
+          size={"1.7rem"}
           color="grey"
           onClick={() => {
-            setClick(0)
-            displayAfterClick(0)
+            setClick(0);
+            displayAfterClick(0);
           }}
         />
         <div className="avatar-editor-container flex flex-row justify-center">
@@ -300,7 +301,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
             type="file"
             onChange={handleImageChange}
             ref={fileInputRef}
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
           />
           {image && (
             <div className="absolute mt-20 max450:mt-14 top-[25%]">
@@ -333,7 +334,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 <button
                   className="rounded-md w-[4rem] h-8 text-white ml-4"
                   style={{
-                    backgroundColor: InstitutionData.PrimaryColor
+                    backgroundColor: InstitutionData.PrimaryColor,
                   }}
                   onClick={handleSave}
                 >
@@ -352,7 +353,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                     {UserCtx.imgUrl ? (
                       <img
                         alt="profile"
-                        key={'profileUpdate1' + Date.now()}
+                        key={"profileUpdate1" + Date.now()}
                         src={UserCtx.imgUrl}
                         className="w-full h-full rounded-full object-cover cursor-pointer"
                         onClick={handleEditClick}
@@ -378,16 +379,19 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                       className="absolute bottom-0 right-0 w-10 h-10 text-white flex items-center justify-center cursor-pointer "
                       onClick={handleEditClick}
                     >
-                      <i className=" rounded-full fa-solid fa-pencil pencil-icon"
+                      <i
+                        className=" rounded-full fa-solid fa-pencil pencil-icon"
                         style={{
-                          background: InstitutionData.PrimaryColor
+                          background: InstitutionData.PrimaryColor,
                         }}
                       ></i>
                     </div>
                   </div>
                 </div>
                 <form className={`mt-6 flex flex-col gap-8 max560:w-full`}>
-                  <div className={`grid grid-cols-2 gap-4 max536:grid-cols-1 max536:w-full`}>
+                  <div
+                    className={`grid grid-cols-2 gap-4 max536:grid-cols-1 max536:w-full`}
+                  >
                     <div className={`flex flex-col gap-1 justify-center`}>
                       <label className={`ml-2`}>Name</label>
                       <EditableInput
@@ -459,7 +463,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                     Change Password
                   </button> */}
                   <div className={`flex justify-center`}>
-                    <Button2 data={'Update'} fn={onProfileUpdate} w="8rem" />
+                    <Button2 data={"Update"} fn={onProfileUpdate} w="8rem" />
                   </div>
                 </form>
               </div>
@@ -501,7 +505,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                       </label>
                       <input
                         className={`bg-inputBgColor px-4 py-2 rounded-lg`}
-                        type={!passwordVisible ? 'password' : 'text'}
+                        type={!passwordVisible ? "password" : "text"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                       />
@@ -509,13 +513,13 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                         <AiFillEye
                           onClick={passwordVisibilityChange}
                           className={`absolute right-4`}
-                          size={'1.25rem'}
+                          size={"1.25rem"}
                         />
                       ) : (
                         <AiFillEyeInvisible
                           onClick={passwordVisibilityChange}
                           className={`absolute right-4`}
-                          size={'1.25rem'}
+                          size={"1.25rem"}
                         />
                       )}
                     </div>
@@ -525,16 +529,16 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                   )}
                   <div className={`flex gap-5`}>
                     <Button2
-                      data={'Cancel'}
+                      data={"Cancel"}
                       fn={(e) => {
-                        e.preventDefault()
-                        setErr('')
-                        setIsChangePassword(false)
+                        e.preventDefault();
+                        setErr("");
+                        setIsChangePassword(false);
                       }}
                       w="8rem"
                     />
                     <Button2
-                      data={'Update'}
+                      data={"Update"}
                       fn={onPasswordChange}
                       w="8rem"
                       className={`mt-8`}
@@ -547,11 +551,12 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
         ) : (
           <>
             {!isPhoneCode ? (
-              <div >
+              <div>
                 <form className={`flex flex-col items-center my-4`}>
                   <p className={`text-[1.3rem]`}>Change Phone Number</p>
                   <p className={`text-[0.8rem] text-gray-500 mt-2`}>
-                    *Note: Please include the country code before entering the phone number.
+                    *Note: Please include the country code before entering the
+                    phone number.
                   </p>
                   <div className={`flex flex-col items-center`}>
                     <div
@@ -569,18 +574,18 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                   )}
                   <div className={`flex gap-5`}>
                     <Button2
-                      data={'Cancel'}
+                      data={"Cancel"}
                       fn={(e) => {
-                        e.preventDefault()
-                        setPhoneNumber(userData.phoneNumber)
-                        setErr('')
-                        setIsPhoneChange(false)
+                        e.preventDefault();
+                        setPhoneNumber(userData.phoneNumber);
+                        setErr("");
+                        setIsPhoneChange(false);
                       }}
                       w="8rem"
                       className={`mt-8`}
                     />
                     <Button2
-                      data={'Send Code'}
+                      data={"Send Code"}
                       fn={onPhoneChange}
                       w="8rem"
                       className={`mt-8`}
@@ -592,7 +597,9 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
               <div>
                 <form className={`flex flex-col items-center my-4`}>
                   <p className={`text-[1.3rem]`}>Verify Phone Number</p>
-                  <p className={`my-2 text-[0.8rem]`}>Code sent to {phoneNumber}</p>
+                  <p className={`my-2 text-[0.8rem]`}>
+                    Code sent to {phoneNumber}
+                  </p>
                   <div className={`flex flex-col items-center`}>
                     <div
                       className={`flex items-center gap-20 mt-5 max536:flex-col max536:gap-2 max536:items-start`}
@@ -610,19 +617,19 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                   )}
                   <div className={`flex gap-5`}>
                     <Button2
-                      data={'Cancel'}
+                      data={"Cancel"}
                       fn={(e) => {
-                        e.preventDefault()
-                        setPhoneNumber(userData.phoneNumber)
-                        setErr('')
-                        setIsPhoneChange(false)
-                        setIsPhoneCode(false)
+                        e.preventDefault();
+                        setPhoneNumber(userData.phoneNumber);
+                        setErr("");
+                        setIsPhoneChange(false);
+                        setIsPhoneCode(false);
                       }}
                       w="8rem"
                       className={`mt-8`}
                     />
                     <Button2
-                      data={'Confirm'}
+                      data={"Confirm"}
                       fn={onPhoneCodeConfirm}
                       w="8rem"
                       className={`mt-8`}
@@ -634,8 +641,15 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
           </>
         )}
       </div>
-    </div>
-  )
-}
 
-export default ProfileUpdate
+      {(userData.userType === "instructor" ||
+        userData.userType === "admin") && (
+        <div>
+          <ReferralCode />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProfileUpdate;
