@@ -17,6 +17,7 @@ import { Button, Label, Modal, TextInput, Select } from "flowbite-react";
 import { FaUserTie, FaCalendarAlt } from "react-icons/fa";
 import { HiOutlineLink } from "react-icons/hi";
 import { GrYoga } from "react-icons/gr";
+import {FaQrcode} from "react-icons/fa6";
 
 const UpcomingSessionsMobile = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -655,7 +656,7 @@ const UpcomingSessionsMobile = () => {
                                     className={`rounded-[0.51rem] px-1 attractive-dropdown`}
                                     style={{
                                       backgroundColor:
-                                        InstitutionData.SecondaryColor,
+                                      InstitutionData.SecondaryColor,
                                     }}
                                     value={
                                       getInstructor(clas.instructorNames)?.name
@@ -682,7 +683,7 @@ const UpcomingSessionsMobile = () => {
                                   className={`rounded-[0.51rem] pr-4 max600:bg-[#09edb900] `}
                                   style={{
                                     backgroundColor:
-                                      InstitutionData.SecondaryColor,
+                                    InstitutionData.SecondaryColor,
                                   }}
                                 >
                                   {clas.instructorNames}
@@ -696,7 +697,7 @@ const UpcomingSessionsMobile = () => {
                                     className={`rounded-[0.51rem] px-1 attractive-dropdown2`}
                                     style={{
                                       backgroundColor:
-                                        InstitutionData.SecondaryColor,
+                                      InstitutionData.SecondaryColor,
                                     }}
                                     value={clas.classType}
                                     onChange={(e) => {
@@ -722,7 +723,7 @@ const UpcomingSessionsMobile = () => {
                                   className={`rounded-[0.51rem] max600:bg-[#09edb900] `}
                                   style={{
                                     backgroundColor:
-                                      InstitutionData.SecondaryColor,
+                                    InstitutionData.SecondaryColor,
                                   }}
                                 >
                                   {clas.classType}
@@ -777,6 +778,14 @@ const UpcomingSessionsMobile = () => {
                               </button>
                             )}
                           </div>
+                          {UserCtx.userData.userType !== "member" && <div
+                            className={
+                              "w-fit"
+                            }
+                          >
+                            <a href={`https://qrtag.net/api/qr_4.png?url=https://beta.happyprancer.com/put-attendance/${clas.classId}`}
+                               target='_blank'><FaQrcode/></a>
+                          </div>}
                         </div>
                       </div>
                     </div>

@@ -19,6 +19,7 @@ import { Button, Label, Modal, TextInput, Select } from "flowbite-react";
 import { FaUserTie, FaCalendarAlt } from "react-icons/fa";
 import { HiOutlineLink } from "react-icons/hi";
 import { GrYoga } from "react-icons/gr";
+import {FaQrcode} from "react-icons/fa6";
 
 const formatDate = (epochDate) => {
   const date = new Date(epochDate);
@@ -1127,6 +1128,18 @@ const UpcomingSessions = () => {
                                     />
                                   </svg>
                                 </div>
+                                {UserCtx.userData.userType !== "member" && <div
+                                  className={
+                                    "w-fit" +
+                                    (UserCtx.userData.userType === "member"
+                                      ? " hidden"
+                                      : " ")
+                                  }
+                                >
+                                  <a
+                                    href={`https://qrtag.net/api/qr_4.png?url=https://beta.happyprancer.com/put-attendance/${clas.classId}`}
+                                    target='_blank'><FaQrcode/></a>
+                                </div>}
                               </div>
                             </div>
                           </li>

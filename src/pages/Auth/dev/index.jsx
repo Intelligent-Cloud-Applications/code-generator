@@ -5,12 +5,13 @@ import {API, Auth} from "aws-amplify";
 import {toast} from "react-toastify";
 import Context from "../../../Context/Context";
 import institutionContext from "../../../Context/InstitutionContext";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import Header from "../../../components/Header";
 
 const devAuth = () => {
   const options = [
     { userType: 'admin', email: 'admin@tester.com' },
+    { userType: 'instructor', email: 'instructor@tester.com' },
     { userType: 'user', email: 'user@tester.com' },
   ]
 
@@ -18,6 +19,7 @@ const devAuth = () => {
   const { InstitutionId } = useContext(institutionContext).institutionData;
   const [email, setEmail] = useState(options[0].email);
   const navigate = useNavigate();
+  const { "*": link } = useParams();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ const devAuth = () => {
 
       toast.info('Logged in');
       onAuthLoad(true, InstitutionId);
-      navigate('/dashboard');
+      navigate(`/${link}`);
     } catch (e) {
       console.log(e);
       toast.error('Unknown error occurred');

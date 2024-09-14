@@ -8,19 +8,18 @@ import InputComponent from '../../../../common/InputComponent';
 import { API } from 'aws-amplify';
 
 function CreateUser({
-  phoneNumber, userName, email, status,cognitoId, setStatus, balance, setShowUserAdd,
-  setPhoneNumber, setIsModalOpen, setEmail, setCountryCode, setLastName, setuserName, setBalance
+  phoneNumber, name, email, status, cognitoId, setStatus, balance, setShowUserAdd,
+  setPhoneNumber, createButton, setCreateButton, setIsModalOpen, setEmail, countryCode, setCountryCode, setName, setBalance, productType, setProductType, selectedProductAmount, setSelectedProductAmount
 }) {
   const [userType, setUserType] = useState('member')
   const [instructorPaymentType, setInstructorPaymentType] = useState('');
   const [instructorPaymentAmount, setInstructorPaymentAmount] = useState('');
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const Ctx = useContext(Context);
+  const { getUserList } = useContext(Context)
   const UtilCtx = useContext(Context).util;
 
   // State for product type and amount
-  const [productType, setProductType] = useState('Product Type');
-  const [selectedProductAmount, setSelectedProductAmount] = useState('');
 
   const [productDetails, setProductDetails] = useState([]);
 
@@ -50,22 +49,23 @@ function CreateUser({
     setSelectedProductAmount(selectedProduct ? selectedProduct.amount : '');
   };
 
+  console.log(countryCode)
   const onCreateUser = async (e) => {
     e.preventDefault();
     UtilCtx.setLoader(true);
     const data = {
       institution: InstitutionData.InstitutionId,
-          cognitoId,
-          emailId: email,
-          userName: userName,
-          name: userName,
-          phoneNumber,
-          status,
-          productType,
-          amount: selectedProductAmount,
-          userType,
-          instructorPaymentType: userType === 'instructor' ? instructorPaymentType : '',
-          instructorPaymentAmount: userType === 'instructor' ? instructorPaymentAmount : ''
+      cognitoId,
+      emailId: email,
+      userName: name,
+      name: name,
+      phoneNumber: `${countryCode}${phoneNumber}`,
+      status,
+      productType,
+      amount: selectedProductAmount,
+      userType,
+      instructorPaymentType: userType === 'instructor' ? instructorPaymentType : '',
+      instructorPaymentAmount: userType === 'instructor' ? instructorPaymentAmount : ''
     }
 
     try {
@@ -81,7 +81,7 @@ function CreateUser({
       Ctx.setUserList([
         {
           emailId: email,
-          userName: userName,
+          userName: name,
           phoneNumber,
           status: status,
           balance: balance,
@@ -92,9 +92,9 @@ function CreateUser({
 
       toast.success("User Added");
 
+      getUserList();
       // Reset form fields
-      setuserName("");
-      setLastName("");
+      setName("");
       setCountryCode("+91");
       setEmail("");
       setStatus("InActive");
@@ -115,13 +115,14 @@ function CreateUser({
 
   return (
     <div>
-      <div className=" w-[30vw] bg-white px-1 py-4 rounded-md flex flex-col justify-center items-center gap-4 max800:w-[90vw] relative">
+      <div className=" w-[35rem] bg-white px-1 py-4 rounded-md flex flex-col justify-center items-center gap-4 max800:w-[90vw] relative">
 
         <span
           className="absolute top-5 right-5 cursor-pointer"
           onClick={() => {
             setShowUserAdd(false);
             setIsModalOpen(false);
+            setCreateButton(false);
           }}
         >
           <X size={25} />
@@ -132,8 +133,8 @@ function CreateUser({
             <InputComponent
               width={100}
               label="Name"
-              value={userName}
-              onChange={(e) => setuserName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
             <InputComponent
               width={100}
@@ -143,6 +144,17 @@ function CreateUser({
             />
           </div>
           <div className="flex gap-1">
+            <select
+              value={countryCode}
+              name="countryCode"
+              className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-1/2 border-gray-300`}
+              onChange={(e) => {
+                setCountryCode(e.target.value.toString())
+              }}
+              style={{ maxHeight: '100px' }}
+            >
+              {<Country />}
+            </select>
             <InputComponent
               width={100}
               label="Phone Number"
@@ -150,7 +162,7 @@ function CreateUser({
               onChange={(e) => setPhoneNumber(e.target.value)}
             />
           </div>
-          <div className="w-full flex justify-center items-center gap-2">
+          <div className="w-full flex flex-row-reverse justify-center items-center gap-2">
             <div className='flex w-[80%] flex-col'>
               <label className='font-[500] ml-1'>User Status</label>
               <select
@@ -266,7 +278,7 @@ function CreateUser({
           style={{ backgroundColor: InstitutionData.PrimaryColor }}
           onClick={onCreateUser}
         >
-          Create / Update
+          {createButton ? 'create' : 'update'}
         </button>
       </div>
     </div>
