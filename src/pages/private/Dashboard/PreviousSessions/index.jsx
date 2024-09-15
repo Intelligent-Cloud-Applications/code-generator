@@ -423,7 +423,7 @@ const PreviousSessions = () => {
                 Filter
               </Button>
             </div>
-            <div className={`flex flex-col-reverse w-[85%]`}>
+            <div className={`flex flex-col-reverse w-[75%]`}>
               <div className={`filters ${showFilters ? "show" : ""}`}>
                 <div className={`w-[95%] flex justify-end m-[0.8rem] gap-3`}>
                   <label className={`font-bold`} htmlFor="instructorTypeFilter">
@@ -615,15 +615,31 @@ const PreviousSessions = () => {
                                     )
                                   }
                                 >
-                                  {Ctx.instructorList.map((i) => (
-                                    <option
-                                      key={i.name}
-                                      value={i.name}
-                                      onChange={(e) => {}}
-                                    >
-                                      {i.name}
-                                    </option>
-                                  ))}
+                                  {Ctx.instructorList
+                                    .sort(function (a, b) {
+                                      if (a.name < b.name) {
+                                        return -1;
+                                      }
+                                      if (a.name > b.name) {
+                                        return 1;
+                                      }
+                                      return 0;
+                                    })
+                                    .map(
+                                      (i) =>
+                                        i.name !== "Cancelled" && (
+                                          <option
+                                            key={i.name}
+                                            value={i.name}
+                                            onChange={(e) => {}}
+                                          >
+                                            {i.name}
+                                          </option>
+                                        )
+                                    )}
+                                  <option onChange={(e) => {}}>
+                                    Cancelled
+                                  </option>
                                 </select>
                               ) : (
                                 clas.instructorNames
