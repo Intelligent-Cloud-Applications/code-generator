@@ -72,10 +72,11 @@ function CreateUser({
       const response = await API.post("main", `/admin/create-user`, {
         body: data
       });
+      const createdCognitoId = response.user.cognitoId;
       if (userType === 'instructor') {
         await API.put('main', '/admin/member-to-instructor', {
-          body: data
-        })
+          body: { ...data, cognitoId: createdCognitoId }
+        });
       }
       console.log("User created successfully:", response);
       Ctx.setUserList([
