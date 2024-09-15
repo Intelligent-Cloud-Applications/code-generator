@@ -208,10 +208,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                   }}
                   id="userStatusFilter"
                   value={userStatus}
-                  onChange={(e) => {
-                    setUserStatus(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => setUserStatus(e.target.value)}
                 >
                   {availableStatuses.map((status) => (
                     <option key={status} value={status}>
@@ -236,7 +233,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 setCreateButton={setCreateButton}
                 phoneNumber={phoneNumber}
                 cognitoId={cognitoId}
-                setCognitoId={setCognitoId}
                 balance={balance}
                 status={status}
                 email={email}
