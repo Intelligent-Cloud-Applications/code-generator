@@ -100,6 +100,13 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   // Further filter the searched list to exclude archived users
   const activeUserList = searchedUserList.filter((user) => !user.isArchived);
 
+  // Sort the filtered list based on the join date
+  activeUserList.sort((a, b) => {
+    return b.joiningDate - a.joiningDate;
+  });
+
+  console.log("Active user list: ", activeUserList);
+
   // Paginate the filtered list
   const filteredUserList = activeUserList.slice(startIndex, endIndex);
 
@@ -208,7 +215,10 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                   }}
                   id="userStatusFilter"
                   value={userStatus}
-                  onChange={(e) => setUserStatus(e.target.value)}
+                  onChange={(e) => {
+                    setUserStatus(e.target.value);
+                    setCurrentPage(1);
+                  }}
                 >
                   {availableStatuses.map((status) => (
                     <option key={status} value={status}>

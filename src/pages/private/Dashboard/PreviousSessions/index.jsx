@@ -423,7 +423,7 @@ const PreviousSessions = () => {
                 Filter
               </Button>
             </div>
-            <div className={`flex flex-col-reverse w-[85%]`}>
+            <div className={`flex flex-col-reverse w-[75%]`}>
               <div className={`filters ${showFilters ? "show" : ""}`}>
                 <div className={`w-[95%] flex justify-end m-[0.8rem] gap-3`}>
                   <label className={`font-bold`} htmlFor="instructorTypeFilter">
