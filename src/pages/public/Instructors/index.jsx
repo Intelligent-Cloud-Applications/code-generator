@@ -164,6 +164,8 @@ const Instructor = () => {
         `/admin/create-instructor/${institutionData.InstitutionId}`,
         { body: data }
       );
+
+      
       console.log(response);
       localStorage.removeItem(
         `instructorList_${institutionData.InstitutionId}`

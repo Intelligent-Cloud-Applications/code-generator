@@ -8,7 +8,7 @@ import InputComponent from '../../../../common/InputComponent';
 import { API } from 'aws-amplify';
 
 function CreateUser({
-  phoneNumber, name, email, status, cognitoId, setStatus, balance, setShowUserAdd,
+  phoneNumber, name, email, status, cognitoId, setStatus, balance, setShowUserAdd,setCognitoId,
   setPhoneNumber, createButton, setCreateButton, setIsModalOpen, setEmail, countryCode, setCountryCode, setName, setBalance, productType, setProductType, selectedProductAmount, setSelectedProductAmount
 }) {
   const [userType, setUserType] = useState('member')
@@ -96,6 +96,7 @@ function CreateUser({
       // Reset form fields
       setName("");
       setCountryCode("+91");
+      setCognitoId("")
       setEmail("");
       setStatus("InActive");
       setPhoneNumber("");

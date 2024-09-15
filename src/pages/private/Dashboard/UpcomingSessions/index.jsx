@@ -13,13 +13,20 @@ import Streak from "./Streak";
 import QRCode from "qrcode.react";
 import wp from "../../../../utils/images/whatsapp.png";
 import { onJoinClass } from "./StreakFunctions";
-import {toast} from 'react-toastify';
+import { toast } from "react-toastify";
 
-import { Button, Label, Modal, TextInput, Select } from "flowbite-react";
-import { FaUserTie, FaCalendarAlt } from "react-icons/fa";
+import {
+  Button,
+  Label,
+  Modal,
+  TextInput,
+  Select,
+  Datepicker,
+} from "flowbite-react";
+import { FaUserTie, FaCalendarAlt, FaClock  } from "react-icons/fa";
 import { HiOutlineLink } from "react-icons/hi";
 import { GrYoga } from "react-icons/gr";
-import {FaQrcode} from "react-icons/fa6";
+import { FaQrcode } from "react-icons/fa6";
 
 const formatDate = (epochDate) => {
   const date = new Date(epochDate);
@@ -38,7 +45,9 @@ const UpcomingSessions = () => {
   const [classType, setClassType] = useState("");
   const [zoomLink, setZoomLink] = useState("");
   const [selectedInstructor, setselectedInstructor] = useState("");
-  const [date, setDate] = useState("");
+  // const [date, setDate] = useState("");
+  const [datePicker, setDatePicker] = useState("");
+  const [time, setTime] = useState("00:00:00");
   // const [isEditing, setIsEditing] = useState(false);
   const [editingIndex, setEditingIndex] = useState(-1);
   const [attendanceList, setAttendanceList] = useState(false);
@@ -147,7 +156,7 @@ const UpcomingSessions = () => {
       UtilCtx.setLoader(true);
 
       // Check if any of the required fields are empty
-      if (!classType || !selectedInstructor.name || !date) {
+      if (!classType || !selectedInstructor.name || !datePicker || !time) {
         toast.warn("Please fill in all sections.");
         return;
       }
@@ -169,14 +178,14 @@ const UpcomingSessions = () => {
         {
           body: {
             classType: classType,
-            startTimeEst: new Date(date).getTime(),
+            startTimeEst: new Date(datePicker + "T" + time).getTime(),
             instructorEmailId: Ctx.userData.emailId,
             duration: 600,
             instructorId: selectedInstructor.instructorId,
             instructorNames: selectedInstructor.name,
             classDescription: "",
             zoomLink: zoomLink || "", // Provide an empty string if no Zoom link is provided
-            date: new Date(date).getTime(),
+            date: new Date(datePicker + "T" + time).getTime(),
           },
         }
       );
@@ -188,7 +197,8 @@ const UpcomingSessions = () => {
       setClassType("");
       setselectedInstructor({});
       setZoomLink("");
-      setDate("");
+      setDatePicker("");
+      setTime("00:00:00");
       setModal(false);
     } catch (error) {
       toast.error(error.message);
@@ -202,7 +212,8 @@ const UpcomingSessions = () => {
     setClassType("");
     setselectedInstructor({});
     setZoomLink("");
-    setDate("");
+    setDatePicker("");
+    setTime("00:00:00");
   }
 
   const [showForm, setShowForm] = useState(false);
@@ -267,7 +278,7 @@ const UpcomingSessions = () => {
       toast.success("Attendance Marked Successfully");
     } catch (error) {
       console.error(error);
-      toast,error("An error occurred while marking attendance");
+      toast, error("An error occurred while marking attendance");
     }
   };
 
@@ -481,27 +492,10 @@ const UpcomingSessions = () => {
   return (
     <>
       <Modal show={modal} size="lg" onClose={handleClose} popup>
-        <Modal.Header />
+        <Modal.Header/>
         <Modal.Body>
           <div className="space-y-4">
-            <div>
-              <div className="mb-2 block">
-                <Label value="Zoom Link" />
-              </div>
-              <TextInput
-                id="text"
-                placeholder="Zoom Link"
-                onChange={(e) => {
-                  setZoomLink(e.target.value);
-                }}
-                color={"primary"}
-                icon={HiOutlineLink}
-                value={zoomLink}
-                required
-              />
-            </div>
-
-            <div className="flex flex-row justify-between gap-2">
+            <div className="flex flex-col justify-between gap-2 min800:flex-row">
               <div className="w-full">
                 <div className="mb-2 block">
                   <Label value="Class Type" />
@@ -550,7 +544,40 @@ const UpcomingSessions = () => {
               </div>
             </div>
 
-            <div className="w-full">
+            <div className="flex flex-col justify-between gap-2 min800:flex-row">
+              <div className="w-full">
+                <div className="mb-2 block">
+                  <Label value="Date" />
+                </div>
+                <TextInput
+                  icon={FaCalendarAlt}
+                  color={"primary"}
+                  placeholder="Select Date and Time"
+                  type={"date"}
+                  value={datePicker}
+                  onChange={(e) => {
+                    setDatePicker(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="w-full">
+                <div className="mb-2 block">
+                  <Label value="Time" />
+                </div>
+                <TextInput
+                  icon={FaClock }
+                  color={"primary"}
+                  placeholder="Select Date and Time"
+                  type={"time"}
+                  value={time}
+                  onChange={(e) => {
+                    setTime(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* <div className="w-full">
               <div className="mb-2 block">
                 <Label value="Date and Time" />
               </div>
@@ -563,6 +590,22 @@ const UpcomingSessions = () => {
                 onChange={(e) => {
                   setDate(e.target.value);
                 }}
+              />
+            </div> */}
+            <div>
+              <div className="mb-2 block">
+                <Label value="Zoom Link" />
+              </div>
+              <TextInput
+                id="text"
+                placeholder="Zoom Link"
+                onChange={(e) => {
+                  setZoomLink(e.target.value);
+                }}
+                color={"primary"}
+                icon={HiOutlineLink}
+                value={zoomLink}
+                required
               />
             </div>
           </div>
@@ -902,7 +945,9 @@ const UpcomingSessions = () => {
                             : " mr-[-1rem]")
                         }
                       >
-                        Zoom Link / Attendance
+                        {sortedFilteredClasses[0]?.zoomLink
+                          ? "Join"
+                          : "Attendance"}
                       </p>
                     </div>
                   </li>
@@ -946,7 +991,7 @@ const UpcomingSessions = () => {
                               <p className={`overflow-hidden w-[5.6rem] m-0`}>
                                 {formatDate(parseInt(clas.date))}
                               </p>
-                              <div className={`w-[7rem] `}>
+                              <div className={`w-[7rem] ml-8`}>
                                 {Ctx.userData.userType === "admin" ||
                                 Ctx.userData.userType === "instructor" ? (
                                   <select
@@ -968,15 +1013,34 @@ const UpcomingSessions = () => {
                                       );
                                     }}
                                   >
-                                    {Ctx.instructorList.map((i) => (
-                                      <option
-                                        key={i.name}
-                                        value={i.name}
-                                        onChange={(e) => {}}
-                                      >
-                                        {i.name}
-                                      </option>
-                                    ))}
+                                    {Ctx.instructorList
+                                      .sort(function (a, b) {
+                                        if (a.name < b.name) {
+                                          return -1;
+                                        }
+                                        if (a.name > b.name) {
+                                          return 1;
+                                        }
+                                        return 0;
+                                      })
+                                      .map(
+                                        (i) =>
+                                          i.name !== "Cancelled" && (
+                                            <option
+                                              key={i.name}
+                                              value={i.name}
+                                              onChange={(e) => {}}
+                                            >
+                                              {i.name}
+                                            </option>
+                                          )
+                                      )}
+                                    <option
+                                      value="Cancelled"
+                                      onChange={(e) => {}}
+                                    >
+                                      Cancelled
+                                    </option>
                                   </select>
                                 ) : (
                                   <p
@@ -1128,18 +1192,23 @@ const UpcomingSessions = () => {
                                     />
                                   </svg>
                                 </div>
-                                {UserCtx.userData.userType !== "member" && <div
-                                  className={
-                                    "w-fit" +
-                                    (UserCtx.userData.userType === "member"
-                                      ? " hidden"
-                                      : " ")
-                                  }
-                                >
-                                  <a
-                                    href={`https://qrtag.net/api/qr_4.png?url=https://beta.happyprancer.com/put-attendance/${clas.classId}`}
-                                    target='_blank'><FaQrcode/></a>
-                                </div>}
+                                {UserCtx.userData.userType !== "member" && (
+                                  <div
+                                    className={
+                                      "w-fit" +
+                                      (UserCtx.userData.userType === "member"
+                                        ? " hidden"
+                                        : " ")
+                                    }
+                                  >
+                                    <a
+                                      href={`https://qrtag.net/api/qr_4.png?url=https://beta.happyprancer.com/put-attendance/${clas.classId}`}
+                                      target="_blank"
+                                    >
+                                      <FaQrcode />
+                                    </a>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </li>

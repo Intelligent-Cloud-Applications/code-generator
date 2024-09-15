@@ -10,7 +10,7 @@ import { FaEye } from "react-icons/fa6";
 import { Button2 } from "../../../../common/Inputs";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import CreateUser from "./CreateUser";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { API } from "aws-amplify";
 import InstructorList from "./InstructorList";
 
@@ -19,7 +19,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const Ctx = useContext(Context);
   const [isUserAdd, setIsUserAdd] = useState(false);
   const [showUserAdd, setShowUserAdd] = useState(false);
-  const { getUserList } = useContext(Context)
+  const { getUserList } = useContext(Context);
   const [userName, setuserName] = useState("");
   const [lastName, setLastName] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
@@ -27,9 +27,9 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [status, setStatus] = useState("InActive");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [balance, setBalance] = useState("");
-  const [productType, setProductType] = useState('Product Type');
-  const [selectedProductAmount, setSelectedProductAmount] = useState('');
-  const [createButton, setCreateButton] = useState('');
+  const [productType, setProductType] = useState("Product Type");
+  const [selectedProductAmount, setSelectedProductAmount] = useState("");
+  const [createButton, setCreateButton] = useState("");
 
   // eslint-disable-next-line
   // const [country, setCountry] = useState('')
@@ -103,7 +103,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   // Paginate the filtered list
   const filteredUserList = activeUserList.slice(startIndex, endIndex);
 
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
@@ -113,23 +112,31 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     <div className="font-bold">
       <p>Are you sure you want to delete?</p>
       <div>
-        <button onClick={onConfirm} className="bg-red-400 text-black font-[500] p-2 px-3 rounded w-[40%]">
+        <button
+          onClick={onConfirm}
+          className="bg-red-400 text-black font-[500] p-2 px-3 rounded w-[40%]"
+        >
           Yes
         </button>
-        <button onClick={onCancel} className="bg-green-400 text-black font-[500] p-2 px-3 rounded w-[40%] ml-2">No</button>
+        <button
+          onClick={onCancel}
+          className="bg-green-400 text-black font-[500] p-2 px-3 rounded w-[40%] ml-2"
+        >
+          No
+        </button>
       </div>
     </div>
   );
 
   const handleDelete = async (institution, cognitoId) => {
     // console.log(institution)
-    const response = await API.put('main', '/admin/delete-user', {
+    const response = await API.put("main", "/admin/delete-user", {
       body: {
         institution: institution,
-        cognitoId
-      }
-    })
-    toast.success('Deleted successfully!', { autoClose: 3000 });
+        cognitoId,
+      },
+    });
+    toast.success("Deleted successfully!", { autoClose: 3000 });
     getUserList();
   };
 
@@ -146,10 +153,10 @@ const UsersList = ({ userCheck, setUserCheck }) => {
           toast.dismiss();
         }}
         onCancel={handleCancel}
-      />,
+      />
     );
   };
-  const [selectedOption, setSelectedOption] = useState('Members List');
+  const [selectedOption, setSelectedOption] = useState("Members List");
   const handleSelectChange = (event) => {
     setSelectedOption(event.target.value);
   };
@@ -168,16 +175,16 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 data={"Add New User"}
                 fn={() => {
                   setUserCheck(1);
-                  setCreateButton(true)
+                  setCreateButton(true);
                   setuserName("");
                   setLastName("");
-                  setName("")
+                  setName("");
                   setCountryCode("+91");
                   setEmail("");
                   setStatus("InActive");
                   setPhoneNumber("");
                   setBalance("");
-                  setProductType('')
+                  setProductType("");
                   setShowUserAdd(true);
                 }}
                 w={"12rem"}
@@ -201,7 +208,10 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                   }}
                   id="userStatusFilter"
                   value={userStatus}
-                  onChange={(e) => setUserStatus(e.target.value)}
+                  onChange={(e) => {
+                    setUserStatus(e.target.value);
+                    setCurrentPage(1);
+                  }}
                 >
                   {availableStatuses.map((status) => (
                     <option key={status} value={status}>
@@ -212,7 +222,11 @@ const UsersList = ({ userCheck, setUserCheck }) => {
               </div>
             </div>
 
-            <div className={(showUserAdd || isModalOpen) ? "showBox open" : " hidden"}>
+            <div
+              className={
+                showUserAdd || isModalOpen ? "showBox open" : " hidden"
+              }
+            >
               <CreateUser
                 productType={productType}
                 setProductType={setProductType}
@@ -222,6 +236,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 setCreateButton={setCreateButton}
                 phoneNumber={phoneNumber}
                 cognitoId={cognitoId}
+                setCognitoId={setCognitoId}
                 balance={balance}
                 status={status}
                 email={email}
@@ -244,7 +259,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
               backgroundColor: InstitutionData.LightestPrimaryColor,
             }}
           >
-
             {/* Step 4: Create and integrate the search bar */}
             <div
               className={`flex w-[94.5%] mt-4 rounded-md overflow-hidden gap-2`}
@@ -271,7 +285,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 w={"5rem"}
               />
             </div>
-            {selectedOption === 'Members List' ? (
+            {selectedOption === "Members List" ? (
               <div className="overflow-x-auto w-full">
                 <ul className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-col max536:bg-primaryColor rounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] max536:bg-gradient-to-b max536:from-[#dad7c6] max536:to-[#fdd00891]">
                   {/* List header */}
@@ -289,7 +303,9 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                       <div className="w-[11%] font-sans ml-[0.5rem]">Phone</div>
                       <div className="w-[11%] font-sans">Joining Date</div>
                       <div className="w-[14%] font-sans">Attendance</div>
-                      <div className="w-[8%] font-sans absolute right-[0rem]">Balance</div>
+                      <div className="w-[8%] font-sans absolute right-[0rem]">
+                        Balance
+                      </div>
                       {/* Icons */}
                       <div className="w-10 font-sans h-10">
                         <img
@@ -331,7 +347,9 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                             className="w-full flex flex-col gap-[4px] items-center justify-center p-2 max536:bg-primaryColor max536:pt-6 max536:rounded-2xl Sansita max536:text-[0.8rem]"
                           >
                             <div className="flex justify-between w-[100%]">
-                              <div className="w-[18%] font-[400] mr-2 font-sans truncate">{user.userName}</div>
+                              <div className="w-[18%] font-[400] mr-2 font-sans truncate">
+                                {user.userName}
+                              </div>
                               <div
                                 className="w-[16%] font-[400] font-sans email-hover"
                                 onClick={() => requestSort("email")}
@@ -347,12 +365,21 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                 {formatDate(user.joiningDate)}
                               </div>
                               <div className="w-[15%] font-[400] font-sans overflow-hidden text-center mr-2">
-                                {user.currentMonthZPoints ? user.currentMonthZPoints : 0}/{user.lastMonthZPoints ? user.lastMonthZPoints : 0}
+                                {user.currentMonthZPoints
+                                  ? user.currentMonthZPoints
+                                  : 0}
+                                /
+                                {user.lastMonthZPoints
+                                  ? user.lastMonthZPoints
+                                  : 0}
                               </div>
                               <div
                                 className="w-[7%] h-7 rounded px-2 text-center"
                                 style={{
-                                  color: parseFloat(user.balance) < 0 ? "red" : "black",
+                                  color:
+                                    parseFloat(user.balance) < 0
+                                      ? "red"
+                                      : "black",
                                 }}
                               >
                                 {user.balance}
@@ -360,7 +387,10 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                               <button
                                 className="pl-[0.4rem]"
                                 onClick={() => {
-                                  console.log("User data before opening modal:", user);
+                                  console.log(
+                                    "User data before opening modal:",
+                                    user
+                                  );
                                   setIsUserAdd(false);
                                   openModal();
                                   setCognitoId(user.cognitoId);
@@ -375,9 +405,19 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                               </button>
                               <button
                                 className="absolute -right-6 mt-1"
-                                onClick={() => handleDeleteUser(user.institution, user.cognitoId)}
+                                onClick={() =>
+                                  handleDeleteUser(
+                                    user.institution,
+                                    user.cognitoId
+                                  )
+                                }
                               >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  className="w-5"
+                                >
                                   <path
                                     fillRule="evenodd"
                                     d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
@@ -410,8 +450,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
             ) : (
               <InstructorList />
             )}
-
-
           </div>
         </div>
       )}
