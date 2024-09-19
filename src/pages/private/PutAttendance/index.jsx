@@ -8,7 +8,7 @@ import SubmitRating from "./SubmitRating";
 
 const PutAttendance = () => {
   const { InstitutionId } = useContext(InstitutionContext).institutionData;
-  const { userData, util } = useContext(Context);
+  const { isAuth, userData, util } = useContext(Context);
   const { emailId } = userData;
   const navigate = useNavigate();
   // const { classId } = useParams();
@@ -18,7 +18,7 @@ const PutAttendance = () => {
   useEffect(() => {
     const putAttendance = async () => {
       console.log('USERDATA', userData);
-      if (userData === {}) return;
+      if (!isAuth) return;
       util.setLoader(true);
       let response;
       try {
@@ -44,7 +44,7 @@ const PutAttendance = () => {
     }
 
     putAttendance();
-  }, [userData]);
+  }, [isAuth]);
 
   return <SubmitRating instructorData={instructorData} />
 }
