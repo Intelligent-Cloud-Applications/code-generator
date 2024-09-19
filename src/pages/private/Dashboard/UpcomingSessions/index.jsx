@@ -1192,23 +1192,23 @@ const UpcomingSessions = () => {
                                     />
                                   </svg>
                                 </div>
-                                {UserCtx.userData.userType !== "member" && (
-                                  <div
-                                    className={
-                                      "w-fit" +
-                                      (UserCtx.userData.userType === "member"
-                                        ? " hidden"
-                                        : " ")
-                                    }
-                                  >
-                                    <a
-                                      href={`https://qrtag.net/api/qr_4.png?url=https://beta.happyprancer.com/put-attendance/${clas.classId}`}
-                                      target="_blank"
-                                    >
-                                      <FaQrcode />
-                                    </a>
-                                  </div>
-                                )}
+                                {/*{UserCtx.userData.userType !== "member" && (*/}
+                                {/*  <div*/}
+                                {/*    className={*/}
+                                {/*      "w-fit" +*/}
+                                {/*      (UserCtx.userData.userType === "member"*/}
+                                {/*        ? " hidden"*/}
+                                {/*        : " ")*/}
+                                {/*    }*/}
+                                {/*  >*/}
+                                {/*    <a*/}
+                                {/*      href={`https://qrtag.net/api/qr_4.png?url=https://beta.happyprancer.com/put-attendance/${clas.classId}`}*/}
+                                {/*      target="_blank"*/}
+                                {/*    >*/}
+                                {/*      <FaQrcode />*/}
+                                {/*    </a>*/}
+                                {/*  </div>*/}
+                                {/*)}*/}
                               </div>
                             </div>
                           </li>

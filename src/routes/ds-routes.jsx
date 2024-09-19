@@ -65,7 +65,7 @@ const RoutesContainer = () => {
       <Route path='/paymentfailed' element={<PaymentFailed />} />
       <Route path='/rating' element={<Rating />} />
       <Route path='/auth/*' element={ process.env.REACT_APP_STAGE === 'PROD' ? <Auth /> : <DevAuth /> } />
-      <Route path='/put-attendance/:classId' element={ <PutAttendance /> } />
+      <Route path='/put-attendance' element={ <PutAttendance /> } />
       <Route path='*' element={ <Error /> } />
     </Routes>
   )
