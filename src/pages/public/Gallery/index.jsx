@@ -431,7 +431,7 @@ const Gallery = () => {
         <div>
           <div className="py-[2rem] flex justify-center mb-0 text-[3rem] max600:text-[2rem]">
             <h2
-              className="text-[3rem] max600:text-[2rem] font-bold text-center w-[15rem] text-white rounded-lg px-4 py-2 galindo-regular"
+              className="text-[3rem] max600:text-[2rem] font-bold text-center w-[15rem] text-white rounded-lg px-4 py-2 monserrat-bold"
               style={{ backgroundColor: InstitutionData.PrimaryColor }}
             >
               Gallery

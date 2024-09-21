@@ -61,10 +61,10 @@ const Testimonial = () => {
   return (
     <div
       id="testimonial-section"
-      className={`sans-sarif max500:h-[22rem] max700:h-[58rem] size min-h-screen`}
+      className={`font-sans min-h-screen`}
     >
       <div
-        className={`Test-size py-[0.2rem] flex flex-col item-center bg-black`}
+        className={`py-[0.2rem] flex flex-col item-center bg-black h-full min-h-screen`}
         style={{
           backgroundImage: inView
             ? `url(${InstitutionData.TestimonialBg})`
@@ -73,7 +73,7 @@ const Testimonial = () => {
         }}
       >
         <h1
-          className={`Test-text m-8 text-white-250 max478:text-white-[4rem] font-bold`}
+          className={`text-white text-4xl text-center font-[500] max800:text-[1.5rem] py-8 max800:py-2`}
         >
           TESTIMONIAL
         </h1>
@@ -81,7 +81,7 @@ const Testimonial = () => {
           <div className={``}>
             <ul className={`feedback`}>
               <div
-                className={`absolute w-screen flex justify-center flex-col min-h-[25rem]`}
+                className={`absolute w-screen flex justify-center flex-col`}
               ></div>
               {testimonials.map((test, i) => (
                 <li key={i}>
@@ -112,8 +112,7 @@ const Testimonial = () => {
           {testimonials[1] && (
             <>
               <h1
-                className={`mona h-[4.5rem] w-[100%] font-[500] `}
-                style={{ fontSize: '1.8rem' }}
+                className={`h-[4.5rem] w-[100%] text-3xl font-[500] max800:text-[1.4rem] text-center text-white flex items-center justify-center`}
               >
                 {testimonials[1].name}
               </h1>

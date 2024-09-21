@@ -75,7 +75,7 @@ const customTheme = {
       yellow:
         "border border-yellow-300 bg-white text-yellow-900 focus:ring-4 focus:ring-yellow-300 enabled:hover:bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-600 dark:text-white dark:focus:ring-yellow-700 dark:enabled:hover:border-yellow-700 dark:enabled:hover:bg-yellow-700",
       primary:
-        "border border-transparent bg-primaryColor text-white focus:ring-2 focus:ring-primaryColor enabled:hover:bg-primaryColor dark:bg-primaryColor dark:focus:ring-primaryColor dark:enabled:hover:bg-primaryColor",
+        "border border-transparent bg-lightPrimaryColor text-white focus:ring-2 focus:ring-primaryColor enabled:hover:bg-primaryColor dark:bg-primaryColor dark:focus:ring-primaryColor dark:enabled:hover:bg-primaryColor",
       
     },
     disabled: "cursor-not-allowed opacity-50",

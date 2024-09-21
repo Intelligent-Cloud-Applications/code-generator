@@ -27,7 +27,7 @@ const AboutUs = () => {
         <div className="w-[82vw] mt-[2rem]">
           <div className="flex justify-center items-center">
             <h1
-              className="text-[3rem] max600:text-[2rem] font-bold text-center text-white rounded-lg px-4 py-2 galindo-regular"
+              className="text-[3rem] max600:text-[2rem] font-bold text-center text-white rounded-lg px-4 py-2 monserrat-bold"
               style={{ backgroundColor: institutionData.PrimaryColor }}
             >
               About Us
