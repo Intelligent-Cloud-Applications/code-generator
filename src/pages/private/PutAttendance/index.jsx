@@ -17,29 +17,28 @@ const PutAttendance = () => {
 
   useEffect(() => {
     const putAttendance = async () => {
-      console.log('USERDATA', userData);
-      if (!isAuth) return;
-      util.setLoader(true);
-      let response;
       try {
         await Auth.currentAuthenticatedUser();
-        try {
-          const { classId } = await API.get('main', `/any/get-current-class/${InstitutionId}`, {});
-          response = await API.post('main', `/user/put-attendance/${InstitutionId}`, { body: { classId, emailId } });
-          setInstructorData(response);
-          toast.success("Attendance marked successfully");
-          if (response.message) toast.info(response.message);
-        } catch (error) {
-          toast.error(error.response.data.message || "An unknown error occurred");
-          util.setLoader(false);
-          navigate('/dashboard');
-        } finally {
-          util.setLoader(false);
-        }
-      }
-      catch {
-        util.setLoader(false);
+      } catch (error) {
         navigate(`/auth/put-attendance`);
+      }
+      if (!isAuth) return;
+
+      util.setLoader(true);
+      let response;
+
+      try {
+        const { classId } = await API.get('main', `/any/get-current-class/${InstitutionId}`, {});
+        response = await API.post('main', `/user/put-attendance/${InstitutionId}`, { body: { classId, emailId } });
+        setInstructorData(response);
+        toast.success("Attendance marked successfully");
+        if (response.message) toast.info(response.message);
+      } catch (error) {
+        toast.error(error.response.data.message || "An unknown error occurred");
+        util.setLoader(false);
+        navigate('/dashboard');
+      } finally {
+        util.setLoader(false);
       }
     }
 
