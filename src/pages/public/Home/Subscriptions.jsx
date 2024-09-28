@@ -80,15 +80,13 @@ const Subscription = () => {
     } else {
       return (
         <button
+          type="button"
           onClick={() => {
-            Navigate("/signup");
+            Navigate("/auth");
           }}
-          className={`w-[15rem] px-12 py-2 rounded-2xl hover:text-lightPrimaryColor hover:bg- hover:border-lightPrimaryColor hover:border-[0.3rem] h-[3rem] flex justify-center items-center mt-auto mb-10 text-white`}
-          style={{
-            backgroundColor: InstitutionData.LightPrimaryColor,
-          }}
+          className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
         >
-          Sign Up
+          Sign up
         </button>
       );
     }
@@ -128,7 +126,7 @@ const Subscription = () => {
           See the pricing details below
         </h3>
       </div>
-      
+
       <div className="flex flex-row gap-8 justify-center flex-wrap max850:!flex-col max-w-[90vw]">
         {productList.map((item, i) => (
           <Card key={i} className="w-[400px] max850:w-[300px]">

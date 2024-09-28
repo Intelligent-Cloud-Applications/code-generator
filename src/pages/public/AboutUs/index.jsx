@@ -34,7 +34,7 @@ const AboutUs = () => {
             </h1>
           </div>
           {institutionData?.AboutUs.map((item, index) => (
-            <div key={index} className="w-full sm:ml-0 ml-5">
+            <div key={index} className="w-full ml-5 max850:ml-0">
               {index === 0 ? (
                 <h1 className="text-center text-[4rem] font-bebas-neue">
                   {item.title}
