@@ -1,20 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
-import Context from '../../../Context/Context';
-import HappyprancerPaypalMonthly from '../Subscription/HappyprancerPaypalMonthly';
-import HappyprancerPaypalHybrid from '../Subscription/HappyprancerPaypalHybrid';
-import InstitutionContext from '../../../Context/InstitutionContext';
-import RazorpayPayment from '../Subscription/RazorpayPayment';
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import Context from "../../../Context/Context";
+import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly";
+import HappyprancerPaypalHybrid from "../Subscription/HappyprancerPaypalHybrid";
+import InstitutionContext from "../../../Context/InstitutionContext";
+import RazorpayPayment from "../Subscription/RazorpayPayment";
+import { Card } from "flowbite-react";
 
 const Subscription = () => {
   const { institutionData: InstitutionData } = useContext(InstitutionContext);
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const Navigate = useNavigate();
-
-  const text = {
-    Heading: 'Monthly Membership Subscription',
-    SubHeading: 'See the pricing details below',
-  };
 
   const [bgInView, setBgInView] = useState(false);
 
@@ -28,10 +24,10 @@ const Subscription = () => {
           }
         });
       },
-      { threshold: 0.01} // Adjust threshold as needed
+      { threshold: 0.01 } // Adjust threshold as needed
     );
 
-    const element = document.getElementById('subscription-section');
+    const element = document.getElementById("subscription-section");
     if (element) {
       observer.observe(element);
     }
@@ -45,39 +41,52 @@ const Subscription = () => {
 
   const paymentHandler = (item) => {
     if (isAuth) {
-      if (UserCtx?.status === 'Active' && UserCtx?.productIds?.some((productId) => productId === item.productId)) {
+      if (
+        UserCtx?.status === "Active" &&
+        UserCtx?.productIds?.some((productId) => productId === item.productId)
+      ) {
         return (
-          <p
-            className={`text-[1rem] w-[15rem] px-12 py-2 rounded-2xl border-[0.2rem] h-[3rem] flex justify-center items-center`}
-            style={{
-              color: InstitutionData.LightPrimaryColor,
-              borderColor: InstitutionData.LightPrimaryColor,
-            }}
+          <button
+            type="button"
+            className="inline-flex w-full justify-center rounded-lg bg-white border-lightPrimaryColor border-2 px-5 py-2.5 text-center text-sm font-medium text-lightPrimaryColor hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
           >
             Subscribed
-          </p>
+          </button>
         );
       } else {
-        if (item.currency === 'INR' ) {
+        if (item.currency === "INR") {
           return <RazorpayPayment productId={item.productId} />;
-        } else if (item.currency === 'USD' && item.subscriptionType === 'Monthly') {
+        } else if (
+          item.currency === "USD" &&
+          item.subscriptionType === "Monthly"
+        ) {
           return <HappyprancerPaypalMonthly />;
-        } else if (item.currency === 'USD' && item.subscriptionType === 'Hybrid') {
+        } else if (
+          item.currency === "USD" &&
+          item.subscriptionType === "Hybrid"
+        ) {
           return <HappyprancerPaypalHybrid />;
+        } else {
+          return (
+            <button
+              type="button"
+              className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+            >
+              Subscribe
+            </button>
+          );
         }
       }
     } else {
       return (
         <button
+          type="button"
           onClick={() => {
-            Navigate('/signup');
+            Navigate("/auth");
           }}
-          className={`w-[15rem] px-12 py-2 rounded-2xl hover:text-lightPrimaryColor hover:bg- hover:border-lightPrimaryColor hover:border-[0.3rem] h-[3rem] flex justify-center items-center mt-auto mb-10 text-white`}
-          style={{
-            backgroundColor: InstitutionData.LightPrimaryColor,
-          }}
+          className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
         >
-          Sign Up
+          Sign up
         </button>
       );
     }
@@ -86,60 +95,86 @@ const Subscription = () => {
   return (
     <div
       id="subscription-section"
-      className={`Back text-[1.5rem] flex flex-col items-center h-auto min-h-screen max980:h-[auto] justify-center gap-[5rem] `}
+      className={`text-[1.5rem] flex flex-col items-center justify-center gap-[5rem] `}
       style={{
-        backgroundImage: bgInView ? `url(${InstitutionData.SubscriptionBg})` : 'none',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center center',
-        backgroundColor: bgInView ? 'transparent' : 'black',
-        transition: 'background-color 0.3s ease-in-out',
+        backgroundImage: bgInView
+          ? `url(${InstitutionData.SubscriptionBg})`
+          : "none",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center center",
+        backgroundColor: bgInView ? "transparent" : "black",
+        transition: "background-color 0.3s ease-in-out",
       }}
     >
       <div className="text-center sans-serif mt-4">
         <h1
-        className='text-[3rem] max850:text-[1.5rem] font-[700]'
+          className="text-[3rem] max850:text-[1.5rem] font-[700] max800:px-3"
           style={{
-            color: 'black',
-            fontWeight: 'bold',
+            color: "black",
+            fontWeight: "bold",
           }}
         >
-          Monthly Membership Subscription
+          Membership Subscription
         </h1>
         <h3
           className="text-[1rem] mt-2 max850:text-[.7rem] font-[600]"
           style={{
-            color: 'black',
+            color: "black",
           }}
         >
           See the pricing details below
         </h3>
       </div>
-      <ul className="flex flex-wrap justify-center w-[90vw] max-w-[80rem] gap-16 pl-0">
+
+      <div className="flex flex-row gap-8 justify-center flex-wrap max850:!flex-col max-w-[90vw]">
         {productList.map((item, i) => (
-          <li
-            key={item.productId + `home${i}`}
-            className="subscription-card w-full sm:w-[45%] lg:w-[30%] py-6 px-8 rounded-[2rem] z-10 flex flex-col items-center gap-4 shadowSubscribe bg-white border-[0.1rem]"
-            style={{ borderColor: InstitutionData.LightPrimaryColor }}
-          >
-            <p className="text-[1.6rem] font-bold text-center">{item.heading}</p>
-            <ul className="text-[1rem] pl-0 flex flex-col items-center gap-2 ">
+          <Card key={i} className="w-[400px] max850:w-[300px]">
+            <h5 className="text-2xl min-h-20 font-medium flex items-center text-gray-500 dark:text-gray-400">
+              {item.heading}
+            </h5>
+            <div className="flex items-baseline text-gray-900 dark:text-white">
+              <span className="text-3xl font-semibold">
+                {item.currency === "INR" ? "₹ " : "$ "}
+              </span>
+              <span className="text-5xl font-extrabold tracking-tight">
+                {parseInt(item.amount) / 100}
+              </span>
+              <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400">
+                /{item.durationText}
+              </span>
+            </div>
+            <ul className="my-7 space-y-5">
               {item.provides.map((provide, j) => (
-                <li key={`${i}-provide-${j}`} className="text-center">
-                  <p>{provide}</p>
+                <li key={`${i}-provide-${j}`} className="flex space-x-3">
+                  <svg
+                    className="h-5 w-5 shrink-0 text-primaryColor dark:text-primaryColor"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
+                    {provide}
+                  </span>
                 </li>
               ))}
             </ul>
-            <div className="flex-grow"></div>
-            <h1 className="w-[100%] text-center text-[2.3rem] font-bold">
-              {(item.currency === 'INR' ? '₹ ' : '$ ') + parseInt(item.amount) / 100 + '/' + item.durationText}
-            </h1>
-            <div className="z-1 flex justify-center items-center mt-auto mb-10">
-              {paymentHandler(item)}
-            </div>
-          </li>
+            {/* <button
+              type="button"
+              className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+            >
+              Choose plan
+            </button> */}
+            {paymentHandler(item)}
+          </Card>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

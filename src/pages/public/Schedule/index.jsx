@@ -94,10 +94,10 @@ const Schedule = () => {
       <NavBar />
       <div className="flex justify-center pt-[2rem]">
         <div
-          className="text-[3rem] max600:text-[2rem] text-center text-white rounded-lg px-4 py-2 galindo-regular"
+          className="text-[3rem] max600:text-[2rem] text-center text-white rounded-lg px-4 py-2 monserrat-bold"
           style={{ backgroundColor: institutionData.PrimaryColor }}
         >
-          <h1 className="text-white text-3xl mt-2 sm:text-5xl sm:mt-3 p-0 font-bold text-center galindo-regular">
+          <h1 className="text-white text-3xl mt-2 sm:text-5xl sm:mt-3 p-0 font-bold text-center monserrat-bold">
             This Week
           </h1>
         </div>

@@ -6,27 +6,16 @@ import { Pagination } from "flowbite-react";
 import "./index.css";
 import { useMediaQuery } from "../../../../utils/helpers";
 import UpcomingSessionsMobile from "./mobile";
-import { Button2 } from "../../../../common/Inputs";
 import "./mobile.css";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import Streak from "./Streak";
-import QRCode from "qrcode.react";
-import wp from "../../../../utils/images/whatsapp.png";
 import { onJoinClass } from "./StreakFunctions";
 import { toast } from "react-toastify";
 
-import {
-  Button,
-  Label,
-  Modal,
-  TextInput,
-  Select,
-  Datepicker,
-} from "flowbite-react";
-import { FaUserTie, FaCalendarAlt, FaClock  } from "react-icons/fa";
+import { Button, Label, Modal, TextInput, Select } from "flowbite-react";
+import { FaUserTie, FaCalendarAlt, FaClock } from "react-icons/fa";
 import { HiOutlineLink } from "react-icons/hi";
 import { GrYoga } from "react-icons/gr";
-import { FaQrcode } from "react-icons/fa6";
 
 const formatDate = (epochDate) => {
   const date = new Date(epochDate);
@@ -96,7 +85,8 @@ const UpcomingSessions = () => {
     classId,
     editedInstructorNames,
     editedClassType,
-    instructorId
+    instructorId,
+    date,
   ) => {
     UtilCtx.setLoader(true);
 
@@ -119,6 +109,7 @@ const UpcomingSessions = () => {
               instructorNames: editedInstructorNames,
               instructorId: instructorId,
               classType: editedClassType,
+              date: date,
             }
           : c
       );
@@ -135,6 +126,7 @@ const UpcomingSessions = () => {
             instructorNames: editedInstructorNames,
             instructorId: instructorId,
             classType: editedClassType,
+            date: date,
           },
         }
       );
@@ -484,6 +476,25 @@ const UpcomingSessions = () => {
     }));
   };
 
+  const getDate = (epochTime) => {
+    const date = new Date(epochTime);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${year}-${month < 10 ? "0" + month : month}-${
+      day < 10 ? "0" + day : day
+    }`;
+  };
+
+  const getTime = (epochTime) => {
+    const date = new Date(epochTime);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    return `${hours < 10 ? "0" + hours : hours}:${
+      minutes < 10 ? "0" + minutes : minutes
+    }`;
+  };
+
   useEffect(() => {
     fetchAttendance();
     // eslint-disable-next-line
@@ -491,8 +502,9 @@ const UpcomingSessions = () => {
 
   return (
     <>
+      {/*  Create a new class modal */}
       <Modal show={modal} size="lg" onClose={handleClose} popup>
-        <Modal.Header/>
+        <Modal.Header />
         <Modal.Body>
           <div className="space-y-4">
             <div className="flex flex-col justify-between gap-2 min800:flex-row">
@@ -565,7 +577,7 @@ const UpcomingSessions = () => {
                   <Label value="Time" />
                 </div>
                 <TextInput
-                  icon={FaClock }
+                  icon={FaClock}
                   color={"primary"}
                   placeholder="Select Date and Time"
                   type={"time"}
@@ -991,6 +1003,7 @@ const UpcomingSessions = () => {
                               <p className={`overflow-hidden w-[5.6rem] m-0`}>
                                 {formatDate(parseInt(clas.date))}
                               </p>
+
                               <div className={`w-[7rem] ml-8`}>
                                 {Ctx.userData.userType === "admin" ||
                                 Ctx.userData.userType === "instructor" ? (
@@ -1009,7 +1022,8 @@ const UpcomingSessions = () => {
                                         getInstructor(e.target.value).name,
                                         clas.classType,
                                         getInstructor(e.target.value)
-                                          .instructorId
+                                          .instructorId,
+                                        clas.date
                                       );
                                     }}
                                   >
@@ -1070,7 +1084,8 @@ const UpcomingSessions = () => {
                                         getInstructor(clas.instructorNames)
                                           ?.name,
                                         e.target.value,
-                                        clas.instructorId
+                                        clas.instructorId,
+                                        clas.date
                                       );
                                     }}
                                   >
@@ -1086,7 +1101,7 @@ const UpcomingSessions = () => {
                                   </select>
                                 ) : (
                                   <p
-                                    className={`rounded-[0.51rem] px-4 `}
+                                    className={`rounded-[0.51rem] px-4`}
                                     style={{
                                       backgroundColor:
                                         InstitutionData.LightestPrimaryColor,
@@ -1096,15 +1111,34 @@ const UpcomingSessions = () => {
                                   </p>
                                 )}
                               </div>
-                              <p className={`m-0 `}>
-                                {new Date(parseInt(clas.date)).toLocaleString(
-                                  "en-us",
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  }
-                                )}
-                              </p>
+                              {Ctx.userData.userType === "admin" ||
+                              Ctx.userData.userType === "instructor" ? (
+                                <input
+                                  value={getTime(clas.date)}
+                                  type="time"
+                                  className="border border-black rounded bg-transparent"
+                                  onChange={(e) => {
+                                    onClassUpdated(
+                                      clas.classId,
+                                      getInstructor(clas.instructorNames)?.name,
+                                      clas.classType,
+                                      clas.instructorId,
+                                      new Date(getDate(clas.date) + "T" + e.target.value).getTime()
+                                    );
+                                  }}
+                                />
+                              ) : (
+                                <p className={`m-0 `}>
+                                  {new Date(parseInt(clas.date)).toLocaleString(
+                                    "en-us",
+                                    {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    }
+                                  )}
+                                </p>
+                              )}
+
                               <div className="flex gap-4 justify-center items-center">
                                 {clas.zoomLink ? (
                                   <button

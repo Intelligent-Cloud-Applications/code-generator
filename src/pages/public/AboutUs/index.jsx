@@ -27,14 +27,14 @@ const AboutUs = () => {
         <div className="w-[82vw] mt-[2rem]">
           <div className="flex justify-center items-center">
             <h1
-              className="text-[3rem] max600:text-[2rem] font-bold text-center text-white rounded-lg px-4 py-2 galindo-regular"
+              className="text-[3rem] max600:text-[2rem] font-bold text-center text-white rounded-lg px-4 py-2 monserrat-bold"
               style={{ backgroundColor: institutionData.PrimaryColor }}
             >
               About Us
             </h1>
           </div>
           {institutionData?.AboutUs.map((item, index) => (
-            <div key={index} className="w-full sm:ml-0 ml-5">
+            <div key={index} className="w-full ml-5 max850:ml-0">
               {index === 0 ? (
                 <h1 className="text-center text-[4rem] font-bebas-neue">
                   {item.title}
