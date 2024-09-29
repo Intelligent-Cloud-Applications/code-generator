@@ -1,74 +1,19 @@
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .page-wrapper {
-    margin: 0;
-    padding: 0;
-  }
-  
-  h1 {
-    text-align: center;
-    color: #343a40;
-  }
-  
-  table {
-    border-collapse: collapse;
-    margin: 20px auto;
-    width: 100%;
-  }
-  
-  th,
-  td {
-    border: 1px solid #ffffff;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  
-  .common-time {
-    text-align: center;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  
-  tr {
-    border: none !important;
-  }
-  
-  .cls td {
-    border: none; 
-  }
-  
-  th {
-    position: relative;
-  }
-  
-  th:after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: -1px; 
-    width: 1px;
-   
-  }
-  @media (max-width: 700px) {
-    .mob{
-      display: none;
-    }
-    .cls{
-      display: flex;
-      flex-direction: column;
-      
-    }
-    table{
-      font-size: 10px;
-    }
-    .cls td {
-        padding: 0px; 
-      }
-  }
-  
+@import url('https://fonts.googleapis.com/css2?family=Fasthand&family=Galindo&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Galindo&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chelsea+Market&family=Fasthand&family=Galindo&display=swap');
+
+.fasthand-regular {
+  font-family: "Fasthand", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+.galindo-regular {
+  font-family: "Galindo", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.chelsea-market-regular {
+  font-family: "Chelsea Market", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}

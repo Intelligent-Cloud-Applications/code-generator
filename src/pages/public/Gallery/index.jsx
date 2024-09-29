@@ -1,21 +1,22 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import { API, Storage } from "aws-amplify";
-import dancebg from "../../../utils/images/dancebg.jpg";
-import "./Gallery.css";
-import Spinner from "../../../spinner";
-import NavBar from "../../../components/Header";
-import Footer from "../../../components/Footer";
-import Context from "../../../Context/Context";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { toast } from "react-toastify";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/blur.css";
-import InstitutionContext from "../../../Context/InstitutionContext";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+import React, { useState, useEffect, useContext, useRef } from 'react'
+import { API, Storage } from 'aws-amplify'
+import Context from '../../../Context/Context'
+import InstitutionContext from '../../../Context/InstitutionContext'
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import { Image, Trash2Icon, Upload, X } from 'lucide-react'
+import { toast } from 'react-toastify'
+
+import Spinner from '../../../spinner'
+import { FadeLoader } from 'react-spinners'
+import NavBar from '../../../components/Header'
+import Footer from '../../../components/Footer'
+
+import 'react-lazy-load-image-component/src/effects/blur.css'
+import './Gallery.css'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const Gallery = () => {
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState(false)
   const {
     getImagesFromAPI,
     tempImgSrc,
@@ -25,381 +26,335 @@ const Gallery = () => {
     title,
     setTitle,
     description,
-    setDescription,
-  } = useContext(Context);
-  const [img, setImg] = useState();
-  const [model, setModel] = useState(false);
-  const [showInput, setShowInput] = useState(false);
-  const userData = useContext(Context);
-  const user = userData.userData;
-  const [selectedFile, setSelectedFile] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
-  const bucketName = "team-dev-testing";
-  const region = "us-east-2";
-  const institution = user.institution;
-  const { institutionData: InstitutionData } = useContext(InstitutionContext);
-  const fileInputRef = useRef(null);
-  const [loading, setLoading] = useState(true);
+    setDescription
+  } = useContext(Context)
+
+  const [img, setImg] = useState()
+  const [model, setModel] = useState(false)
+  const [showInput, setShowInput] = useState(false)
+  const userData = useContext(Context)
+  const user = userData.userData
+  const [selectedFile, setSelectedFile] = useState('')
+  const [isAdmin, setIsAdmin] = useState(false)
+  const bucketName = 'team-dev-testing'
+  const region = 'us-east-2'
+  const institution = user.institution
+  const { institutionData: InstitutionData } = useContext(InstitutionContext)
+  const fileInputRef = useRef(null)
+  const [loading, setLoading] = useState(true)
+  const [isDeleteing, setIsDeleteing] = useState(false)
+  const [isDataUploading, setIsDataUploading] = useState(false)
+  const [selectValve, setSelectValve] = useState('All')
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      await getImagesFromAPI();
-      setLoading(false);
-    };
-
-    console.log("Fetching images...");
-    console.log("User data:", user);
-    if (user && user.userType === "admin") {
-      setIsAdmin(true);
-    } else {
-      setIsAdmin(false);
+      setLoading(true)
+      await getImagesFromAPI()
+      setLoading(false)
     }
-    console.log("isAdmin after setting:", isAdmin);
-    fetchData();
+
+    console.log('Fetching images...')
+    console.log('User data:', user)
+    if (user && user.userType === 'admin') {
+      setIsAdmin(true)
+    } else {
+      setIsAdmin(false)
+    }
+    console.log('isAdmin after setting:', isAdmin)
+    fetchData()
     // eslint-disable-next-line
-  }, [user]);
+  }, [user])
 
   const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    console.log("File selected:", file);
+    const file = event.target.files[0]
+    console.log('File selected:', file)
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Please upload an image of less than 5MB size.", {
-        className: "custom-toast",
-      });
-      return;
+    if (file.size > 30 * 1024 * 1024) {
+      toast.error('Please upload an image/video of less than 30MB size.', {
+        className: 'custom-toast'
+      })
+      return
     }
 
-    const folderPath = `${user.institution}`;
-    const existingImageNames = imageUrls.map((url) => url.split("/").pop());
+    const folderPath = `${user.institution}`
+    const existingImageNames = imageUrls.map((url) => url.split('/').pop())
 
     if (existingImageNames.includes(file.name)) {
-      toast.error("Selected image already exists.", {
-        className: "custom-toast",
-      });
-      return (fileInputRef.current.value = "");
+      toast.error('Selected image/video already exists.', {
+        className: 'custom-toast'
+      })
+      return (fileInputRef.current.value = '')
     }
-    setShowInput(true);
+    setShowInput(true)
     if (imageUrls.length >= 25) {
-      toast.error("Maximum limit reached. You can upload up to 25 images.", {
-        className: "custom-toast",
-      });
-      return;
+      toast.error(
+        'Maximum limit reached. You can upload up to 25 images/videos.',
+        {
+          className: 'custom-toast'
+        }
+      )
+      return
     }
 
-    setUploading(true);
+    setUploading(true)
     try {
-      console.log("Uploading image:", file.name);
+      console.log('Uploading media:', file.name, file.type)
       await Storage.put(`${folderPath}/${file.name}`, file, {
-        contentType: "image/jpeg",
+        progressCallback(progress) {
+          console.log(`Uploaded: ${progress.loaded}/${progress.total}`)
+        },
+        contentType: file.type,
         bucket: bucketName,
         region: region,
-        ACL: "public-read",
-      });
-      console.log("Image uploaded successfully.");
+        ACL: 'public-read'
+      })
+      console.log('Image uploaded successfully.')
 
-      const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/public/${folderPath}/${file.name}`;
-      setSelectedFile(imageUrl);
-      console.log(title);
-      console.log(description);
-      console.log("API call successful.");
-      await getImagesFromAPI();
+      const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/public/${folderPath}/${file.name}`
+      setSelectedFile(imageUrl)
+      console.log(title)
+      console.log(description)
+      console.log('API call successful.')
+      await getImagesFromAPI()
       if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        fileInputRef.current.value = ''
       }
     } catch (error) {
-      console.error("Error uploading image: ", error);
-      toast.error("Failed to upload image");
+      console.error('Error uploading image: ', error)
+      toast.error('Failed to upload image')
     } finally {
-      setUploading(false); // Ensure this is called to stop the spinner
+      setUploading(false) // Ensure this is called to stop the spinner
     }
-  };
+  }
 
   const uploadImageDataToAPI = async () => {
-    const filename = selectedFile.split("/").pop();
-
+    setIsDataUploading(true)
+    const filename = selectedFile.split('/').pop()
     try {
       const data = {
         institution: institution,
         title: title,
         description: description,
         imageUrl: filename,
-        imgLink: selectedFile,
-      };
+        imgLink: selectedFile
+      }
 
-      await API.post("main", `/admin/upload-image/${institution}`, {
-        body: data,
-      });
-      setTitle("");
-      setDescription("");
-      setSelectedFile(""); // Reset the selected file
+      await API.post('main', `/admin/upload-image/${institution}`, {
+        body: data
+      })
+      setTitle('')
+      setDescription('')
+      setSelectedFile('') // Reset the selected file
+      setIsDataUploading(false)
+      setShowInput(false)
     } catch (error) {
-      console.error("Error uploading image data to API: ", error);
+      console.error('Error uploading image data to API: ', error)
     } finally {
-      getImagesFromAPI();
-      setTempImgSrc("");
-      setUploading(false); // Ensure this is called to stop the spinner
+      getImagesFromAPI()
+      setTempImgSrc('')
     }
-  };
+  }
 
   const getImg = (imageUrl) => {
-    setTempImgSrc(imageUrl);
-    setModel(true);
-    setImg(imageUrl);
-    getImagesFromAPI(imageUrl);
-  };
+    setTempImgSrc(imageUrl)
+    setModel(true)
+    setImg(imageUrl)
+    getImagesFromAPI(imageUrl)
+  }
 
   const handleDelete = async (tempImgSrc) => {
-    console.log("Deleting image:", tempImgSrc);
+    console.log('Deleting image:', tempImgSrc)
     try {
       const key = img.split(
         `https://${bucketName}.s3.${region}.amazonaws.com/public/`
-      )[1];
+      )[1]
+
       await Storage.remove(key, {
         bucket: bucketName,
-        region: region,
-      });
-      setImageUrls((prevUrls) => prevUrls.filter((url) => url !== tempImgSrc));
-      setSelectedFile("");
+        region: region
+      })
+      setImageUrls((prevUrls) => prevUrls.filter((url) => url !== tempImgSrc))
+      setSelectedFile('')
       // Fetch updated image list after deletion
-      getImagesFromAPI();
+      getImagesFromAPI()
     } catch (error) {
-      console.error("Error deleting image: ", error);
+      console.error('Error deleting image: ', error)
     }
-    setModel(false);
-  };
+    setModel(false)
+  }
 
   const dataDelete = async (tempImgSrc) => {
-    console.log(tempImgSrc);
+    console.log(tempImgSrc)
+    setIsDeleteing(true)
     try {
-      await API.del("main", `/admin/delete-image/${institution}`, {
+      await API.del('main', `/admin/delete-image/${institution}`, {
         body: {
-          imageUrl: tempImgSrc,
-        },
-      });
+          imageUrl: tempImgSrc
+        }
+      })
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-    handleDelete(tempImgSrc);
-  };
+    handleDelete(tempImgSrc)
+    setIsDeleteing(false)
+    setModel(false)
+  }
 
   const handleCancelUpload = () => {
-    setShowInput(false);
-    setSelectedFile("");
-    setTitle("");
-    setDescription("");
+    setShowInput(false)
+    setSelectedFile('')
+    setTitle('')
+    setDescription('')
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = ''
     }
-  };
+  }
+
+  let mediaUrls = imageUrls
+  if (selectValve === 'images') {
+    mediaUrls = imageUrls.filter(
+      (url) =>
+        url.split('/').pop().split('.')[1] !== 'mp4' &&
+        url.split('/').pop().split('.')[1] !== 'avi'
+    )
+  } else if (selectValve === 'videos') {
+    mediaUrls = imageUrls.filter(
+      (url) =>
+        url.split('/').pop().split('.')[1] === 'mp4' ||
+        url.split('/').pop().split('.')[1] === 'avi'
+    )
+  } else {
+    mediaUrls = imageUrls
+  }
 
   return (
-    <div>
-      <NavBar />
-      <div className="w-full overflow-hidden flex justify-center">
-        <div className="w-full overflow-hidden flex justify-center items-center">
-          <img
-            className="absolute inset-0 w-full h-full object-cover"
-            src={dancebg}
-            alt=""
-          />
-          <div
-            className="absolute inset-0"
-            style={{ backdropFilter: "blur(5px)" }}
-          ></div>
-          <div className={model ? "model open" : "model"}>
-            <div className="flex justify-between gap-3 max950:flex-col max950:items-center ">
-              <div>
-                <img src={tempImgSrc} alt="" />
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={3}
-                  stroke="white"
-                  className="close-btn w-10 h-10 z-[200]"
-                  onClick={() => {
-                    setModel(false);
-                    setTitle("");
-                    setDescription("");
-                  }}
-                >
-                  <path
-                    strokeLinecap=""
-                    strokeLinejoin="round"
-                    d="M6 18 18 6M6 6l12 12"
+    <>
+      <div className="min-h-screen">
+        {!model && <NavBar />}
+        <div className={model ? 'model open' : 'model'}>
+          {isDeleteing ? (
+            <div className="w-[22.5vw] h-[30vh] z-10 flex flex-col justify-center items-center rounded-lg max800:w-[70vw] max800:h-[20vh]">
+              <FadeLoader
+                color="white"
+                speedMultiplier={2}
+                height={15}
+                width={5}
+              />
+            </div>
+          ) : (
+            <>
+              {tempImgSrc?.split('/').pop().split('.')[1] === 'mp4' ||
+              tempImgSrc?.split('/').pop().split('.')[1] === 'avi' ? (
+                <div className="max-h-[90vh] relative">
+                  <video
+                    className="w-auto max-w-full h-auto max-h-[90vh] block box-border my-0 mx-auto rounded"
+                    src={tempImgSrc}
+                    autoPlay
+                    muted
+                    controls
+                    loop
                   />
-                </svg>
-                {isAdmin && (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="white"
-                    className="del-btn w-8 h-8 z-[200]"
-                    onClick={() => dataDelete(tempImgSrc)}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                    />
-                  </svg>
-                )}
-              </div>
-              {(title || description) && (
-                <div className="flex p-4 flex-col gap-4 justify-center z-[50] text-white w-[60rem] max950:w-[90vw]">
-                  {title && (
-                    <div className="text-[1.5rem] text-center border border-white bg-[#dbdbdb] text-black font-[700] uppercase">
-                      {title}
+                  {(title || description) && (
+                    <div className="absolute bottom-6 left-8 right-8 p-4 bg-zinc-800 bg-opacity-50 text-white w-auto min-w-[20rem] min-h-[20vh] max-w-[30rem] rounded-lg max800:w-[90vw] max800:fixed max800:bottom-4 max800:text-[.7rem]">
+                      <h2 className="text-xl font-semibold roboto-slab-regural">
+                        {title}
+                      </h2>
+                      <p className="roboto-slab-normal">{description}</p>
                     </div>
                   )}
-                  {description && (
-                    <div
-                      className="bg-[#3d3d3d62] p-3 text-[1.1rem] border border-white text-justify"
-                      style={{
-                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                        backdropFilter: "blur(5px)",
-                      }}
-                    >
-                      {description}
+                </div>
+              ) : (
+                <div className="max-h-[90vh] relative">
+                  <img
+                    className="w-auto max-w-[80vw] h-auto max-h-[90vh] block box-border my-0 mx-auto rounded"
+                    src={tempImgSrc}
+                    alt="fitness"
+                  />
+                  {(title || description) && (
+                    <div className="absolute bottom-6 left-8 right-8 p-4 bg-zinc-800 bg-opacity-50 text-white w-auto max-w-[30rem] rounded-lg max800:w-[90vw] max800:fixed max800:bottom-4 max800:text-[.7rem]">
+                      <h2 className="text-xl font-semibold roboto-slab-regural">
+                        {title}
+                      </h2>
+                      <p className="roboto-slab-normal">{description}</p>
                     </div>
                   )}
                 </div>
               )}
-            </div>
-          </div>
-          {showInput && (
-            <div
-              className="absolute flex flex-col justify-center items-center z-[200] w-[100vw] h-[100vh] bg-[#00000091]"
-              style={{
-                boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                backdropFilter: "blur(5px)",
-              }}
-            >
-              {uploading ? (
-                <div
-                  className="w-[50vw] h-[35rem] flex flex-col justify-center items-center bg-[#ffffff6e] rounded-lg max600:w-[90vw]"
-                  style={{
-                    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                    backdropFilter: "blur(5px)",
-                  }}
-                >
-                  <Spinner />
-                </div>
-              ) : null}
-              <img
-                className="min600:max-w-[25vw] min600:max-h-[34rem] max600:w-[90vw] max600:mt-9"
-                src={selectedFile}
-                alt=""
-              />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="white"
-                className="absolute cursor-pointer top-[7%] right-5 w-10 h-10 z-[200]max600:right-1"
-                onClick={handleCancelUpload}
-              >
-                <path
-                  strokeLinecap=""
-                  strokeLinejoin="round"
-                  d="M6 18 18 6M6 6l12 12"
-                />
-              </svg>
-              <div className="flex gap-4 justify-center items-center mt-3 flex-col ">
-                <div className="flex gap-4 justify-center items-center max600:flex-col">
-                  <input
-                    className="h-[3rem] p-[1rem] border border-white w-[25vw] bg-[#0000009d] text-[white] max600:w-[90vw]"
-                    type="text"
-                    placeholder="Title"
-                    onChange={(e) => setTitle(e.target.value)}
+              <div className="fixed top-[20px] right-[20px] flex flex-row justify-center items-center gap-3 text-white cursor-pointer">
+                {isAdmin && (
+                  <Trash2Icon
+                    height={24}
+                    width={24}
+                    onClick={() => dataDelete(tempImgSrc)}
                   />
-                  <textarea
-                    className="scroolbar h-[6rem] p-[1rem] border border-white w-[25vw] bg-[#0000009d] text-[white] max600:w-[90vw]"
-                    placeholder="Description"
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-                <button
-                  className="w-[52vw] text-white font-bold p-2  max600:w-[90vw]"
-                  style={{ background: InstitutionData.LightPrimaryColor }}
+                )}
+                <X
+                  height={24}
+                  width={24}
                   onClick={() => {
-                    setUploading(true);
-                    setShowInput(false);
-                    uploadImageDataToAPI(selectedFile);
+                    setModel(false)
+                    setTitle('')
+                    setDescription('')
+                    setTempImgSrc('')
                   }}
-                >
-                  Upload
-                </button>
+                />
               </div>
-            </div>
+            </>
           )}
-          <div className="scroolbar p-8 w-[95vw] h-[87vh] m-auto z-50 max600:flex max600:w-[100vw]">
-            {imageUrls.length === 0 && isAdmin && (
-              <div className="w-[20rem] h-[14rem]">
-                <label
-                  className="upload cursor-pointer flex text-black text-[1.2rem] font-semibold flex-col justify-center items-center w-[22.5vw] h-[30vh] mb-1 mt-1 bg-[#ffffff6e] max1194:w-[28vw] max1194:h-[20vh]"
-                  style={{
-                    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                    backdropFilter: "blur(5px)",
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
-                    />
-                  </svg>
-                  Upload
-                  <input
-                    type="file"
-                    className="hidden"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                  />
-                </label>
-              </div>
-            )}
+        </div>
 
-            <div className="max600:w-[100vw] ">
-              <ResponsiveMasonry
-                columnsCountBreakPoints={{ 350: 1, 600: 2, 900: 3, 1200: 4 }}
-              >
-                <Masonry>
-                  {imageUrls.length > 0 && isAdmin && (
-                    <label
-                      className="upload cursor-pointer flex text-black text-[1.2rem] font-semibold flex-col justify-center items-center w-[22.5vw] h-[30vh] mb-1 mt-1 bg-[#ffffff6e] max1194:w-[28vw] max1194:h-[20vh]"
+        <div className={showInput ? 'showInput open' : 'showInput'}>
+          {isDataUploading ? (
+            <div className="w-[22.5vw] h-[30vh] z-10 flex flex-col justify-center items-center rounded-lg max800:w-[70vw] max800:h-[20vh]">
+              <FadeLoader
+                color="white"
+                speedMultiplier={2}
+                height={15}
+                width={5}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="h-auto w-[40vw] bg-white px-5 py-4 rounded-md flex flex-col justify-center items-center gap-4 max800:w-[90vw]">
+                <div className="h-[30vh] max800:h-[20vh]">
+                  {selectedFile ? (
+                    selectedFile?.split('/').pop().split('.')[1] === 'mp4' ||
+                    selectedFile?.split('/').pop().split('.')[1] === 'avi' ? (
+                      <video
+                        className="w-[22.5vw] h-[30vh] rounded"
+                        src={selectedFile}
+                        autoPlay
+                        muted
+                      />
+                    ) : (
+                      <img
+                        className="w-[22.5vw] h-[30vh] rounded object-cover"
+                        style={{
+                          border: `2px solid ${InstitutionData.PrimaryColor}`
+                        }}
+                        src={selectedFile}
+                        alt="fitness"
+                      />
+                    )
+                  ) : uploading ? (
+                    <div
+                      className="w-[22.5vw] h-[30vh] z-10 flex flex-col justify-center items-center bg-[#ffffff6e] rounded-lg max800:w-[70vw] max800:h-[20vh]"
                       style={{
-                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                        backdropFilter: "blur(5px)",
+                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                        backdropFilter: 'blur(5px)'
                       }}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
-                        />
-                      </svg>
+                      <Spinner />
+                    </div>
+                  ) : (
+                    <label
+                      className="upload border-2 border-dotted border-stone-500 rounded-lg cursor-pointer flex text-black text-[1.2rem] font-semibold flex-col justify-center items-center w-[22.5vw] h-[30vh] mb-1 mt-1  max800:w-[70vw] max800:h-[20vh]"
+                      style={{
+                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                        backdropFilter: 'blur(5px)'
+                      }}
+                    >
+                      <Upload height={20} width={20} />
                       Upload
                       <input
                         type="file"
@@ -409,67 +364,164 @@ const Gallery = () => {
                       />
                     </label>
                   )}
-                  {imageUrls.length > 0 &&
-                    imageUrls.map((imageUrl, index) => (
-                      <div key={index}>
-                        {loading ? (
-                          <SkeletonTheme
-                            baseColor="#bcbcbc"
-                            highlightColor="#a6a6a6"
-                          >
-                            <div className="relative flex justify-center items-center">
-                              <Skeleton height="30vh" width="22vw" />
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.3}
-                                stroke="gray"
-                                className="absolute w-10 top-[45%]"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                                />
-                              </svg>
-                            </div>
-                          </SkeletonTheme>
-                        ) : (
-                          <LazyLoadImage
-                            className="w-[21w] p-1 object-cover"
-                            src={imageUrl}
-                            effect="blur"
-                            onClick={() => getImg(imageUrl)}
-                            alt=""
-                            style={{
-                              display:
-                                imageUrls.length === 0 ? "none" : "block",
-                            }}
-                          />
-                        )}
-                      </div>
-                    ))}
-                  {uploading ? (
-                    <div
-                      className="h-[25rem] w-[25rem] flex flex-col justify-center items-center bg-[#ffffff3f] "
-                      style={{
-                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                        backdropFilter: "blur(5px)",
-                      }}
+                </div>
+                <div className="w-full">
+                  <div className="mb-4">
+                    <label
+                      for="title"
+                      className="block text-gray-700 text-sm font-semibold mb-2"
                     >
-                      <Spinner />
-                    </div>
-                  ) : null}
-                </Masonry>
-              </ResponsiveMasonry>
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      id="title"
+                      name="title"
+                      value={title}
+                      placeholder="Enter the title"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
+                  </div>
+                  <div className="">
+                    <label
+                      for="description"
+                      className="block text-gray-700 text-sm font-semibold mb-2"
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      id="description"
+                      name="description"
+                      placeholder="Enter the description"
+                      value={description}
+                      rows="4"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
+                      onChange={(e) => setDescription(e.target.value)}
+                    ></textarea>
+                  </div>
+                </div>
+                <div className="min800:w-full flex justify-between max800:justify-between max950:gap-2 ">
+                  <button
+                    className="px-12 py-2 text-white bg-red-400 rounded flex flex-row gap-2 items-center justify-center"
+                    onClick={() => {
+                      handleCancelUpload()
+                      setUploading(false)
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-12 py-2 text-white rounded flex flex-row gap-2 items-center justify-center"
+                    style={{
+                      backgroundColor: `${InstitutionData.PrimaryColor}`
+                    }}
+                    onClick={() => {
+                      setShowInput(false)
+                      uploadImageDataToAPI(selectedFile)
+                    }}
+                  >
+                    Upload
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+        <div>
+          <div className="py-[2rem] flex justify-center mb-0 text-[3rem] max600:text-[2rem]">
+            <h2
+              className="text-[3rem] max600:text-[2rem] font-bold text-center w-[15rem] text-white rounded-lg px-4 py-2 monserrat-bold"
+              style={{ backgroundColor: InstitutionData.PrimaryColor }}
+            >
+              Gallery
+            </h2>
+          </div>
+          <div>
+            <div className="flex justify-end items-center gap-3 mr-8 mb-4">
+              <select
+                className="px-[1.3rem] py-2 border-2 rounded cursor-pointer"
+                value={selectValve}
+                onChange={(e) => setSelectValve(e.target.value)}
+              >
+                <option value="All">All</option>
+                <option value="images">Images</option>
+                <option value="videos">Videos</option>
+              </select>
+              {isAdmin && (
+                <button
+                  className="px-12 py-2 text-white rounded flex flex-row gap-2 items-center justify-center"
+                  style={{ backgroundColor: `${InstitutionData.PrimaryColor}` }}
+                  onClick={() => {
+                    setShowInput(true)
+                  }}
+                >
+                  <Upload height={20} width={20} />
+                  Upload
+                </button>
+              )}
             </div>
           </div>
+
+          {mediaUrls.length === 0 ? (
+            <h2 className="text-center text-[1.5rem] mt-16 text-slate-400">
+              No Media Found
+            </h2>
+          ) : (
+            <div className="gallery mb-4 columns-4 max850:columns-2">
+              {mediaUrls.map((imageUrl, index) =>
+                loading ? (
+                  <SkeletonTheme baseColor="#bcbcbc" highlightColor="#a6a6a6">
+                    <div className="relative flex justify-center items-center">
+                      <Skeleton
+                        height="40vh"
+                        width="24vw"
+                        className="mb-[12px] max900:!w-[45vw] max900:!h-[20vh]"
+                      />
+                      <Image
+                        className="absolute w-10 top-[45%] opacity-50"
+                        height={48}
+                        width={48}
+                      />
+                    </div>
+                  </SkeletonTheme>
+                ) : (
+                  <div className="media">
+                    {imageUrl.split('/').pop().split('.')[1] === 'mp4' ||
+                    imageUrl.split('/').pop().split('.')[1] === 'avi' ? (
+                      <video
+                        key={index}
+                        src={imageUrl}
+                        alt="Gallery"
+                        style={{
+                          width: '100%'
+                        }}
+                        onClick={() => getImg(imageUrl)}
+                        autoPlay
+                        muted
+                        loop
+                      />
+                    ) : (
+                      <img
+                        key={index}
+                        src={imageUrl}
+                        alt="Gallery"
+                        style={{
+                          width: '100%'
+                        }}
+                        onClick={() => getImg(imageUrl)}
+                      />
+                    )}
+                  </div>
+                )
+              )}
+            </div>
+          )}
         </div>
       </div>
       <Footer />
-    </div>
-  );
-};
+    </>
+  )
+}
 
-export default Gallery;
+export default Gallery

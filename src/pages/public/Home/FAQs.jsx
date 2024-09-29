@@ -36,7 +36,7 @@ export default function FAQ() {
   };
 
   return (
-    <div className={`home-faq flex flex-col items-center justify-center gap-20 mb-8 max800:py-[20rem]`}>
+    <div className={`home-faq flex flex-col items-center justify-center gap-20 max800:py-[10rem]`}>
       <div className={` flex flex-col max800:px-[5rem] `}>
         <h2 className={'text-5xl font-bold'}>FAQs</h2>
       </div>

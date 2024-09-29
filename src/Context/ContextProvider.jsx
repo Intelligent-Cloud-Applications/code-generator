@@ -60,15 +60,7 @@ const ContextProvider = (props) => {
         setPreviousClasses([])
         console.log(e)
       }
-
-      try {
-        const list = await API.get('main', apiPaths.getMembers)
-        setUserList(list)
-      } catch (e) {
-        console.log(e)
-        setUserList([])
-      }
-
+      getUserList();
       try {
         // Add the API call for fetching streak data
         const streakResponse = await API.get('main', apiPaths.getStreak)
@@ -134,7 +126,15 @@ const ContextProvider = (props) => {
       // }
     }
   }
-
+  const getUserList = async() => {
+    try {
+      const list = await API.get('main', apiPaths.getMembers)
+      setUserList(list)
+    } catch (e) {
+      console.log(e)
+      setUserList([])
+    }
+  }
   const onUnauthLoad = async (id) => {
     API.get('main', apiPaths.getProducts)
       .then((list) => {
@@ -203,7 +203,7 @@ const ContextProvider = (props) => {
       const response = await API.get('main', `/user/get-imageUrl/${web.InstitutionId}`);
       console.log(response);
       setImageUrls(response.GalleryImagesLinks || []);
-      if (tempImgSrc) {
+      if (imageUrl) {
         const filename = imageUrl.split('/').pop();
         console.log(filename)
         if (response.gallery && response.gallery[filename]) {
@@ -218,7 +218,29 @@ const ContextProvider = (props) => {
   useEffect(() => {
     getImagesFromAPI()
 // eslint-disable-next-line 
-  },[])
+  }, [])
+  
+  const [revenue, setRevenue] = useState([]); // Initialize with an empty array
+
+  useEffect(() => {
+    const paymentDetailsAdmin = async () => {
+      try {
+        const response = await API.get('main', `/payment-history/${userData.institution}`);
+        const payments = response?.payments || [];
+        console.log(response);
+        setRevenue(Array.isArray(payments) ? payments : []); // Ensure revenue is an array
+      } catch (error) {
+        console.error('Error getting payment history from API: ', error);
+      }
+    };
+
+    // Only run the function if userData.institution is available
+    if (userData.institution) {
+      paymentDetailsAdmin();
+    }
+  }, [userData.institution]); // Dependency on userData.institution
+
+  console.log(revenue);
 
   const ContextData = {
     onAuthLoad: onAuthLoad,
@@ -237,6 +259,7 @@ const ContextProvider = (props) => {
     setPreviousClasses: setPreviousClassesFn,
     userList: userList,
     setUserList: setUserListFn,
+    getUserList:getUserList,
     productList: productList,
     instructorList: instructorList,
     setInstructorList: () => {},
@@ -254,7 +277,8 @@ const ContextProvider = (props) => {
     title: title,
     setTitle: setTitle,
     description: description,
-    setDescription:setDescription
+    setDescription: setDescription,
+    revenue
   }
 
   return (
