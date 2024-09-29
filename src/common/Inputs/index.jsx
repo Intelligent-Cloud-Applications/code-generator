@@ -9,22 +9,23 @@ import {LuHash, LuMail, LuPhone, LuText} from "react-icons/lu";
 //import {useSelector} from "react-redux";
 
 export const CountrySelect = (props) => {
-  const { country, setCountry } = useState(91);
-  
+  const [country, setCountry] = useState(userData?.countryValue);
+
+  const handleChange = (event) => {
+    setCountry(event.target.value);
+  };
+
   return (
-    <Select
-      value={country}
-      onChange={setCountry}
-      {...props}
-    >
-      {countries.map((item, index) =>
-        <option key={ index } value={ item.value }>
-          { item.name }
+    <Select value={country} onChange={handleChange} {...props}>
+      {countries.map((item, index) => (
+        <option key={index} value={item.value}>
+          {item.name}
         </option>
-      )}
+      ))}
     </Select>
-  )
+  );
 }
+
 
 
 export const PhoneInput = (props) => {

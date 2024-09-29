@@ -5,12 +5,34 @@ import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly
 import HappyprancerPaypalHybrid from "../Subscription/HappyprancerPaypalHybrid";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import RazorpayPayment from "../Subscription/RazorpayPayment";
-import { Card } from "flowbite-react";
+import { API } from "aws-amplify";
 
 const Subscription = () => {
   const { institutionData: InstitutionData } = useContext(InstitutionContext);
-  const { isAuth, productList, userData: UserCtx } = useContext(Context);
+  const { isAuth, productList, userData, setUserData } = useContext(Context);
   const Navigate = useNavigate();
+
+  // Ensure userData is initialized with a default value
+  const [localUserData, setLocalUserData] = useState(userData || {});
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userInfo = await API.get("main", "/user/check-user-location");
+        setUserData(userInfo); // This updates the global context state
+        setLocalUserData(userInfo); // Also update local state
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, [setUserData]);
+
+  const text = {
+    Heading: "Monthly Membership Subscription",
+    SubHeading: "See the pricing details below",
+  };
 
   const [bgInView, setBgInView] = useState(false);
 
@@ -42,16 +64,21 @@ const Subscription = () => {
   const paymentHandler = (item) => {
     if (isAuth) {
       if (
-        UserCtx?.status === "Active" &&
-        UserCtx?.productIds?.some((productId) => productId === item.productId)
+        localUserData?.status === "Active" &&
+        localUserData?.productIds?.some(
+          (productId) => productId === item.productId
+        )
       ) {
         return (
-          <button
-            type="button"
-            className="inline-flex w-full justify-center rounded-lg bg-white border-lightPrimaryColor border-2 px-5 py-2.5 text-center text-sm font-medium text-lightPrimaryColor hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+          <p
+            className={`text-[1rem] w-[15rem] px-12 py-2 rounded-2xl border-[0.2rem] h-[3rem] flex justify-center items-center`}
+            style={{
+              color: InstitutionData.LightPrimaryColor,
+              borderColor: InstitutionData.LightPrimaryColor,
+            }}
           >
             Subscribed
-          </button>
+          </p>
         );
       } else {
         if (item.currency === "INR") {
@@ -66,36 +93,36 @@ const Subscription = () => {
           item.subscriptionType === "Hybrid"
         ) {
           return <HappyprancerPaypalHybrid />;
-        } else {
-          return (
-            <button
-              type="button"
-              className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
-            >
-              Subscribe
-            </button>
-          );
         }
       }
     } else {
       return (
         <button
-          type="button"
           onClick={() => {
-            Navigate("/auth");
+            Navigate("/signup");
           }}
-          className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+          className={`w-[15rem] px-12 py-2 rounded-2xl hover:text-lightPrimaryColor hover:bg- hover:border-lightPrimaryColor hover:border-[0.3rem] h-[3rem] flex justify-center items-center mt-auto mb-10 text-white`}
+          style={{
+            backgroundColor: InstitutionData.LightPrimaryColor,
+          }}
         >
-          Sign up
+          Sign Up
         </button>
       );
     }
   };
 
+  const filteredProductListINR = productList.filter(
+    (item) => item.currency === "INR"
+  );
+  const filteredProductListUSD = productList.filter(
+    (item) => item.currency === "USD"
+  );
+
   return (
     <div
       id="subscription-section"
-      className={`text-[1.5rem] flex flex-col items-center justify-center gap-[5rem] `}
+      className={`Back text-[1.5rem] flex flex-col items-center h-auto min-h-screen max980:h-[auto] justify-center gap-[5rem] `}
       style={{
         backgroundImage: bgInView
           ? `url(${InstitutionData.SubscriptionBg})`
@@ -109,13 +136,13 @@ const Subscription = () => {
     >
       <div className="text-center sans-serif mt-4">
         <h1
-          className="text-[3rem] max850:text-[1.5rem] font-[700] max800:px-3"
+          className="text-[3rem] max850:text-[1.5rem] font-[700]"
           style={{
             color: "black",
             fontWeight: "bold",
           }}
         >
-          Membership Subscription
+          Monthly Membership Subscription
         </h1>
         <h3
           className="text-[1rem] mt-2 max850:text-[.7rem] font-[600]"
@@ -126,55 +153,65 @@ const Subscription = () => {
           See the pricing details below
         </h3>
       </div>
-
-      <div className="flex flex-row gap-8 justify-center flex-wrap max850:!flex-col max-w-[90vw]">
-        {productList.map((item, i) => (
-          <Card key={i} className="w-[400px] max850:w-[300px]">
-            <h5 className="text-2xl min-h-20 font-medium flex items-center text-gray-500 dark:text-gray-400">
-              {item.heading}
-            </h5>
-            <div className="flex items-baseline text-gray-900 dark:text-white">
-              <span className="text-3xl font-semibold">
-                {item.currency === "INR" ? "₹ " : "$ "}
-              </span>
-              <span className="text-5xl font-extrabold tracking-tight">
-                {parseInt(item.amount) / 100}
-              </span>
-              <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400">
-                /{item.durationText}
-              </span>
-            </div>
-            <ul className="my-7 space-y-5">
-              {item.provides.map((provide, j) => (
-                <li key={`${i}-provide-${j}`} className="flex space-x-3">
-                  <svg
-                    className="h-5 w-5 shrink-0 text-primaryColor dark:text-primaryColor"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-                    {provide}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            {/* <button
-              type="button"
-              className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+      <ul className="flex flex-wrap justify-center w-[90vw] max-w-[80rem] gap-16 pl-0">
+        {localUserData?.countryCode === "IN" ? (
+          filteredProductListINR.length > 0 ? (
+            filteredProductListINR.map((item, i) => (
+              <li
+                key={item.productId + `home${i}`}
+                className="subscription-card w-full sm:w-[45%] lg:w-[30%] py-6 px-8 rounded-[2rem] z-10 flex flex-col items-center gap-4 shadowSubscribe bg-white border-[0.1rem]"
+                style={{ borderColor: InstitutionData.LightPrimaryColor }}
+              >
+                <p className="text-[1.6rem] font-bold text-center">
+                  {item.heading}
+                </p>
+                <ul className="text-[1rem] pl-0 flex flex-col items-center gap-2 ">
+                  {item.provides.map((provide, j) => (
+                    <li key={`${i}-provide-${j}`} className="text-center">
+                      <p>{provide}</p>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex-grow"></div>
+                <h1 className="w-[100%] text-center text-[2.3rem] font-bold">
+                  {"₹ " + parseInt(item.amount) / 100 + "/" + item.durationText}
+                </h1>
+                <div className="z-1 flex justify-center items-center mt-auto mb-10">
+                  {paymentHandler(item)}
+                </div>
+              </li>
+            ))
+          ) : (
+            <p>No products available for India.</p>
+          )
+        ) : (
+          filteredProductListUSD.map((item, i) => (
+            <li
+              key={item.productId + `home${i}`}
+              className="subscription-card w-full sm:w-[45%] lg:w-[30%] py-6 px-8 rounded-[2rem] z-10 flex flex-col items-center gap-4 shadowSubscribe bg-white border-[0.1rem]"
+              style={{ borderColor: InstitutionData.LightPrimaryColor }}
             >
-              Choose plan
-            </button> */}
-            {paymentHandler(item)}
-          </Card>
-        ))}
-      </div>
+              <p className="text-[1.6rem] font-bold text-center">
+                {item.heading}
+              </p>
+              <ul className="text-[1rem] pl-0 flex flex-col items-center gap-2 ">
+                {item.provides.map((provide, j) => (
+                  <li key={`${i}-provide-${j}`} className="text-center">
+                    <p>{provide}</p>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex-grow"></div>
+              <h1 className="w-[100%] text-center text-[2.3rem] font-bold">
+                {"$ " + parseInt(item.amount) / 100 + "/" + item.durationText}
+              </h1>
+              <div className="z-1 flex justify-center items-center mt-auto mb-10">
+                {paymentHandler(item)}
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
     </div>
   );
 };
