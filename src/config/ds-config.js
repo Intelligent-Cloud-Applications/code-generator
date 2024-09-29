@@ -16,14 +16,12 @@ export const dsProd = {
         endpoints: [
             {
                 name: 'main',
-                // endpoint: 'https://xc5rnclqr6.execute-api.us-east-1.amazonaws.com/dev',
-                endpoint: 'https://ozmwa310vk.execute-api.us-east-1.amazonaws.com/dev',
+                endpoint: 'https://xc5rnclqr6.execute-api.us-east-1.amazonaws.com/dev',
                 region: 'us-east-1',
             },
             {
                 name: 'prod',
-                // endpoint: 'https://xc5rnclqr6.execute-api.us-east-1.amazonaws.com/dev',
-                endpoint: 'https://ozmwa310vk.execute-api.us-east-1.amazonaws.com/dev',
+                endpoint: 'https://xc5rnclqr6.execute-api.us-east-1.amazonaws.com/dev',
                 region: 'us-east-1',
             },
             {

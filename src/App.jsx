@@ -10,17 +10,6 @@ function App() {
   const RefCtx = useRef(useContext(Context))
   const RefInstitutionCtx = useRef(useContext(InstitutionContext))
   const InsitutionCtx = useContext(InstitutionContext)
-  const { setUserData } = useContext(Context);
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const userInfo = await API.get("main", "/user/check-user-location");
-      setUserData(userInfo);
-    };
-
-    fetchUserInfo();
-  }, []);
-
   useEffect(() => {
     const dataLoadFn = async () => {
       try {
