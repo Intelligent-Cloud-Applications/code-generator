@@ -14,6 +14,7 @@ const PutAttendance = () => {
   // const { classId } = useParams();
 
   const [instructorData, setInstructorData ] = useState({});
+  const [classData, setClassData] = useState({});
 
   useEffect(() => {
     const putAttendance = async () => {
@@ -28,10 +29,12 @@ const PutAttendance = () => {
       let response;
 
       try {
-        const { classId } = await API.get('main', `/any/get-current-class/${InstitutionId}`, {});
+        const classData = await API.get('main', `/any/get-current-class/${InstitutionId}`, {});
+        setClassData(classData);
+        const { classId } = classData;
         response = await API.post('main', `/user/put-attendance/${InstitutionId}`, { body: { classId, emailId } });
         setInstructorData(response);
-        toast.success("Attendance marked successfully");
+        // toast.success("Attendance marked successfully");
         if (response.message) toast.info(response.message);
       } catch (error) {
         toast.error(error.response.data.message || "An unknown error occurred");
@@ -45,7 +48,7 @@ const PutAttendance = () => {
     putAttendance();
   }, [isAuth]);
 
-  return <SubmitRating instructorData={instructorData} />
+  return <SubmitRating instructorData={instructorData} classData={classData} />
 }
 
 export default PutAttendance;
