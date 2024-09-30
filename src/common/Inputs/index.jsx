@@ -10,11 +10,20 @@ import countries from "./countries.json";
 //import {useSelector} from "react-redux";
 
 export const CountrySelect = (props) => {
-  const { userData } = useContext(Context);
+  const { userData,setUserData } = useContext(Context);
   const [country, setCountry] = useState(userData?.location?.countryValue);
 
   const handleChange = (event) => {
     setCountry(event.target.value);
+    setUserData((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        countryValue: event.target.value,
+        countryName: countries.find((item) => item.value === event.target.value)
+          ?.name,
+      },
+    }));
   };
   return (
     <Select value={country} onChange={handleChange} {...props}>
