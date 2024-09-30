@@ -11,7 +11,7 @@ import countries from "./countries.json";
 
 export const CountrySelect = (props) => {
   const { userData } = useContext(Context);
-  const [country, setCountry] = useState(userData?.location?.countryCode);
+  const [country, setCountry] = useState(userData?.location?.countryValue);
 
   const handleChange = (event) => {
     setCountry(event.target.value);
