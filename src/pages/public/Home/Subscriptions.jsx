@@ -14,6 +14,8 @@ const Subscription = () => {
 
   const [bgInView, setBgInView] = useState(false);
 
+
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -38,6 +40,17 @@ const Subscription = () => {
       }
     };
   }, []);
+
+    const filteredProductListINR = productList.filter(
+      (item) => item.currency === "INR"
+    );
+    const filteredProductListUSD = productList.filter(
+      (item) => item.currency === "USD"
+    );
+
+      // console.log("filteredProductListINR", filteredProductListINR);
+      // console.log("filteredProductListUSD", filteredProductListUSD);
+      // console.log(UserCtx.location)
 
   const paymentHandler = (item) => {
     if (isAuth) {
@@ -128,52 +141,101 @@ const Subscription = () => {
       </div>
 
       <div className="flex flex-row gap-8 justify-center flex-wrap max850:!flex-col max-w-[90vw]">
-        {productList.map((item, i) => (
-          <Card key={i} className="w-[400px] max850:w-[300px]">
-            <h5 className="text-2xl min-h-20 font-medium flex items-center text-gray-500 dark:text-gray-400">
-              {item.heading}
-            </h5>
-            <div className="flex items-baseline text-gray-900 dark:text-white">
-              <span className="text-3xl font-semibold">
-                {item.currency === "INR" ? "₹ " : "$ "}
-              </span>
-              <span className="text-5xl font-extrabold tracking-tight">
-                {parseInt(item.amount) / 100}
-              </span>
-              <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400">
-                /{item.durationText}
-              </span>
-            </div>
-            <ul className="my-7 space-y-5">
-              {item.provides.map((provide, j) => (
-                <li key={`${i}-provide-${j}`} className="flex space-x-3">
-                  <svg
-                    className="h-5 w-5 shrink-0 text-primaryColor dark:text-primaryColor"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-                    {provide}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            {/* <button
+        {UserCtx?.location?.countryCode === "IN" &&
+          filteredProductListINR.map((item, i) => (
+            <Card key={i} className="w-[400px] max850:w-[300px]">
+              <h5 className="text-2xl min-h-20 font-medium flex items-center text-gray-500 dark:text-gray-400">
+                {item.heading}
+              </h5>
+              <div className="flex items-baseline text-gray-900 dark:text-white">
+                <span className="text-3xl font-semibold">
+                  {item.currency === "INR" ? "₹ " : "$ "}
+                </span>
+                <span className="text-5xl font-extrabold tracking-tight">
+                  {parseInt(item.amount) / 100}
+                </span>
+                <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400">
+                  /{item.durationText}
+                </span>
+              </div>
+              <ul className="my-7 space-y-5">
+                {item.provides.map((provide, j) => (
+                  <li key={`${i}-provide-${j}`} className="flex space-x-3">
+                    <svg
+                      className="h-5 w-5 shrink-0 text-primaryColor dark:text-primaryColor"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
+                      {provide}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {/* <button
               type="button"
               className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
             >
               Choose plan
             </button> */}
-            {paymentHandler(item)}
-          </Card>
-        ))}
+              {paymentHandler(item)}
+            </Card>
+          ))}
+
+        {UserCtx?.location?.countryCode !== "IN" &&
+          filteredProductListUSD.map((item, i) => (
+            <Card key={i} className="w-[400px] max850:w-[300px]">
+              <h5 className="text-2xl min-h-20 font-medium flex items-center text-gray-500 dark:text-gray-400">
+                {item.heading}
+              </h5>
+              <div className="flex items-baseline text-gray-900 dark:text-white">
+                <span className="text-3xl font-semibold">
+                  {item.currency === "INR" ? "₹ " : "$ "}
+                </span>
+                <span className="text-5xl font-extrabold tracking-tight">
+                  {parseInt(item.amount) / 100}
+                </span>
+                <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400">
+                  /{item.durationText}
+                </span>
+              </div>
+              <ul className="my-7 space-y-5">
+                {item.provides.map((provide, j) => (
+                  <li key={`${i}-provide-${j}`} className="flex space-x-3">
+                    <svg
+                      className="h-5 w-5 shrink-0 text-primaryColor dark:text-primaryColor"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
+                      {provide}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {/* <button
+              type="button"
+              className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+            >
+              Choose plan
+            </button> */}
+              {paymentHandler(item)}
+            </Card>
+          ))}
       </div>
     </div>
   );
