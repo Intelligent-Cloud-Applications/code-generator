@@ -8,12 +8,14 @@ import InstitutionContext from "../../../Context/InstitutionContext";
 import {toast} from "react-toastify";
 import {useNavigate} from "react-router-dom";
 
-const RatingPage = ({ instructorData }) => {
+const RatingPage = ({ instructorData, classData }) => {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
   const { InstitutionId } = useContext(InstitutionContext).institutionData;
   const { userData, util } = useContext(Context);
   const navigate = useNavigate();
+
+  console.log(classData)
 
   const handleRating = (rate) => {
     setRating(rate);
@@ -22,6 +24,11 @@ const RatingPage = ({ instructorData }) => {
   const handleSubmit = async () => {
     console.log('Rating submitted:', rating);
     console.log('Feedback submitted:', feedback);
+
+    if (rating === 0) {
+      toast.error("Please give a rating.")
+      return;
+    }
 
     // Handle the submission logic (e.g., send to an API)
     try {
@@ -51,9 +58,12 @@ const RatingPage = ({ instructorData }) => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex flex-col gap-4 justify-center items-center h-screen">
+      <h1 className='font-bold text-center text-2xl max-w-2xl'>Your attendance for below class is marked. Have a
+        great session ahead and Please Rate us after the session.</h1>
+      <p className='font-bold text-xl'>{classData.classDescription} Class by {classData.instructorNames}</p>
       <Card className="w-full max-w-lg">
-        <h2 className="text-xl font-semibold mb-4">Rate Us</h2>
+        <h2 className="text-xl font-semibold mb-4">Rating</h2>
         <div className="flex justify-center mb-4">
           {[1, 2, 3, 4, 5].map((star) => (
             <FaStar
