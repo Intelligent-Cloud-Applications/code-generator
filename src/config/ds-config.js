@@ -2,9 +2,10 @@ export const dsProd = {
     Auth: {
         mandatorySignIn: true,
         region: 'us-east-1',
-        userPoolId: 'us-east-1_a3Fk5S3hh',
+        userPoolId: process.env.USER_POOL_ID,
         identityPoolId: 'us-east-1:a68cac30-d7f7-4f73-9b1f-ca6a4f86eba6',
-        userPoolWebClientId: 'jevucp6v2ehehqerq0rlgn4d8',
+        // userPoolWebClientId: 'jevucp6v2ehehqerq0rlgn4d8',
+        userPoolWebClientId: '4p8eok5qs75tje17bsjn7k2boi',
         oauth: { responseType: 'token' },
     },
     Storage: {
