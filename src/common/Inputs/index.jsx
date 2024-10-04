@@ -1,6 +1,6 @@
 // Packages
 import { Select, TextInput } from "flowbite-react";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 // Local
 import { LuHash, LuMail, LuPhone, LuText } from "react-icons/lu";
@@ -10,20 +10,14 @@ import countries from "./countries.json";
 //import {useSelector} from "react-redux";
 
 export const CountrySelect = (props) => {
-  const { userData,setUserData } = useContext(Context);
+  const { userData } = useContext(Context);
   const [country, setCountry] = useState(userData?.location?.countryValue);
 
+  useEffect(() => {
+    setCountry(userData?.location?.countryValue);
+  }, [userData?.location?.countryValue]);
   const handleChange = (event) => {
     setCountry(event.target.value);
-    setUserData((prev) => ({
-      ...prev,
-      location: {
-        ...prev.location,
-        countryValue: event.target.value,
-        countryName: countries.find((item) => item.value === event.target.value)
-          ?.name,
-      },
-    }));
   };
   return (
     <Select value={country} onChange={handleChange} {...props}>

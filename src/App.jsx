@@ -4,6 +4,7 @@ import Context from "./Context/Context";
 import RoutesContainer from "./routes";
 import LoaderProvider from "./components/LoaderProvider";
 import InstitutionContext from "./Context/InstitutionContext";
+import apiPaths from "./utils/api-paths";
 
 function App() {
   const UtilCtx = useRef(useContext(Context).util);
@@ -57,6 +58,8 @@ function App() {
           `/user/profile/${data && data.InstitutionId}`
         );
 
+        const location = await API.get("main", apiPaths?.getUserLocation);
+
         // userdata.Status = true;
         RefCtx.current.setUserData((prev) => ({
           ...prev,
@@ -72,11 +75,13 @@ function App() {
         RefCtx.current.setUserData({});
         UtilCtx.current.setLoader(false);
       } finally {
-         const location = await API.get("main", "/user/check-user-location");
+        if((RefCtx.current.userData)["location"] === undefined) {
+         const location = await API.get("main", apiPaths?.getUserLocation);
          RefCtx.current.setUserData((prev) => ({
            ...prev,
            location: location,
          }));
+        }
       }
     };
 
