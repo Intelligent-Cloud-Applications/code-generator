@@ -2,16 +2,15 @@ export const dsProd = {
     Auth: {
         mandatorySignIn: true,
         region: 'us-east-1',
-        userPoolId: process.env.USER_POOL_ID,
-        identityPoolId: 'us-east-1:a68cac30-d7f7-4f73-9b1f-ca6a4f86eba6',
-        // userPoolWebClientId: 'jevucp6v2ehehqerq0rlgn4d8',
-        userPoolWebClientId: '4p8eok5qs75tje17bsjn7k2boi',
+        userPoolId: process.env.REACT_APP_PROD_USER_POOL_ID,
+        identityPoolId: process.env.REACT_APP_PROD_IDENTITY_POOL_ID,
+        userPoolWebClientId: process.env.REACT_APP_CLIENT_ID,
         oauth: { responseType: 'token' },
     },
     Storage: {
         region: 'us-east-1',
         bucket: 'insitution-utils',
-        identityPoolId: 'us-east-1:a68cac30-d7f7-4f73-9b1f-ca6a4f86eba6',
+        identityPoolId: process.env.REACT_APP_PROD_IDENTITY_POOL_ID,
     },
     API: {
         endpoints: [
@@ -40,11 +39,8 @@ export const dsDev = {
     Auth: {
         mandatorySignIn: true,
         region: 'us-east-2',
-        // userPoolId: 'us-east-2_L3E5BSjIf',
         userPoolId: 'us-east-2_J02pfxenV',
-        // identityPoolId: 'us-east-2:9b1fda39-3231-4606-b32f-7ba24edcb53d',
         identityPoolId: 'us-east-2:2966c931-c163-4682-89d6-9bf8c491e5b7',
-        // userPoolWebClientId: '5pqia04a65b3ef6fbmpoccj4vl',
         userPoolWebClientId: '1oui8eijud46ajipjeg01h4i3m',
         // oauth: { responseType: 'token' },
     },
