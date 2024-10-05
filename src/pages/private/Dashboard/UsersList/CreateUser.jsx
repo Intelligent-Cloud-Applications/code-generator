@@ -1,22 +1,41 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from "react";
 import { X } from "lucide-react";
 import Country from "../../../../components_old/Country";
 import InstitutionContext from "../../../../Context/InstitutionContext";
-import Context from '../../../../Context/Context';
-import { toast } from 'react-toastify';
-import InputComponent from '../../../../common/InputComponent';
-import { API } from 'aws-amplify';
+import Context from "../../../../Context/Context";
+import { toast } from "react-toastify";
+import InputComponent from "../../../../common/InputComponent";
+import { API } from "aws-amplify";
 
 function CreateUser({
-  phoneNumber, name, email, status, cognitoId, setStatus, balance, setShowUserAdd,
-  setPhoneNumber, createButton, setCreateButton, setIsModalOpen, setEmail, countryCode, setCountryCode, setName, setBalance, productType, setProductType, selectedProductAmount, setSelectedProductAmount
+  phoneNumber,
+  name,
+  email,
+  status,
+  cognitoId,
+  setStatus,
+  balance,
+  setShowUserAdd,
+  setPhoneNumber,
+  createButton,
+  setCreateButton,
+  setIsModalOpen,
+  setEmail,
+  countryCode,
+  setCountryCode,
+  setName,
+  setBalance,
+  productType,
+  setProductType,
+  selectedProductAmount,
+  setSelectedProductAmount,
 }) {
-  const [userType, setUserType] = useState('member')
-  const [instructorPaymentType, setInstructorPaymentType] = useState('');
-  const [instructorPaymentAmount, setInstructorPaymentAmount] = useState('');
+  const [userType, setUserType] = useState("member");
+  const [instructorPaymentType, setInstructorPaymentType] = useState("");
+  const [instructorPaymentAmount, setInstructorPaymentAmount] = useState("");
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const Ctx = useContext(Context);
-  const { getUserList } = useContext(Context)
+  const { getUserList } = useContext(Context);
   const UtilCtx = useContext(Context).util;
 
   // State for product type and amount
@@ -27,29 +46,30 @@ function CreateUser({
     return new Date(localTime).getTime();
   };
 
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const productList = await API.get(
-          'main',
+          "main",
           `/any/products/${InstitutionData.InstitutionId}`
         );
         setProductDetails(productList);
       } catch (error) {
-        console.error('Error fetching product details:', error);
+        console.error("Error fetching product details:", error);
       }
     };
 
     fetchProducts();
   }, [InstitutionData.InstitutionId]);
   const handleProductTypeChange = (e) => {
-    const selectedProduct = productDetails.find(product => product.heading === e.target.value);
+    const selectedProduct = productDetails.find(
+      (product) => product.heading === e.target.value
+    );
     setProductType(e.target.value);
-    setSelectedProductAmount(selectedProduct ? selectedProduct.amount : '');
+    setSelectedProductAmount(selectedProduct ? selectedProduct.amount : "");
   };
 
-  console.log(countryCode)
+  console.log(countryCode);
   const onCreateUser = async (e) => {
     e.preventDefault();
     UtilCtx.setLoader(true);
@@ -64,20 +84,25 @@ function CreateUser({
       productType,
       amount: selectedProductAmount,
       userType,
-      instructorPaymentType: userType === 'instructor' ? instructorPaymentType : '',
-      instructorPaymentAmount: userType === 'instructor' ? instructorPaymentAmount : ''
-    }
+      instructorPaymentType:
+        userType === "instructor" ? instructorPaymentType : "",
+      instructorPaymentAmount:
+        userType === "instructor" ? instructorPaymentAmount : "",
+    };
 
     try {
       const response = await API.post("main", `/admin/create-user`, {
-        body: data
+        body: data,
       });
       const createdCognitoId = response.user.cognitoId;
-      if (userType === 'instructor') {
-        await API.put('main', '/admin/member-to-instructor', {
-          body: { ...data, cognitoId: createdCognitoId }
+      if (userType === "instructor") {
+        await API.put("main", "/admin/member-to-instructor", {
+          body: { ...data, cognitoId: createdCognitoId },
         });
       }
+      localStorage.removeItem(
+        `instructorList_${InstitutionData.InstitutionId}`
+      );
       console.log("User created successfully:", response);
       Ctx.setUserList([
         {
@@ -101,9 +126,8 @@ function CreateUser({
       setStatus("InActive");
       setPhoneNumber("");
       setBalance("");
-      setProductType('');
-      setSelectedProductAmount('');
-
+      setProductType("");
+      setSelectedProductAmount("");
     } catch (e) {
       console.error("Error creating user:", e);
       toast.error("Error creating user. Please try again later.");
@@ -117,7 +141,6 @@ function CreateUser({
   return (
     <div>
       <div className=" w-[35rem] bg-white px-1 py-4 rounded-md flex flex-col justify-center items-center gap-4 max800:w-[90vw] relative">
-
         <span
           className="absolute top-5 right-5 cursor-pointer"
           onClick={() => {
@@ -150,9 +173,9 @@ function CreateUser({
               name="countryCode"
               className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-1/2 border-gray-300`}
               onChange={(e) => {
-                setCountryCode(e.target.value.toString())
+                setCountryCode(e.target.value.toString());
               }}
-              style={{ maxHeight: '100px' }}
+              style={{ maxHeight: "100px" }}
             >
               {<Country />}
             </select>
@@ -164,8 +187,8 @@ function CreateUser({
             />
           </div>
           <div className="w-full flex flex-row-reverse justify-center items-center gap-2">
-            <div className='flex w-[80%] flex-col'>
-              <label className='font-[500] ml-1'>User Status</label>
+            <div className="flex w-[80%] flex-col">
+              <label className="font-[500] ml-1">User Status</label>
               <select
                 required
                 className={` border-[1px] px-[1.5rem] py-[0.7rem] rounded-2 `}
@@ -176,8 +199,8 @@ function CreateUser({
                 <option value="InActive">InActive</option>
               </select>
             </div>
-            <div className='flex w-[80%] flex-col'>
-              <label className='font-[500] ml-1'>User Type</label>
+            <div className="flex w-[80%] flex-col">
+              <label className="font-[500] ml-1">User Type</label>
               <select
                 className={`w-full border-[1px] px-[1.5rem] py-[0.7rem] rounded`}
                 value={userType}
@@ -185,20 +208,20 @@ function CreateUser({
                   setUserType(e.target.value);
                 }}
               >
-                <option value='member'>Member</option>
-                <option value='instructor'>Instructor</option>
-                <option value='admin'>Admin</option>
+                <option value="member">Member</option>
+                <option value="instructor">Instructor</option>
+                <option value="admin">Admin</option>
               </select>
             </div>
           </div>
         </div>
 
         {/* Conditionally render product type and amount fields */}
-        {(status === "Active" && userType !== 'instructor') && (
-          <div className='w-[80%]'>
+        {status === "Active" && userType !== "instructor" && (
+          <div className="w-[80%]">
             <div className="w-full flex justify-center items-center gap-2">
               <div className="w-full flex flex-col -mt-3 mb-3">
-                <label className='font-[500] ml-1'>Select Product Type</label>
+                <label className="font-[500] ml-1">Select Product Type</label>
                 <select
                   required
                   className={`w-full border-[1px] px-[1.5rem] py-[0.7rem] rounded-2 `}
@@ -222,12 +245,12 @@ function CreateUser({
               </div>
             </div>
             <div className="flex gap-2 justify-center items-center">
-              <div className='flex w-full flex-col'>
-                <label className='font-[500] ml-1'>Payment Date</label>
-                <input type="date" className='py-[0.7rem] rounded' />
+              <div className="flex w-full flex-col">
+                <label className="font-[500] ml-1">Payment Date</label>
+                <input type="date" className="py-[0.7rem] rounded" />
               </div>
               <div className="flex flex-col w-full">
-                <label className='font-[500] ml-1'>Payment Status</label>
+                <label className="font-[500] ml-1">Payment Status</label>
                 <select
                   required
                   className={`border-[1px] px-[1.5rem] py-[0.7rem] rounded`}
@@ -241,11 +264,13 @@ function CreateUser({
             </div>
           </div>
         )}
-        {userType === 'instructor' && (
+        {userType === "instructor" && (
           <div className="flex flex-col gap-4 w-[80%]">
             <div className="flex flex-row w-full gap-2 max560:flex-col max560:gap-8">
               <div className="flex flex-col justify-center w-full">
-                <label className='font-[500] ml-1'>Instructor Payment Type</label>
+                <label className="font-[500] ml-1">
+                  Instructor Payment Type
+                </label>
                 <select
                   className={`border-[1px] px-[1.5rem] py-[0.7rem] rounded`}
                   value={instructorPaymentType}
@@ -262,7 +287,7 @@ function CreateUser({
               <div className="mt-[1.6rem]">
                 <InputComponent
                   width={100}
-                  type='number'
+                  type="number"
                   label="Bonus Amount"
                   value={instructorPaymentAmount}
                   onChange={(e) => {
@@ -279,7 +304,7 @@ function CreateUser({
           style={{ backgroundColor: InstitutionData.PrimaryColor }}
           onClick={onCreateUser}
         >
-          {createButton ? 'create' : 'update'}
+          {createButton ? "create" : "update"}
         </button>
       </div>
     </div>
