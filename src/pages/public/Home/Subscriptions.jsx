@@ -1,18 +1,33 @@
+import { Card } from "flowbite-react";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Context from "../../../Context/Context";
-import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly";
-import HappyprancerPaypalHybrid from "../Subscription/HappyprancerPaypalHybrid";
 import InstitutionContext from "../../../Context/InstitutionContext";
+import HappyprancerPaypalHybrid from "../Subscription/HappyprancerPaypalHybrid";
+import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly";
 import RazorpayPayment from "../Subscription/RazorpayPayment";
-import { Card } from "flowbite-react";
 
 const Subscription = () => {
   const { institutionData: InstitutionData } = useContext(InstitutionContext);
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
+  const [products, setProducts] = useState([]);
   const Navigate = useNavigate();
 
   const [bgInView, setBgInView] = useState(false);
+
+  useEffect(() => {
+    try {
+      let data = [];
+      if (UserCtx?.location?.countryCode === "IN") {
+        data = productList.filter((item) => item.currency === "INR");
+      } else {
+        data = productList.filter((item) => item.currency !== "INR");
+      }
+      setProducts(data);
+    } catch (e) {
+      throw new Error(e);
+    }
+  }, [UserCtx?.location?.countryCode, productList]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -38,6 +53,10 @@ const Subscription = () => {
       }
     };
   }, []);
+
+  // console.log("filteredProductListINR", filteredProductListINR);
+  // console.log("filteredProductListUSD", filteredProductListUSD);
+  // console.log(UserCtx.location)
 
   const paymentHandler = (item) => {
     if (isAuth) {
@@ -128,7 +147,7 @@ const Subscription = () => {
       </div>
 
       <div className="flex flex-row gap-8 justify-center flex-wrap max850:!flex-col max-w-[90vw]">
-        {productList.map((item, i) => (
+        {products.map((item, i) => (
           <Card key={i} className="w-[400px] max850:w-[300px]">
             <h5 className="text-2xl min-h-20 font-medium flex items-center text-gray-500 dark:text-gray-400">
               {item.heading}
