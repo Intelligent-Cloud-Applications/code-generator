@@ -557,15 +557,35 @@ const PreviousSessionsMobile = () => {
                                 )
                               }
                             >
-                              {Ctx.instructorList.map((i) => (
-                                <option
-                                  key={i.name}
-                                  value={i.name}
-                                  onChange={(e) => {}}
-                                >
-                                  {i.name.split(" ")[0]}
-                                </option>
-                              ))}
+                              {Ctx.instructorList
+                                .sort(function (a, b) {
+                                  if (a.name < b.name) {
+                                    return -1;
+                                  }
+                                  if (a.name > b.name) {
+                                    return 1;
+                                  }
+                                  return 0;
+                                })
+                                .map(
+                                  (i) =>
+                                    i.name !== "cancelled" && (
+                                      <option
+                                        key={i.name}
+                                        value={i.name}
+                                        onChange={(e) => {}}
+                                      >
+                                        {i.name}
+                                      </option>
+                                    )
+                                )}
+                              <option
+                                key="cancelled"
+                                value="cancelled"
+                                onChange={(e) => {}}
+                              >
+                                cancelled
+                              </option>
                             </select>
                             {/* <div className={`dropdown-arrow`}></div> */}
                           </div>

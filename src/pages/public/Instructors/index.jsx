@@ -510,7 +510,7 @@ const Instructor = () => {
               : "md:grid-cols-1"
           } bg`}
         >
-          {instructorList.map((instructor, i) => (
+          {instructorList.map((instructor, i) => instructor.name !== "cancelled" && (
             <div className={`inst-card relative`} key={i}>
               {isAdmin && (
                 <div className="absolute top-2 right-2 flex flex-row gap-1.5">
