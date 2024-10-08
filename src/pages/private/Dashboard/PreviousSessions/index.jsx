@@ -627,7 +627,7 @@ const PreviousSessions = () => {
                                     })
                                     .map(
                                       (i) =>
-                                        i.name !== "Cancelled" && (
+                                        i.name !== "cancelled" && (
                                           <option
                                             key={i.name}
                                             value={i.name}
@@ -637,8 +637,12 @@ const PreviousSessions = () => {
                                           </option>
                                         )
                                     )}
-                                  <option onChange={(e) => {}}>
-                                    Cancelled
+                                  <option
+                                    key="cancelled"
+                                    value="cancelled"
+                                    onChange={(e) => {}}
+                                  >
+                                    cancelled
                                   </option>
                                 </select>
                               ) : (

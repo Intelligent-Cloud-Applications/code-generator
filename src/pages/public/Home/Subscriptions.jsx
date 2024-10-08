@@ -163,7 +163,7 @@ const Subscription = () => {
                 /{item.durationText}
               </span>
             </div>
-            <ul className="my-7 space-y-5">
+            <ul className="my-7 space-y-5 min-h-[12rem]">
               {item.provides.map((provide, j) => (
                 <li key={`${i}-provide-${j}`} className="flex space-x-3">
                   <svg
