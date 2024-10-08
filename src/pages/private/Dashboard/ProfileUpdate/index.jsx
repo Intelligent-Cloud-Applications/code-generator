@@ -1,16 +1,16 @@
 import { API, Auth, Storage } from "aws-amplify";
-import React, { useRef, useState } from "react";
-import { useContext } from "react";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { FaArrowLeft } from "react-icons/fa";
-import Context from "../../../../Context/Context";
-import { Button2 } from "../../../../common/Inputs";
-import InstitutionContext from "../../../../Context/InstitutionContext";
+import { Label, Modal, TextInput } from "flowbite-react";
+import React, { useContext, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
-import "./index.css";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { FaArrowLeft, FaCalendarAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
-import EditableInput from "./EditableInput";
+import { Button2 } from "../../../../common/Inputs";
 import ReferralCode from "../../../../common/ReferralCode/index.jsx";
+import Context from "../../../../Context/Context";
+import InstitutionContext from "../../../../Context/InstitutionContext";
+import EditableInput from "./EditableInput";
+import "./index.css";
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -46,6 +46,8 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [joiningDate] = useState(formatDate(UserCtx.joiningDate));
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
+  const [dob, setDob] = useState(UserCtx.dob||"");
+  const [address, setAddress] = useState(UserCtx.address||"");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
@@ -55,12 +57,18 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [isPhoneChange, setIsPhoneChange] = useState(false);
   const [isPhoneCode, setIsPhoneCode] = useState(false);
 
+  // useEffect(() => {
+  //   console.log(dob);
+  //   console.log(new Date().toISOString().split("T")[0]);
+  // }, [dob]);
   const ifDataChanged = () => {
     if (
       name.trim() === UserCtx.userName.trim() &&
       phoneNumber.trim() === UserCtx.phoneNumber &&
       country.trim() === UserCtx.country &&
-      joiningDate.trim() === UserCtx.joiningDate
+      joiningDate.trim() === UserCtx.joiningDate &&
+      dob.trim() === UserCtx.dob &&
+      address.trim() === UserCtx.address
     ) {
       return false;
     } else {
@@ -161,6 +169,8 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 phoneNumber: phoneNumber,
                 country: country,
                 joiningDate: joiningDate,
+                dob: dob,
+                address: address,
               },
             }
           );
@@ -440,6 +450,40 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                       type="email"
                       value={currentEmail}
                       onChange={(e) => setCurrentEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <div className="mb-2 block">
+                      <Label value="Date of Birth" />
+                    </div>
+                    <TextInput
+                      icon={FaCalendarAlt}
+                      style={{ backgroundColor: "#c2bfbf81" }}
+                      placeholder="Select DOB"
+                      type={"date"}
+                      value={dob}
+                      onChange={(e) => {
+                        setDob(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <div className="mb-2 block">
+                      {UserCtx.userType === "admin" ? (
+                        <Label value="Institution Addrress" />
+                      ) : (
+                        <Label value="Addrress" />
+                      )}
+                    </div>
+                    <textarea
+                      // icon={FaRegAddressCard}
+                      placeholder={`Enter ${UserCtx.userType === "admin" && "Institution"} Address`}
+                      type={"text"}
+                      className="min-h-16 bg-[#c2bfbf81] min-w-full rounded-lg pl-4 py-2"
+                      value={address}
+                      onChange={(e) => {
+                        setAddress(e.target.value);
+                      }}
                     />
                   </div>
                   {/* <button
