@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Modal } from "flowbite-react"; // Import Flowbite Modal
 import BirthdayCard from "./BirthdayCard"; // Your BirthdayCard component
 import Context from "../../../../Context/Context";
@@ -7,7 +7,18 @@ const BirthdayModal = () => {
   const [openModal, setOpenModal] = useState(false);
   const UserCtx = useContext(Context).userData;
   let dob = UserCtx.dob;
+  let age = useRef(0);
 
+  const claculateAge = (dob) => {
+    let today = new Date();
+    let birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    let m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   const dateOfBirthChangeFormat=(date)=> {
     let dob = date.split("-");
@@ -15,8 +26,8 @@ const BirthdayModal = () => {
     dob = dob.join("-");
     return dob;
   }
+  age = claculateAge(dob);
   dob = dateOfBirthChangeFormat(dob);
-  console.log(dob)
   useEffect(() => {
     // Compare the date of birth with the current date
     
@@ -28,7 +39,6 @@ const BirthdayModal = () => {
       }
     });
     today = today.join("-");
-    console.log(today)
     if (dob === today) {
       setOpenModal(true);
     }
@@ -46,7 +56,7 @@ const BirthdayModal = () => {
         <Modal.Header>🎉Wishing You Birthday 🎂</Modal.Header>
         <Modal.Body>
           {/* Display the BirthdayCard in the modal */}
-          <BirthdayCard userName={UserCtx.userName} />
+          <BirthdayCard userName={UserCtx.userName} age={age}/>
         </Modal.Body>
         {/* <Modal.Footer>
           <button
