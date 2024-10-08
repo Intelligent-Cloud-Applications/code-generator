@@ -1,4 +1,4 @@
-export const institution = 'happyprancer';
+export const institution = 'magentofitnesshub';
 export const institutionType = 'ds';
 
 export const defaultProfileImageUrl =
