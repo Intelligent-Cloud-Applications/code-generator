@@ -1,7 +1,7 @@
-import React from "react";
+import React, { memo } from "react";
 import "./BirthdayCard.css";
 
-const BirthdayCard = ({ userName,age }) => {
+const BirthdayCard = ({ userName }) => {
   return (
     <div className="flex justify-center items-center">
       <div className="bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 rounded-xl shadow-2xl p-10 max-w-lg mx-auto text-center relative overflow-hidden transform transition-all duration-500">
@@ -44,7 +44,6 @@ const BirthdayCard = ({ userName,age }) => {
         <h1 className="text-4xl font-bold text-white mb-4 z-10 relative animate-pulse">
           🎉 Happy Birthday {userName.split(" ")[0]}! 🎂
         </h1>
-        <div className="text-xl text-white font-bold">{age}</div>
         <img
           src="https://th.bing.com/th/id/OIP.v8Is0dcyT_iakZLPY04LlQHaHK?rs=1&pid=ImgDetMain"
           alt="Birthday Cake"
@@ -61,4 +60,4 @@ const BirthdayCard = ({ userName,age }) => {
   );
 };
 
-export default BirthdayCard;
+export default memo(BirthdayCard);

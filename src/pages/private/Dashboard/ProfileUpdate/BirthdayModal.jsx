@@ -7,40 +7,41 @@ const BirthdayModal = () => {
   const [openModal, setOpenModal] = useState(false);
   const UserCtx = useContext(Context).userData;
   let dob = UserCtx.dob;
-  let age = useRef(0);
 
-  const claculateAge = (dob) => {
-    let today = new Date();
-    let birthDate = new Date(dob);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    let m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
-  const dateOfBirthChangeFormat=(date)=> {
+  const dateOfBirthChangeFormat = (date) => {
     let dob = date.split("-");
     dob.shift();
     dob = dob.join("-");
     return dob;
-  }
-  age = claculateAge(dob);
+  };
   dob = dateOfBirthChangeFormat(dob);
+
   useEffect(() => {
     // Compare the date of birth with the current date
-    
     let today = new Date().toLocaleDateString().split("/");
     today.pop();
-    today.map((date, index) => {
+    today = today.map((date, index) => {
       if (date.length === 1) {
-        today[index] = "0" + date;
+        return "0" + date;
       }
+      return date;
     });
     today = today.join("-");
-    if (dob === today) {
+
+    // Check if the modal has been shown before
+    const modalShown = localStorage.getItem("birthdayModalShown");
+    const modalShownDate = localStorage.getItem("birthdayModalShownDate");
+
+    // If the stored date is different from today, remove the key
+    if (modalShownDate && modalShownDate !== today) {
+      localStorage.removeItem("birthdayModalShown");
+      localStorage.removeItem("birthdayModalShownDate");
+    }
+
+    if (dob === today && !modalShown) {
       setOpenModal(true);
+      localStorage.setItem("birthdayModalShown", "true");
+      localStorage.setItem("birthdayModalShownDate", today);
     }
   }, [dob]);
 
@@ -56,7 +57,7 @@ const BirthdayModal = () => {
         <Modal.Header>🎉Wishing You Birthday 🎂</Modal.Header>
         <Modal.Body>
           {/* Display the BirthdayCard in the modal */}
-          <BirthdayCard userName={UserCtx.userName} age={age}/>
+          <BirthdayCard userName={UserCtx.userName}/>
         </Modal.Body>
         {/* <Modal.Footer>
           <button
