@@ -4,7 +4,7 @@ export const dsProd = {
         region: 'us-east-1',
         userPoolId: process.env.REACT_APP_PROD_USER_POOL_ID,
         identityPoolId: process.env.REACT_APP_PROD_IDENTITY_POOL_ID,
-        userPoolWebClientId: process.env.REACT_APP_CLIENT_ID,
+        userPoolWebClientId: process.env.REACT_APP_PROD_CLIENT_ID,
         oauth: { responseType: 'token' },
     },
     Storage: {
