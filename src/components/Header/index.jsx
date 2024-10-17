@@ -34,7 +34,7 @@ const Header = () => {
     : [
         { label: 'Login', path: '/login' },
         { label: 'Join Now', path: '/signup' },
-        { label: process.env.REACT_APP_STAGE !== 'PROD' && "Auth", path: "/auth" },
+        { label: process.env.REACT_APP_STAGE !== 'PROD' && "Dev", path: "/auth" },
       ];
 
   let navBarContent = [

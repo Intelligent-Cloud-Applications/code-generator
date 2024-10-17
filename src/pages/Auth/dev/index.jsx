@@ -25,19 +25,8 @@ const devAuth = () => {
     util.setLoader(true);
     try {
       await Auth.signIn(email, 'Password@123');
-
-      const userdata = await API.get(
-        'main',
-        `/user/profile/${InstitutionId}`,
-        {}
-      );
-      setUserData(userdata);
-      setIsAuth(true);
       util.setLoader(false);
-
-      toast.info('Logged in');
-      onAuthLoad(true, InstitutionId);
-      navigate('/dashboard');
+      navigate('/redirect');
     } catch (e) {
       console.log(e);
       toast.error('Unknown error occurred');

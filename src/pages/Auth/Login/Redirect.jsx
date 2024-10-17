@@ -27,7 +27,9 @@ const Redirect = () => {
         toast.info('Logged in');
         onAuthLoad(true, InstitutionId);
         util.setLoader(false);
-        navigate('/dashboard');
+        const path = window.sessionStorage.getItem('login_redirect');
+        window.sessionStorage.removeItem('login_redirect');
+        navigate(path || '/dashboard');
       } catch (e) {
         toast.error('Please signup first');
         util.setLoader(false);
