@@ -45,8 +45,10 @@ export const dsDev = {
         oauth: {
             domain: 'intellegent-google.auth.us-east-2.amazoncognito.com',
             scope: ['openid', 'email'],
-            redirectSignIn: 'http://localhost:3000/redirect',
-            redirectSignOut: 'http://localhost:3000',
+            redirectSignIn: process.env.NODE_ENV === 'development' ?
+              'http://localhost:3000/redirect' : process.env.REACT_APP_DOMAIN_BETA + '/redirect',
+            redirectSignOut: process.env.NODE_ENV === 'development' ?
+              'http://localhost:3000' : process.env.REACT_APP_DOMAIN_BETA,
             responseType: 'code',
         }
     },
