@@ -1,4 +1,4 @@
-import {OtpInput, PrimaryButton} from "../../common/Inputs";
+import {OtpInput, PrimaryButton} from "../../../common/Inputs";
 import {useState, useEffect} from "react";
 import {Auth} from "aws-amplify";
 import {toast} from "react-toastify";

@@ -23,9 +23,12 @@ import Subscriptions from '../pages/private/Subscriptions';
 import PaymentSuccessful from "../pages/private/PaymentSuccessful";
 import PaymentFailed from "../pages/private/PaymentFailed";
 import Rating from '../pages/private/Rating';
-import Auth from "../pages/Auth";
+import Auth from "../pages/Auth/phone";
 import PutAttendance from "../pages/private/PutAttendance";
 import DevAuth from "../pages/Auth/dev";
+import Redirect from '../pages/Auth/Login/Redirect';
+import Login from "../pages/Auth/Login";
+import Signup from "../pages/Auth/Signup";
 
 
 //const Navigate = ({to}) => {
@@ -53,9 +56,9 @@ const RoutesContainer = () => {
       <Route path='/privacypolicy' element={<PrivacyPolicy/>}/>
       <Route path='/terms' element={<Terms/>}/>
       <Route path='/refund' element={<Refund/>}/>
-      {/*<Route path='/login' element={ <Login /> } />*/}
+      <Route path='/login' element={ <Login /> } />
       <Route path='/logout' element={ <Logout /> } />
-      {/*<Route path='/signup' element={ <Signup /> } />*/}
+      <Route path='/signup' element={ <Signup /> } />
       <Route path='/dashboard' element={ <DashBoard /> } />
       <Route path='/meeting' element={ <Meeting /> } />
       <Route path='/query' element={ <Query /> } />
@@ -66,6 +69,7 @@ const RoutesContainer = () => {
       <Route path='/rating' element={<Rating />} />
       <Route path='/auth/*' element={ process.env.REACT_APP_STAGE === 'PROD' ? <Auth /> : <DevAuth /> } />
       <Route path='/put-attendance' element={ <PutAttendance /> } />
+        <Route path='/redirect' element={ <Redirect /> } />
       <Route path='*' element={ <Error /> } />
     </Routes>
   )

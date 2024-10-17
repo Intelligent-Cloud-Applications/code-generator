@@ -4,7 +4,7 @@ export const dsProd = {
         region: 'us-east-1',
         userPoolId: process.env.REACT_APP_PROD_USER_POOL_ID,
         identityPoolId: process.env.REACT_APP_PROD_IDENTITY_POOL_ID,
-        userPoolWebClientId: process.env.REACT_APP_CLIENT_ID,
+        userPoolWebClientId: process.env.REACT_APP_PROD_CLIENT_ID,
         oauth: { responseType: 'token' },
     },
     Storage: {
@@ -39,22 +39,28 @@ export const dsDev = {
     Auth: {
         mandatorySignIn: true,
         region: 'us-east-2',
-        userPoolId: 'us-east-2_J02pfxenV',
-        identityPoolId: 'us-east-2:2966c931-c163-4682-89d6-9bf8c491e5b7',
-        userPoolWebClientId: '1oui8eijud46ajipjeg01h4i3m',
-        // oauth: { responseType: 'token' },
+        userPoolId: process.env.REACT_APP_DEV_USER_POOL_ID,
+        identityPoolId: process.env.REACT_APP_DEV_IDENTITY_POOL_ID,
+        userPoolWebClientId: process.env.REACT_APP_DEV_CLIENT_ID,
+        oauth: {
+            domain: 'intellegent-google.auth.us-east-2.amazoncognito.com',
+            scope: ['openid', 'email'],
+            redirectSignIn: 'http://localhost:3000/redirect',
+            redirectSignOut: 'http://localhost:3000',
+            responseType: 'code',
+        }
     },
     Storage: {
         region: 'us-east-1',
         bucket: 'insitution-utils',
-        identityPoolId: 'us-east-2:9b1fda39-3231-4606-b32f-7ba24edcb53d',
+        identityPoolId: process.env.REACT_APP_PROD_IDENTITY_POOL_ID,
     },
     API: {
         endpoints: [
             {
                 name: 'main',
                 // endpoint: 'https://r5dp21mb28.execute-api.us-east-2.amazonaws.com/dev',
-                endpoint: ' https://ikticbkaxh.execute-api.us-east-2.amazonaws.com/dev',
+                endpoint: 'https://ikticbkaxh.execute-api.us-east-2.amazonaws.com/dev',
                 region: 'us-east-2',
             },
             {
