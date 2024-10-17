@@ -8,6 +8,7 @@ import countries from "../../../common/Inputs/countries.json";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import {useNavigate} from "react-router-dom";
 import Context from "../../../Context/Context";
+import {FormWrapper} from "../../../common/Layouts";
 
 const Signup = () => {
   const { setLoader } = useContext(Context).util;
@@ -88,21 +89,10 @@ const Signup = () => {
   }
 
   return (
-    <div>
-      <Header />
-      <div className='flex flex-col items-center mt-10'>
-        <div
-          className={
-            `flex flex-col items-center gap-4
-            shadow-xl px-20 py-12 w-[480px] rounded-xl`
-          }
-        >
-          <h2 className='font-bold text-2xl mb-4'>Signup</h2>
-          {formState === 'signup' ? <SignupForm handler={handleSignup} /> :
-            <OtpForm handler={confirmSignup} resendHandler={resendHandler} />}
-        </div>
-      </div>
-    </div>
+    <FormWrapper heading='Signup'>
+      {formState === 'signup' ? <SignupForm handler={handleSignup} /> :
+        <OtpForm handler={confirmSignup} resendHandler={resendHandler} />}
+    </FormWrapper>
   );
 }
 

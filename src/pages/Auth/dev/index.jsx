@@ -19,7 +19,6 @@ const devAuth = () => {
   const { InstitutionId } = useContext(institutionContext).institutionData;
   const [email, setEmail] = useState(options[0].email);
   const navigate = useNavigate();
-  const { "*": link } = useParams();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -38,7 +37,7 @@ const devAuth = () => {
 
       toast.info('Logged in');
       onAuthLoad(true, InstitutionId);
-      navigate(`/${link}`);
+      navigate('/dashboard');
     } catch (e) {
       console.log(e);
       toast.error('Unknown error occurred');

@@ -29,6 +29,7 @@ import DevAuth from "../pages/Auth/dev";
 import Redirect from '../pages/Auth/Login/Redirect';
 import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
+import ForgotPassword from "../pages/Auth/ForgotPassword";
 
 
 //const Navigate = ({to}) => {
@@ -67,9 +68,10 @@ const RoutesContainer = () => {
       <Route path='/paymentsuccessful' element={<PaymentSuccessful />} />
       <Route path='/paymentfailed' element={<PaymentFailed />} />
       <Route path='/rating' element={<Rating />} />
-      <Route path='/auth/*' element={ process.env.REACT_APP_STAGE === 'PROD' ? <Auth /> : <DevAuth /> } />
+      <Route path='/auth' element={ process.env.REACT_APP_STAGE === 'PROD' ? <Error /> : <DevAuth /> } />
       <Route path='/put-attendance' element={ <PutAttendance /> } />
         <Route path='/redirect' element={ <Redirect /> } />
+        <Route path='/forgot-password' element={<ForgotPassword />} />
       <Route path='*' element={ <Error /> } />
     </Routes>
   )
