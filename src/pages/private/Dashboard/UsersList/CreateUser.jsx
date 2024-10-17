@@ -33,6 +33,7 @@ function CreateUser({
   const [userType, setUserType] = useState("member");
   const [instructorPaymentType, setInstructorPaymentType] = useState("");
   const [instructorPaymentAmount, setInstructorPaymentAmount] = useState("");
+  const [trialPeriod, setTrialPeriod] = useState("");
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const Ctx = useContext(Context);
   const { getUserList } = useContext(Context);
@@ -70,56 +71,48 @@ function CreateUser({
   };
 
   console.log(countryCode);
+
   const onCreateUser = async (e) => {
     e.preventDefault();
     UtilCtx.setLoader(true);
+
     const data = {
       institution: InstitutionData.InstitutionId,
-      cognitoId,
+      cognitoId, // required for both create and update
       emailId: email,
       userName: name,
-      name: name,
       phoneNumber: `${countryCode}${phoneNumber}`,
       status,
       productType,
       amount: selectedProductAmount,
       userType,
-      instructorPaymentType:
-        userType === "instructor" ? instructorPaymentType : "",
-      instructorPaymentAmount:
-        userType === "instructor" ? instructorPaymentAmount : "",
+      instructorPaymentType: userType === "instructor" ? instructorPaymentType : "",
+      instructorPaymentAmount: userType === "instructor" ? instructorPaymentAmount : "",
+      trialPeriod: status === "Trial" ? trialPeriod : "",
     };
 
     try {
-      const response = await API.post("main", `/admin/create-user`, {
-        body: data,
-      });
-      const createdCognitoId = response.user.cognitoId;
-      if (userType === "instructor") {
-        await API.put("main", "/admin/member-to-instructor", {
-          body: { ...data, cognitoId: createdCognitoId },
-        });
-      }
-      localStorage.removeItem(
-        `instructorList_${InstitutionData.InstitutionId}`
-      );
-      console.log("User created successfully:", response);
-      Ctx.setUserList([
-        {
-          emailId: email,
-          userName: name,
-          phoneNumber,
-          status: status,
-          balance: balance,
-          joiningDate: conversion(new Date().toISOString()?.split("T")[0]),
-        },
-        ...Ctx.userList,
-      ]);
+      if (createButton) {
+        // Creating a new user
+        const response = await API.post("main", `/admin/create-user`, { body: data });
+        const createdCognitoId = response.user.cognitoId;
 
-      toast.success("User Added");
+        if (userType === "instructor") {
+          await API.put("main", "/admin/member-to-instructor", {
+            body: { ...data, cognitoId: createdCognitoId },
+          });
+        }
+
+        toast.success("User Created Successfully");
+      } else {
+        // Updating an existing user
+        await API.put("main", `/admin/update-user/${InstitutionData.InstitutionId}`, { body: data });
+        toast.success("User Updated Successfully");
+      }
 
       getUserList();
-      // Reset form fields
+
+      // Reset form fields after success
       setName("");
       setCountryCode("+91");
       setEmail("");
@@ -128,15 +121,17 @@ function CreateUser({
       setBalance("");
       setProductType("");
       setSelectedProductAmount("");
-    } catch (e) {
-      console.error("Error creating user:", e);
-      toast.error("Error creating user. Please try again later.");
+
+    } catch (error) {
+      console.error("Error creating/updating user:", error);
+      toast.error("Error processing request. Please try again later.");
     } finally {
       setShowUserAdd(false);
       setIsModalOpen(false);
       UtilCtx.setLoader(false);
     }
   };
+
 
   return (
     <div>
@@ -168,7 +163,7 @@ function CreateUser({
             />
           </div>
           <div className="flex gap-1">
-            <select
+            {/* <select
               value={countryCode}
               name="countryCode"
               className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-1/2 border-gray-300`}
@@ -178,7 +173,7 @@ function CreateUser({
               style={{ maxHeight: "100px" }}
             >
               {<Country />}
-            </select>
+            </select> */}
             <InputComponent
               width={100}
               label="Phone Number"
@@ -197,6 +192,7 @@ function CreateUser({
               >
                 <option value="Active">Active</option>
                 <option value="InActive">InActive</option>
+                <option value="Trial">Trial</option>
               </select>
             </div>
             <div className="flex w-[80%] flex-col">
@@ -215,6 +211,27 @@ function CreateUser({
             </div>
           </div>
         </div>
+
+        {/* Conditionally render trial period dropdown */}
+        {status === "Trial" && (
+          <div className="w-full flex flex-row justify-center items-center gap-2">
+            <div className="flex w-full flex-col px-14">
+              <label className="font-[500] ml-1">Trial Period</label>
+              <select
+                required
+                className="border-[1px] px-4 py-[0.7rem] rounded w-full"
+                value={trialPeriod}
+                onChange={(e) => setTrialPeriod(e.target.value)}
+              >
+                <option value="">Select Trial Period</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Half-yearly">Half-yearly</option>
+                <option value="Yearly">Yearly</option>
+              </select>
+            </div>
+          </div>
+        )}
 
         {/* Conditionally render product type and amount fields */}
         {status === "Active" && userType !== "instructor" && (
@@ -304,7 +321,7 @@ function CreateUser({
           style={{ backgroundColor: InstitutionData.PrimaryColor }}
           onClick={onCreateUser}
         >
-          {createButton ? "create" : "update"}
+          {createButton ? "Create" : "Update"}
         </button>
       </div>
     </div>
