@@ -5,7 +5,15 @@ export const dsProd = {
         userPoolId: process.env.REACT_APP_PROD_USER_POOL_ID,
         identityPoolId: process.env.REACT_APP_PROD_IDENTITY_POOL_ID,
         userPoolWebClientId: process.env.REACT_APP_PROD_CLIENT_ID,
-        oauth: { responseType: 'token' },
+        oauth: {
+            domain: process.env.REACT_APP_AUTH_DOMAIN_PROD,
+            scope: ['openid', 'email'],
+            redirectSignIn: process.env.NODE_ENV === 'development' ?
+              'http://localhost:3000/redirect' : process.env.REACT_APP_DOMAIN_PROD + '/redirect',
+            redirectSignOut: process.env.NODE_ENV === 'development' ?
+              'http://localhost:3000' : process.env.REACT_APP_DOMAIN_PROD,
+            responseType: 'code',
+        }
     },
     Storage: {
         region: 'us-east-1',
@@ -43,7 +51,7 @@ export const dsDev = {
         identityPoolId: process.env.REACT_APP_DEV_IDENTITY_POOL_ID,
         userPoolWebClientId: process.env.REACT_APP_DEV_CLIENT_ID,
         oauth: {
-            domain: 'intellegent-google.auth.us-east-2.amazoncognito.com',
+            domain: process.env.REACT_APP_AUTH_DOMAIN_BETA,
             scope: ['openid', 'email'],
             redirectSignIn: process.env.NODE_ENV === 'development' ?
               'http://localhost:3000/redirect' : process.env.REACT_APP_DOMAIN_BETA + '/redirect',

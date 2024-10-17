@@ -61,6 +61,7 @@ const Signup = () => {
   const confirmSignup = async (event) => {
     event.preventDefault();
 
+    setLoader(true);
     try {
       await Auth.confirmSignUp(userData.emailId, event.target.otp.value);
       await Auth.signIn(userData.emailId, password);
@@ -73,9 +74,12 @@ const Signup = () => {
         }
       );
 
+      setLoader(false);
       navigate('/redirect');
     } catch (e) {
       toast.error(e.message);
+    } finally {
+      setLoader(false);
     }
   }
 
