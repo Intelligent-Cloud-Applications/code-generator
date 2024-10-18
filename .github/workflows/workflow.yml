@@ -2,7 +2,7 @@ name: Deploy to S3
 on:
   push:
     branches:
-      - dev # Replace 'prod' with the branch you want to deploy
+      - dev # Replace 'Signup' with the branch you want to deploy
 
 jobs:
   deploy:

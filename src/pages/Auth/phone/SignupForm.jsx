@@ -1,4 +1,4 @@
-import {BaseTextInput, CountrySelect, EmailInput, PhoneInput, PrimaryButton} from "../../common/Inputs";
+import {BaseTextInput, CountrySelect, EmailInput, PhoneInput, PrimaryButton} from "../../../common/Inputs";
 import {useState} from "react";
 import {Link} from "react-router-dom";
 

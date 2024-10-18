@@ -3,7 +3,7 @@ import { Select, TextInput } from "flowbite-react";
 import React, { useContext, useEffect, useState } from "react";
 
 // Local
-import { LuHash, LuMail, LuPhone, LuText } from "react-icons/lu";
+import {LuHash, LuLock, LuMail, LuPhone, LuText} from "react-icons/lu";
 import Context from "../../Context/Context";
 import institutionContext from "../../Context/InstitutionContext";
 import countries from "./countries.json";
@@ -55,6 +55,18 @@ export const EmailInput = (props) => {
     />
   );
 };
+
+export const PasswordInput = (props) => {
+  return (
+    <TextInput
+      type="password"
+      placeholder="Password"
+      icon={LuLock}
+      required
+      {...props}
+    />
+  )
+}
 
 export const OtpInput = (props) => {
   return (
