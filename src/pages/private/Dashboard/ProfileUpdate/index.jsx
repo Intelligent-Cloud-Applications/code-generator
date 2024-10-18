@@ -11,6 +11,7 @@ import Context from "../../../../Context/Context";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import EditableInput from "./EditableInput";
 import "./index.css";
+import EditableTextArea from "./EditableTextArea.jsx";
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -46,7 +47,8 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [joiningDate] = useState(formatDate(UserCtx.joiningDate));
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
-  const [dob, setDob] = useState(UserCtx.dob||"");
+  
+  const [tempDob, setTempDob] = useState(UserCtx.dob);
   const [address, setAddress] = useState(UserCtx.address||"");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -56,11 +58,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [phoneCode, setPhoneCode] = useState("");
   const [isPhoneChange, setIsPhoneChange] = useState(false);
   const [isPhoneCode, setIsPhoneCode] = useState(false);
-
-  // useEffect(() => {
-  //   console.log(dob);
-  //   console.log(new Date().toISOString().split("T")[0]);
-  // }, [dob]);
+const dob = UserCtx.dob || "";
   const ifDataChanged = () => {
     if (
       name.trim() === UserCtx.userName.trim() &&
@@ -169,7 +167,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 phoneNumber: phoneNumber,
                 country: country,
                 joiningDate: joiningDate,
-                dob: dob,
+                dob: tempDob,
                 address: address,
               },
             }
@@ -456,16 +454,29 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                     <div className="mb-2 block">
                       <Label value="Date of Birth" />
                     </div>
-                    <TextInput
-                      icon={FaCalendarAlt}
-                      style={{ backgroundColor: "#c2bfbf81" }}
-                      placeholder="Select DOB"
-                      type={"date"}
-                      value={dob}
-                      onChange={(e) => {
-                        setDob(e.target.value);
-                      }}
-                    />
+                    {dob ? (
+                      // This is else cannot be editable
+                      <TextInput
+                        icon={FaCalendarAlt}
+                        style={{ backgroundColor: "#c2bfbf81" }}
+                        placeholder="Select DOB"
+                        type={"date"}
+                        value={dob}
+                        readOnly
+                      />
+                    ) : (
+                      // This is for first time editable dob
+                      <TextInput
+                        icon={FaCalendarAlt}
+                        style={{ backgroundColor: "#c2bfbf81" }}
+                        placeholder="Select DOB"
+                        type={"date"}
+                        value={tempDob}
+                        onChange={(e) => {
+                          setTempDob(e.target.value);
+                        }}
+                      />
+                    )}
                   </div>
                   <div className="w-full">
                     <div className="mb-2 block">
@@ -475,11 +486,12 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                         <Label value="Addrress" />
                       )}
                     </div>
-                    <textarea
-                      // icon={FaRegAddressCard}
-                      placeholder={`Enter ${UserCtx.userType === "admin" && "Institution"} Address`}
+                    <EditableTextArea
+                      placeholder={`Enter ${
+                        UserCtx.userType === "admin" && "Institution"
+                      } Address`}
                       type={"text"}
-                      className="min-h-16 bg-[#c2bfbf81] min-w-full rounded-lg pl-4 py-2"
+                      className="min-h-16 bg-inputBgColor min-w-full rounded-lg pl-4 py-2"
                       value={address}
                       onChange={(e) => {
                         setAddress(e.target.value);

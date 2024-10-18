@@ -6,7 +6,7 @@ import Context from "../../../../Context/Context";
 const BirthdayModal = () => {
   const [openModal, setOpenModal] = useState(false);
   const UserCtx = useContext(Context).userData;
-  let dob = UserCtx.dob;
+  let dob = UserCtx?.dob;
 
   const dateOfBirthChangeFormat = (date) => {
     let dob = date.split("-");
@@ -20,7 +20,7 @@ const BirthdayModal = () => {
     // Compare the date of birth with the current date
     let today = new Date().toLocaleDateString().split("/");
     today.pop();
-    today = today.map((date, index) => {
+    today =  today.map((date, index) => {
       if (date.length === 1) {
         return "0" + date;
       }
@@ -43,7 +43,9 @@ const BirthdayModal = () => {
       localStorage.setItem("birthdayModalShown", "true");
       localStorage.setItem("birthdayModalShownDate", today);
     }
-  }, [dob]);
+  }, [UserCtx?.dob]);
+
+  if (!dob) return null;
 
   return (
     <>

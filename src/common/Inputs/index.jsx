@@ -48,7 +48,7 @@ export const EmailInput = (props) => {
   return (
     <TextInput
       type="email"
-      placeholder="Email Address"
+      placeholder="Email Address(*)"
       icon={LuMail}
       required
       {...props}
