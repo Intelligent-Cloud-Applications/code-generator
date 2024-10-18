@@ -34,7 +34,7 @@ export const PhoneInput = (props) => {
   return (
     <TextInput
       type="tel"
-      placeholder="Phone Number"
+      placeholder="Phone Number(*)"
       icon={LuPhone}
       required
       pattern="[0-9]{9,10}"
@@ -60,7 +60,7 @@ export const PasswordInput = (props) => {
   return (
     <TextInput
       type="password"
-      placeholder="Password"
+      placeholder="Password(*)"
       icon={LuLock}
       required
       {...props}
