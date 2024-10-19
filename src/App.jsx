@@ -57,6 +57,10 @@ function App() {
           "main",
           `/user/profile/${data && data.InstitutionId}`
         );
+        const showBirthdayModal = await API.post(
+          "main",
+          `/user/birthday-message/${data && data.InstitutionId}`
+        );
 
         const location = await API.get("main", apiPaths?.getUserLocation);
 
@@ -65,6 +69,7 @@ function App() {
           ...prev,
           ...userdata,
           location,
+          showBirthdayModal,
         })
         );
         RefCtx.current.setIsAuth(true);

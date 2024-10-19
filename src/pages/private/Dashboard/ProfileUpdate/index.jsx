@@ -172,8 +172,13 @@ const dob = UserCtx.dob || "";
               },
             }
           );
+                  const showBirthdayModal = await API.post(
+                    "main",
+                    `/user/birthday-message/${InstitutionData.InstitutionId}`
+                  );
+          const data = {...userdata.Attributes, showBirthdayModal};
 
-          Ctx.setUserData(userdata.Attributes);
+          Ctx.setUserData(data);
           toast.info("Updated");
           UtilCtx.setLoader(false);
         } catch (e) {
