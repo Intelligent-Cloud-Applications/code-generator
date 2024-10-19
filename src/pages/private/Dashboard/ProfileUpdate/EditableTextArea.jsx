@@ -17,9 +17,10 @@ const EditableTextArea = ({ label, value, onChange }) => {
       <label className="ml-2">{label}</label>
       <textarea
         ref={inputRef}
-        className="bg-inputBgColor px-4 py-2 rounded-lg w-full"
+        className="bg-inputBgColor px-4 py-2 rounded-lg w-full min-h-16"
         type="text"
         value={value}
+        placeholder="Enter your address here"
         readOnly={!isEditable}
         onChange={onChange}
         onBlur={() => setIsEditable(false)}
