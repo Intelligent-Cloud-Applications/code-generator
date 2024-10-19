@@ -10,28 +10,24 @@ const SignupForm = ({ handler }) => {
       className="grid grid-cols-2 items-center gap-x-4 gap-y-8"
     >
       <BaseTextInput
-        placeholder="First Name(*)"
+        placeholder="First Name"
         name="firstName"
         className="rounded w-full"
-        important={true}
       />
       <BaseTextInput
-        placeholder="Last Name(*)"
+        placeholder="Last Name"
         name="lastName"
         className="rounded w-full"
-        important={true}
       />
       <EmailInput
         name="email"
         className="rounded w-full col-span-2"
-        important={true}
       />
       <BaseTextInput
         placeholder="Referral Code (Optional)"
         name="referralCode"
         className="rounded w-full col-span-2"
         required={false}
-        important={false}
       />
 
       <PrimaryButton className="col-span-2 m-auto">Send OTP</PrimaryButton>
