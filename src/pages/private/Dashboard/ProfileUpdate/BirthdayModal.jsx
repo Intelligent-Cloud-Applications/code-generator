@@ -9,7 +9,6 @@ const BirthdayModal = () => {
 
   return (
     <>
-    {console.log(UserCtx)}
       {/* Flowbite Modal */}
       <Modal
         show={openModal}
