@@ -7,12 +7,15 @@ const BirthdayModal = () => {
   const UserCtx = useContext(Context).userData;
   const [openModal, setOpenModal] = useState(UserCtx?.showBirthdayModal?.showCard);
 
+  const handleClose = () => {
+    setOpenModal(false);
+  };
   return (
     <>
       {/* Flowbite Modal */}
       <Modal
         show={openModal}
-        onClose={() => setOpenModal(false)}
+        onClose={handleClose}
         size="xl"
         position="center"
       >
@@ -24,7 +27,7 @@ const BirthdayModal = () => {
         <Modal.Footer>
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={() => setOpenModal(false)}
+            onClick={handleClose}
           >
             Close
           </button>

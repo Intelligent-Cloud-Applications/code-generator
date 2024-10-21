@@ -47,9 +47,11 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [joiningDate] = useState(formatDate(UserCtx.joiningDate));
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
-  
-  const [tempDob, setTempDob] = useState(UserCtx.dob);
-  const [address, setAddress] = useState(UserCtx.address||"");
+
+  const [tempDob, setTempDob] = useState(
+    UserCtx.dob ? formatDate(Number(UserCtx.dob)) : ""
+  );
+  const [address, setAddress] = useState(UserCtx.address || "");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
@@ -58,14 +60,19 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [phoneCode, setPhoneCode] = useState("");
   const [isPhoneChange, setIsPhoneChange] = useState(false);
   const [isPhoneCode, setIsPhoneCode] = useState(false);
-const dob = UserCtx.dob || "";
+  const dob = UserCtx.dob
+    ? new Date(Number(UserCtx.dob)).toISOString().split("T")[0]
+    : "";
+
+  console.log(tempDob);
   const ifDataChanged = () => {
     if (
       name.trim() === UserCtx.userName.trim() &&
       phoneNumber.trim() === UserCtx.phoneNumber &&
       country.trim() === UserCtx.country &&
       joiningDate.trim() === UserCtx.joiningDate &&
-      dob.trim() === UserCtx.dob &&
+      dob.trim() ===
+        new Date(Number(UserCtx.dob)).toISOString().split("T")[0] &&
       address.trim() === UserCtx.address
     ) {
       return false;
@@ -167,16 +174,16 @@ const dob = UserCtx.dob || "";
                 phoneNumber: phoneNumber,
                 country: country,
                 joiningDate: joiningDate,
-                dob: tempDob,
+                dob: String(new Date(tempDob).getTime()),
                 address: address,
               },
             }
           );
-                  const showBirthdayModal = await API.post(
-                    "main",
-                    `/user/birthday-message/${InstitutionData.InstitutionId}`
-                  );
-          const data = {...userdata.Attributes, showBirthdayModal};
+          const showBirthdayModal = await API.post(
+            "main",
+            `/user/birthday-message/${InstitutionData.InstitutionId}`
+          );
+          const data = { ...userdata.Attributes, showBirthdayModal };
 
           Ctx.setUserData(data);
           toast.info("Updated");
@@ -471,12 +478,13 @@ const dob = UserCtx.dob || "";
                       />
                     ) : (
                       // This is for first time editable dob
+
                       <TextInput
                         icon={FaCalendarAlt}
                         style={{ backgroundColor: "#c2bfbf81" }}
                         placeholder="Select DOB"
                         type={"date"}
-                        value={tempDob}
+                        value={tempDob === "tempDob" ? "" : tempDob}
                         onChange={(e) => {
                           setTempDob(e.target.value);
                         }}
