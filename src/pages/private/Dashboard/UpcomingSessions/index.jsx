@@ -105,12 +105,12 @@ const UpcomingSessions = () => {
       const updatedClasses = Ctx.upcomingClasses.map((c) =>
         c.classId === classId
           ? {
-              ...c,
-              instructorNames: editedInstructorNames,
-              instructorId: instructorId,
-              classType: editedClassType,
-              date: date,
-            }
+            ...c,
+            instructorNames: editedInstructorNames,
+            instructorId: instructorId,
+            classType: editedClassType,
+            date: date,
+          }
           : c
       );
 
@@ -481,18 +481,16 @@ const UpcomingSessions = () => {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
-    return `${year}-${month < 10 ? "0" + month : month}-${
-      day < 10 ? "0" + day : day
-    }`;
+    return `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day
+      }`;
   };
 
   const getTime = (epochTime) => {
     const date = new Date(epochTime);
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    return `${hours < 10 ? "0" + hours : hours}:${
-      minutes < 10 ? "0" + minutes : minutes
-    }`;
+    return `${hours < 10 ? "0" + hours : hours}:${minutes < 10 ? "0" + minutes : minutes
+      }`;
   };
 
   useEffect(() => {
@@ -652,16 +650,22 @@ const UpcomingSessions = () => {
                     </h2>
                   )}
 
-                  {Ctx.userData.status === "Active" ? (
+                  {Ctx.userData.status === "Active" || Ctx.userData.status === "Trial" ? (
                     <p className={`text-[1.4rem] font-bold max500:text-[1rem]`}>
-                      Be Regular and Work Hard to Achieve Goals
+                      {Ctx.userData.status === "Trial" ? (
+                        `Your trial period ends in ${Math.ceil(
+                          (new Date(Ctx.userData.trialEndDate) - new Date()) / (1000 * 60 * 60 * 24)
+                        )} days`
+                      ) : (
+                        "Be Regular and Work Hard to Achieve Goals"
+                      )}
                     </p>
                   ) : (
                     <div>
                       <p
                         className={`text-[1.4rem] font-bold cursor-pointer`}
                         onClick={() => {
-                          Navigate("/subscripiton");
+                          Navigate("/subscription");
                         }}
                       >
                         Please Upgrade to start your Instructor training
@@ -761,19 +765,18 @@ const UpcomingSessions = () => {
               </h3>
 
               <div
-                className={`flex ${
-                  Ctx.userData.userType === "admin" ||
-                  Ctx.userData.userType === "instructor"
+                className={`flex ${Ctx.userData.userType === "admin" ||
+                    Ctx.userData.userType === "instructor"
                     ? "justify-between"
                     : "justify-end"
-                } relative`}
+                  } relative`}
               >
                 {(Ctx.userData.userType === "admin" ||
                   Ctx.userData.userType === "instructor") && (
-                  <Button color="primary" onClick={() => setModal(true)}>
-                    Create Class
-                  </Button>
-                )}
+                    <Button color="primary" onClick={() => setModal(true)}>
+                      Create Class
+                    </Button>
+                  )}
                 <Button
                   color="primary"
                   onClick={() => setShowFilters((e) => !e)}
@@ -923,13 +926,12 @@ const UpcomingSessions = () => {
                 </div>
               )}
               <ul
-                className={`h-[28rem] relative pb-[3rem] flex flex-col overflow-auto pt-6 ${
-                  (Ctx.userData.userType === "admin" ||
+                className={`h-[28rem] relative pb-[3rem] flex flex-col overflow-auto pt-6 ${(Ctx.userData.userType === "admin" ||
                     Ctx.userData.userType === "instructor") &&
                   (attendanceList
                     ? "h-[32rem] relative pb-[3rem]"
                     : "h-[28rem] relative pb-[3rem]")
-                } flex flex-col overflow-auto pt-6`}
+                  } flex flex-col overflow-auto pt-6`}
                 style={{
                   backgroundColor: InstitutionData.LightestPrimaryColor,
                 }}
@@ -993,9 +995,8 @@ const UpcomingSessions = () => {
                         return (
                           <li
                             key={clas.classId}
-                            className={`w-[100%] flex flex-col items-center justify-center ${
-                              editingIndex === i ? "bg-[#fdd00823]" : ""
-                            } `}
+                            className={`w-[100%] flex flex-col items-center justify-center ${editingIndex === i ? "bg-[#fdd00823]" : ""
+                              } `}
                           >
                             <div
                               className={`flex w-[85%] max1050:w-[96%] justify-between items-center max1050:justify-between relative pr-8`}
@@ -1006,7 +1007,7 @@ const UpcomingSessions = () => {
 
                               <div className={`w-[7rem] ml-8`}>
                                 {Ctx.userData.userType === "admin" ||
-                                Ctx.userData.userType === "instructor" ? (
+                                  Ctx.userData.userType === "instructor" ? (
                                   <select
                                     className={`rounded-[0.51rem] px-4 `}
                                     style={{
@@ -1043,7 +1044,7 @@ const UpcomingSessions = () => {
                                             <option
                                               key={i.name}
                                               value={i.name}
-                                              onChange={(e) => {}}
+                                              onChange={(e) => { }}
                                             >
                                               {i.name}
                                             </option>
@@ -1051,7 +1052,7 @@ const UpcomingSessions = () => {
                                       )}
                                     <option
                                       value="Cancelled"
-                                      onChange={(e) => {}}
+                                      onChange={(e) => { }}
                                     >
                                       Cancelled
                                     </option>
@@ -1070,7 +1071,7 @@ const UpcomingSessions = () => {
                               </div>
                               <div className={`w-[7rem]`}>
                                 {Ctx.userData.userType === "admin" ||
-                                Ctx.userData.userType === "instructor" ? (
+                                  Ctx.userData.userType === "instructor" ? (
                                   <select
                                     className={`rounded-[0.51rem] px-4 `}
                                     style={{
@@ -1093,7 +1094,7 @@ const UpcomingSessions = () => {
                                       <option
                                         key={name}
                                         value={name}
-                                        onChange={(e) => {}}
+                                        onChange={(e) => { }}
                                       >
                                         {name}
                                       </option>
@@ -1112,7 +1113,7 @@ const UpcomingSessions = () => {
                                 )}
                               </div>
                               {Ctx.userData.userType === "admin" ||
-                              Ctx.userData.userType === "instructor" ? (
+                                Ctx.userData.userType === "instructor" ? (
                                 <input
                                   value={getTime(clas.date)}
                                   type="time"
@@ -1275,13 +1276,13 @@ const UpcomingSessions = () => {
                                 onChange={(event) =>
                                   event.target.checked
                                     ? handleCheckboxClick(
-                                        user.cognitoId,
-                                        user.emailId
-                                      )
+                                      user.cognitoId,
+                                      user.emailId
+                                    )
                                     : handleCheckboxUnclick(
-                                        user.cognitoId,
-                                        user.emailId
-                                      )
+                                      user.cognitoId,
+                                      user.emailId
+                                    )
                                 }
                               />
                             </label>
