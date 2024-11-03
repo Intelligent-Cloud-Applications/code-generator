@@ -242,6 +242,41 @@ const ContextProvider = (props) => {
 
   console.log(revenue);
 
+  const updateUserStatus = async (userId, institution) => {
+    const currentEpochTime = Math.floor(new Date().getTime() / 1000);
+  
+    // Assuming userData contains the trialEndDate
+    if (userData && userData.trialEndDate && userData.status === 'Trial') {
+      const trialEndEpoch = userData.trialEndDate;
+  
+      if (currentEpochTime > trialEndEpoch) {
+        try {
+          // Call the user update API to set the status to 'Inactive'
+          const response = await API.put('main', `/user/profile-update/${institution}`, {
+            body: {
+              status: 'Inactive', // Set status to Inactive
+            },
+          });
+          console.log('User status updated to Inactive:', response);
+          setUserData((prevData) => ({
+            ...prevData,
+            status: 'Inactive', // Update the context state
+          }));
+        } catch (error) {
+          console.error('Error updating user status to Inactive:', error);
+        }
+      }
+    }
+  };
+  
+  // Call this function periodically or after certain actions
+  useEffect(() => {
+    if (userData.institution && userData.cognitoId) {
+      updateUserStatus(userData.cognitoId, userData.institution);
+    }
+  }, [userData]); // Run whenever userData changes
+  
+
   const ContextData = {
     onAuthLoad: onAuthLoad,
     onUnauthLoad: onUnauthLoad,
