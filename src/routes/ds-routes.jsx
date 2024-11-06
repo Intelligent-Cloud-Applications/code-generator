@@ -30,6 +30,8 @@ import Redirect from '../pages/Auth/Login/Redirect';
 import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
+import {HybridPayment} from '../pages/private/HybridPayment';
+
 
 
 //const Navigate = ({to}) => {
@@ -65,6 +67,7 @@ const RoutesContainer = () => {
       <Route path='/query' element={ <Query /> } />
       <Route path="/qr" element={<Attendance />} />
       <Route path='/subscription' element={<Subscriptions />} />
+      <Route path='/hybrid-payment' element={<HybridPayment />} />
       <Route path='/paymentsuccessful' element={<PaymentSuccessful />} />
       <Route path='/paymentfailed' element={<PaymentFailed />} />
       <Route path='/rating' element={<Rating />} />
