@@ -201,11 +201,9 @@ const ContextProvider = (props) => {
   const getImagesFromAPI = async (imageUrl) => {
     try {
       const response = await API.get('main', `/user/get-imageUrl/${web.InstitutionId}`);
-      console.log(response);
       setImageUrls(response.GalleryImagesLinks || []);
       if (imageUrl) {
         const filename = imageUrl.split('/').pop();
-        console.log(filename)
         if (response.gallery && response.gallery[filename]) {
           setDescription(response.gallery[filename].description);
           setTitle(response.gallery[filename].title);
@@ -227,7 +225,6 @@ const ContextProvider = (props) => {
       try {
         const response = await API.get('main', `/payment-history/${userData.institution}`);
         const payments = response?.payments || [];
-        console.log(response);
         setRevenue(Array.isArray(payments) ? payments : []); // Ensure revenue is an array
       } catch (error) {
         console.error('Error getting payment history from API: ', error);
@@ -239,8 +236,6 @@ const ContextProvider = (props) => {
       paymentDetailsAdmin();
     }
   }, [userData.institution]); // Dependency on userData.institution
-
-  console.log(revenue);
 
   const updateUserStatus = async (userId, institution) => {
     const currentEpochTime = Math.floor(new Date().getTime() / 1000);
