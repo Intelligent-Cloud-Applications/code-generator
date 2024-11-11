@@ -53,7 +53,6 @@ const UsersListMobile = ({
   itemsPerPage,
 
   // Data arrays
-  filteredUserList,
   activeUserList,
 
   // Helper functions
@@ -65,9 +64,6 @@ const UsersListMobile = ({
   showDeleteModal,
   setShowDeleteModal,
   confirmDelete,
-  requestSort,
-  handleSelectChange,
-  selectedOption
 }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
 
