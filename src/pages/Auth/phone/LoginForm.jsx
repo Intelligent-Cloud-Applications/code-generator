@@ -1,4 +1,4 @@
-import {CountrySelect, PhoneInput, PrimaryButton} from "../../common/Inputs";
+import {CountrySelect, PhoneInput, PrimaryButton} from "../../../common/Inputs";
 
 const LoginForm = ({ handler }) => {
   return (

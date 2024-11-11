@@ -32,9 +32,9 @@ const Header = () => {
         { label: profileImage, path: "/dashboard" },
       ]
     : [
-        // { label: 'Login', path: '/login' },
-        // { label: 'Join Now', path: '/signup' },
-        { label: "Login/Signup", path: "/auth/dashboard" },
+        { label: 'Login', path: '/login' },
+        { label: 'Join Now', path: '/signup' },
+        { label: process.env.REACT_APP_STAGE !== 'PROD' && "Dev", path: "/auth" },
       ];
 
   let navBarContent = [

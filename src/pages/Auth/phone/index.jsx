@@ -1,14 +1,14 @@
-import Header from "../../components/Header";
+import Header from "../../../components/Header";
 import {useContext, useState} from "react";
 import LoginForm from "./LoginForm";
 import OtpForm from "./OtpForm";
 import SignupForm from "./SignupForm";
-import institutionContext from "../../Context/InstitutionContext";
-import Context from "../../Context/Context";
+import institutionContext from "../../../Context/InstitutionContext";
+import Context from "../../../Context/Context";
 import {API, Auth} from "aws-amplify";
 import {toast} from "react-toastify";
 import {redirect, useNavigate, useParams} from "react-router-dom";
-import countries from "../../common/Inputs/countries.json";
+import countries from "../../../common/Inputs/countries.json";
 
 const AuthPage = () => {
   const { InstitutionId } = useContext(institutionContext).institutionData;
@@ -33,7 +33,7 @@ const AuthPage = () => {
     const phoneNumber = `+${event.target.country.value}${event.target.phone.value}`;
 
     for (let country of countries) {
-      if (country.value == event.target.country.value) {
+      if (country.value === event.target.country.value) {
         console.log(country.name);
         setCountry(country.name.split(' (')[0]);
         break;

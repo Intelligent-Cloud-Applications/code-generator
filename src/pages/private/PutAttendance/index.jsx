@@ -21,7 +21,7 @@ const PutAttendance = () => {
       try {
         await Auth.currentAuthenticatedUser();
       } catch (error) {
-        navigate(`/auth/put-attendance`);
+        navigate('/login');
       }
       if (!isAuth) return;
 
