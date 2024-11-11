@@ -27,7 +27,7 @@ const Carousel = () => {
         height="435"
         viewBox="0 0 869 435"
         fill="none"
-        className="absolute top-4 left-0 w-screen"
+        className="absolute top-4 left-0 w-screen z-0"
       >
         <g filter="url(#filter0_f_1_249)">
           <path
@@ -72,10 +72,10 @@ const Carousel = () => {
         </defs>
       </svg>
       <div className="mb-7">
-        <h1 className="text-3xl font-bold text-center mt-8 text-[3rem] mb-4 text-lightPrimaryColor">
+        <h1 className="hybrid-heading relative z-10 text-3xl font-bold text-center mt-8 text-[3rem] mb-4 text-lightPrimaryColor ">
           Hybrid Class
         </h1>
-        <p className="text-[1rem] mt-2 text-center font-[600]">
+        <p className="relative z-10 text-[1rem] px-4 mt-2 text-center font-[600]">
           A unique dance program offering both in-person and online classes,
           perfect for dancers seeking flexibility and a comprehensive learning
           experience
@@ -128,6 +128,7 @@ const Carousel = () => {
           <div className="half-ellipse-border-down absolute z-20 h-[53px] top-[342px]"></div>
         </div>
       </div>
+
     </>
   );
 };

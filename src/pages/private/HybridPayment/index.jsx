@@ -9,6 +9,7 @@ import ProfileCard from "./ProfileCard";
 import SubscriptionCard from "./SubscriptionCard";
 import {Overview} from "./Overview";
 import Carousel from "./Carousel";
+import"./Carousel.css";
 
 import apiPaths from "../../../utils/api-paths";
 import { API } from "aws-amplify";
@@ -26,17 +27,17 @@ export const HybridPayment = () => {
     {
       name: "Overview",
       description:
-        "Say goodbye to interruptions and enjoy uninterrupted music streaming. With our ad-free platform, you’ll have access to millions of songs",
+        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolores minus cum voluptates voluptatum rerum eos placeat eligendi quia explicabo! Enim voluptatem possimus voluptatum odit officia mollitia accusamus, nostrum delectus perferendis!",
     },
     {
       name: "Subscription",
       description:
-        "Say goodbye to interruptions and enjoy uninterrupted music streaming. With our ad-free platform, you’ll have access to millions of songs",
+        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolores minus cum voluptates voluptatum rerum eos placeat eligendi quia explicabo! Enim voluptatem possimus voluptatum odit officia mollitia accusamus, nostrum delectus perferendis!",
     },
     {
       name: "Success Story",
       description:
-        "Say goodbye to interruptions and enjoy uninterrupted music streaming. With our ad-free platform, you’ll have access to millions of songs",
+        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolores minus cum voluptates voluptatum rerum eos placeat eligendi quia explicabo! Enim voluptatem possimus voluptatum odit officia mollitia accusamus, nostrum delectus perferendis!",
     },
   ]);
   const data = dataRef.current;
@@ -177,7 +178,10 @@ export const HybridPayment = () => {
       </div> */}
 
       <NavBar />
-        <Carousel />
+      <Carousel />
+      <div className="w-screen flex justify-center items-center">
+        <button className="free-demo">Book a Demo</button>
+      </div>
       <div className=" mx-auto p-4 flex flex-col">
         <Overview />
         <div className="my-4"></div>
