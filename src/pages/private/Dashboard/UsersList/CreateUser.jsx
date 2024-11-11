@@ -53,13 +53,15 @@ function CreateUser({
   const onCreateUser = async (e) => {
     e.preventDefault();
     UtilCtx.setLoader(true);
+    const formattedPhoneNumber = createButton ? `${countryCode}${phoneNumber}` : phoneNumber;
+
     const data = {
       institution: InstitutionData.InstitutionId,
       cognitoId,
       emailId: email,
       userName: name,
       name: name,
-      phoneNumber: `${countryCode}${phoneNumber}`,
+      phoneNumber: formattedPhoneNumber,
       status,
       productType,
       amount: selectedProductAmount,
@@ -130,10 +132,10 @@ function CreateUser({
         </span>
 
         <div className="w-[80%] flex flex-col gap-4 mt-6">
-          <div className="flex gap-1">
+          <div className="flex gap-1 max850:flex-col max850:space-y-4">
             <InputComponent
               width={100}
-              label="Name"
+              label="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -144,18 +146,20 @@ function CreateUser({
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className="flex gap-1">
-            <select
-              value={countryCode}
-              name="countryCode"
-              className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-1/2 border-gray-300`}
-              onChange={(e) => {
-                setCountryCode(e.target.value.toString())
-              }}
-              style={{ maxHeight: '100px' }}
-            >
-              {<Country />}
-            </select>
+          <div className="flex gap-1 max850:flex-col max850:space-y-4">
+            {createButton && (
+              <select
+                value={countryCode}
+                name="countryCode"
+                className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-1/2 border-gray-300 max850:w-full`}
+                onChange={(e) => {
+                  setCountryCode(e.target.value.toString())
+                }}
+                style={{ maxHeight: '100px' }}
+              >
+                {<Country />}
+              </select>
+            )}
             <InputComponent
               width={100}
               label="Phone Number"
@@ -164,19 +168,21 @@ function CreateUser({
             />
           </div>
           <div className="w-full flex flex-row-reverse justify-center items-center gap-2">
-            <div className='flex w-[80%] flex-col'>
-              <label className='font-[500] ml-1'>User Status</label>
-              <select
-                required
-                className={` border-[1px] px-[1.5rem] py-[0.7rem] rounded-2 `}
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <option value="Active">Active</option>
-                <option value="InActive">InActive</option>
-              </select>
-            </div>
-            <div className='flex w-[80%] flex-col'>
+            {userType === 'member' && (
+              <div className='flex w-[80%] flex-col'>
+                <label className='font-[500] ml-1'>User Status</label>
+                <select
+                  required
+                  className={` border-[1px] px-[1.5rem] py-[0.7rem] rounded-2 focus:ring-transparent`}
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option value="Active">Active</option>
+                  <option value="InActive">InActive</option>
+                </select>
+              </div>
+            )}
+            <div className={`flex flex-col ${userType !== 'member'?'w-full':'w-[80%]'}`}>
               <label className='font-[500] ml-1'>User Type</label>
               <select
                 className={`w-full border-[1px] px-[1.5rem] py-[0.7rem] rounded`}
@@ -275,7 +281,7 @@ function CreateUser({
         )}
 
         <button
-          className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center"
+          className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center max850:w-[82%]"
           style={{ backgroundColor: InstitutionData.PrimaryColor }}
           onClick={onCreateUser}
         >

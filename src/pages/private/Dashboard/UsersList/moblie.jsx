@@ -1,525 +1,267 @@
-import React, { useState } from 'react'
-import { useContext } from 'react'
-import Context from '../../../../Context/Context'
-import './index.css'
-import { API } from 'aws-amplify'
-import {Pagination} from "flowbite-react";
-import 'bootstrap/dist/css/bootstrap.min.css'
-import './mobile.css'
-import InstitutionContext from '../../../../Context/InstitutionContext'
+import React from 'react';
+import { useContext } from 'react';
+import Context from '../../../../Context/Context';
+import { Pagination } from "flowbite-react";
+import InstitutionContext from '../../../../Context/InstitutionContext';
+import CreateUser from './CreateUser';
+import './index.css';
+import './mobile.css';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
-const UsersListMobile = ({ userCheck, setUserCheck }) => {
-  const InstitutionData = useContext(InstitutionContext).institutionData
-  const Ctx = useContext(Context)
-  const [isUserAdd, setIsUserAdd] = useState(false)
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [status, setStatus] = useState('Active')
-  const [balance, setBalance] = useState('')
-  const UtilCtx = useContext(Context).util
-  const [userStatus, setUserStatus] = useState('all')
-  // eslint-disable-next-line
-  const [cognitoId, setCognitoId] = useState('')
-  const [isViewingProfile, setIsViewingProfile] = useState(true)
+const UsersListMobile = ({
+  // User data props
+  userCheck,
+  setUserCheck,
+  phoneNumber,
+  name,
+  email,
+  status,
+  cognitoId,
+  balance,
+  countryCode,
+  productType,
+  selectedProductAmount,
 
-  const toggleProfileView = () => {
-    setIsViewingProfile(!isViewingProfile)
-  }
+  // UI state props
+  createButton,
+  showUserAdd,
+  isModalOpen,
 
-  const filterUsersByStatus = (status) => {
-    if (status === 'all') {
-      return Ctx.userList
-    }
-    return Ctx.userList.filter((user) => user.status === status)
-  }
+  // State setters
+  setStatus,
+  setCognitoId,
+  setShowUserAdd,
+  setPhoneNumber,
+  setCreateButton,
+  setIsModalOpen,
+  setEmail,
+  setCountryCode,
+  setName,
+  setBalance,
+  setProductType,
+  setSelectedProductAmount,
 
-  const availableStatuses = [
-    'all',
-    ...Array.from(new Set(Ctx.userList.map((user) => user.status)))
-  ]
+  // Search and filter props
+  userStatus,
+  setUserStatus,
+  searchQuery,
+  setSearchQuery,
 
-  const itemsPerPage = 5 // Set the desired number of items per page
-  const [currentPage, setCurrentPage] = useState(1)
-  const totalPages = Math.ceil(Ctx.userList.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  // eslint-disable-next-line
-  const [showScheduleForm, setShowScheduleForm] = useState(false)
+  // Pagination props
+  currentPage,
+  setCurrentPage,
+  itemsPerPage,
 
-  const [searchQuery, setSearchQuery] = useState('') // Step 1: Add state for the search query
+  // Data arrays
+  filteredUserList,
+  activeUserList,
 
-  const formatDate = (epochDate) => {
-    const date = new Date(epochDate)
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0') // Month is zero-indexed, so we add 1 to get the correct month
-    const year = date.getFullYear()
-    return `${day}/${month}/${year}`
-  }
+  // Helper functions
+  handleDeleteUser,
+  formatDate,
+  availableStatuses,
 
-  // Step 2: Implement the search functionality
-  const filter2 = filterUsersByStatus(userStatus)
-  const filteredUserList = filter2
-    .filter((user) => {
-      return (
-        user.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.emailId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.phoneNumber.includes(searchQuery)
-      )
-    })
-    .slice(startIndex, endIndex)
-  // eslint-disable-next-line
-  const onUpdateUser = async (e) => {
-    e.preventDefault()
+  // Additional functionality
+  showDeleteModal,
+  setShowDeleteModal,
+  confirmDelete,
+  requestSort,
+  handleSelectChange,
+  selectedOption
+}) => {
+  const InstitutionData = useContext(InstitutionContext).institutionData;
 
-    if (!(name && email && phoneNumber && status && balance)) {
-      alert('Fill all Fields')
-      return
-    }
-    if (!name) {
-      alert('Fill Name')
-      return
-    } else if (!email) {
-      alert('Fill email')
-      return
-    } else if (!phoneNumber) {
-      alert('Fill Phone Number')
-      return
-    } else if (!status) {
-      alert('Fill Status')
-      return
-    } else if (!balance) {
-      alert('Fill Balance')
-      return
-    }
-
-    UtilCtx.setLoader(true)
-
-    try {
-      await API.put(
-        'main',
-        `/admin/update-user/${InstitutionData.InstitutionId}`,
-        {
-          body: {
-            cognitoId: cognitoId,
-            emailId: email,
-            userName: name,
-            phoneNumber: phoneNumber,
-            status: status,
-            balance: balance
-          }
-        }
-      )
-
-      alert('User Updated')
-
-      setName('')
-      setEmail('')
-      setPhoneNumber('')
-      setStatus('')
-      setBalance('')
-
-      Ctx.onreload()
-
-      UtilCtx.setLoader(false)
-    } catch (e) {
-      console.log(e)
-      UtilCtx.setLoader(false)
-    }
-  }
-
-  const onCreateUser = async (e) => {
-    e.preventDefault()
-
-    if (!(name && email && phoneNumber && status && balance)) {
-      alert('Fill all Fields')
-      return
-    }
-    if (!name) {
-      alert('Fill Name')
-      return
-    } else if (!email) {
-      alert('Fill email')
-      return
-    } else if (!phoneNumber) {
-      alert('Fill Phone Number')
-      return
-    } else if (!status) {
-      alert('Fill Status')
-      return
-    } else if (!balance) {
-      alert('Fill Balance')
-      return
-    }
-
-    UtilCtx.setLoader(true)
-
-    try {
-      await API.post(
-        'main',
-        `/admin/create-user/${InstitutionData.InstitutionId}`,
-        {
-          body: {
-            emailId: email,
-            userName: name,
-            phoneNumber: phoneNumber,
-            status: status,
-            balance: balance
-          }
-        }
-      )
-      Ctx.setUserList([
-        ...Ctx.userList,
-        {
-          emailId: email,
-          userName: name,
-          phoneNumber: phoneNumber,
-          status: status,
-          balance: balance
-        }
-      ])
-
-      alert('User Added')
-
-      setName('')
-      setEmail('')
-      setPhoneNumber('')
-      setStatus('')
-      setBalance('')
-
-      UtilCtx.setLoader(false)
-    } catch (e) {
-      console.log(e)
-      UtilCtx.setLoader(false)
-    }
-  }
+  // Calculate pagination
+  const totalPages = Math.ceil(activeUserList.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentUsers = activeUserList.slice(startIndex, endIndex);
 
   const handleToggleUserAdd = () => {
-    setUserCheck((prevState) => (prevState === 1 ? 0 : 1))
-    setIsUserAdd((prevState) => !prevState)
-  }
+    setUserCheck(prev => prev === 1 ? 0 : 1);
+    setIsModalOpen(true);
+    setCreateButton(true);
+  };
 
-  const sendReminder = async (cognitoId) => {
-    UtilCtx.setLoader(true)
+  const handleUpdateProfile = (user) => {
+    if (!user) return;
 
-    const pa = 'happyprancer@ybl'
-    const pn = 'happyprancer'
-    const am = 10
-
-    try {
-      const res = await API.post(
-        'main',
-        `/user/send-email/${InstitutionData.InstitutionId}`,
-        {
-          body: {
-            pa,
-            pn,
-            am,
-            cognitoId
-          }
-        }
-      )
-
-      alert(res.message)
-      UtilCtx.setLoader(false)
-    } catch (e) {
-      console.log(e)
-      UtilCtx.setLoader(false)
-    }
-  }
+    setIsModalOpen(true);
+    setCognitoId(user.cognitoId || '');
+    setName(user.userName || '');
+    setEmail(user.emailId || '');
+    setPhoneNumber(user.phoneNumber || '');
+    setStatus(user.status || '');
+    setBalance(user.balance || '');
+    setUserCheck(2);
+    setCreateButton(false);
+  };
 
   return (
-    <div className={`w-full px-2 pb-4`}>
-      <div className={`container`}>
-        {/* Step 1: Update the button class */}
+    <div className="w-full px-2 pb-4">
+      {/* Add New User Button */}
+      <div className="container">
         <button
-          className={`filter-button w-full m-[1rem] h-[2.1rem] rounded-[0.3rem] text-snow  text-white`}
+          className="filter-button w-full m-[1rem] h-[2.1rem] rounded-[0.3rem] text-snow text-white"
           style={{
-            backgroundColor:
-              isUserAdd && userCheck === 1
-                ? InstitutionData.PrimaryColor
-                : 'black'
+            backgroundColor: isModalOpen && userCheck === 1 ? InstitutionData?.PrimaryColor : 'black'
           }}
-          onClick={handleToggleUserAdd} // Use the custom function to handle toggle
+          onClick={handleToggleUserAdd}
         >
-          {isUserAdd && userCheck === 1 ? 'Cancel' : 'Add New User'}{' '}
-          {/* Toggle button text */}
+          Add New User
         </button>
       </div>
-      {isUserAdd && userCheck === 1 && (
-        <form className={`flex flex-col gap-6 w-full Sansita`}>
-          <div
-            className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-[0.5rem]`}
-          >
-            {/* Step 2: Apply the custom input field class to the input elements */}
+
+      {/* CreateUser Modal */}
+      {(showUserAdd || isModalOpen) && (
+        <div className="showBox open">
+          <CreateUser
+            productType={productType}
+            setProductType={setProductType}
+            selectedProductAmount={selectedProductAmount}
+            setSelectedProductAmount={setSelectedProductAmount}
+            createButton={createButton}
+            setCreateButton={setCreateButton}
+            phoneNumber={phoneNumber}
+            cognitoId={cognitoId}
+            balance={balance}
+            status={status}
+            email={email}
+            countryCode={countryCode}
+            name={name}
+            setPhoneNumber={setPhoneNumber}
+            setBalance={setBalance}
+            setStatus={setStatus}
+            setEmail={setEmail}
+            setCountryCode={setCountryCode}
+            setName={setName}
+            setShowUserAdd={setShowUserAdd}
+            setIsModalOpen={setIsModalOpen}
+          />
+        </div>
+      )}
+
+      {/* Search and Filter Controls */}
+      <div className="flex flex-col gap-4">
+        {/* Search Input */}
+        <div className="w-full flex justify-center pr-2">
+          <div className="relative w-[80vw]">
             <input
-              required
-              placeholder="Name"
-              className={`input-field`}
-              type={'text'}
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value)
-              }}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name, email, or phone"
+              className="p-2 rounded-[0.3rem] w-full shadow-md"
             />
-            <input
-              required
-              placeholder="Email Address"
-              className={`input-field`}
-              type={'email'}
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value)
-              }}
-            />
-            <input
-              required
-              className={`input-field`}
-              placeholder="Phone Number"
-              type={'number'}
-              value={phoneNumber}
-              onChange={(e) => {
-                setPhoneNumber(e.target.value)
-              }}
-            />
+            <span className="absolute right-2 top-1/2 transform -translate-y-1/2">
+              <img
+                src="https://institution-utils.s3.amazonaws.com/institution-common/Assests/search.png"
+                alt="Search"
+                className="h-6 w-6 opacity-80"
+              />
+            </span>
+          </div>
+        </div>
+
+        {/* Status Filter */}
+        <div className="w-full flex justify-end px-4">
+          <div className="flex items-center gap-2">
+            <label className="font-bold whitespace-nowrap" htmlFor="userStatusFilter">
+              User Status:
+            </label>
             <select
-              className={`input-field`}
-              onChange={(e) => {
-                setStatus(e.target.value)
-              }}
-              value={status}
+              id="userStatusFilter"
+              value={userStatus}
+              onChange={(e) => setUserStatus(e.target.value)}
+              className="rounded-[0.51rem] py-1 px-2 bg-white shadow-md"
             >
-              <option value={'Active'}>Active</option>
-              <option value={'InActive'}>InActive</option>
+              {availableStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status === 'all' ? 'All' : status}
+                </option>
+              ))}
             </select>
-            <input
-              required
-              className={`input-field`}
-              placeholder="Balance"
-              type={'number'}
-              value={balance}
-              onChange={(e) => {
-                setBalance(e.target.value)
-              }}
-            />
-            <div className={`flex gap-3 w-full justify-center items-center`}>
-              {/* Step 4: Update the button styles */}
+          </div>
+        </div>
+      </div>
+
+      {/* Users List */}
+      <h2 className="text-[1.4rem] mb-5 font-bold text-black-700 mt-10 text-center">
+        Members List
+        {activeUserList.length > 0 && ` (${activeUserList.length})`}
+      </h2>
+
+      <div className="grid gap-[1.5rem] md:gap-4 grid-cols-1 sm:grid-cols-2">
+        {currentUsers.map((user) => (
+          <div
+            key={user?.cognitoId || Math.random()}
+            className="rounded-[1.5rem] p-3 md:p-4 shadow-lg relative"
+            style={{
+              background: 'linear-gradient(to bottom, rgb(0 255 196), rgb(26 203 164))',
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold mb-2">{user?.userName || 'N/A'}</h3>
+            </div>
+            <div className="space-y-1">
+              <div>Email: {user?.emailId || 'N/A'}</div>
+              <div>Phone: {user?.phoneNumber || 'N/A'}</div>
+              <div>Country: {user?.country || 'N/A'}</div>
+              <div>Joining Date: {formatDate(user?.joiningDate)}</div>
+              <div>Due: {user?.balance || '0'}</div>
+              <div>
+                Attendance: {user?.currentMonthZPoints || 0}/{user?.lastMonthZPoints || 0}
+              </div>
+            </div>
+            <div className="flex gap-2 mt-2">
               <button
-                className={`sans-serif tracking-wider h-[2.4rem] w-[85%] rounded-lg py-2 bg-black text-white`}
-                onClick={onCreateUser}
+                className="bg-white rounded-[0.3rem] px-3 py-1 text-black font-bold text-center flex-1"
+                onClick={() => handleUpdateProfile(user)}
               >
-                Create
+                Update Profile
+              </button>
+              <button
+                className="absolute top-3 right-1 rounded-[0.3rem] px-3 py-1 font-bold"
+                onClick={() => handleDeleteUser(user.institution, user.cognitoId)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-5"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </button>
             </div>
           </div>
-        </form>
-      )}
-      <div className={`w-full flex justify-center pr-2 mb-3`}>
-        {/* Step 6: Add the search bar */}
-        <div className={`relative`}>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by name, email, or phone"
-            style={{
-              boxShadow: '0 0 8px rgba(0, 0, 0, 0.3)'
-            }}
-            className={`p-1 rounded-[0.3rem] w-[80vw] ml-2`}
-          />
-
-          <span
-            className={`absolute right-2 top-1/2 transform -translate-y-1/2`}
-          >
-            {/* Custom Search Icon */}
-            <img
-              src={`https://institution-utils.s3.amazonaws.com/institution-common/Assests/search.png`}
-              alt="Search Icon"
-              className={`h-6 w-6 text-gray-500 opacity-80`}
-            />
-          </span>
-        </div>
-      </div>
-      <div className={`flex`}>
-        <div className={`w-[95%] flex justify-end gap-3`}>
-          <label className={`font-bold" htmlFor="userStatusFilter`}>
-            User Status:
-          </label>
-          <select
-            className={`rounded-[0.51rem] mr-3 py-1 px-1 bg-snow`}
-            id="userStatusFilter"
-            value={userStatus}
-            onChange={(e) => setUserStatus(e.target.value)}
-            style={{ boxShadow: '0 0 12px rgba(0, 0, 0, 0.3)' }}
-          >
-            {availableStatuses.map((status) => (
-              <option
-                key={status}
-                value={status}
-                style={{ background: 'white' }}
-              >
-                {status === 'all' ? 'All' : status}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <h2
-        className={`text-[1.4rem] mb-5 font-bold text-black-700 mt-10 text-center`}
-      >
-        Members List
-      </h2>
-      <div className={`grid gap-[1.5rem] md:gap-4 grid-cols-1 sm:grid-cols-2`}>
-        {filteredUserList.map((user, i) => (
-          <div
-            key={user.cognitoId}
-            className={`bg-gradient-to-r from-#1b7571  to-#1b7571 rounded-lg p-3 md:p-4 shadow-md`}
-            style={{
-              background: `linear-gradient(to bottom,rgb(0 255 196), rgb(26 203 164))`,
-              boxShadow: '0 0px 15px rgba(0, 0, 0, 0.4)',
-              borderRadius: '1.5rem'
-            }}
-          >
-            {isUserAdd && userCheck === 2 && cognitoId === user.cognitoId && (
-              <form className={`flex flex-col gap-[1rem] w-full Sansita`}>
-                <input
-                  required
-                  placeholder="Name"
-                  className={` p-[4px] pl-[1rem] rounded-[0.3rem] item-center bg-[#9dffdeba]`}
-                  type={'text'}
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value)
-                  }}
-                />
-                <input
-                  required
-                  placeholder="Email Address"
-                  className={` p-[4px] pl-[1rem] rounded-[0.3rem] item-center bg-[#9dffdeba]`}
-                  type={'email'}
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value)
-                  }}
-                />
-
-                <input
-                  required
-                  className={` p-[4px] pl-[1rem] rounded-[0.3rem] item-center bg-[#9dffdeba]`}
-                  placeholder="Phone Number"
-                  type={'number'}
-                  value={phoneNumber}
-                  onChange={(e) => {
-                    setPhoneNumber(e.target.value)
-                  }}
-                />
-                <div className={`flex gap-3 w-full`}>
-                  <select
-                    className={` w-[42vw] p-[4px] pl-[1rem] rounded-[0.3rem] item-center bg-[#9dffdeba]`}
-                    onChange={(e) => {
-                      setStatus(e.target.value)
-                    }}
-                    value={status}
-                  >
-                    <option value={'Active'}>Active</option>
-                    <option value={'InActive'}>InActive</option>
-                  </select>
-                  <input
-                    required
-                    className={` w-[42vw] p-[4px] pl-[1rem] rounded-[0.3rem] item-center bg-[#9dffdeba]`}
-                    placeholder="Balance"
-                    type={'number'}
-                    value={balance}
-                    onChange={(e) => {
-                      setBalance(e.target.value)
-                    }}
-                  />
-                </div>
-                <button
-                  className={`sans-sarif w-[87vw] tracking-wide rounded-[0.2rem] py-1 bg-black text-white`}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    sendReminder(cognitoId)
-                  }}
-                >
-                  Send Invoice
-                </button>
-                <div
-                  className={`flex gap-3 w-full items-center justify-center`}
-                >
-                  <button
-                    className={`sans-sarif w-[41vw] tracking-wide rounded-[0.2rem] py-1 mb-4 bg-black text-white`}
-                    onClick={() => {
-                      setIsUserAdd(false)
-                      setUserCheck(0)
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className={`sans-sarif w-[41vw] tracking-wide rounded-[0.2rem] py-1 mb-4 bg-black text-white`}
-                    onClick={onUpdateUser}
-                  >
-                    Update
-                  </button>
-                </div>
-              </form>
-            )}
-
-            <div className={`flex items-center justify-between`}>
-              <h3 className={`text-lg font-bold mb-2`}>{user.userName}</h3>
-            </div>
-            <div className={`mb-1`}>Email: {user.emailId}</div>
-            <div>Phone: {user.phoneNumber}</div>
-            <div className={`mb-1`}>Country: {user.country}</div>
-            <div className={`mb-2`}>
-              Joining Date: {formatDate(user.joiningDate)}
-            </div>
-            <div className={``}>Due:{user.balance}</div>
-            <div className={``}>
-              Attendance:{' '}
-              {user.currentMonthZPoints ? user.currentMonthZPoints : 0}/
-              {user.lastMonthZPoints ? user.lastMonthZPoints : 0}
-            </div>
-            <button
-              className={`bg-white rounded-[0.3rem] px-3 py-1 text-black font-bold text-center mt-2 w-[87vw]`}
-              onClick={() => {
-                if (isViewingProfile) {
-                  // View Profile logic
-                  setIsUserAdd(true)
-                  setCognitoId(user.cognitoId)
-                  setName(user.userName)
-                  setEmail(user.emailId)
-                  setPhoneNumber(user.phoneNumber)
-                  setStatus(user.status)
-                  setBalance(user.balance)
-                  setUserCheck(2)
-                } else {
-                  // Unview Profile logic (e.g., close the profile)
-                  // Add your close profile logic here
-                  setIsUserAdd(false)
-                  setUserCheck(0)
-                }
-                toggleProfileView() // Toggle the profile view
-              }}
-            >
-              {' '}
-              {isViewingProfile ? 'View Profile' : 'Unview Profile'}
-            </button>
-          </div>
         ))}
       </div>
-      <div
-        className={`flex mb-[6rem] justify-center items-center mt-4 md:mt-6`}
-      >
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onPageChange={(value) => setCurrentPage(value)}
-        />
-      </div>
+      <ConfirmDeleteModal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+      />
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-4 md:mt-6 mb-[6rem]">
+          <Pagination
+            currentPage={currentPage}
+            layout="pagination"
+            onPageChange={setCurrentPage}
+            showIcons={true}
+            totalPages={totalPages}
+            previousLabel="Previous"
+            nextLabel="Next"
+          />
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default UsersListMobile
+export default UsersListMobile;
