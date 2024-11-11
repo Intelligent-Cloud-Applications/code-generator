@@ -80,7 +80,7 @@ function CreateUser({
       institution: InstitutionData.InstitutionId,
       cognitoId, // required for both create and update
       emailId: email,
-      userName: name,
+      name: name,
       phoneNumber: `${countryCode}${phoneNumber}`,
       status,
       productType,
