@@ -1,4 +1,4 @@
-import React, { useContext, useRef,useState,useEffect } from "react";
+import React, { useContext,useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../../components/Footer";
 import NavBar from "../../../components/Header";
@@ -18,29 +18,7 @@ import { API } from "aws-amplify";
 
 
 export const HybridPayment = () => {
-  const dataRef = useRef([
-    {
-      name: "Hybrid Class",
-      description:
-        "A unique dance program offering both in-person and online classes, perfect for dancers seeking flexibility and a comprehensive learning experience.",
-    },
-    {
-      name: "Overview",
-      description:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolores minus cum voluptates voluptatum rerum eos placeat eligendi quia explicabo! Enim voluptatem possimus voluptatum odit officia mollitia accusamus, nostrum delectus perferendis!",
-    },
-    {
-      name: "Subscription",
-      description:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolores minus cum voluptates voluptatum rerum eos placeat eligendi quia explicabo! Enim voluptatem possimus voluptatum odit officia mollitia accusamus, nostrum delectus perferendis!",
-    },
-    {
-      name: "Success Story",
-      description:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolores minus cum voluptates voluptatum rerum eos placeat eligendi quia explicabo! Enim voluptatem possimus voluptatum odit officia mollitia accusamus, nostrum delectus perferendis!",
-    },
-  ]);
-  const data = dataRef.current;
+
   const { institutionData: InstitutionData } = useContext(InstitutionContext);
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const Navigate = useNavigate();
@@ -85,6 +63,14 @@ export const HybridPayment = () => {
           Sign Up
         </button>
       );
+    }
+  };
+
+  const handleFreeTrial = async () => {
+    if(isAuth){
+      console.log(UserCtx);
+    }else{
+      Navigate("/signup?trial=true&trialPeriod=Monthly");
     }
   };
 
@@ -180,7 +166,7 @@ export const HybridPayment = () => {
       <NavBar />
       <Carousel />
       <div className="w-screen flex justify-center items-center">
-        <button className="free-demo">Book a Demo</button>
+        <button className="free-demo" onClick={handleFreeTrial}>Register for free trials</button>
       </div>
       <div className=" mx-auto p-4 flex flex-col">
         <Overview />
