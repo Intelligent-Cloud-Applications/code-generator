@@ -1,3 +1,4 @@
+// UsersList.jsx
 import React, { useState } from "react";
 import { useMediaQuery } from "../../../../utils/helpers";
 import UsersListMobile from "./moblie";
@@ -13,6 +14,7 @@ import CreateUser from "./CreateUser";
 import { toast } from "react-toastify";
 import { API } from "aws-amplify";
 import InstructorList from "./InstructorList";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 const UsersList = ({ userCheck, setUserCheck }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -30,19 +32,19 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [productType, setProductType] = useState("Product Type");
   const [selectedProductAmount, setSelectedProductAmount] = useState("");
   const [createButton, setCreateButton] = useState("");
-
-  // eslint-disable-next-line
-  // const [country, setCountry] = useState('')
-
-  const UtilCtx = useContext(Context).util;
-  // eslint-disable-next-line
   const [cognitoId, setCognitoId] = useState("");
-  // eslint-disable-next-line
   const [name, setName] = useState("");
   const [userStatus, setUserStatus] = useState("all");
-  // eslint-disable-next-line
-  // const [selectedUser, setSelectedUser] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("Members List");
 
+  const itemsPerPage = 10;
+  const isMobileScreen = useMediaQuery("(max-width: 600px)");
+
+  // Filter functions
   const filterUsersByStatus = (status) => {
     if (status === "all") {
       return Ctx.userList;
@@ -55,16 +57,64 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     ...Array.from(new Set(Ctx.userList.map((user) => user.status))),
   ];
 
-  const isMobileScreen = useMediaQuery("(max-width: 600px)");
+  const filter2 = filterUsersByStatus(userStatus);
 
-  const itemsPerPage = 10;
-  const [currentPage, setCurrentPage] = useState(1);
-  //  let totalPages = Math.ceil(Ctx.userList.length / itemsPerPage)
+  // Search functionality
+  const searchedUserList = filter2.filter((user) => {
+    return (
+      user?.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user?.emailId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user?.phoneNumber?.includes(searchQuery)
+    );
+  });
+
+  const activeUserList = searchedUserList.filter((user) => !user.isArchived);
+
+  // Sort functionality
+  activeUserList.sort((a, b) => {
+    return b.joiningDate - a.joiningDate;
+  });
+
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
-  const [searchQuery, setSearchQuery] = useState(""); // Step 1: Add state for the search query
+  const filteredUserList = activeUserList.slice(startIndex, endIndex);
 
+  // Delete functionality
+  const handleDelete = async (institution, cognitoId) => {
+    const response = await API.put("main", "/admin/delete-user", {
+      body: {
+        institution: institution,
+        cognitoId,
+      },
+    });
+    if (response.status === 200) {
+      toast.success("Deleted successfully!", { autoClose: 3000 });
+    }
+    getUserList();
+  };
+
+  const handleCancel = () => {
+    toast.dismiss();
+  };
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
+  const handleDeleteUser = (institution, cognitoId) => {
+    setUserToDelete({ institution, cognitoId });
+    setShowDeleteModal(true); // Open the modal
+  };
+
+  const confirmDelete = async () => {
+    if (userToDelete) {
+      await handleDelete(userToDelete.institution, userToDelete.cognitoId);
+      setShowDeleteModal(false);
+      setUserToDelete(null);
+      toast.success("User deleted successfully!");
+    }
+  };
+
+  // Format date helper
   const formatDate = (epochDate) => {
     const date = new Date(epochDate);
     const day = String(date.getDate()).padStart(2, "0");
@@ -73,6 +123,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     return `${day}/${month}/${year}`;
   };
 
+  // Sort functionality
   const requestSort = (key) => {
     let direction = "ascending";
     if (
@@ -85,93 +136,62 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     setSortConfig({ key, direction });
   };
 
-  // Step 2: Implement the search functionality
-  const filter2 = filterUsersByStatus(userStatus);
-
-  // Filter based on search query
-  const searchedUserList = filter2.filter((user) => {
-    return (
-      user?.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user?.emailId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user?.phoneNumber?.includes(searchQuery)
-    );
-  });
-
-  // Further filter the searched list to exclude archived users
-  const activeUserList = searchedUserList.filter((user) => !user.isArchived);
-
-  // Sort the filtered list based on the join date
-  activeUserList.sort((a, b) => {
-    return b.joiningDate - a.joiningDate;
-  });
-
-  console.log("Active user list: ", activeUserList);
-
-  // Paginate the filtered list
-  const filteredUserList = activeUserList.slice(startIndex, endIndex);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-  const ConfirmToast = ({ onConfirm, onCancel }) => (
-    <div className="font-bold">
-      <p>Are you sure you want to delete?</p>
-      <div>
-        <button
-          onClick={onConfirm}
-          className="bg-red-400 text-black font-[500] p-2 px-3 rounded w-[40%]"
-        >
-          Yes
-        </button>
-        <button
-          onClick={onCancel}
-          className="bg-green-400 text-black font-[500] p-2 px-3 rounded w-[40%] ml-2"
-        >
-          No
-        </button>
-      </div>
-    </div>
-  );
-
-  const handleDelete = async (institution, cognitoId) => {
-    // console.log(institution)
-    const response = await API.put("main", "/admin/delete-user", {
-      body: {
-        institution: institution,
-        cognitoId,
-      },
-    });
-    toast.success("Deleted successfully!", { autoClose: 3000 });
-    getUserList();
-  };
-
-  const handleCancel = () => {
-    toast.dismiss();
-  };
-
-  const handleDeleteUser = (institution, cognitoId) => {
-    // console.log(institution)
-    toast(
-      <ConfirmToast
-        onConfirm={() => {
-          handleDelete(institution, cognitoId);
-          toast.dismiss();
-        }}
-        onCancel={handleCancel}
-      />
-    );
-  };
-  const [selectedOption, setSelectedOption] = useState("Members List");
   const handleSelectChange = (event) => {
     setSelectedOption(event.target.value);
+  };
+
+  const mobileProps = {
+    userCheck,
+    setUserCheck,
+    phoneNumber,
+    name,
+    email,
+    status,
+    cognitoId,
+    balance,
+    countryCode,
+    productType,
+    selectedProductAmount,
+    createButton,
+    showUserAdd,
+    isModalOpen,
+    setStatus,
+    setCognitoId,
+    setShowUserAdd,
+    setPhoneNumber,
+    setCreateButton,
+    setIsModalOpen,
+    setEmail,
+    setCountryCode,
+    setName,
+    setBalance,
+    setProductType,
+    setSelectedProductAmount,
+    userStatus,
+    setUserStatus,
+    searchQuery,
+    setSearchQuery,
+    currentPage,
+    setCurrentPage,
+    filteredUserList,
+    activeUserList,
+    handleDeleteUser,
+    formatDate,
+    availableStatuses,
+    itemsPerPage,
+    requestSort,
+    handleSelectChange,
+    selectedOption,
+    filter2,
+    setShowDeleteModal,
+    showDeleteModal,
+    confirmDelete
   };
 
   return (
     <>
       {isMobileScreen ? (
-        <UsersListMobile userCheck={userCheck} setUserCheck={setUserCheck} />
+        <UsersListMobile {...mobileProps} />
       ) : (
         <div
           className={`w-[99%] flex flex-col items-center pt-6 max536:pt-0 gap-10`}
@@ -398,7 +418,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                     user
                                   );
                                   setIsUserAdd(false);
-                                  openModal();
+                                  setIsModalOpen(true);
                                   setCognitoId(user.cognitoId);
                                   setName(user.userName);
                                   setEmail(user.emailId);
@@ -437,7 +457,11 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                       }
                       return null; // Ensure a return in the else case
                     })}
-
+                    <ConfirmDeleteModal
+                      show={showDeleteModal}
+                      onHide={() => setShowDeleteModal(false)}
+                      onConfirm={confirmDelete}
+                    />
                     <div
                       className={`absolute bottom-0 flex justify-center items-center w-full`}
                     >
