@@ -1,34 +1,51 @@
-import React, { useContext } from 'react';
-import Context from '../../../Context/Context';
-import HappyprancerPaypalHybrid from '../Components/Subscription/HappyprancerPaypalHybrid';
-import InstitutionContext from '../../../Context/InstitutionContext';
-import { useNavigate } from 'react-router-dom';
-import NavBar from '../../../components/Header';
-import Footer from '../../../components/Footer';
+import React, { useContext,useState,useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Footer from "../../../components/Footer";
+import NavBar from "../../../components/Header";
+import Context from "../../../Context/Context";
+import InstitutionContext from "../../../Context/InstitutionContext";
+import HappyprancerPaypalHybrid from "../../public/Subscription/HappyprancerPaypalHybrid";
+import ProfileCard from "./ProfileCard";
+import SubscriptionCard from "./SubscriptionCard";
+import {Overview} from "./Overview";
+import Carousel from "./Carousel";
+import"./Carousel.css";
 
-const HybridPayment = () => {
+import apiPaths from "../../../utils/api-paths";
+import { API } from "aws-amplify";
+
+
+
+
+export const HybridPayment = () => {
+
   const { institutionData: InstitutionData } = useContext(InstitutionContext);
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const Navigate = useNavigate();
 
-  const hybridProduct = productList.find(item => item.subscriptionType === 'Hybrid');
+  const hybridProduct = productList.find(
+    (item) => item.subscriptionType === "Hybrid"
+  );
 
   const paymentHandler = (item) => {
     if (isAuth) {
-      if (UserCtx?.status === 'Active' && UserCtx?.productIds?.some(productId => productId === item.productId)) {
+      if (
+        UserCtx?.status === "Active" &&
+        UserCtx?.productIds?.some((productId) => productId === item.productId)
+      ) {
         return (
           <p
             className="text-[1rem] w-[15rem] px-12 py-2 rounded-2xl border-[0.2rem] h-[3rem] flex justify-center items-center"
             style={{
               color: InstitutionData.LightPrimaryColor,
-              borderColor: InstitutionData.LightPrimaryColor
+              borderColor: InstitutionData.LightPrimaryColor,
             }}
           >
             Subscribed
           </p>
         );
       } else {
-        if (item.currency === 'USD' && item.subscriptionType === 'Hybrid') {
+        if (item.currency === "USD" && item.subscriptionType === "Hybrid") {
           return <HappyprancerPaypalHybrid />;
         }
       }
@@ -36,11 +53,11 @@ const HybridPayment = () => {
       return (
         <button
           onClick={() => {
-            Navigate('/signup');
+            Navigate("/signup");
           }}
           className="w-[15rem] px-12 py-2 rounded-2xl hover:text-lightPrimaryColor hover:bg- hover:border-lightPrimaryColor hover:border-[0.3rem] h-[3rem] flex justify-center items-center mt-auto mb-10 text-white"
           style={{
-            backgroundColor: InstitutionData.LightPrimaryColor
+            backgroundColor: InstitutionData.LightPrimaryColor,
           }}
         >
           Sign Up
@@ -49,9 +66,17 @@ const HybridPayment = () => {
     }
   };
 
+  const handleFreeTrial = async () => {
+    if(isAuth){
+      console.log(UserCtx);
+    }else{
+      Navigate("/signup?trial=true&trialPeriod=Monthly");
+    }
+  };
+
   return (
     <>
-    <NavBar />
+      {/* <NavBar />
       <div className="relative flex place-items-center sm:h-full text-white lg:w-3/4 md:w-full sm:w-full "
         style={{
           backgroundColor: InstitutionData.LightPrimaryColor
@@ -136,10 +161,27 @@ const HybridPayment = () => {
       </div>
       <div className='mt-[32rem] md:mt-[30rem] sm:mt-[28rem] lg:mt-0'>
       <Footer  />
+      </div> */}
+
+      <NavBar />
+      <Carousel />
+      <div className="w-screen flex justify-center items-center">
+        <button className="free-demo" onClick={handleFreeTrial}>Register for free trials</button>
       </div>
-      
+      <div className=" mx-auto p-4 flex flex-col">
+        <Overview />
+        <div className="my-4"></div>
+        <SubscriptionCard />
+        <div className="my-4"></div>
+        <ProfileCard />
+      </div>
+      <Footer />
     </>
   );
 };
 
-export default HybridPayment;
+
+
+
+
+

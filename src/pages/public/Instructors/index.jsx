@@ -6,6 +6,7 @@ import { API, Storage } from "aws-amplify";
 import Context from "../../../Context/Context";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import "./Instructor.css";
+import Country from "../../../components_old/Country";
 import { toast } from "react-toastify";
 import {
   Button,
@@ -13,8 +14,9 @@ import {
   FileInput,
   Label,
   TextInput,
+  Select,
 } from "flowbite-react";
-import { FaUserEdit } from "react-icons/fa";
+import { FaUserEdit, FaPhoneAlt, FaGlobe } from "react-icons/fa";
 import {
   HiMail,
   HiUser,
@@ -22,7 +24,12 @@ import {
   HiTrash,
   HiOutlineExclamationCircle,
 } from "react-icons/hi";
-import { MdVerified, MdEdit } from "react-icons/md";
+import {
+  MdVerified,
+  MdEdit,
+  MdPayment,
+  MdOutlinePayments,
+} from "react-icons/md";
 
 const Instructor = () => {
   const [instructorList, setInstructorList] = useState([]);
@@ -38,6 +45,10 @@ const Instructor = () => {
   const [position, setPosition] = useState("");
   const [imageURL, setImageURL] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("91");
+  const [instructorPaymentType, setInstructorPaymentType] = useState("");
+  const [instructorPaymentAmount, setInstructorPaymentAmount] = useState("");
   const [instructorId, setInstructorId] = useState("");
   const [modalShow, setModalShow] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -151,20 +162,41 @@ const Instructor = () => {
 
   async function handleAddInstructor() {
     setLoaderInitialized(true);
+    if (!name || !phone) {
+      toast.error("Name and Phone are required.", {
+        className: "custom-toast",
+      });
+      setLoaderInitialized(false);
+      return;
+    }
+    console.log(`+${countryCode}${phone}`);
+
     try {
       const data = {
+        institution: institutionData.InstitutionId,
         name: name,
+        userName: name,
+        phoneNumber: `+${countryCode}${phone}`,
         position: position,
         image: imageURL,
         emailId: email,
+        instructorPaymentType: instructorPaymentType
+          ? instructorPaymentType
+          : "",
+        instructorPaymentAmount: instructorPaymentAmount
+          ? instructorPaymentAmount
+          : "",
       };
-      const response = await API.post(
-        "main",
-        `/admin/create-instructor/${institutionData.InstitutionId}`,
-        { body: data }
-      );
+      const response = await API.post("main", `/admin/create-user`, {
+        body: data,
+      });
 
-      
+      const createdCognitoId = response.user.cognitoId;
+
+      await API.put("main", "/admin/member-to-instructor", {
+        body: { ...data, cognitoId: createdCognitoId },
+      });
+
       console.log(response);
       localStorage.removeItem(
         `instructorList_${institutionData.InstitutionId}`
@@ -183,8 +215,10 @@ const Instructor = () => {
   }
 
   async function handleUpdateInstructor() {
-    
     try {
+      setLoaderInitialized(true);
+      console.log(imageURL);
+      
       const response = await API.put(
         "main",
         `/admin/put-instructor/${institutionData.InstitutionId}/${instructorId}`,
@@ -193,6 +227,9 @@ const Instructor = () => {
             name: name,
             position: position,
             image: imageURL,
+            phoneNumber: phone ? `${countryCode}${phone}` : phone,
+            instructorPaymentType: instructorPaymentType,
+            instructorPaymentAmount: instructorPaymentAmount,
             emailId: email,
           },
         }
@@ -205,6 +242,7 @@ const Instructor = () => {
       toast.success("Instructor updated successfully.", {
         className: "custom-toast",
       });
+      setLoaderInitialized(false);
       onCloseModal();
     } catch (e) {
       console.log(e);
@@ -257,6 +295,10 @@ const Instructor = () => {
     setPosition("");
     setEmail("");
     setImageURL("");
+    setPhone("");
+    setCountryCode("91");
+    setInstructorPaymentType("");
+    setInstructorPaymentAmount("");
   }
 
   return (
@@ -290,7 +332,7 @@ const Instructor = () => {
           {isUpdating ? "Update Instructor" : "Add Instructor"}
         </Modal.Header>
         <Modal.Body>
-          <div className="space-y-6">
+          <div className="space-y-2">
             <div id="fileUpload" className="max-w-md">
               <div className="mb-2 block">
                 <Label htmlFor="file" value="Upload file" />
@@ -337,6 +379,76 @@ const Instructor = () => {
                 required
                 rightIcon={isUpdating ? MdEdit : null}
               />
+            </div>
+            {!isUpdating && (
+              <div className="flex flex-row gap-2">
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="text" value="Country Code" />
+                  </div>
+                  <Select
+                    color={"primary"}
+                    icon={FaGlobe}
+                    value={countryCode}
+                    onChange={(e) => {
+                      setCountryCode(e.target.value.toString());
+                    }}
+                  >
+                    <Country />
+                  </Select>
+                </div>
+
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="text" value="Phone" />
+                  </div>
+                  <TextInput
+                    color={"primary"}
+                    id="text"
+                    type="text"
+                    icon={FaPhoneAlt}
+                    value={phone}
+                    placeholder="Enter Phone"
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                    rightIcon={isUpdating ? MdEdit : null}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-row gap-2">
+              <div>
+                <div className="mb-2 block">
+                  <Label htmlFor="text" value="Payment Type" />
+                </div>
+                <Select
+                  color={"primary"}
+                  icon={MdPayment}
+                  value={instructorPaymentType}
+                  onChange={(e) => setInstructorPaymentType(e.target.value)}
+                >
+                  <option value="">Select Payment Type</option>
+                  <option value="percent">Percent</option>
+                  <option value="flat">Flat</option>
+                </Select>
+              </div>
+              <div>
+                <div className="mb-2 block">
+                  <Label htmlFor="text" value="Payment Amount" />
+                </div>
+                <TextInput
+                  color={"primary"}
+                  id="text"
+                  type="text"
+                  icon={MdOutlinePayments}
+                  value={instructorPaymentAmount}
+                  placeholder="Enter Payment Amount"
+                  onChange={(e) => setInstructorPaymentAmount(e.target.value)}
+                  required
+                  rightIcon={isUpdating ? MdEdit : null}
+                />
+              </div>
             </div>
             <div className="max-w-md">
               <div className="mb-2 block">
@@ -398,59 +510,70 @@ const Instructor = () => {
               : "md:grid-cols-1"
           } bg`}
         >
-          {instructorList.map((instructor, i) => (
-            <div className={`inst-card relative`} key={i}>
-              {isAdmin && (
-                <div className="absolute top-2 right-2 flex flex-row gap-1.5">
-                  <div
-                    className={` bg-gray-400 bg-opacity-40 text-white cursor-pointer border-1 border-white p-2 rounded hover:scale-10`}
-                    onClick={() => {
-                      setModalShow(true);
-                      setIsUpdating(true);
-                      setName(instructor.name);
-                      setPosition(instructor.position);
-                      setEmail(instructor.emailId);
-                      setImageURL(instructor.image);
-                      setInstructorId(instructor.instructorId);
-                    }}
-                  >
-                    <HiPencilAlt />
-                  </div>
-                  <div
-                    className={`bg-gray-400 bg-opacity-40 text-white cursor-pointer border-1 border-white p-2 rounded`}
-                    onClick={() => {
-                      setAlert(true);
-                      setInstructorId(instructor.instructorId);
-                      setImageURL(instructor.image);
-                    }}
-                  >
-                    <HiTrash />
-                  </div>
-                </div>
-              )}
+          {instructorList.map(
+            (instructor, i) =>
+              instructor.name !== "cancelled" && (
+                <div className={`inst-card relative`} key={i}>
+                  {isAdmin && (
+                    <div className="absolute top-2 right-2 flex flex-row gap-1.5">
+                      <div
+                        className={` bg-gray-400 bg-opacity-40 text-white cursor-pointer border-1 border-white p-2 rounded hover:scale-10`}
+                        onClick={() => {
+                          setModalShow(true);
+                          setIsUpdating(true);
+                          setName(instructor.name);
+                          setPosition(instructor.position);
+                          setEmail(instructor.emailId);
+                          setImageURL(instructor.image);
+                          setInstructorId(instructor.instructorId);
+                          setPhone(instructor.phoneNumber);
+                          setCountryCode(instructor.phoneNumber?.slice(1, 3));
+                          setInstructorPaymentType(
+                            instructor.instructorPaymentType
+                          );
+                          setInstructorPaymentAmount(
+                            instructor.instructorPaymentAmount
+                          );
+                        }}
+                      >
+                        <HiPencilAlt />
+                      </div>
+                      <div
+                        className={`bg-gray-400 bg-opacity-40 text-white cursor-pointer border-1 border-white p-2 rounded`}
+                        onClick={() => {
+                          setAlert(true);
+                          setInstructorId(instructor.instructorId);
+                          setImageURL(instructor.image);
+                        }}
+                      >
+                        <HiTrash />
+                      </div>
+                    </div>
+                  )}
 
-              <Card
-                className={`Box`}
-                style={{
-                  backgroundImage: `url(${instructor.image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  height: "29rem",
-                  borderRadius: "10px",
-                }}
-              >
-                <div className={`overlay`}></div>
-                <div
-                  className={`instructor-card-text flex flex-col items-center`}
-                >
-                  <h4 className={`text-[1.3rem] font-semibold`}>
-                    {instructor.name}
-                  </h4>
-                  <h6>{instructor.position}</h6>
+                  <Card
+                    className={`Box`}
+                    style={{
+                      backgroundImage: `url(${instructor.image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      height: "29rem",
+                      borderRadius: "10px",
+                    }}
+                  >
+                    <div className={`overlay`}></div>
+                    <div
+                      className={`instructor-card-text flex flex-col items-center`}
+                    >
+                      <h4 className={`text-[1.3rem] font-semibold`}>
+                        {instructor.name}
+                      </h4>
+                      <h6>{instructor.position}</h6>
+                    </div>
+                  </Card>
                 </div>
-              </Card>
-            </div>
-          ))}
+              )
+          )}
         </div>
       </div>
       <Footer />

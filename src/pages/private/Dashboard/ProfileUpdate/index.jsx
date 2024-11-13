@@ -1,16 +1,17 @@
 import { API, Auth, Storage } from "aws-amplify";
-import React, { useRef, useState } from "react";
-import { useContext } from "react";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { FaArrowLeft } from "react-icons/fa";
-import Context from "../../../../Context/Context";
-import { Button2 } from "../../../../common/Inputs";
-import InstitutionContext from "../../../../Context/InstitutionContext";
+import { Label, Modal, TextInput } from "flowbite-react";
+import React, { useContext, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
-import "./index.css";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { FaArrowLeft, FaCalendarAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
-import EditableInput from "./EditableInput";
+import { Button2 } from "../../../../common/Inputs";
 import ReferralCode from "../../../../common/ReferralCode/index.jsx";
+import Context from "../../../../Context/Context";
+import InstitutionContext from "../../../../Context/InstitutionContext";
+import EditableInput from "./EditableInput";
+import "./index.css";
+import EditableTextArea from "./EditableTextArea.jsx";
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -46,6 +47,11 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [joiningDate] = useState(formatDate(UserCtx.joiningDate));
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
+
+  const [tempDob, setTempDob] = useState(
+    UserCtx.dob ? formatDate(Number(UserCtx.dob)) : ""
+  );
+  const [address, setAddress] = useState(UserCtx.address || "");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
@@ -54,13 +60,20 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [phoneCode, setPhoneCode] = useState("");
   const [isPhoneChange, setIsPhoneChange] = useState(false);
   const [isPhoneCode, setIsPhoneCode] = useState(false);
+  const dob = UserCtx.dob
+    ? new Date(Number(UserCtx.dob)).toISOString().split("T")[0]
+    : "";
 
+  console.log(tempDob);
   const ifDataChanged = () => {
     if (
       name.trim() === UserCtx.userName.trim() &&
       phoneNumber.trim() === UserCtx.phoneNumber &&
       country.trim() === UserCtx.country &&
-      joiningDate.trim() === UserCtx.joiningDate
+      joiningDate.trim() === UserCtx.joiningDate &&
+      dob.trim() ===
+        new Date(Number(UserCtx.dob)).toISOString().split("T")[0] &&
+      address.trim() === UserCtx.address
     ) {
       return false;
     } else {
@@ -161,11 +174,18 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 phoneNumber: phoneNumber,
                 country: country,
                 joiningDate: joiningDate,
+                dob: String(new Date(tempDob).getTime()),
+                address: address,
               },
             }
           );
+          const showBirthdayModal = await API.post(
+            "main",
+            `/user/birthday-message/${InstitutionData.InstitutionId}`
+          );
+          const data = { ...userdata.Attributes, showBirthdayModal };
 
-          Ctx.setUserData(userdata.Attributes);
+          Ctx.setUserData(data);
           toast.info("Updated");
           UtilCtx.setLoader(false);
         } catch (e) {
@@ -440,6 +460,55 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                       type="email"
                       value={currentEmail}
                       onChange={(e) => setCurrentEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <div className="mb-2 block">
+                      <Label value="Date of Birth" />
+                    </div>
+                    {dob ? (
+                      // This is else cannot be editable
+                      <TextInput
+                        icon={FaCalendarAlt}
+                        style={{ backgroundColor: "#c2bfbf81" }}
+                        placeholder="Select DOB"
+                        type={"date"}
+                        value={dob}
+                        readOnly
+                      />
+                    ) : (
+                      // This is for first time editable dob
+
+                      <TextInput
+                        icon={FaCalendarAlt}
+                        style={{ backgroundColor: "#c2bfbf81" }}
+                        placeholder="Select DOB"
+                        type={"date"}
+                        value={tempDob === "tempDob" ? "" : tempDob}
+                        onChange={(e) => {
+                          setTempDob(e.target.value);
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div className="w-full">
+                    <div className="mb-2 block">
+                      {UserCtx.userType === "admin" ? (
+                        <Label value="Institution Addrress" />
+                      ) : (
+                        <Label value="Addrress" />
+                      )}
+                    </div>
+                    <EditableTextArea
+                      placeholder={`Enter ${
+                        UserCtx.userType === "admin" && "Institution"
+                      } Address`}
+                      type={"text"}
+                      className="min-h-16 bg-inputBgColor min-w-full rounded-lg pl-4 py-2"
+                      value={address}
+                      onChange={(e) => {
+                        setAddress(e.target.value);
+                      }}
                     />
                   </div>
                   {/* <button

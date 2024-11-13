@@ -13,6 +13,7 @@ import Context from "../../../Context/Context";
 import { useNavigate } from "react-router-dom";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import Footer from "../../../components/Footer";
+import BirthdayModal from "./ProfileUpdate/BirthdayModal";
 
 const DashBoard = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -70,6 +71,9 @@ const DashBoard = () => {
     <>
       <NavBar />
       <div className={`flex flex-col items-center w-screen `}>
+        {
+          Ctx.userData.dob && (<BirthdayModal />)
+        }
         <div
           className={`w-full rounded-3xl flex max1050:w-screen max1050:ml-0 max536:rounded-none items-top ml-0 h-full relative`}
         >

@@ -8,6 +8,7 @@ const apiPaths = {
     getMembers: `/admin/profile-list/${institution}`,
     getStreak: `/user/streak-get/${institution}`,
     getRating: `/admin/rating-fetch/${institution}`,
+    getUserLocation: "/user/check-user-location",
 }
 
 export default apiPaths;

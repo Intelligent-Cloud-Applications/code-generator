@@ -1,85 +1,106 @@
-import { useContext, useEffect, useRef} from 'react'
-import { Auth, API } from 'aws-amplify'
-import Context from './Context/Context'
-import RoutesContainer from './routes'
-import LoaderProvider from './components/LoaderProvider'
-import InstitutionContext from './Context/InstitutionContext'
+import { useContext, useEffect, useRef } from "react";
+import { Auth, API } from "aws-amplify";
+import Context from "./Context/Context";
+import RoutesContainer from "./routes";
+import LoaderProvider from "./components/LoaderProvider";
+import InstitutionContext from "./Context/InstitutionContext";
+import apiPaths from "./utils/api-paths";
 
 function App() {
-  const UtilCtx = useRef(useContext(Context).util)
-  const RefCtx = useRef(useContext(Context))
-  const RefInstitutionCtx = useRef(useContext(InstitutionContext))
-  const InsitutionCtx = useContext(InstitutionContext)
-  const { setUserData } = useContext(Context);
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const userInfo = await API.get("main", "/user/check-user-location");
-      setUserData(userInfo);
-    };
-
-    fetchUserInfo();
-  }, []);
+  const UtilCtx = useRef(useContext(Context).util);
+  const RefCtx = useRef(useContext(Context));
+  const RefInstitutionCtx = useRef(useContext(InstitutionContext));
+  const InsitutionCtx = useContext(InstitutionContext);
 
   useEffect(() => {
     const dataLoadFn = async () => {
       try {
-        let data = require('./utils/data.json')
+        let data = require("./utils/data.json");
         data = await API.get(
-          'prod',
+          "prod",
           `/any/get-institution-data/${data && data.InstitutionId}`
-        )
-        data.InstitutionId = data.institutionid
+        );
+        data.InstitutionId = data.institutionid;
 
-        document.documentElement.style.setProperty('--color-primary', data.PrimaryColor);
-        document.documentElement.style.setProperty('--color-secondary', data.SecondaryColor);
-        document.documentElement.style.setProperty('--color-light-primary', data.LightPrimaryColor);
-        document.documentElement.style.setProperty('--color-lightest-primary', data.LightestPrimaryColor);
+        document.documentElement.style.setProperty(
+          "--color-primary",
+          data.PrimaryColor
+        );
+        document.documentElement.style.setProperty(
+          "--color-secondary",
+          data.SecondaryColor
+        );
+        document.documentElement.style.setProperty(
+          "--color-light-primary",
+          data.LightPrimaryColor
+        );
+        document.documentElement.style.setProperty(
+          "--color-lightest-primary",
+          data.LightestPrimaryColor
+        );
 
-        RefInstitutionCtx.current.setInstitutionData(data)
-        RefCtx.current.onUnauthLoad(data.InstitutionId)
+        RefInstitutionCtx.current.setInstitutionData(data);
+        RefCtx.current.onUnauthLoad(data.InstitutionId);
 
-        await check(data)
-
+        await check(data);
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
-    }
+    };
 
     const check = async (data) => {
-      UtilCtx.current.setLoader(true)
+      UtilCtx.current.setLoader(true);
 
       try {
-        await Auth.currentAuthenticatedUser()
+        await Auth.currentAuthenticatedUser();
         const userdata = await API.get(
-          'main',
+          "main",
           `/user/profile/${data && data.InstitutionId}`
-        )
+        );
+        const showBirthdayModal = await API.post(
+          "main",
+          `/user/birthday-message/${data && data.InstitutionId}`
+        );
+
+        const location = await API.get("main", apiPaths?.getUserLocation);
 
         // userdata.Status = true;
-        RefCtx.current.setUserData(userdata)
-        RefCtx.current.setIsAuth(true)
-        UtilCtx.current.setLoader(false)
-        RefCtx.current.onAuthLoad(true, data.InstitutionId)
+        RefCtx.current.setUserData((prev) => ({
+          ...prev,
+          ...userdata,
+          location,
+          showBirthdayModal,
+        })
+        );
+        RefCtx.current.setIsAuth(true);
+        UtilCtx.current.setLoader(false);
+        RefCtx.current.onAuthLoad(true, data.InstitutionId);
       } catch (e) {
-        console.log(e)
-        RefCtx.current.setUserData({})
-        UtilCtx.current.setLoader(false)
+        console.log(e);
+        RefCtx.current.setUserData({});
+        UtilCtx.current.setLoader(false);
+      } finally {
+        if((RefCtx.current.userData)["location"] === undefined) {
+         const location = await API.get("main", apiPaths?.getUserLocation);
+         RefCtx.current.setUserData((prev) => ({
+           ...prev,
+           location: location,
+         }));
+        }
       }
-    }
+    };
 
-    dataLoadFn()
-  }, [])
+    dataLoadFn();
+  }, []);
 
   return (
     <LoaderProvider>
       {InsitutionCtx.institutionData && <RoutesContainer />}
     </LoaderProvider>
-  )
+  );
 }
 
-export default App
-
+export default App;
 
 //// Packages
 //import React, { useEffect } from 'react';
