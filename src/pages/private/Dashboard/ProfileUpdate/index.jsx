@@ -22,7 +22,20 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [name, setName] = useState(UserCtx.userName);
   const [country] = useState(UserCtx.country);
   const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId);
+
+
+  
+  const [image, setImage] = useState(null);
+  const [editor, setEditor] = useState(null);
+  const [scale, setScale] = useState(1);
+  const getInitials = (name) => {
+    const names = name?.split(" ");
+    const initials = names.map((name) => name.charAt(0).toUpperCase()).join("");
+    return initials;
+  };
   const formatDate = (epochDate) => {
+    epochDate = Number(epochDate);
+    if (!epochDate) return "";
     const date = new Date(epochDate);
     const day = date.getDate();
     const month = date.getMonth() + 1;
@@ -32,25 +45,16 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
     const formattedDay = day < 10 ? `0${day}` : day;
     const formattedMonth = month < 10 ? `0${month}` : month;
 
-    return `${formattedDay}/${formattedMonth}/${year}`;
-  };
-
-  const [image, setImage] = useState(null);
-  const [editor, setEditor] = useState(null);
-  const [scale, setScale] = useState(1);
-  const getInitials = (name) => {
-    const names = name.split(" ");
-    const initials = names.map((name) => name.charAt(0).toUpperCase()).join("");
-    return initials;
+    return UserCtx?.location?.countryCode === "IN"
+      ? `${formattedDay}/${formattedMonth}/${year}`
+      : `${formattedMonth}/${formattedDay}/${year}`;
   };
   const fileInputRef = useRef(null);
   const [joiningDate] = useState(formatDate(UserCtx.joiningDate));
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
-
-  const [tempDob, setTempDob] = useState(
-    UserCtx.dob ? formatDate(Number(UserCtx.dob)) : ""
-  );
+  
+  const [dob, setDob] = useState(UserCtx.dob || "");
   const [address, setAddress] = useState(UserCtx.address || "");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -60,26 +64,25 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [phoneCode, setPhoneCode] = useState("");
   const [isPhoneChange, setIsPhoneChange] = useState(false);
   const [isPhoneCode, setIsPhoneCode] = useState(false);
-  const dob = UserCtx.dob
-    ? new Date(Number(UserCtx.dob)).toISOString().split("T")[0]
-    : "";
+  
+const [tempDob, setTempDob] = useState(
+  dob ? new Date(Number(dob)).toISOString().split("T")[0] : ""
+);
 
-  console.log(tempDob);
-  const ifDataChanged = () => {
-    if (
-      name.trim() === UserCtx.userName.trim() &&
-      phoneNumber.trim() === UserCtx.phoneNumber &&
-      country.trim() === UserCtx.country &&
-      joiningDate.trim() === UserCtx.joiningDate &&
-      dob.trim() ===
-        new Date(Number(UserCtx.dob)).toISOString().split("T")[0] &&
-      address.trim() === UserCtx.address
-    ) {
-      return false;
-    } else {
-      return true;
-    }
-  };
+
+
+
+const ifDataChanged = () => {
+  return !(
+    name.trim() === UserCtx.userName.trim() &&
+    phoneNumber.trim() === UserCtx.phoneNumber &&
+    country.trim() === UserCtx.country &&
+    joiningDate.trim() === UserCtx.joiningDate &&
+    Number(dob) === Number(UserCtx.dob) && // Directly compare as epoch timestamps
+    address.trim() === UserCtx.address
+  );
+};
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -164,6 +167,10 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
     if (ifDataChanged()) {
       if (phoneNumber.length >= 10) {
         try {
+          const formattedDob = tempDob
+            ? String(new Date(tempDob).getTime())
+            : "";
+
           const userdata = await API.put(
             "main",
             `/user/profile/${InstitutionData.InstitutionId}`,
@@ -174,7 +181,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 phoneNumber: phoneNumber,
                 country: country,
                 joiningDate: joiningDate,
-                dob: String(new Date(tempDob).getTime()),
+                dob: formattedDob,
                 address: address,
               },
             }
@@ -186,6 +193,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
           const data = { ...userdata.Attributes, showBirthdayModal };
 
           Ctx.setUserData(data);
+          setDob(formattedDob);
           toast.info("Updated");
           UtilCtx.setLoader(false);
         } catch (e) {
@@ -468,12 +476,11 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                     </div>
                     {dob ? (
                       // This is else cannot be editable
-                      <TextInput
-                        icon={FaCalendarAlt}
+                      <input
+                        className="bg-inputBgColor px-4 py-2 rounded-lg w-full"
                         style={{ backgroundColor: "#c2bfbf81" }}
-                        placeholder="Select DOB"
-                        type={"date"}
-                        value={dob}
+                        type="text"
+                        value={formatDate(dob) || ""}
                         readOnly
                       />
                     ) : (
@@ -484,7 +491,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                         style={{ backgroundColor: "#c2bfbf81" }}
                         placeholder="Select DOB"
                         type={"date"}
-                        value={tempDob === "tempDob" ? "" : tempDob}
+                        value={tempDob || ""}
                         onChange={(e) => {
                           setTempDob(e.target.value);
                         }}
@@ -506,9 +513,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                       type={"text"}
                       className="min-h-16 bg-inputBgColor min-w-full rounded-lg pl-4 py-2"
                       value={address}
-                      onChange={(e) => {
-                        setAddress(e.target.value);
-                      }}
+                      onChange={(e) => setAddress(e.target.value)}
                     />
                   </div>
                   {/* <button
