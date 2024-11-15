@@ -31,6 +31,7 @@ import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
 import {HybridPayment} from '../pages/private/HybridPayment';
+import QR from "../pages/private/PutAttendance/QR";
 
 
 
@@ -73,6 +74,7 @@ const RoutesContainer = () => {
       <Route path='/rating' element={<Rating />} />
       <Route path='/auth' element={ process.env.REACT_APP_STAGE === 'PROD' ? <Error /> : <DevAuth /> } />
       <Route path='/put-attendance' element={ <PutAttendance /> } />
+      <Route path='/attendance-qr' element={ <QR /> } />
         <Route path='/redirect' element={ <Redirect /> } />
         <Route path='/forgot-password' element={<ForgotPassword />} />
       <Route path='*' element={ <Error /> } />
