@@ -22,7 +22,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [name, setName] = useState(UserCtx.userName);
   const [country] = useState(UserCtx.country);
   const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId);
-
+  const [about,setAbout] = useState(UserCtx.about)
 
   
   const [image, setImage] = useState(null);
@@ -150,6 +150,7 @@ const ifDataChanged = () => {
       );
       // setProfileImageUrl(imageUrl);
       const tempUser = { ...UserCtx, imgUrl: imageUrl };
+      console.log(tempUser)
       Ctx.setUserData(tempUser);
       // setImageKey(Date.now());
     } catch (error) {
@@ -183,6 +184,7 @@ const ifDataChanged = () => {
                 joiningDate: joiningDate,
                 dob: formattedDob,
                 address: address,
+                about:about,
               },
             }
           );
@@ -511,11 +513,30 @@ const ifDataChanged = () => {
                         UserCtx.userType === "admin" && "Institution"
                       } Address`}
                       type={"text"}
-                      className="min-h-16 bg-inputBgColor min-w-full rounded-lg pl-4 py-2"
+                      className=" bg-inputBgColor min-w-full rounded-lg pl-4 py-2"
+                      minimumHeight={"min-h-16"}
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
                     />
                   </div>
+                  {
+                    UserCtx.userType === "instructor" && (
+                  <div className="w-full">
+                    <div className="mb-2 block">
+                        <Label value="About" />
+                    </div>
+                    <EditableTextArea
+                      placeholder={`Enter About`}
+                      type={"text"}
+                      className=" bg-inputBgColor min-w-full rounded-lg pl-4 py-2 "
+                      minimumHeight={"min-h-28"}
+                      value={about}
+                      onChange={(e) => setAbout(e.target.value)}
+                    />
+                  </div>
+
+                    )
+                  }
                   {/* <button
                     className={`rounded-lg py-2 bg-[#c2bfbf81]`}
                     onClick={(e) => {

@@ -13,6 +13,7 @@ import"./Carousel.css";
 
 import apiPaths from "../../../utils/api-paths";
 import { API } from "aws-amplify";
+import InstructorTestimonial from "./InstructorTestimonial";
 
 
 
@@ -165,7 +166,8 @@ export const HybridPayment = () => {
 
       <NavBar />
       <Carousel />
-      <div className="w-screen flex justify-center items-center">
+      <div className="w-screen flex flex-col justify-center items-center">
+        <InstructorTestimonial />
         <button className="free-demo" onClick={handleFreeTrial}>Register for free trials</button>
       </div>
       <div className=" mx-auto p-4 flex flex-col">
