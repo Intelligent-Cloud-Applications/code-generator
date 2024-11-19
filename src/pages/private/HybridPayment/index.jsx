@@ -166,9 +166,12 @@ export const HybridPayment = () => {
 
       <NavBar />
       <Carousel />
-      <div className="w-screen flex flex-col justify-center items-center">
+      <div className="w-screen flex flex-col justify-center items-center p-2">
         <InstructorTestimonial />
-        <button className="free-demo" onClick={handleFreeTrial}>Register for free trials</button>
+        <div className="my-4"></div>
+        <button className="free-demo" onClick={handleFreeTrial}>
+          Register for free trials
+        </button>
       </div>
       <div className=" mx-auto p-4 flex flex-col">
         <Overview />

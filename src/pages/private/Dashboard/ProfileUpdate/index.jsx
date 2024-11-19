@@ -12,6 +12,7 @@ import InstitutionContext from "../../../../Context/InstitutionContext";
 import EditableInput from "./EditableInput";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
+import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -116,12 +117,15 @@ const ifDataChanged = () => {
       if (base64File.size > 5 * 1024 * 1024) {
         throw new Error("File size exceeds 5MB limit.");
       }
+      console.log(base64File);
 
       // Get the current authenticated user
       const currentUser = await Auth.currentAuthenticatedUser();
       const cognitoId = currentUser.attributes.sub; // Cognito User ID
+      console.log(cognitoId);
 
       const blob = await fetch(base64File).then((res) => res.blob());
+      console.log(blob);
       // Upload the file to S3 with the filename as Cognito User ID
       const response = await Storage.vault.put(
         `${InstitutionData.InstitutionId}/${cognitoId}/profile.jpg?v=` +
@@ -134,12 +138,14 @@ const ifDataChanged = () => {
           ACL: "public-read",
         }
       );
+      console.log(`Response is ${response}`);
 
       // Get the URL of the uploaded file
       let imageUrl = await Storage.get(response.key);
+      console.log(`The image url is ${imageUrl}`);
       imageUrl = imageUrl.split("?")[0];
 
-      await API.put(
+      const apiResponse = await API.put(
         "main",
         `/user/profile/img/${InstitutionData.InstitutionId}`,
         {
@@ -148,6 +154,7 @@ const ifDataChanged = () => {
           },
         }
       );
+      console.log(apiResponse);
       // setProfileImageUrl(imageUrl);
       const tempUser = { ...UserCtx, imgUrl: imageUrl };
       console.log(tempUser)
@@ -519,24 +526,21 @@ const ifDataChanged = () => {
                       onChange={(e) => setAddress(e.target.value)}
                     />
                   </div>
-                  {
-                    UserCtx.userType === "instructor" && (
-                  <div className="w-full">
-                    <div className="mb-2 block">
+                  {UserCtx.userType === "instructor" && (
+                    <div className="w-full">
+                      <div className="mb-2 block">
                         <Label value="About" />
+                      </div>
+                      <EditableTextArea
+                        placeholder={`Enter About`}
+                        type={"text"}
+                        className=" bg-inputBgColor min-w-full rounded-lg pl-4 py-2 "
+                        minimumHeight={"min-h-28"}
+                        value={about}
+                        onChange={(e) => setAbout(e.target.value)}
+                      />
                     </div>
-                    <EditableTextArea
-                      placeholder={`Enter About`}
-                      type={"text"}
-                      className=" bg-inputBgColor min-w-full rounded-lg pl-4 py-2 "
-                      minimumHeight={"min-h-28"}
-                      value={about}
-                      onChange={(e) => setAbout(e.target.value)}
-                    />
-                  </div>
-
-                    )
-                  }
+                  )}
                   {/* <button
                     className={`rounded-lg py-2 bg-[#c2bfbf81]`}
                     onClick={(e) => {
@@ -739,9 +743,14 @@ const ifDataChanged = () => {
 
       {(userData.userType === "instructor" ||
         userData.userType === "admin") && (
-        <div>
-          <ReferralCode />
-        </div>
+        <>
+          <div>
+            <ReferralCode />
+          </div>
+          <div>
+            <InsrtuctorReferral />
+          </div>
+        </>
       )}
     </div>
   );
