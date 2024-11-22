@@ -29,7 +29,13 @@ const Context = createContext({
   Streak: [],
   setStreakData: () => {},
   ratings: [],
-  setRatings: () => {}
+  setRatings: () => {},
+  revenue: [],
+  getCartItems: () => { },
+  getPaymentHistory:() => { },
+  removeCartItem: () => { },
+  addCartItem: () => { },
+  paymentHistory: [],
 })
 
 export default Context
