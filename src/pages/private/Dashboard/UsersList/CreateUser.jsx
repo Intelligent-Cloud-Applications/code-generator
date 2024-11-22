@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import Select from "react-select";
 import { X } from "lucide-react";
 import Country from "../../../../components_old/Country";
 import InstitutionContext from "../../../../Context/InstitutionContext";
@@ -38,6 +39,16 @@ function CreateUser({
   const Ctx = useContext(Context);
   const { getUserList } = useContext(Context);
   const UtilCtx = useContext(Context).util;
+  const [selectedClassTypes, setSelectedClassTypes] = useState([]);
+
+  const classTypeOptions = InstitutionData.ClassTypes.map((classType) => ({
+    value: classType,
+    label: classType,
+  }));
+
+  const handleClassTypeChange = (selectedOptions) => {
+    setSelectedClassTypes(selectedOptions || []);
+  };
 
   // State for product type and amount
 
@@ -78,9 +89,10 @@ function CreateUser({
     const formattedPhoneNumber = createButton ? `${countryCode}${phoneNumber}` : phoneNumber;
 
     const data = {
-      institution: InstitutionData.InstitutionId,
+      institution: InstitutionData.InstitutionId, // Add institution to the body
       cognitoId, // required for both create and update
       emailId: email,
+      userName:name,
       name: name,
       phoneNumber: formattedPhoneNumber,
       status,
@@ -90,6 +102,7 @@ function CreateUser({
       instructorPaymentType: userType === "instructor" ? instructorPaymentType : "",
       instructorPaymentAmount: userType === "instructor" ? instructorPaymentAmount : "",
       trialPeriod: status === "Trial" ? trialPeriod : "",
+      classType: userType === "instructor" ? selectedClassTypes.map((type) => type.value) : [], // Add classType for instructor
     };
 
     try {
@@ -99,9 +112,8 @@ function CreateUser({
         const createdCognitoId = response.user.cognitoId;
 
         if (userType === "instructor") {
-          await API.put("main", "/admin/member-to-instructor", {
-            body: { ...data, cognitoId: createdCognitoId },
-          });
+          // Member to instructor API
+          await API.put("main", "/admin/member-to-instructor", { body: data });
         }
 
         toast.success("User Created Successfully");
@@ -197,7 +209,7 @@ function CreateUser({
                 </select>
               </div>
             )}
-            <div className={`flex flex-col ${userType !== 'member'?'w-full':'w-[80%]'}`}>
+            <div className={`flex flex-col ${userType !== 'member' ? 'w-full' : 'w-[80%]'}`}>
               <label className='font-[500] ml-1'>User Type</label>
               <select
                 className={`w-full border-[1px] px-[1.5rem] py-[0.7rem] rounded`}
@@ -284,40 +296,48 @@ function CreateUser({
             </div>
           </div>
         )}
+
+        {/* Conditionally render instructor-specific fields */}
         {userType === "instructor" && (
           <div className="flex flex-col gap-4 w-[80%]">
             <div className="flex flex-row w-full gap-2 max560:flex-col max560:gap-8">
               <div className="flex flex-col justify-center w-full">
-                <label className="font-[500] ml-1">
-                  Instructor Payment Type
-                </label>
+                <label className="font-[500] ml-1">Instructor Payment Type</label>
                 <select
-                  className={`border-[1px] px-[1.5rem] py-[0.7rem] rounded`}
+                  className="border-[1px] px-[1.5rem] py-[0.7rem] rounded"
                   value={instructorPaymentType}
-                  onChange={(e) => {
-                    setInstructorPaymentType(e.target.value);
-                  }}
+                  onChange={(e) => setInstructorPaymentType(e.target.value)}
                 >
                   <option value="">Select Payment Type</option>
                   <option value="percent">Percent</option>
                   <option value="flat">Flat</option>
                 </select>
               </div>
-
               <div className="mt-[1.6rem]">
                 <InputComponent
                   width={100}
                   type="number"
                   label="Bonus Amount"
                   value={instructorPaymentAmount}
-                  onChange={(e) => {
-                    setInstructorPaymentAmount(e.target.value);
-                  }}
+                  onChange={(e) => setInstructorPaymentAmount(e.target.value)}
                 />
               </div>
             </div>
+            {/* Multi-select for class types */}
+            <div className="flex flex-col">
+              <label className="font-[500] ml-1">Select Class Types</label>
+              <Select
+                isMulti
+                options={classTypeOptions}
+                value={selectedClassTypes}
+                onChange={handleClassTypeChange}
+                placeholder="Select Class Type(s)"
+                className="mt-1"
+              />
+            </div>
           </div>
         )}
+
 
         <button
           className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center max850:w-[82%]"

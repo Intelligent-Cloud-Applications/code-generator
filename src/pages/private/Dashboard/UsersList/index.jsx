@@ -318,6 +318,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                   <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
                     <div className="d-flex justify-content-between w-[98%] max1050:w-[100%] mb-3 font-bold">
                       {/* List header content */}
+                      <div className="profilepic"></div>
                       <div className="w-[15%]">Name</div>
                       <div
                         className="w-[13%] email-hover"
@@ -372,7 +373,21 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                             key={user.cognitoId}
                             className="w-full flex flex-col gap-[4px] items-center justify-center p-2 max536:bg-primaryColor max536:pt-6 max536:rounded-2xl Sansita max536:text-[0.8rem]"
                           >
-                            <div className="flex justify-between w-[100%]">
+                            <div className="flex justify-between w-[100%] items-center">
+                              {/* Profile picture - shifted left and made circular */}
+                              <div className="w-[4%] h-8 flex justify-start items-center mr-3 rounded-full overflow-hidden">
+                                {user.imgUrl ? (
+                                  <img
+                                    src={user.imgUrl}
+                                    alt={user.userName?.charAt(0).toUpperCase()}
+                                    className="w-full h-full object-cover rounded-full"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-primaryColor flex justify-center items-center text-white font-bold text-lg rounded-full">
+                                    {user.userName?.charAt(0).toUpperCase()}
+                                  </div>
+                                )}
+                              </div>
                               <div className="w-[18%] font-[400] mr-2 font-sans truncate">
                                 {user.userName}
                               </div>
