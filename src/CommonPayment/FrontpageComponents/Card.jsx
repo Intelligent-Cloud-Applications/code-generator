@@ -10,6 +10,7 @@ function Card({ product, setActiveComponent, userType, setIsEditPopupOpen, handl
   const [isLoading, setIsLoading] = useState(true);
   const { institution, cognitoId } = useParams();
   const { getCartItems, isProductInCart, addCartItem } = useContext(Context);
+  const util = useContext(Context).util;
   const [isAnimating, setIsAnimating] = useState(false);
   const color = colors[institution];
 
@@ -24,10 +25,12 @@ function Card({ product, setActiveComponent, userType, setIsEditPopupOpen, handl
   const handleAddToCart = async () => {
     try {
       setIsAnimating(true);
+      util.setLoader(true);
       await addCartItem(product, institution, cognitoId);
       await getCartItems(institution, cognitoId);
       setTimeout(() => {
         setIsAnimating(false);
+        util.setLoader(false);
       }, 1000);
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -103,9 +106,7 @@ function Card({ product, setActiveComponent, userType, setIsEditPopupOpen, handl
             border: isInCart ? `3px solid ${color.primary}` : 'none'
           }}
         >
-          {isLoading ? <Skeleton width={100} height={30} /> : isAnimating ? (
-            <div className="loader2"></div>
-          ) : isInCart ? 'GO TO CART' : 'ADD TO CART'}
+          {isLoading ? <Skeleton width={100} height={30} /> : isInCart ? 'GO TO CART' : 'ADD TO CART'}
           {!isLoading && !isAnimating && (
             <svg
               xmlns="http://www.w3.org/2000/svg"
