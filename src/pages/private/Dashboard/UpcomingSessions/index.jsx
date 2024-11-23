@@ -74,7 +74,36 @@ const UpcomingSessions = () => {
   // if (Ctx.userData.status === "InActive" && Ctx.userData.userType === "member") {
   //   Navigate("/subscription");
   // }
+  const [instructorClassTypes, setInstructorClassTypes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchInstructorData = async () => {
+      if (Ctx.userData.userType === "instructor") {
+        try {
+          // Fetch data from the API
+          const response = await API.get(
+            "main",
+            `/any/instructor-list/${InstitutionData.InstitutionId}`
+          );
+          // Assuming response is an array of instructors
+          const instructor = response.find(
+            (inst) => inst.instructorId === Ctx.userData.cognitoId
+          );
+          console.log(instructor)
+          // Set classType if found, or an empty array if not
+          setInstructorClassTypes(instructor?.classType || []);
+        } catch (error) {
+          console.error("Error fetching instructor data:", error);
+        } finally {
+          setIsLoading(false); // Stop loading regardless of success or failure
+        }
+      }
+    };
 
+    fetchInstructorData(); // Call the async function
+  }, [Ctx.userData.userType, InstitutionData.InstitutionId]); 
+  
   const getInstructor = (name) => {
     return Ctx.instructorList.find(
       (i) => i.name?.toString().trim() === name?.toString().trim()
@@ -985,6 +1014,11 @@ const UpcomingSessions = () => {
                         }
                       })
                       .filter((clas) => {
+                        // If user is an instructor, filter by class types they are associated with
+                        if (Ctx.userData.userType === "instructor") {
+                          // Check if classType exists in the instructor's allowed classTypes
+                          return instructorClassTypes.includes(clas.classType);
+                        }
                         if (classTypeFilter === "") {
                           return true;
                         } else {

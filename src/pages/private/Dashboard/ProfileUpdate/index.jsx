@@ -120,7 +120,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
 
       const blob = await fetch(base64File).then((res) => res.blob());
       // Upload the file to S3 with the filename as Cognito User ID
-      const response = await Storage.vault.put(
+      const response = await Storage.put(
         `${InstitutionData.InstitutionId}/${cognitoId}/profile.jpg?v=` +
           new Date().getTime(),
         blob,

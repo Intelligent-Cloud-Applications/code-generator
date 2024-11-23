@@ -1,83 +1,83 @@
-import { API } from 'aws-amplify'
-import React, { useState, useMemo, useEffect } from 'react'
-import Context from './Context';
-import web from '../utils/data.json';
-import apiPaths from '../utils/api-paths';
+import { API } from "aws-amplify";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
+import Context from "./Context";
+import web from "../utils/data.json";
+import apiPaths from "../utils/api-paths";
 
 const ContextProvider = (props) => {
-  const [isAuth, setIsAuth] = useState(false)
-  const [userData, setUserData] = useState({})
-  const [loader, setLoader] = useState(false)
-  const [upcomingClasses, setUpcomingClasses] = useState([])
-  const [previousClasses, setPreviousClasses] = useState([])
-  const [userList, setUserList] = useState([])
-  const [productList, setProductList] = useState([])
-  const [instructorList, setInstructorList] = useState([])
-  const [streakData, setStreakData] = useState({})
-  const [ratings, setRatings] = useState([])
+  const [isAuth, setIsAuth] = useState(false);
+  const [userData, setUserData] = useState({});
+  const [loader, setLoader] = useState(false);
+  const [upcomingClasses, setUpcomingClasses] = useState([]);
+  const [previousClasses, setPreviousClasses] = useState([]);
+  const [userList, setUserList] = useState([]);
+  const [productList, setProductList] = useState([]);
+  const [instructorList, setInstructorList] = useState([]);
+  const [streakData, setStreakData] = useState({});
+  const [ratings, setRatings] = useState([]);
 
   const onAuthLoad = async (auth, id) => {
     if (auth) {
-      API.get('main', apiPaths.getProducts, {})
+      API.get("main", apiPaths.getProducts, {})
         .then((list) => {
-          let newList = []
-          let tempProduct
+          let newList = [];
+          let tempProduct;
           list.forEach((element) => {
-            if (element.subscriptionType !== 'Hybrid') {
-              newList.push(element)
+            if (element.subscriptionType !== "Hybrid") {
+              newList.push(element);
             } else {
-              tempProduct = element
+              tempProduct = element;
             }
-          })
-          newList = tempProduct ? [tempProduct].concat(newList) : newList
-          setProductList(newList)
+          });
+          newList = tempProduct ? [tempProduct].concat(newList) : newList;
+          setProductList(newList);
         })
         .catch((e) => {
-          console.log(e)
-          setUserList([])
-        })
+          console.log(e);
+          setUserList([]);
+        });
 
-      API.get('main', apiPaths.getInstructors, {})
+      API.get("main", apiPaths.getInstructors, {})
         .then((data) => {
-          setInstructorList(data)
+          setInstructorList(data);
         })
         .catch((e) => {
-          console.log(e)
-        })
+          console.log(e);
+        });
 
       try {
-        const classes = await API.get('main',  apiPaths.getUpcomingSchedule, {})
-        setUpcomingClasses(classes)
+        const classes = await API.get("main", apiPaths.getUpcomingSchedule, {});
+        setUpcomingClasses(classes);
       } catch (e) {
-        setUpcomingClasses([])
-        console.log(e)
+        setUpcomingClasses([]);
+        console.log(e);
       }
 
       try {
-        const classes = await API.get('main', apiPaths.getPreviousScedule, {})
-        setPreviousClasses(classes)
+        const classes = await API.get("main", apiPaths.getPreviousScedule, {});
+        setPreviousClasses(classes);
       } catch (e) {
-        setPreviousClasses([])
-        console.log(e)
+        setPreviousClasses([]);
+        console.log(e);
       }
       getUserList();
       try {
         // Add the API call for fetching streak data
-        const streakResponse = await API.get('main', apiPaths.getStreak)
-        setStreakData(streakResponse)
+        const streakResponse = await API.get("main", apiPaths.getStreak);
+        setStreakData(streakResponse);
       } catch (e) {
-        console.log(e)
-        setStreakData({})
+        console.log(e);
+        setStreakData({});
       }
 
       try {
-        const response = await API.put('main', apiPaths.getRating, {
-          body: {}
-        })
-        console.log(response)
-        setRatings(response)
+        const response = await API.put("main", apiPaths.getRating, {
+          body: {},
+        });
+        console.log(response);
+        setRatings(response);
       } catch (error) {
-        console.error('Error fetching ratings:', error)
+        console.error("Error fetching ratings:", error);
       }
 
       // try {
@@ -125,109 +125,115 @@ const ContextProvider = (props) => {
       //   setLoader(false);
       // }
     }
-  }
-  const getUserList = async() => {
+  };
+  const getUserList = async () => {
     try {
-      const list = await API.get('main', apiPaths.getMembers)
-      setUserList(list)
+      const list = await API.get("main", apiPaths.getMembers);
+      setUserList(list);
     } catch (e) {
-      console.log(e)
-      setUserList([])
+      console.log(e);
+      setUserList([]);
     }
-  }
+  };
   const onUnauthLoad = async (id) => {
-    API.get('main', apiPaths.getProducts)
+    API.get("main", apiPaths.getProducts)
       .then((list) => {
-        setProductList(list)
+        setProductList(list);
       })
       .catch((e) => {
-        console.log(e)
-        setUserList([])
-      })
-  }
+        console.log(e);
+        setUserList([]);
+      });
+  };
 
   const setIsAuthFn = (data) => {
-    setIsAuth(data)
-  }
+    setIsAuth(data);
+  };
 
   const setUserDataFn = (data) => {
-    setUserData(data)
-  }
+    setUserData(data);
+  };
 
   const setLoaderFn = (data) => {
-    setLoader(data)
-  }
+    setLoader(data);
+  };
 
   const setUpcomingClassesFn = (classes) => {
-    setUpcomingClasses(classes)
-  }
+    setUpcomingClasses(classes);
+  };
 
   const setPreviousClassesFn = (classes) => {
-    setPreviousClasses(classes)
-  }
+    setPreviousClasses(classes);
+  };
 
   const setUserListFn = (list) => {
-    setUserList(list)
-  }
+    setUserList(list);
+  };
 
   const setStreakDataFn = (streakResponse) => {
-    setStreakData(streakResponse)
-  }
+    setStreakData(streakResponse);
+  };
 
   const checkSubscriptionStatus = useMemo(() => {
     if (userData && userData.userType) {
-      const subscriptionType = userData.userType
-      const subscriptionStatus = userData.status
-      if (subscriptionType === 'admin') {
-        return { borderColor: 'green' }
-      } else if (subscriptionType === 'instructor') {
-        return { borderColor: 'blue' }
+      const subscriptionType = userData.userType;
+      const subscriptionStatus = userData.status;
+      if (subscriptionType === "admin") {
+        return { borderColor: "green" };
+      } else if (subscriptionType === "instructor") {
+        return { borderColor: "blue" };
       } else if (
-        subscriptionType === 'member' &&
-        subscriptionStatus === 'Active'
+        subscriptionType === "member" &&
+        subscriptionStatus === "Active"
       ) {
-        return { borderColor: '#1b7571' }
+        return { borderColor: "#1b7571" };
       }
     }
     // Return the default style for non-admin and non-active accounts
-    return { borderColor: 'red' }
-  }, [userData])
+    return { borderColor: "red" };
+  }, [userData]);
 
   const [imageUrls, setImageUrls] = useState([]);
   const [tempImgSrc, setTempImgSrc] = useState();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   const getImagesFromAPI = async (imageUrl) => {
     try {
-      const response = await API.get('main', `/user/get-imageUrl/${web.InstitutionId}`);
+      const response = await API.get(
+        "main",
+        `/user/get-imageUrl/${web.InstitutionId}`
+      );
       setImageUrls(response.GalleryImagesLinks || []);
       if (imageUrl) {
-        const filename = imageUrl.split('/').pop();
+        const filename = imageUrl.split("/").pop();
         if (response.gallery && response.gallery[filename]) {
           setDescription(response.gallery[filename].description);
           setTitle(response.gallery[filename].title);
         }
       }
     } catch (error) {
-      console.error('Error getting images from API: ', error);
+      console.error("Error getting images from API: ", error);
     }
   };
   useEffect(() => {
-    getImagesFromAPI()
-// eslint-disable-next-line 
-  }, [])
-  
+    getImagesFromAPI();
+    // eslint-disable-next-line
+  }, []);
+
   const [revenue, setRevenue] = useState([]); // Initialize with an empty array
 
   useEffect(() => {
     const paymentDetailsAdmin = async () => {
       try {
-        const response = await API.get('main', `/payment-history/${userData.institution}`);
+        const response = await API.get(
+          "main",
+          `/payment-history/${userData.institution}`
+        );
         const payments = response?.payments || [];
         setRevenue(Array.isArray(payments) ? payments : []); // Ensure revenue is an array
       } catch (error) {
-        console.error('Error getting payment history from API: ', error);
+        console.error("Error getting payment history from API: ", error);
       }
     };
 
@@ -239,38 +245,130 @@ const ContextProvider = (props) => {
 
   const updateUserStatus = async (userId, institution) => {
     const currentEpochTime = Math.floor(new Date().getTime() / 1000);
-  
+
     // Assuming userData contains the trialEndDate
-    if (userData && userData.trialEndDate && userData.status === 'Trial') {
+    if (userData && userData.trialEndDate && userData.status === "Trial") {
       const trialEndEpoch = userData.trialEndDate;
-  
+
       if (currentEpochTime > trialEndEpoch) {
         try {
           // Call the user update API to set the status to 'Inactive'
-          const response = await API.put('main', `/user/profile-update/${institution}`, {
-            body: {
-              status: 'Inactive', // Set status to Inactive
-            },
-          });
-          console.log('User status updated to Inactive:', response);
+          const response = await API.put(
+            "main",
+            `/user/profile-update/${institution}`,
+            {
+              body: {
+                status: "Inactive", // Set status to Inactive
+              },
+            }
+          );
+          console.log("User status updated to Inactive:", response);
           setUserData((prevData) => ({
             ...prevData,
-            status: 'Inactive', // Update the context state
+            status: "Inactive", // Update the context state
           }));
         } catch (error) {
-          console.error('Error updating user status to Inactive:', error);
+          console.error("Error updating user status to Inactive:", error);
         }
       }
     }
   };
-  
+
   // Call this function periodically or after certain actions
   useEffect(() => {
     if (userData.institution && userData.cognitoId) {
       updateUserStatus(userData.cognitoId, userData.institution);
     }
   }, [userData]); // Run whenever userData changes
-  
+
+  // Cart System
+  const [itemCount, setItemCount] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [cartState, setCartState] = useState({
+    subtotal: 0,
+    productItems: [],
+    quantities: [],
+    currencySymbol: "$",
+  });
+
+  const getCartItems = async (institution, cognitoId) => {
+    try {
+      const response = await API.get(
+        "awsaiapp",
+        `/any/getcartitems/${institution}/${cognitoId}`
+      );
+      setCartItems(response);
+      setItemCount(response.length);
+      getPaymentHistory(institution, cognitoId);
+      if (Array.isArray(response) && response.length > 0) {
+        const quantities = response.map(() => 1);
+        const subtotal = response.reduce(
+          (total, item, index) =>
+            total + (item.amount / 100) * quantities[index],
+          0
+        );
+        const currencySymbol = response[0].currency === "INR" ? "₹" : "$";
+        setCartState({
+          productItems: response,
+          quantities,
+          subtotal,
+          currencySymbol,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
+    }
+  };
+
+  const removeCartItem = async (productId, institution, cognitoId) => {
+    try {
+      await API.del(
+        "awsaiapp",
+        `/any/deleteCartItem/${institution}/${cognitoId}`,
+        {
+          body: { productId },
+        }
+      );
+      getCartItems(institution, cognitoId);
+    } catch (error) {
+      console.error("Error removing product:", error);
+    }
+  };
+
+  const addCartItem = async (item, institution, cognitoId) => {
+    try {
+      await API.post("awsaiapp", "/any/addtocart", {
+        body: { institution, cognitoId, cart: [item] },
+      });
+      getCartItems(institution, cognitoId);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    }
+  };
+
+  const getPaymentHistory = async (institution, cognitoId) => {
+    try {
+      const paymentHistory = await API.get(
+        "awsaiapp",
+        `/getReciept/${institution}/${cognitoId}`
+      );
+      setPaymentHistory(paymentHistory);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // New function to check if a product is in the cart
+  const isProductInCart = useCallback(
+    (productId) => {
+      return (
+        Array.isArray(cartItems) &&
+        cartItems.some((item) => item.planId === productId)
+      );
+    },
+    [cartItems]
+  );
 
   const ContextData = {
     onAuthLoad: onAuthLoad,
@@ -281,7 +379,7 @@ const ContextProvider = (props) => {
     setUserData: setUserDataFn,
     util: {
       loader: loader,
-      setLoader: setLoaderFn
+      setLoader: setLoaderFn,
     },
     upcomingClasses: upcomingClasses,
     setUpcomingClasses: setUpcomingClassesFn,
@@ -289,7 +387,7 @@ const ContextProvider = (props) => {
     setPreviousClasses: setPreviousClassesFn,
     userList: userList,
     setUserList: setUserListFn,
-    getUserList:getUserList,
+    getUserList: getUserList,
     productList: productList,
     instructorList: instructorList,
     setInstructorList: () => {},
@@ -298,22 +396,33 @@ const ContextProvider = (props) => {
     streakData: streakData,
     setStreakData: setStreakDataFn,
     ratings: ratings,
-    setRatings: () => { },
+    setRatings: () => {},
     getImagesFromAPI: getImagesFromAPI,
     setTempImgSrc: setTempImgSrc,
-    tempImgSrc:tempImgSrc,
+    tempImgSrc: tempImgSrc,
     imageUrls: imageUrls,
     setImageUrls: setImageUrls,
     title: title,
     setTitle: setTitle,
     description: description,
     setDescription: setDescription,
-    revenue
-  }
+    revenue,
+    getCartItems,
+    getPaymentHistory,
+    cartState,
+    setCartState,
+    removeCartItem,
+    addCartItem,
+    setCartItems,
+    paymentHistory,
+    cartItems,
+    itemCount,
+    isProductInCart,
+  };
 
   return (
     <Context.Provider value={ContextData}>{props.children}</Context.Provider>
-  )
-}
+  );
+};
 
-export { ContextProvider }
+export { ContextProvider };

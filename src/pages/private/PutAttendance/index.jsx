@@ -21,6 +21,7 @@ const PutAttendance = () => {
       try {
         await Auth.currentAuthenticatedUser();
       } catch (error) {
+        window.sessionStorage.setItem('login_redirect', '/put-attendance');
         navigate('/login');
       }
       if (!isAuth) return;
