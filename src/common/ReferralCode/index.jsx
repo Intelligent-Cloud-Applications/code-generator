@@ -25,7 +25,6 @@ function ReferralCode() {
   }
   
   let referralLink;
-  
   if (userData.userType === 'instructor') {
     referralLink = `${domain}/signup?referral=${userData.referral_code}`;
   } else if (userData.userType === 'admin') {

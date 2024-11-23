@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 
-const EditableTextArea = ({ label, value, onChange }) => {
+const EditableTextArea = ({ label, value, onChange,placeholder,minimumHeight }) => {
   const [isEditable, setIsEditable] = useState(false);
   const inputRef = useRef(null);
 
@@ -17,10 +17,10 @@ const EditableTextArea = ({ label, value, onChange }) => {
       <label className="ml-2">{label}</label>
       <textarea
         ref={inputRef}
-        className="bg-inputBgColor px-4 py-2 rounded-lg w-full min-h-16"
+        className={`bg-inputBgColor px-4 py-2 rounded-lg w-full ${minimumHeight}`}
         type="text"
         value={value}
-        placeholder="Enter your address here"
+        placeholder={placeholder || "Enter your address here"}
         readOnly={!isEditable}
         onChange={onChange}
         onBlur={() => setIsEditable(false)}
