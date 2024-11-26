@@ -49,7 +49,7 @@ const Billing = () => {
       <h2 className='text-2xl font-bold'>Membership Details</h2>
       <div className='bg-white my-4 p-4'>
         <p className='bg-primaryColor text-white font-bold w-fit -ml-6 my-2 py-2 px-4 rounded-r-full'>Member since {(new Date(userData.joiningDate).toDateString())}</p>
-        <p className='text-xl font-bold'>{userData.products.slice(-1)[0].S}</p>
+        <p className='text-xl font-bold'>{userData.products?.slice(-1)[0].S}</p>
         <p className='text-lg'>{amount}</p>
         <br />
         <p className='text-xl font-bold'>Next billing date</p>
