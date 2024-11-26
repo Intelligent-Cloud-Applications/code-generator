@@ -5,6 +5,7 @@ import Context from "../../../Context/Context";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import HappyprancerPaypalHybrid from "../Subscription/HappyprancerPaypalHybrid";
 import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly";
+import web from "../../../utils/data.json";
 import RazorpayPayment from "../Subscription/RazorpayPayment";
 
 const Subscription = () => {
@@ -58,6 +59,11 @@ const Subscription = () => {
   // console.log("filteredProductListUSD", filteredProductListUSD);
   // console.log(UserCtx.location)
 
+  const domain =
+    process.env.REACT_APP_STAGE === "DEV"
+      ? process.env.REACT_APP_DOMAIN_BETA
+      : process.env.REACT_APP_DOMAIN_PROD;
+
   const paymentHandler = (item) => {
     if (isAuth) {
       if (
@@ -67,18 +73,13 @@ const Subscription = () => {
         return (
           <button
             type="button"
-            className="inline-flex w-full justify-center rounded-lg bg-white border-lightPrimaryColor border-2 px-5 py-2.5 text-center text-sm font-medium text-lightPrimaryColor hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+            className="mt-4 inline-flex w-full justify-center rounded-lg bg-white border-lightPrimaryColor border-2 px-5 py-2.5 text-center text-sm font-medium text-lightPrimaryColor hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
           >
             Subscribed
           </button>
         );
       } else {
-        if (item.currency === "INR") {
-          return <RazorpayPayment productId={item.productId} />;
-        } else if (
-          item.currency === "USD" &&
-          item.subscriptionType === "Monthly"
-        ) {
+        if (item.currency === "USD" && item.subscriptionType === "Monthly") {
           return <HappyprancerPaypalMonthly />;
         } else if (
           item.currency === "USD" &&
@@ -89,7 +90,14 @@ const Subscription = () => {
           return (
             <button
               type="button"
-              className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+              className="mt-4 first-letter:inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+              onClick={() => {
+                window.open(
+                  `${domain}/allpayment/${web.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}`,
+                  "_blank",
+                  "noopener,noreferrer"
+                );
+              }}
             >
               Subscribe
             </button>
@@ -148,7 +156,7 @@ const Subscription = () => {
 
       <div className="flex flex-row gap-8 justify-center flex-wrap max850:!flex-col max-w-[90vw]">
         {products.map((item, i) => (
-          <Card key={i} className="w-[400px] max850:w-[300px]">
+          <Card key={i} className="w-[400px] min-h-[450px] max850:w-[300px]">
             <h5 className="text-2xl min-h-20 font-medium flex items-center text-gray-500 dark:text-gray-400">
               {item.heading}
             </h5>

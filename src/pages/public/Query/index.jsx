@@ -66,7 +66,7 @@ export default function Query() {
 
   return (
     <>
-      <NavBar />
+      {window.location.href.split('/')[3] === 'query' && <NavBar />}
       <div className={`flex flex-col gap-16 py-10 items-center Background`}>
         <div className={`flex flex-col items-center `}>
           <h2
