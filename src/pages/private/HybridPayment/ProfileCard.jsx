@@ -9,19 +9,19 @@ const ProfileCard = () => {
       description: `Online training provides a great alternative to traditional gyms, especially for beginners. Dance makes workouts fun and expressive, and HappyPrancers delivers an outstanding experience with skilled, motivating trainers. Suitable for all levels, it’s been a fantastic journey—thank you, HappyPrancers!`,
       image:
         "https://institution-utils.s3.amazonaws.com/happyprancer/images/Testimonial/2.png",
-      name: "John Doe",
+      name: "Bapuji Mallik",
     },
     {
       description: `Joining in this Live session ....I have learnt to spend time with myself and relative my stress in a fraction of minute.. delighted to be a part of this class...`,
       image:
         "https://institution-utils.s3.amazonaws.com/happyprancer/images/Testimonial/3.jpg",
-      name: "Jane Doe",
+      name: "Priyanka Biswal",
     },
     {
       description: `Joining in this Live session ....I have learnt to spend time with myself and relative my stress in a fraction of minute.. delighted to be a part of this class..`,
       image:
         "https://institution-utils.s3.amazonaws.com/happyprancer/images/Testimonial/1.png",
-      name: "John Doe",
+      name: "Monalisha Sahoo",
     },
     
   ]);
