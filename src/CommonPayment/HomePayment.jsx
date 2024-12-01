@@ -9,6 +9,7 @@ import { API } from "aws-amplify";
 import CreateSubscriptionPopup from './CreateSubscriptionPopup';
 import UpdateSubscriptionPopup from './UpdateSubscriptionPopup';
 import Context from '../Context/Context';
+import { User } from 'lucide-react';
 
 function HomePayment() {
   const { institution, cognitoId } = useParams();
@@ -21,6 +22,10 @@ function HomePayment() {
   const [products, setProducts] = useState([]);
   const providesContainerRef = useRef(null);
   const util = useContext(Context).util;
+  const UserCtx = useContext(Context)?.userData;
+
+  const Userlocation = UserCtx?.location?.countryCode;
+
   console.log(error);
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -36,7 +41,8 @@ function HomePayment() {
     const fetchProducts = async () => {
       try {
         const data = await API.get('main', `/any/products/${institution}`);
-        setProducts(data);
+        console.log(data);
+        Userlocation === 'IN' ? setProducts(data.filter(product=> product.india === false)) : setProducts(data.filter(product => product.india === true));
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -335,6 +341,7 @@ function HomePayment() {
         handleCloseEditPopup();
       alert('Subscription deleted successfully');
       const data = await API.get('main', `/any/products/${institution}`);
+
       setProducts(data);
       util.setLoader(false); 
     } catch (error) {
