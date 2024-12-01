@@ -2,7 +2,8 @@ name: Deploy to S3
 on:
   push:
     branches:
-      - dev # Replace 'Signup' with the branch you want to deploy
+#      - dev # Replace 'Signup' with the branch you want to deploy
+      - betartiger
 
 jobs:
   deploy:
@@ -32,7 +33,7 @@ jobs:
           aws-region: us-east-1 # Replace with your desired AWS region
 
       - name: Deploy to S3
-        run: aws s3 sync ./build s3://beta.happyprancer.com --delete
+        run: aws s3 sync ./build s3://betartiger.happyprancer.com --delete
 
       - name: Cloudfront Invalidation
-        run: aws cloudfront create-invalidation --distribution-id E263LXOGXF3H0N --paths "/*"
+        run: aws cloudfront create-invalidation --distribution-id ESCY8E14XUN7G --paths "/*"

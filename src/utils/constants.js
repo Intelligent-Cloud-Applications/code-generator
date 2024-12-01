@@ -1,4 +1,4 @@
-export const institution = 'happyprancer';
+export const institution = 'rtiger';
 export const institutionType = 'ds';
 
 export const defaultProfileImageUrl =
