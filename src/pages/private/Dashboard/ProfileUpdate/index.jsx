@@ -51,7 +51,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
       : `${formattedMonth}/${formattedDay}/${year}`;
   };
   const fileInputRef = useRef(null);
-  const [joiningDate] = useState(formatDate(UserCtx.joiningDate));
+  const [joiningDate] = useState(formatDate(UserCtx?.joiningDate));
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
   

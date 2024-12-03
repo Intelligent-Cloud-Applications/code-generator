@@ -24,6 +24,9 @@ const InstructorTestimonial = () => {
   const institution = queryParams.get("institution");
   const cognitoId = queryParams.get("cognitoId");
 
+  console.log("Referral:", referral);
+  console.log("Institution:", institution);
+
   useEffect(() => {
     const fetchInstructor = async () => {
       Util.setLoader(true); // Start loading
@@ -84,7 +87,7 @@ if (referral && institution) {
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 max-w-md mx-auto mt-8">
       <div className="text-center mb-4">
-        <p className="text-2xl font-semibold text-gray-800 md:text-3xl">
+        <p className="text-2xl font-semibold text-gray-800 md:text-3xl underline">
           {referral}
         </p>
         <p className="text-lg font-medium text-gray-600 md:text-xl">
@@ -99,8 +102,8 @@ if (referral && institution) {
           </p>
         </div>
       )}
-
-      {instructors.map(
+      {console.log(instructors)}
+      {instructors?.map(
         (e) =>
           e.emailId === instructor.emailId && (
             <div key={e.emailId} className="flex flex-col items-center">
