@@ -89,6 +89,7 @@ function HomePayment() {
         amount: selectedProduct.amount / 100,
         durationText: selectedProduct.durationText,
         provides: selectedProduct.provides,
+        classType:selectedProduct.classType
       });
     }
   }, [selectedProduct,isPopupOpen]);
@@ -153,7 +154,7 @@ function HomePayment() {
     e.preventDefault();
     try {
       util.setLoader(true); 
-      const { heading, amount, durationText, provides } = formData;
+      const { heading, amount, durationText, provides, classType } = formData;
       if (!heading || !amount) {
         alert('Heading and Amount cannot be empty');
         setIsPopupOpen(true); 
@@ -210,7 +211,8 @@ function HomePayment() {
             india:true,
             durationText:subscriptionType,
             subscriptionType:subscriptionType, 
-            provides
+            provides,
+            classType
         
           },
         }
@@ -238,7 +240,7 @@ function HomePayment() {
     e.preventDefault();
     try {
       util.setLoader(true); 
-      const { heading, amount, durationText, provides } = formData;
+      const { heading, amount, durationText, provides, classType } = formData;
       if (!heading || !amount) {
         alert('Heading and Amount cannot be empty');
         setIsEditPopupOpen(true); 
@@ -296,8 +298,8 @@ function HomePayment() {
             durationText:subscriptionType,
             subscriptionType:subscriptionType, 
             provides,
-            productId:selectedProduct.productId
-        
+            productId:selectedProduct.productId,
+            classType
           },
         }
       );
