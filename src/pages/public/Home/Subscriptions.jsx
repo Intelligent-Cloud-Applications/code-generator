@@ -16,19 +16,20 @@ const Subscription = () => {
 
   const [bgInView, setBgInView] = useState(false);
 
-  useEffect(() => {
-    try {
-      let data = [];
-      if (UserCtx?.location?.countryCode === "IN") {
-        data = productList.filter((item) => item.currency === "INR");
-      } else {
-        data = productList.filter((item) => item.currency !== "INR");
-      }
-      setProducts(data);
-    } catch (e) {
-      throw new Error(e);
-    }
-  }, [UserCtx?.location?.countryCode, productList]);
+useEffect(() => {
+  if (UserCtx?.location?.countryCode) {
+    localStorage.setItem("userLocation", `${UserCtx.location.countryCode}`);
+  } else {
+    console.warn("UserCtx.location.countryCode is undefined");
+  }
+}, [UserCtx?.location?.countryCode]);
+
+useEffect(() => {
+  localStorage.getItem("userLocation") === "IN"
+    ? setProducts(productList.filter((item) => item.currency === "INR"))
+    : setProducts(productList.filter((item) => item.currency !== "INR"));
+}, [UserCtx?.location?.countryCode]);
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(

@@ -32,7 +32,7 @@ const ProfileCard = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % data.length);
   };
   const handlePrev = () => {
-    console.log("prev");
+    // console.log("prev");
     setCurrentIndex((prevIndex) => (prevIndex - 1 + data.length) % data.length);
   };
 
@@ -116,9 +116,6 @@ const ProfileCard = () => {
                 {data[currentIndex].name || "User Name"}
               </div>
 
-              <div className="[font-family:'Manrope-Regular',Helvetica] font-normal text-[#808080] text-[12.7px] relative w-fit tracking-[0] leading-[normal]">
-                user id
-              </div>
             </div>
 
             <p className="absolute w-full  max-w-[361px] md:max950:max-w-[220px] top-28 left-4  [font-family:'Manrope-Regular',Helvetica] font-normal text-black md:first-letter:text-3xl md:tracking-wide">

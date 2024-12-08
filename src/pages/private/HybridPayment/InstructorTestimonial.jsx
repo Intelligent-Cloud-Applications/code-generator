@@ -4,8 +4,10 @@ import { useLocation } from "react-router-dom";
 import Context from "../../../Context/Context";
 import { API } from "aws-amplify";
 import apiPaths from "../../../utils/api-paths";
+import InstitutionContext from "../../../Context/InstitutionContext";
 
 const InstructorTestimonial = () => {
+  const InstitutionData = useContext(InstitutionContext).institutionData;
   const Util = useContext(Context).util;
   const [loading, setLoading] = useState(true);
   const { userData: UserCtx } = useContext(Context);
@@ -33,10 +35,10 @@ const InstructorTestimonial = () => {
       try {
         const response = await API.get(
           "main",
-          `/instructor/profile/${institution}?cognitoId=${cognitoId}`
+          `/instructor/profile/${institution}?referral=${referral}`
         );
         setInstructor(response);
-        console.log(instructor);
+        // console.log(instructor);
       } catch (error) {
         console.error("Error fetching instructor:", error);
       } finally {
@@ -85,6 +87,7 @@ const InstructorTestimonial = () => {
 
 if (referral && institution) {
   return (
+    <>
     <div className="bg-white shadow-lg rounded-lg p-6 max-w-md mx-auto mt-8">
       <div className="text-center mb-4">
         <p className="text-2xl font-semibold text-gray-800 md:text-3xl underline">
@@ -94,15 +97,21 @@ if (referral && institution) {
           {institution}
         </p>
       </div>
-
+      {/* {
+        UserCtx.cognitoId === instructor.cognitoId && (
+    <div className="w-full flex justify-end ">
+      <div className="cursor-pointer text-xl w-24 relative right-3 bg-primaryColor p-2 px-4 text-white rounded-md">Edit</div>
+    </div>)
+      } */}
+      {console.log(UserCtx)}
       {instructor && (
         <div className="mb-4">
           <p className="text-gray-700 text-base md:text-lg italic">
-            "{instructor.about}"
+            "{instructor?.instructorProfile?.about}"
           </p>
         </div>
       )}
-      {console.log(instructors)}
+      {/* {console.log(instructors)} */}
       {instructors?.map(
         (e) =>
           e.emailId === instructor.emailId && (
@@ -117,6 +126,7 @@ if (referral && institution) {
           )
       )}
     </div>
+    </>
   );
 }return <></>
 

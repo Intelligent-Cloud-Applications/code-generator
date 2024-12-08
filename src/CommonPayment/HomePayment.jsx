@@ -42,7 +42,7 @@ function HomePayment() {
       try {
         const data = await API.get('main', `/any/products/${institution}`);
         console.log(data);
-        Userlocation === 'IN' ? setProducts(data.filter(product=> product.india === false)) : setProducts(data.filter(product => product.india === true));
+        localStorage.getItem("userLocation") === 'IN' ? setProducts(data.filter(product=> product.india === true)) : setProducts(data.filter(product => product.india === false));
       } catch (error) {
         console.error("Error fetching products:", error);
       }

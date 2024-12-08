@@ -12,7 +12,7 @@ import InstitutionContext from "../../../../Context/InstitutionContext";
 import EditableInput from "./EditableInput";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
-import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
+// import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -45,8 +45,8 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
     // Format day and month with leading zeros if necessary
     const formattedDay = day < 10 ? `0${day}` : day;
     const formattedMonth = month < 10 ? `0${month}` : month;
-
-    return UserCtx?.location?.countryCode === "IN"
+    const userLocation = localStorage.getItem("userLocation") || UserCtx?.location?.countryCode;
+    return userLocation === "IN"
       ? `${formattedDay}/${formattedMonth}/${year}`
       : `${formattedMonth}/${formattedDay}/${year}`;
   };
@@ -746,9 +746,6 @@ const ifDataChanged = () => {
         <>
           <div>
             <ReferralCode />
-          </div>
-          <div>
-            <InsrtuctorReferral />
           </div>
         </>
       )}
