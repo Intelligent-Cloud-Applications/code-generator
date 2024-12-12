@@ -2,6 +2,7 @@ import { API } from "aws-amplify";
 import { useContext, useEffect, useState } from "react";
 import Context from "../../../Context/Context";
 import apiPaths from "../../../utils/api-paths";
+import {toast} from "react-toastify";
 import "./SubscriptionCard.css";
 import { useNavigate } from "react-router-dom";
 
@@ -47,7 +48,8 @@ const SubscriptionCard = () => {
       navigate("/subscription")
     }
     else{
-      navigate("/auth");
+      toast.error("You have no accounts yet. Please sign up to continue.");
+      navigate("/signup");
     }
   };
 
@@ -148,6 +150,8 @@ const SubscriptionCard = () => {
 
                   {/* Description List */}
                   <ul className="my-7 space-y-5 text-center min-h-[12rem]">
+                    {
+                      item.currency === "INR"?
                     <li className="text-lg font-normal text-white">
                       <div>₹1000 for Monthly.</div>
                       <div>Instructors:Certified Zumba & BWORKZ</div>
@@ -156,6 +160,16 @@ const SubscriptionCard = () => {
                         Classes
                       </div>
                     </li>
+                    :
+                    <li className="text-lg font-normal text-white">
+                      <div>$12 for Monthly.</div>
+                      <div>Instructors:Certified Zumba & BWORKZ</div>
+                      <div>
+                        Plan: 40+ Monthly Online andin-person Dance Fitness
+                        Classes
+                      </div>
+                    </li>
+                    }
                   </ul>
                   <div className="border border-gray-500 w-3/4 mx-auto mb-2"></div>
 

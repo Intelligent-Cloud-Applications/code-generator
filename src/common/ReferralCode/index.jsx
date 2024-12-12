@@ -68,22 +68,22 @@ function ReferralCode() {
     }
     window.open(url, "_blank");
   };
-
   useEffect(() => {
     async function fetchReferralData() {
       try {
         const response = await API.get(
-          "user",
+          "main",
           `/instructor/referred-members/${userData.referral_code}`
         );
         console.log("Response:",response);
         setMembers(response.referredMembers.length);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching referral data:", error);
       }
     }
     fetchReferralData();
   }, [userData.referral_code]);
+
 
   const { number } = useSpring({
     from: { number: 0 },

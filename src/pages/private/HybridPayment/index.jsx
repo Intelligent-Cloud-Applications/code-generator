@@ -11,8 +11,7 @@ import {Overview} from "./Overview";
 import Carousel from "./Carousel";
 import"./Carousel.css";
 
-import apiPaths from "../../../utils/api-paths";
-import { API } from "aws-amplify";
+
 import InstructorTestimonial from "./InstructorTestimonial";
 
 
@@ -71,6 +70,9 @@ export const HybridPayment = () => {
     if(isAuth){
       console.log(UserCtx);
     }else{
+      // Get the current url and append the trial query params
+
+
       Navigate("/signup?trial=true&trialPeriod=Monthly");
     }
   };
@@ -166,19 +168,15 @@ export const HybridPayment = () => {
 
       <NavBar />
       <Carousel />
+        <ProfileCard />
+        
       <div className="w-screen flex flex-col justify-center items-center p-2">
         <InstructorTestimonial />
-        <div className="my-4"></div>
-        <button className="free-demo" onClick={handleFreeTrial}>
-          Register for free trials
-        </button>
       </div>
       <div className=" mx-auto p-4 flex flex-col">
         <Overview />
         <div className="my-4"></div>
         <SubscriptionCard />
-        <div className="my-4"></div>
-        <ProfileCard />
       </div>
       <Footer />
     </>

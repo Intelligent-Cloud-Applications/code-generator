@@ -52,7 +52,7 @@ const ProfileCard = () => {
       <div className="my-32 w-[287px] md:w-11/12 md:max-w-[980px] mx-auto md:h-[450px] h-[333px]">
         <div className="w-[287px] md:w-full -left-1 relative h-full">
           <div className="relative md:w-full w-[284px]">
-            <svg
+            {/* <svg
               className="absolute z-0 -top-[34rem] opacity-70 -left-[56rem]"
               xmlns="http://www.w3.org/2000/svg"
               width="952"
@@ -101,12 +101,62 @@ const ProfileCard = () => {
                   <stop offset="1" stop-color="white" stop-opacity="0.53" />
                 </radialGradient>
               </defs>
+            </svg> */}
+            <svg
+              className="absolute -left-[64rem] opacity-40 z-0 hidden md:block"
+              xmlns="http://www.w3.org/2000/svg"
+              width="963"
+              height="1581"
+              viewBox="0 0 963 1581"
+              fill="none"
+            >
+              <g filter="url(#filter0_f_34_247)">
+                <path
+                  d="M-260.203 764.711C-362.796 603.674 -292.701 389.035 -114.837 319.589L149.941 216.207C328.459 146.505 529.681 234.717 599.383 413.235L747.048 791.429C816.75 969.947 728.538 1171.17 550.02 1240.87L221.984 1368.95C69.07 1428.66 -102.806 1349.15 -156.306 1193.95L-158.109 1188.72C-164.258 1170.89 -172.472 1153.83 -182.585 1137.9L-197.093 1115.05C-224.326 1072.17 -232.231 1019.79 -218.869 970.774C-215.216 957.372 -213.122 943.594 -212.627 929.712L-212.342 921.725C-210.543 871.215 -224.12 821.349 -251.276 778.723L-260.203 764.711Z"
+                  fill="url(#paint0_angular_34_247)"
+                />
+              </g>
+              <defs>
+                <filter
+                  id="filter0_f_34_247"
+                  x="-499.778"
+                  y="0.348495"
+                  width="1462.68"
+                  height="1580.49"
+                  filterUnits="userSpaceOnUse"
+                  color-interpolation-filters="sRGB"
+                >
+                  <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                  <feBlend
+                    mode="normal"
+                    in="SourceGraphic"
+                    in2="BackgroundImageFix"
+                    result="shape"
+                  />
+                  <feGaussianBlur
+                    stdDeviation="96"
+                    result="effect1_foregroundBlur_34_247"
+                  />
+                </filter>
+                <radialGradient
+                  id="paint0_angular_34_247"
+                  cx="0"
+                  cy="0"
+                  r="1"
+                  gradientUnits="userSpaceOnUse"
+                  gradientTransform="translate(207.459 784.186) rotate(16.8193) scale(691.439 508.599)"
+                >
+                  <stop offset="0.146" stop-color="white" stop-opacity="0" />
+                  <stop offset="0.506955" stop-color="#225C59" />
+                  <stop offset="1" stop-color="white" stop-opacity="0.53" />
+                </radialGradient>
+              </defs>
             </svg>
             <div className="absolute w-[310px] md:w-full md:h-[27rem] h-[330px] top-0 left-0 bg-neutral-50 rounded-[21.77px] shadow-[0px_85.26px_181.4px_#15151526]" />
 
             <RiDoubleQuotesL className="relative text-8xl text-slate-500 bottom-8 -left-4 h-12 w-16" />
             <img
-              className="absolute w-[3.188rem] h-[5.78rem] md:h-[35rem] md:w-[23rem] md:right-12 md:-top-28 -top-8 right-0 object-cover rounded-md"
+              className="absolute w-[3.188rem] h-[5.78rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-8 right-0 object-cover rounded-md"
               alt="Unsplash ww"
               src={data[currentIndex].image}
             />
@@ -115,10 +165,9 @@ const ProfileCard = () => {
               <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[29px] relative w-fit tracking-[0] leading-[normal]">
                 {data[currentIndex].name || "User Name"}
               </div>
-
             </div>
 
-            <p className="absolute w-full  max-w-[361px] md:max950:max-w-[220px] top-28 left-4  [font-family:'Manrope-Regular',Helvetica] font-normal text-black md:first-letter:text-3xl md:tracking-wide">
+            <p className="absolute w-full  max-w-[461px] md:max950:max-w-[220px] top-28 left-4  [font-family:'Manrope-Regular',Helvetica] font-normal text-black md:first-letter:text-3xl md:tracking-wide">
               {data[currentIndex].description}
             </p>
           </div>
