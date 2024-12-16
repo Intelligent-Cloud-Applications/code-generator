@@ -1,5 +1,6 @@
 import { API, Auth, Storage } from "aws-amplify";
-import { Label, Modal, TextInput } from "flowbite-react";
+import { Label, Modal, TextInput,Tooltip } from "flowbite-react";
+import {Link} from "react-router-dom";
 import React, { useContext, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
@@ -12,6 +13,7 @@ import InstitutionContext from "../../../../Context/InstitutionContext";
 import EditableInput from "./EditableInput";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
+
 // import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
@@ -34,6 +36,19 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
     const initials = names.map((name) => name.charAt(0).toUpperCase()).join("");
     return initials;
   };
+
+  let domain;
+  if (process.env.REACT_APP_STAGE === "DEV") {
+    domain = process.env.REACT_APP_DOMAIN_BETA;
+  } else if (process.env.REACT_APP_STAGE === "PROD") {
+    domain = process.env.REACT_APP_DOMAIN_PROD;
+  }
+
+  let referralLink;
+  if (userData.userType === "instructor") {
+    referralLink = `${domain}/hybrid/?institution=${userData.institution}&referral=${userData.referral_code}`;
+  }
+
   const formatDate = (epochDate) => {
     epochDate = Number(epochDate);
     if (!epochDate) return "";
@@ -388,21 +403,63 @@ const ifDataChanged = () => {
                 <div className="relative w-[10rem] h-[10rem] mx-auto mb-6">
                   <div className="relative w-full h-full rounded-full flex items-center justify-center border-[3px] border-solid border-t1 shadow-md shadow-black/40">
                     {UserCtx.imgUrl ? (
-                      <img
-                        alt="profile"
-                        key={"profileUpdate1" + Date.now()}
-                        src={UserCtx.imgUrl}
-                        className="w-full h-full rounded-full object-cover cursor-pointer"
-                        onClick={handleEditClick}
-                      />
+                        referralLink !== undefined ? (
+                          <Tooltip
+                            content={
+                              <Link
+                                to={referralLink}
+                                className="text-blue-500 underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {referralLink}
+                              </Link>
+                            }
+                            placement="bottom"
+                          >
+                            <img
+                              alt="profile"
+                              key={"profileUpdate1" + Date.now()}
+                              src={UserCtx.imgUrl}
+                              className="w-full h-full rounded-full object-cover cursor-pointer"
+                              onClick={handleEditClick}
+                            />
+                          </Tooltip>
+                        ) : (
+                          <img
+                            alt="profile"
+                            key={"profileUpdate2" + Date.now()}
+                            src={UserCtx.imgUrl}
+                            className="w-full h-full rounded-full object-cover cursor-pointer"
+                            onClick={handleEditClick}
+                          />
+                        )
                     ) : (
                       <div
                         className="w-full h-full rounded-full bg-gray-300 flex items-center justify-center cursor-pointer"
                         onClick={handleEditClick}
                       >
-                        <span className="text-[3rem] font-bold text-gray-700">
-                          {getInitials(UserCtx.userName)}
-                        </span>
+                        {referralLink !== undefined ? (
+                          <Tooltip
+                            content={
+                              <Link
+                                to={referralLink}
+                                className="text-blue-500 underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {referralLink}
+                              </Link>
+                            }
+                            placement="bottom"
+                          >
+                            <span className="text-[3rem] font-bold text-gray-700">
+                              {getInitials(UserCtx.userName)}
+                            </span>
+                          </Tooltip>
+                        ) : (
+                          <span className="text-[3rem] font-bold text-gray-700">
+                            {getInitials(UserCtx.userName)}
+                          </span>
+                        )}
                       </div>
                     )}
                     <input

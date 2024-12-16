@@ -168,11 +168,11 @@ export const HybridPayment = () => {
 
       <NavBar />
       <Carousel />
-        <ProfileCard />
         
-      <div className="w-screen flex flex-col justify-center items-center p-2">
+      <div className="mb-12 w-screen flex flex-col justify-center items-center p-2">
         <InstructorTestimonial />
       </div>
+        <ProfileCard />
       <div className=" mx-auto p-4 flex flex-col">
         <Overview />
         <div className="my-4"></div>
