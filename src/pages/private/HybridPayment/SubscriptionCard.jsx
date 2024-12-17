@@ -47,7 +47,7 @@ const SubscriptionCard = () => {
       navigate("/subscription")
     }
     else{
-      navigate("/auth");
+      navigate("/login");
     }
   };
 

@@ -269,14 +269,14 @@ const ContextProvider = (props) => {
             `/user/profile-update/${institution}`,
             {
               body: {
-                status: "Inactive", // Set status to Inactive
+                status: "InActive", // Set status to Inactive
               },
             }
           );
           console.log("User status updated to Inactive:", response);
           setUserData((prevData) => ({
             ...prevData,
-            status: "Inactive", // Update the context state
+            status: "InActive", // Update the context state
           }));
         } catch (error) {
           console.error("Error updating user status to Inactive:", error);

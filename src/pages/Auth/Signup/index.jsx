@@ -66,7 +66,7 @@ const Signup = () => {
         phoneNumber: `+${event.target.country.value}${event.target.phone.value}`,
         country: userCountry,
         referred_code: event.target.referral.value,
-        status: trialStatus || "Inactive",  // Set status to Trial if URL param exists
+        status: trialStatus || "InActive",  // Set status to Trial if URL param exists
         trialPeriod: trialPeriod || null,  // Add trialPeriod from URL
         trial: trial
       };

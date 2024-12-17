@@ -79,6 +79,7 @@ const AuthPage = () => {
         <PasswordInput name='password' className='rounded w-full'/>
         <Link to={'/forgot-password'}>Forgot password?</Link>
         <PrimaryButton>Continue</PrimaryButton>
+        <p>Dont have an account? <Link to={'/signup'}>Signup</Link></p>
       </form>
     </FormWrapper>
   );
