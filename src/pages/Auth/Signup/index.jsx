@@ -84,7 +84,7 @@ const Signup = () => {
 
   const confirmSignup = async (event) => {
     event.preventDefault();
-
+    // const queryString = `?trial=${trial}&trialPeriod=${period}`;
     setLoader(true);
     try {
       await Auth.confirmSignUp(userData.emailId, event.target.otp.value);
@@ -94,7 +94,11 @@ const Signup = () => {
       await API.post(
         'main',
         `/user/profile/${InstitutionId}`,
-        {
+        {  
+          queryStringParameters: {
+          trial: trial,
+          trialPeriod: trialPeriod,
+        },
           body: {
             ...userData,
             trial: trial,
