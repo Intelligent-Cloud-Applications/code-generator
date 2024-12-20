@@ -65,7 +65,8 @@ export const Overview = ({
           Overview
         </h1>
         <p className="text-[1rem] mt-2 px-4 w-2/3 mx-auto text-center font-[600]">
-          Get a comprehensive look at our journey, values, and vision—your guide to what makes us unique.
+          Get a comprehensive look at our journey, values, and vision—your guide
+          to what makes us unique.
         </p>
       </div>
 
@@ -112,14 +113,14 @@ export const Overview = ({
                 className="w-12 h-12 sm:w-[75.04px] sm:h-[75.04px] object-cover rounded-full"
                 alt="Insert your image"
                 src={
-                  "https://s3-alpha-sig.figma.com/img/c818/2e84/ca5ca8d65a1c4482d647408cfdd2c0b7?Expires=1731888000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=PCsgrclz4CxCK5tUBl59zZeLrSmBjNLYA3540IwJrp43YyE7fD0AfGWkbSYnmEpuOV~UcRCwymDkZg3G3f1XCrCkhiDkLuCbUIC8R-HXF6ZXQgqFC9Kebmm0PFVYVB8-EID66EcGnI4QUN4300pr2zFHm1mR1FW45Ce58MS2R7t9ILquyUU7dBOvwZjxei5Gp8ywQEcAeOqN7c66gSACe7v9J-JEnvYyhqCz1ExPimnpM3DsWqDa0ovn0qNO~W3H1ywwgrhi6DVh0b70dDGb~HDYjm5iZecv93dXSzfFZL-5-u7Nf~UVfE4~acULHOLNioB4cOO70SPUzkvTmU6aVw__"
+                  "https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?q=80&w=1941&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 }
               />
               <img
                 className="w-12 h-12 sm:w-[75.04px] sm:h-[75.04px] object-cover rounded-full"
                 alt="Insert your image"
                 src={
-                  "https://s3-alpha-sig.figma.com/img/b688/8646/b906a6888fc4256c64d3459e67f6899c?Expires=1731888000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=Fy6eQXYcDfu634pKZU7337RDGddNA9a0v59~jbMMOfO4PqHad5LE3tZGCweh1sHvb-FDzF6Pl07ARNLd2GL~bYIN5l17rLyJsLKQdxzJP0cp4~sf6W478OFgixKcEHpiPbFhFHvLADJYxpQl5tC5wiYMPhHk-QaO6bsj--II8u2GFSkEnfpz8yVGlHzKfpgI6~oEpzNR0J-iNqrgr0GUx2ztyel7xn2syp~pqDgs1JbUes-WaidAOR2~q0Pmo7vX-IE7TXicNsTkbCg06~zWfVXoocAqRmgUmAWkqALlIo0yOLml2b7XebhD~48mKtIApIPqFQH1Xtoxz3yHYO7d9g__"
+                  "https://plus.unsplash.com/premium_photo-1690407617542-2f210cf20d7e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cHJvZmlsZXxlbnwwfDF8MHx8fDA%3D"
                 }
               />
               <div className="w-12 h-12 sm:w-[77.04px] sm:h-[75.04px] bg-[#225c59] rounded-full border-2 border-white flex items-center justify-center ">

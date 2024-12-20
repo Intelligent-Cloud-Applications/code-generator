@@ -9,6 +9,7 @@ import { API } from "aws-amplify";
 import CreateSubscriptionPopup from './CreateSubscriptionPopup';
 import UpdateSubscriptionPopup from './UpdateSubscriptionPopup';
 import Context from '../Context/Context';
+import { User } from 'lucide-react';
 
 function HomePayment() {
   const { institution, cognitoId } = useParams();
@@ -21,6 +22,10 @@ function HomePayment() {
   const [products, setProducts] = useState([]);
   const providesContainerRef = useRef(null);
   const util = useContext(Context).util;
+  const UserCtx = useContext(Context)?.userData;
+
+  const Userlocation = UserCtx?.location?.countryCode;
+
   console.log(error);
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -36,7 +41,8 @@ function HomePayment() {
     const fetchProducts = async () => {
       try {
         const data = await API.get('main', `/any/products/${institution}`);
-        setProducts(data);
+        console.log(data);
+        Userlocation === 'IN' ? setProducts(data.filter(product=> product.india === false)) : setProducts(data.filter(product => product.india === true));
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -83,6 +89,7 @@ function HomePayment() {
         amount: selectedProduct.amount / 100,
         durationText: selectedProduct.durationText,
         provides: selectedProduct.provides,
+        classType:selectedProduct.classType
       });
     }
   }, [selectedProduct,isPopupOpen]);
@@ -147,7 +154,7 @@ function HomePayment() {
     e.preventDefault();
     try {
       util.setLoader(true); 
-      const { heading, amount, durationText, provides } = formData;
+      const { heading, amount, durationText, provides, classType } = formData;
       if (!heading || !amount) {
         alert('Heading and Amount cannot be empty');
         setIsPopupOpen(true); 
@@ -204,7 +211,8 @@ function HomePayment() {
             india:true,
             durationText:subscriptionType,
             subscriptionType:subscriptionType, 
-            provides
+            provides,
+            classType
         
           },
         }
@@ -232,7 +240,7 @@ function HomePayment() {
     e.preventDefault();
     try {
       util.setLoader(true); 
-      const { heading, amount, durationText, provides } = formData;
+      const { heading, amount, durationText, provides, classType } = formData;
       if (!heading || !amount) {
         alert('Heading and Amount cannot be empty');
         setIsEditPopupOpen(true); 
@@ -290,8 +298,8 @@ function HomePayment() {
             durationText:subscriptionType,
             subscriptionType:subscriptionType, 
             provides,
-            productId:selectedProduct.productId
-        
+            productId:selectedProduct.productId,
+            classType
           },
         }
       );
@@ -335,6 +343,7 @@ function HomePayment() {
         handleCloseEditPopup();
       alert('Subscription deleted successfully');
       const data = await API.get('main', `/any/products/${institution}`);
+
       setProducts(data);
       util.setLoader(false); 
     } catch (error) {

@@ -9,6 +9,8 @@ const BirthdayModal = () => {
 
   const handleClose = () => {
     setOpenModal(false);
+    // Window refresh once
+    window.location.reload();
   };
   return (
     <>

@@ -1,7 +1,5 @@
 import React from "react";
 import { useState } from "react";
-//import emailJs from '@emailjs/browser'
-//import '../Components/comp/Query.css'
 import Footer from "../../../components/Footer";
 import NavBar from "../../../components/Header";
 import { API } from "aws-amplify";
@@ -115,7 +113,7 @@ export default function Query() {
               className={`border-[#9d9d9d78] border-[1px] bg-black my-8 max850:hidden`}
             ></div>
             <div
-              className={`sans-sarif font-bold flex flex-col items-center gap-10 py-4`}
+              className={`sans-sarif flex flex-col items-center gap-10 py-4`}
             >
               <h3 className="max500:mr-14">FILL IT UP!</h3>
               <form className={`flex flex-col gap-8 items-center`}>
@@ -125,7 +123,7 @@ export default function Query() {
                   <li
                     className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
                   >
-                    <label>Name</label>
+                    <label className='font-bold'>Name</label>
                     <input
                       className={`rounded-md py-[0.4rem] px-2 max500:w-[100%] bg-[#d9d9d980]`}
                       value={name}
@@ -137,7 +135,7 @@ export default function Query() {
                   <li
                     className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
                   >
-                    <label>Email</label>
+                    <label className='font-bold'>Email</label>
                     <input
                       className={`rounded-md py-[0.4rem] px-2 max500:w-[100%] bg-[#d9d9d980]`}
                       value={email}
@@ -149,7 +147,7 @@ export default function Query() {
                   <li
                     className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
                   >
-                    <label>Phone Number</label>
+                    <label className='font-bold'>Phone Number</label>
                     <input
                       className={`rounded-md py-[0.4rem] px-2 max500:w-[100%] bg-[#d9d9d980]`}
                       value={phoneNumber}
@@ -161,7 +159,7 @@ export default function Query() {
                   <li
                     className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
                   >
-                    <label>Message</label>
+                    <label className='font-bold'>Message</label>
                     <textarea
                       className={`rounded-md py-[0.4rem] px-2 h-[8rem] max500:w-[100%] bg-[#d9d9d980]`}
                       value={message}

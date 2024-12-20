@@ -1,5 +1,5 @@
 import { API } from "aws-amplify";
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback} from "react";
 import Context from "./Context";
 import web from "../utils/data.json";
 import apiPaths from "../utils/api-paths";
@@ -18,6 +18,17 @@ const ContextProvider = (props) => {
 
   const onAuthLoad = async (auth, id) => {
     if (auth) {
+      // try {
+      //   const statusResponse = await API.put("main", `/user/status/${userData.InstitutionId}`);
+      //   if (statusResponse && statusResponse.status) {
+      //     setUserData((prevData) => ({
+      //       ...prevData,
+      //       status: statusResponse.status, // Assuming the API returns the status
+      //     }));
+      //   }
+      // } catch (e) {
+      //   console.log("Error fetching user status:", e);
+      // }
       API.get("main", apiPaths.getProducts, {})
         .then((list) => {
           let newList = [];
@@ -258,14 +269,14 @@ const ContextProvider = (props) => {
             `/user/profile-update/${institution}`,
             {
               body: {
-                status: "Inactive", // Set status to Inactive
+                status: "InActive", // Set status to Inactive
               },
             }
           );
           console.log("User status updated to Inactive:", response);
           setUserData((prevData) => ({
             ...prevData,
-            status: "Inactive", // Update the context state
+            status: "InActive", // Update the context state
           }));
         } catch (error) {
           console.error("Error updating user status to Inactive:", error);
@@ -273,6 +284,39 @@ const ContextProvider = (props) => {
       }
     }
   };
+
+  //update user status after renew date finished
+  const updateUserStatusRenew = async (institution) => {
+    try {
+      // API call to fetch the user status based on institution
+      const statusResponse = await API.put(
+        "main",
+        `/user/status/${institution}`, // Using only institution as identifier
+        {
+          body: {}, // Empty body as we don't need userId
+        }
+      );
+  
+      if (statusResponse && statusResponse.status) {
+        // Update the user status in the context
+        setUserData((prevData) => ({
+          ...prevData,
+          status: statusResponse.status, // Assuming the API returns the status
+        }));
+        console.log("User status updated:", statusResponse.status);
+      }
+    } catch (e) {
+      console.log("Error fetching or updating user status:", e);
+    }
+  };
+  
+  useEffect(() => {
+    if (userData && userData.status) {
+      // Check if user status requires renewal update
+        updateUserStatusRenew(userData.institution); // Just pass the institution to update status
+    }
+  }, [userData]); // Trigger the effect whenever userData changes
+  
 
   // Call this function periodically or after certain actions
   useEffect(() => {
@@ -390,13 +434,13 @@ const ContextProvider = (props) => {
     getUserList: getUserList,
     productList: productList,
     instructorList: instructorList,
-    setInstructorList: () => {},
-    setProductList: () => {},
+    setInstructorList: () => { },
+    setProductList: () => { },
     checkSubscriptionStatus: checkSubscriptionStatus,
     streakData: streakData,
     setStreakData: setStreakDataFn,
     ratings: ratings,
-    setRatings: () => {},
+    setRatings: () => { },
     getImagesFromAPI: getImagesFromAPI,
     setTempImgSrc: setTempImgSrc,
     tempImgSrc: tempImgSrc,

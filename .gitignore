@@ -131,3 +131,6 @@ dist
 
 # For jetbrains ides
 .idea/
+
+# For bun running
+*.lockb

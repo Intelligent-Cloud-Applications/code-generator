@@ -47,7 +47,7 @@ const SubscriptionCard = () => {
       navigate("/subscription")
     }
     else{
-      navigate("/auth");
+      navigate("/login");
     }
   };
 
@@ -149,7 +149,7 @@ const SubscriptionCard = () => {
                   {/* Description List */}
                   <ul className="my-7 space-y-5 text-center min-h-[12rem]">
                     <li className="text-lg font-normal text-white">
-                      <div>$20 for Registration and $20 for Monthly.</div>
+                      <div>₹1000 for Monthly.</div>
                       <div>Instructors:Certified Zumba & BWORKZ</div>
                       <div>
                         Plan: 40+ Monthly Online andin-person Dance Fitness

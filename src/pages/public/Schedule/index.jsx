@@ -68,7 +68,7 @@ const Schedule = () => {
       nextWeekEndDate.setDate(nextWeekEndDate.getDate() + 7);
 
       const response = await API.get(
-        "user",
+        "main",
         `/user/schedule/${institutionData.InstitutionId}`
       );
       const nextWeekClasses = response.filter((classInfo) => {

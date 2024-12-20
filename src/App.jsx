@@ -80,6 +80,7 @@ function App() {
         RefCtx.current.setUserData({});
         UtilCtx.current.setLoader(false);
       } finally {
+        UtilCtx.current.setLoader(true);
         if((RefCtx.current.userData)["location"] === undefined) {
          const location = await API.get("main", apiPaths?.getUserLocation);
          RefCtx.current.setUserData((prev) => ({
@@ -87,6 +88,7 @@ function App() {
            location: location,
          }));
         }
+        UtilCtx.current.setLoader(false);
       }
     };
 

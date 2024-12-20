@@ -90,18 +90,20 @@ const AuthPage = () => {
         );
       }
 
-      const userdata = await API.get(
-          'main',
-          `/user/profile/${InstitutionId}`,
-          {}
-      );
-      setUserData(userdata);
-      setIsAuth(true);
-      setLoader(false);
+      navigate('/redirect')
 
-      toast.info('Logged in');
-      onAuthLoad(true, InstitutionId);
-      navigate(`/${link}`);
+      // const userdata = await API.get(
+      //     'main',
+      //     `/user/profile/${InstitutionId}`,
+      //     {}
+      // );
+      // setUserData(userdata);
+      // setIsAuth(true);
+      // setLoader(false);
+      //
+      // toast.info('Logged in');
+      // onAuthLoad(true, InstitutionId);
+      // navigate(`/${link}`);
     } catch (error) {
       if (error === 'The user is not authenticated')
         toast.error('Incorrect OTP. Try again');
