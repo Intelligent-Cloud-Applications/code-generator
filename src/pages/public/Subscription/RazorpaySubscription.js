@@ -26,7 +26,7 @@ const RazorpaySubscription = ({ productId }) => {
     let response
     try {
       response = await API.put(
-        'user',
+        'main',
         `/user/billing/subscription/${InstitutionData.InstitutionId}`,
         {
           body: {
@@ -59,7 +59,7 @@ const RazorpaySubscription = ({ productId }) => {
             UtilCtx.setLoader(true)
             try {
               const res = await API.put(
-                'user',
+                'main',
                 `/user/billing/subscription/verify/${InstitutionData.InstitutionId}`,
                 {
                   body: {
@@ -68,7 +68,7 @@ const RazorpaySubscription = ({ productId }) => {
                 }
               )
               const tempUserdata = await API.get(
-                'user',
+                'main',
                 `/user/profile/${InstitutionData.InstitutionId}`
               )
               Ctx.setUserData(tempUserdata)
