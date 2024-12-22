@@ -5,7 +5,7 @@ import NavBar from "../../../components/Header";
 import Context from "../../../Context/Context";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import HappyprancerPaypalHybrid from "../../public/Subscription/HappyprancerPaypalHybrid";
-import ProfileCard from "./ProfileCard";
+import Testemonial from "./Testemonial";
 import SubscriptionCard from "./SubscriptionCard";
 import {Overview} from "./Overview";
 import Carousel from "./Carousel";
@@ -172,7 +172,7 @@ export const HybridPayment = () => {
       <div className="mb-12 w-screen flex flex-col justify-center items-center p-2">
         <InstructorTestimonial />
       </div>
-        <ProfileCard />
+        <Testemonial />
       <div className=" mx-auto p-4 flex flex-col">
         <Overview />
         <div className="my-4"></div>

@@ -25,10 +25,15 @@ useEffect(() => {
 }, [UserCtx?.location?.countryCode]);
 
 useEffect(() => {
-  localStorage.getItem("userLocation") === "IN"
-    ? setProducts(productList.filter((item) => item.currency === "INR"))
-    : setProducts(productList.filter((item) => item.currency !== "INR"));
-}, [UserCtx?.location?.countryCode]);
+  // Only update the products when country code changes and avoid including 'products' in the dependency array
+  const storedLocation = localStorage.getItem("userLocation");
+
+  if (storedLocation === "IN") {
+    setProducts(productList.filter((item) => item.currency === "INR"));
+  } else {
+    setProducts(productList.filter((item) => item.currency !== "INR"));
+  }
+}, [UserCtx?.location?.countryCode, productList]);
 
 
   useEffect(() => {
@@ -55,10 +60,6 @@ useEffect(() => {
       }
     };
   }, []);
-
-  // console.log("filteredProductListINR", filteredProductListINR);
-  // console.log("filteredProductListUSD", filteredProductListUSD);
-  // console.log(UserCtx.location)
 
   const domain =
     process.env.REACT_APP_STAGE === "DEV"

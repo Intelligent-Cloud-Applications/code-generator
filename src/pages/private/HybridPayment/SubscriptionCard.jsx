@@ -51,7 +51,7 @@ const SubscriptionCard = () => {
       filterProducts();
     }
   }, [locationData, productList]);
-  console.log(UserCtx);
+  // console.log(UserCtx);
   const handleChoosePlan = () => {
     if (isAuth) {
       navigate(

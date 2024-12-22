@@ -4,6 +4,7 @@ import NavBar from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import { API, Storage } from "aws-amplify";
 import Context from "../../../Context/Context";
+import { useNavigate } from "react-router-dom";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import "./Instructor.css";
 import Country from "../../../components_old/Country";
@@ -54,6 +55,7 @@ const Instructor = () => {
   const [alert, setAlert] = useState(false);
 
   const [isUpdating, setIsUpdating] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInstructorList = async () => {
@@ -513,7 +515,14 @@ const Instructor = () => {
           {instructorList.map(
             (instructor, i) =>
               instructor.name !== "cancelled" && (
-                <div className={`inst-card relative`} key={i}>
+                <div
+                  className={`inst-card relative cursor-pointer`}
+                  key={i}
+                  onClick={() =>
+                    navigate(`/hybrid/?institution=${instructor.institution}&referral=${instructor.name}
+`)
+                  }
+                >
                   {isAdmin && (
                     <div className="absolute top-2 right-2 flex flex-row gap-1.5">
                       <div

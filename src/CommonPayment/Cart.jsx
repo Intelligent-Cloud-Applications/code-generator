@@ -1,4 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { useParams } from 'react-router-dom';
 import CartTable from './Cart/CartTable';
 import Context from '../Context/Context';
@@ -12,7 +13,7 @@ import { BarLoader } from 'react-spinners';
 import displayError from './Errors';
 
 const Cart = ({ institution }) => {
-  const { cognitoId } = useParams();
+  const { cognitoId, forInstitution } = useParams();
   const { getCartItems, cartState, setCartState, getPaymentHistory } = useContext(Context);
   const [isInitialFetch, setIsInitialFetch] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +34,11 @@ const Cart = ({ institution }) => {
     transform: isModalOpen ? 'translateY(0)' : 'translateY(-20px)',
     config: { tension: 200, friction: 20 },
   });
+
+  const navigate = useNavigate();
+  const handlePaymentFailure = (message, navigate) => {
+    navigate("/payment-error", { state: { message } });
+  };
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -208,6 +214,12 @@ const Cart = ({ institution }) => {
                 displayError(error.message);
                 setIsLoading(false);
                 setIsLoading1(false);
+                setTimeout(() => {
+                  handlePaymentFailure(
+                    "Payment verification failed!",
+                    navigate
+                  );
+                }, 100);
               }
             };
             verify();
@@ -216,6 +228,9 @@ const Cart = ({ institution }) => {
             displayError('Error during payment handler');
             setIsLoading(false);
             setIsLoading1(false);
+             setTimeout(() => {
+               handlePaymentFailure("Error during payment process!", navigate);
+             }, 1500);
           }
         },
         prefill: {
@@ -256,6 +271,9 @@ const Cart = ({ institution }) => {
             } catch (error) {
               displayError(error.response.data.error);
             }
+            setTimeout(() => {
+              handlePaymentFailure("Payment cancelled!", navigate);
+            }, 1500);
           },
         },
       };
@@ -263,6 +281,11 @@ const Cart = ({ institution }) => {
         options.subscription_id = response[0].subscriptionResult.paymentId;
       }
       const paymentObject = new window.Razorpay(options);
+      paymentObject.on("payment.failed", (response) => {
+        console.error("Payment failed:", response.error);
+        displayError("Payment failed. Please try again.");
+        setIsLoading(false);
+      });
       paymentObject.open();
     } catch (error) {
       console.error('Error in checkout:', error);

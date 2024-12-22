@@ -1,9 +1,9 @@
 import { API, Auth, Storage } from "aws-amplify";
 import { Label, Modal, TextInput,Tooltip } from "flowbite-react";
-import {Link} from "react-router-dom";
 import React, { useContext, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { FaArrowCircleRight } from "react-icons/fa";
 import { FaArrowLeft, FaCalendarAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { Button2 } from "../../../../common/Inputs";
@@ -403,63 +403,21 @@ const ifDataChanged = () => {
                 <div className="relative w-[10rem] h-[10rem] mx-auto mb-6">
                   <div className="relative w-full h-full rounded-full flex items-center justify-center border-[3px] border-solid border-t1 shadow-md shadow-black/40">
                     {UserCtx.imgUrl ? (
-                        referralLink !== undefined ? (
-                          <Tooltip
-                            content={
-                              <Link
-                                to={referralLink}
-                                className="text-blue-500 underline"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {referralLink}
-                              </Link>
-                            }
-                            placement="bottom"
-                          >
-                            <img
-                              alt="profile"
-                              key={"profileUpdate1" + Date.now()}
-                              src={UserCtx.imgUrl}
-                              className="w-full h-full rounded-full object-cover cursor-pointer"
-                              onClick={handleEditClick}
-                            />
-                          </Tooltip>
-                        ) : (
-                          <img
-                            alt="profile"
-                            key={"profileUpdate2" + Date.now()}
-                            src={UserCtx.imgUrl}
-                            className="w-full h-full rounded-full object-cover cursor-pointer"
-                            onClick={handleEditClick}
-                          />
-                        )
+                      <img
+                        alt="profile"
+                        key={"profileUpdate1" + Date.now()}
+                        src={UserCtx.imgUrl}
+                        className="w-full h-full rounded-full object-cover cursor-pointer"
+                        onClick={handleEditClick}
+                      />
                     ) : (
                       <div
                         className="w-full h-full rounded-full bg-gray-300 flex items-center justify-center cursor-pointer"
                         onClick={handleEditClick}
                       >
-                        {referralLink !== undefined ? (
-                          <Tooltip
-                            content={
-                              <Link
-                                to={referralLink}
-                                className="text-blue-500 underline"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {referralLink}
-                              </Link>
-                            }
-                            placement="bottom"
-                          >
-                            <span className="text-[3rem] font-bold text-gray-700">
-                              {getInitials(UserCtx.userName)}
-                            </span>
-                          </Tooltip>
-                        ) : (
-                          <span className="text-[3rem] font-bold text-gray-700">
-                            {getInitials(UserCtx.userName)}
-                          </span>
-                        )}
+                        <span className="text-[3rem] font-bold text-gray-700">
+                          {getInitials(UserCtx.userName)}
+                        </span>
                       </div>
                     )}
                     <input
@@ -482,6 +440,45 @@ const ifDataChanged = () => {
                     </div>
                   </div>
                 </div>
+
+                <>
+                {
+                  UserCtx.userType === "instructor" && (
+
+                  <div className="flex flex-col gap-4 justify-center bg-gray-100 p-4 rounded-lg shadow-md w-full">
+                    {referralLink && (
+                      <div className="flex flex-col gap-2">
+                        <label className="ml-2 text-sm font-semibold text-gray-700">
+                          Referral Link
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            className="bg-white px-4 py-2 rounded-lg w-full border border-gray-300 shadow-sm text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                            type="text"
+                            value={referralLink}
+                            readOnly
+                          />
+                          <Tooltip
+                            content="Go to Link"
+                            position="top"
+                            arrow={false}
+                          >
+                            <button
+                              className="bg-primaryColor text-white rounded-lg py-2 px-4 shadow-md hover:bg-lightPrimaryColor hover:shadow-lg transition-transform transform hover:scale-105"
+                              onClick={() => {
+                                window.location.href = referralLink;
+                              }}
+                            >
+                              <FaArrowCircleRight className="h-6" />
+                            </button>
+                          </Tooltip>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  )
+                }
+                </>
                 <form className={`mt-6 flex flex-col gap-8 max560:w-full`}>
                   <div
                     className={`grid grid-cols-2 gap-4 max536:grid-cols-1 max536:w-full`}

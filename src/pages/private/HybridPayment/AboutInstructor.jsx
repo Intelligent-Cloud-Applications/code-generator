@@ -7,10 +7,10 @@ const AboutInstructor = ({ aboutText }) => {
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
   };
-  console.log(aboutText)
+  // console.log(aboutText)
 
   return (
-    <p className="text-gray-700 text-base md:text-lg italic break-words overflow-hidden">
+    <p className="text-gray-700 text-base md:text-lg italic break-words overflow-hidden md:pr-5 lg:pr-6">
       {isExpanded || aboutText?.length <= maxLength
         ? `"${aboutText}"`
         : `"${aboutText?.slice(0, maxLength)}..."`}
