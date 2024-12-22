@@ -17,7 +17,7 @@ export const dsProd = {
     },
     Storage: {
         region: 'us-east-1',
-        bucket: 'insitution-utils',
+        bucket: 'institution-utils',
         identityPoolId: process.env.REACT_APP_PROD_IDENTITY_POOL_ID,
     },
     API: {
@@ -62,7 +62,7 @@ export const dsDev = {
     },
     Storage: {
         region: 'us-east-1',
-        bucket: 'insitution-utils',
+        bucket: 'institution-utils',
         identityPoolId: process.env.REACT_APP_PROD_IDENTITY_POOL_ID,
     },
     API: {

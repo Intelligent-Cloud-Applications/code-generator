@@ -136,7 +136,8 @@ const ifDataChanged = () => {
 
       // Get the current authenticated user
       const currentUser = await Auth.currentAuthenticatedUser();
-      const cognitoId = currentUser.attributes.sub; // Cognito User ID
+      console.log(currentUser);
+      const cognitoId = currentUser.attributes?.sub || currentUser.userName; // Cognito User ID
       console.log(cognitoId);
 
       const blob = await fetch(base64File).then((res) => res.blob());
@@ -526,11 +527,11 @@ const ifDataChanged = () => {
                   </div>
                   <div className="flex flex-col gap-1 justify-center">
                     <label className="ml-2">Email</label>
-                    <EditableInput
+                    <input
                       className="bg-inputBgColor rounded-lg py-2 w-full pl-4"
                       type="email"
                       value={currentEmail}
-                      onChange={(e) => setCurrentEmail(e.target.value)}
+                      readOnly
                     />
                   </div>
                   <div className="w-full">

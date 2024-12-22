@@ -28,7 +28,7 @@ const RazorpayPayment = ({ productId }) => {
     let response;
     try {
       response = await API.put(
-        "user",
+        "main",
         `/user/billing/regular/${InstitutionData.InstitutionId}`,
         {
           body: {
@@ -65,14 +65,14 @@ const RazorpayPayment = ({ productId }) => {
                 razorpaySignature: response.razorpay_signature,
               };
               const res = await API.put(
-                "user",
+                "main",
                 `/user/billing/regular/verify/${InstitutionData.InstitutionId}`,
                 {
                   body: resBody,
                 }
               );
               const tempUserdata = await API.get(
-                "user",
+                "main",
                 `/user/profile/${InstitutionData.InstitutionId}`
               );
               Ctx.setUserData(tempUserdata);
