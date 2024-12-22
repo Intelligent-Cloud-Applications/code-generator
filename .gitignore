@@ -134,3 +134,6 @@ dist
 
 # For bun running
 *.lockb
+
+# Removes todo file
+TODO

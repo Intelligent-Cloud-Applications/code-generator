@@ -29,6 +29,7 @@ import ForgotPassword from "../pages/Auth/ForgotPassword";
 import { HybridPayment } from "../pages/private/HybridPayment";
 import QR from "../pages/private/PutAttendance/QR";
 import HomePayment from "../CommonPayment/HomePayment";
+import PaymentError from "../pages/PaymentError";
 import PhoneAuth from "../pages/Auth/phone";
 
 //const Navigate = ({to}) => {
@@ -65,6 +66,7 @@ const RoutesContainer = () => {
       <Route path="/hybrid" element={<HybridPayment />} />
       <Route path="/paymentsuccessful" element={<PaymentSuccessful />} />
       <Route path="/paymentfailed" element={<PaymentFailed />} />
+      <Route path="/payment-error" element={ <PaymentError /> }/>
       <Route path="/rating" element={<Rating />} />
       <Route
         path="/auth"
