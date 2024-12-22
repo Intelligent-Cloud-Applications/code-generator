@@ -110,6 +110,11 @@ const InstructorTestimonial = () => {
     fetchInstructorList();
   }, [institution]);
 
+  const getInitials = (name) => {
+    const names = name?.split(" ");
+    const initials = names?.map((name) => name.charAt(0).toUpperCase()).join("");
+    return initials;
+  };
   const onProfileUpdate = async (about) => {
     try {
       Util.setLoader(true);
@@ -308,6 +313,19 @@ const InstructorTestimonial = () => {
                 }
                 return null;
               })}
+              {!imagePresent === true && (
+                <div className="absolute w-[3.188rem] h-[5.78rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-8 right-0 object-cover rounded-md bg-gray-300">
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-[3rem] font-bold text-gray-700">
+                      {getInitials(
+                        instructor?.instructorProfile?.userName ||
+                          instructor.referralCode ||
+                          instructor.name
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-14 left-4">
                 <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[29px] relative w-fit tracking-[0] leading-[normal]">
@@ -327,11 +345,9 @@ const InstructorTestimonial = () => {
                 UserCtx.cognitoId ===
                   instructor?.instructorProfile?.cognitoId && (
                   <div
-                    className={`flex justify-end md:justify-center mb-6 absolute top-16 right-0  ${
-                      imagePresent
-                        ? "md:right-[50%] lg:right-[50%]"
-                        : "md:right-4 lg:right-4"
-                    } md:top-20 lg:top-20`}
+                    className={`flex justify-end md:justify-center mb-6 absolute top-16 right-0  
+                        md:right-[50%] lg:right-[50%]
+                     md:top-20 lg:top-20`}
                   >
                     <button
                       className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105"
@@ -347,12 +363,9 @@ const InstructorTestimonial = () => {
                   <div className="min-w-full">
                     {!editing ? (
                       <p
-                        className={`mt-5 absolute w-full ${
-                          imagePresent &&
-                          "max-w-[461px] md:max950:max-w-[320px]"
-                        } top-28 left-4 text-black text-left md:first-letter:text-3xl md:tracking-wide overflow-scroll h-36 md:h-40 lg:h-60 rounded-lg ${
-                          !imagePresent && "p-2 md:pr-4 lg:pr-6"
-                        } text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none `}
+                        className={`mt-5 absolute w-full
+                          max-w-[461px] md:max950:max-w-[320px]
+                        top-28 left-4 text-black text-left md:first-letter:text-3xl md:tracking-wide overflow-scroll h-36 md:h-40 lg:h-60 rounded-lg  text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none `}
                       >
                         <AboutInstructor
                           aboutText={
@@ -364,11 +377,9 @@ const InstructorTestimonial = () => {
                     ) : (
                       <div>
                         <textarea
-                          className={`mt-2 absolute w-full ${
-                            imagePresent
-                              ? "max-w-[461px] max950:max-w-[322px]"
-                              : "max-w-[90%]"
-                          } top-28 left-4 h-36 md:h-40 bg-gray-100 border border-gray-300 rounded-lg p-4 text-gray-700 text-base md:text-lg  focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none box-border`}
+                          className={`mt-2 absolute w-full 
+                            max-w-[461px] max950:max-w-[322px]
+                         top-28 left-4 h-36 md:h-40 bg-gray-100 border border-gray-300 rounded-lg p-4 text-gray-700 text-base md:text-lg  focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none box-border`}
                           onChange={(e) => setAbout(e.target.value)}
                           value={about}
                           placeholder="Write something about yourself..."
