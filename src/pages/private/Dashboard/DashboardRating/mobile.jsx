@@ -51,7 +51,7 @@ export default function DashboardRatingMobile() {
 
     // Cleanup the interval when the component is unmounted
     return () => clearInterval(intervalId)
-  })
+  }, [])
 
   const totalPages = Math.ceil(ratings.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage

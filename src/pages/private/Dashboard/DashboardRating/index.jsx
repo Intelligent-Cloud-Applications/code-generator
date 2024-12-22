@@ -52,7 +52,7 @@ export default function DashboardRating() {
 
     // Cleanup the interval when the component is unmounted
     return () => clearInterval(intervalId);
-  });
+  }, []);
 
   //sort ratings by timestamp in descending order
   ratings.sort((a, b) => {

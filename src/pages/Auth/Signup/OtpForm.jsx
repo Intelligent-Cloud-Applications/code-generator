@@ -40,7 +40,7 @@ const OtpForm = ({ handler, resendHandler }) => {
       }
     >
       <OtpInput name='otp' className='rounded w-full'/>
-      <button onClick={handleResend} disabled={isDisabled} className='text-blue-500'>
+      <button type="button" onClick={handleResend} disabled={isDisabled} className='text-blue-500'>
         {isDisabled ? `Resend OTP in ${seconds}s` : 'Resend OTP'}
       </button>
       <PrimaryButton>Continue</PrimaryButton>
