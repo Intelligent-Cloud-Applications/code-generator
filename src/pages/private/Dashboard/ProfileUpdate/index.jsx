@@ -567,7 +567,7 @@ const ifDataChanged = () => {
                       {UserCtx.userType === "admin" ? (
                         <Label value="Institution Addrress" />
                       ) : (
-                        <Label value="Addrress" />
+                        <Label value="Address" />
                       )}
                     </div>
                     <EditableTextArea

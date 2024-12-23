@@ -4,11 +4,11 @@ import NavBar from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import { API, Storage } from "aws-amplify";
 import Context from "../../../Context/Context";
-import { useNavigate } from "react-router-dom";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import "./Instructor.css";
 import Country from "../../../components_old/Country";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Modal,
@@ -55,6 +55,7 @@ const Instructor = () => {
   const [alert, setAlert] = useState(false);
 
   const [isUpdating, setIsUpdating] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -220,7 +221,7 @@ const Instructor = () => {
     try {
       setLoaderInitialized(true);
       console.log(imageURL);
-      
+
       const response = await API.put(
         "main",
         `/admin/put-instructor/${institutionData.InstitutionId}/${instructorId}`,
@@ -515,14 +516,7 @@ const Instructor = () => {
           {instructorList.map(
             (instructor, i) =>
               instructor.name !== "cancelled" && (
-                <div
-                  className={`inst-card relative cursor-pointer`}
-                  key={i}
-                  onClick={() =>
-                    navigate(`/hybrid/?institution=${instructor.institution}&referral=${instructor.name}
-`)
-                  }
-                >
+                <div className={`inst-card relative`} key={i}>
                   {isAdmin && (
                     <div className="absolute top-2 right-2 flex flex-row gap-1.5">
                       <div
@@ -562,12 +556,17 @@ const Instructor = () => {
 
                   <Card
                     className={`Box`}
+                    onClick={() =>
+                      navigate(`/hybrid/?institution=${instructor.institution}&referral=${instructor.name}
+`)
+                    }
                     style={{
                       backgroundImage: `url(${instructor.image})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       height: "29rem",
                       borderRadius: "10px",
+                      cursor: "pointer",
                     }}
                   >
                     <div className={`overlay`}></div>

@@ -1,8 +1,6 @@
 import { useRef, useState } from "react";
 import { GrFormPrevious } from "react-icons/gr";
 import { MdNavigateNext } from "react-icons/md";
-import { RiDoubleQuotesL } from "react-icons/ri";
-import AboutInstructor from "../../private/HybridPayment/AboutInstructor";
 import "./SubscriptionCard.css";
 const Testemonial = () => {
   const dataRef = useRef([
@@ -62,7 +60,7 @@ const Testemonial = () => {
           <img
             src={data[currentIndex].image}
             alt={data[currentIndex].name}
-            className="w-[100px] h-[100px] object-cover rounded-full shadow-lg"
+            className="w-[70px] h-[70px] md:w-[100px] md:h-[100px] object-cover rounded-full shadow-lg"
           />
         </div>
       </div>
@@ -73,7 +71,7 @@ const Testemonial = () => {
   </div>
 
   {/* Navigation Buttons */}
-  <div className="flex min-w-[300px] justify-between items-center mt-6 absolute bottom-6 left-8 right-8">
+  <div className="flex min-w-[300px] justify-between items-center mt-6 absolute bottom-2 md:bottom-6 left-8 right-8">
     {currentIndex !== 0 && (
       <button
         className="custom-button bg-primaryColor text-white px-4 py-2 rounded-md shadow-md hover:bg-lightPrimaryColor transition duration-200 flex items-center space-x-2"

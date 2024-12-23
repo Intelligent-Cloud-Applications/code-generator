@@ -282,7 +282,7 @@ const Cart = ({ institution }) => {
       }
       const paymentObject = new window.Razorpay(options);
       paymentObject.on("payment.failed", (response) => {
-        console.error("Payment failed:", response.error);
+        console.log("Payment failed:", response.error);
         displayError("Payment failed. Please try again.");
         setIsLoading(false);
       });
