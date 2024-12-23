@@ -220,7 +220,7 @@ const Instructor = () => {
     try {
       setLoaderInitialized(true);
       console.log(imageURL);
-      
+
       const response = await API.put(
         "main",
         `/admin/put-instructor/${institutionData.InstitutionId}/${instructorId}`,
@@ -486,9 +486,8 @@ const Instructor = () => {
       </Modal>
 
       <div
-        className={`flex flex-col items-center background-container pt-6 relative ${
-          isAdmin && "max1050:pt-16"
-        }`}
+        className={`flex flex-col items-center background-container pt-6 relative ${isAdmin && "max1050:pt-16"
+          }`}
         style={{
           backgroundImage: `url(${institutionData.InstructorBg})`,
         }}
@@ -504,13 +503,12 @@ const Instructor = () => {
           </div>
         )}
         <div
-          className={`grid grid-cols-1 gap-6 justify-center ${
-            instructorList.length >= 3
+          className={`grid grid-cols-1 gap-6 justify-center ${instructorList.length >= 3
               ? "md:grid-cols-3"
               : instructorList.length === 2
-              ? "md:grid-cols-2"
-              : "md:grid-cols-1"
-          } bg`}
+                ? "md:grid-cols-2"
+                : "md:grid-cols-1"
+            } bg`}
         >
           {instructorList.map(
             (instructor, i) =>
