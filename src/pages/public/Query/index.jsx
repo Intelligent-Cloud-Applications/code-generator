@@ -130,6 +130,7 @@ export default function Query() {
                       onChange={(e) => {
                         setName(e.target.value);
                       }}
+                      required
                     />
                   </li>
                   <li
@@ -142,20 +143,22 @@ export default function Query() {
                       onChange={(e) => {
                         setEmail(e.target.value);
                       }}
+                      required
                     />
                   </li>
-                  <li
-                    className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
-                  >
-                    <label className='font-bold'>Phone Number</label>
-                    <input
-                      className={`rounded-md py-[0.4rem] px-2 max500:w-[100%] bg-[#d9d9d980]`}
-                      value={phoneNumber}
-                      onChange={(e) => {
-                        setPhoneNumber(e.target.value);
-                      }}
-                    />
-                  </li>
+                  {/*<li*/}
+                  {/*  className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}*/}
+                  {/*>*/}
+                  {/*  <label className='font-bold'>Phone Number</label>*/}
+                  {/*  <input*/}
+                  {/*    className={`rounded-md py-[0.4rem] px-2 max500:w-[100%] bg-[#d9d9d980]`}*/}
+                  {/*    value={phoneNumber}*/}
+                  {/*    onChange={(e) => {*/}
+                  {/*      setPhoneNumber(e.target.value);*/}
+                  {/*    }}*/}
+                  {/*    required*/}
+                  {/*  />*/}
+                  {/*</li>*/}
                   <li
                     className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
                   >
@@ -166,6 +169,7 @@ export default function Query() {
                       onChange={(e) => {
                         setMessage(e.target.value);
                       }}
+                      required
                     />
                   </li>
                 </ul>
