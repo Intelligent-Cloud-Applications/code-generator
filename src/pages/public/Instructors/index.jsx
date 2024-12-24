@@ -4,18 +4,19 @@ import NavBar from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import { API, Storage } from "aws-amplify";
 import Context from "../../../Context/Context";
-import { useNavigate } from "react-router-dom";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import "./Instructor.css";
 import Country from "../../../components_old/Country";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import Select from "react-select";
 import {
   Button,
   Modal,
   FileInput,
   Label,
   TextInput,
-  Select,
+  Select as FlowbiteSelect,
 } from "flowbite-react";
 import { FaUserEdit, FaPhoneAlt, FaGlobe } from "react-icons/fa";
 import {
@@ -31,13 +32,13 @@ import {
   MdPayment,
   MdOutlinePayments,
 } from "react-icons/md";
+// import { GrYoga } from "react-icons/gr";
 
 const Instructor = () => {
   const [instructorList, setInstructorList] = useState([]);
   const UserCtx = useContext(Context);
   const Loader = useContext(Context).util;
   const [loaderInitialized, setLoaderInitialized] = useState(false);
-  const { institutionData } = useContext(InstitutionContext);
   const isAdmin = UserCtx.userData.userType === "admin";
 
   const fileInputRef = useRef(null);
@@ -53,10 +54,24 @@ const Instructor = () => {
   const [instructorId, setInstructorId] = useState("");
   const [modalShow, setModalShow] = useState(false);
   const [alert, setAlert] = useState(false);
-
   const [isUpdating, setIsUpdating] = useState(false);
   const navigate = useNavigate();
+  const { institutionData } = useContext(InstitutionContext); // Access InstitutionData
+  const [selectedClassTypes, setSelectedClassTypes] = useState([]); // Track selected class types
 
+  // Prepare class type options
+  const classTypeOptions = institutionData.ClassTypes.map((classType) => ({
+    value: classType,
+    label: classType,
+  }));
+
+  const handleClassTypeChange = (selectedOptions, instructorId) => {
+    setSelectedClassTypes((prev) => ({
+      ...prev,
+      [instructorId]: selectedOptions || [], // Update class types for the specific instructor
+    }));
+  };
+  
   useEffect(() => {
     const fetchInstructorList = async () => {
       try {
@@ -91,13 +106,17 @@ const Instructor = () => {
             timestamp: Date.now(),
           })
         );
+      
         setInstructorList(sortedInstructors);
+        console.log("hello1",sortedInstructor);
+       
       } catch (error) {
         console.error("Error fetching instructors:", error);
       } finally {
         Loader.setLoader(false);
       }
     };
+    console.log("hello",selectedClassTypes)
 
     const cachedInstructorList = localStorage.getItem(
       `instructorList_${institutionData.InstitutionId}`
@@ -113,6 +132,23 @@ const Instructor = () => {
       fetchInstructorList();
     }
   }, [Loader, loaderInitialized, institutionData.InstitutionId]);
+
+  useEffect(() => {
+    if (Array.isArray(instructorList) && instructorList.length > 0) {
+      const mappedClassTypes = instructorList.reduce((acc, instructor) => {
+        acc[instructor.instructorId] = Array.isArray(instructor.classType)
+          ? instructor.classType.map((type) => ({
+              value: type,
+              label: type,
+            }))
+          : [];
+        return acc;
+      }, {});
+      setSelectedClassTypes(mappedClassTypes);
+      
+    }
+  }, [instructorList]);
+  
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -172,7 +208,7 @@ const Instructor = () => {
       return;
     }
     console.log(`+${countryCode}${phone}`);
-
+    const instructorClassTypes = selectedClassTypes[instructorId]?.map((type) => type.value) || [];
     try {
       const data = {
         institution: institutionData.InstitutionId,
@@ -188,6 +224,7 @@ const Instructor = () => {
         instructorPaymentAmount: instructorPaymentAmount
           ? instructorPaymentAmount
           : "",
+        classType:  instructorClassTypes,
       };
       const response = await API.post("main", `/admin/create-user`, {
         body: data,
@@ -220,7 +257,7 @@ const Instructor = () => {
     try {
       setLoaderInitialized(true);
       console.log(imageURL);
-
+      const instructorClassTypes = selectedClassTypes[instructorId]?.map((type) => type.value) || [];
       const response = await API.put(
         "main",
         `/admin/put-instructor/${institutionData.InstitutionId}/${instructorId}`,
@@ -233,6 +270,7 @@ const Instructor = () => {
             instructorPaymentType: instructorPaymentType,
             instructorPaymentAmount: instructorPaymentAmount,
             emailId: email,
+            classType:  instructorClassTypes,
           },
         }
       );
@@ -382,13 +420,24 @@ const Instructor = () => {
                 rightIcon={isUpdating ? MdEdit : null}
               />
             </div>
+            <div className="flex flex-col">
+              <label className="font-medium">Class Types</label>
+              <Select
+  isMulti
+  options={classTypeOptions}
+  value={selectedClassTypes[instructorId] || []}// Use the state variable directly
+  onChange={(selectedOptions) => handleClassTypeChange(selectedOptions, instructorId)}
+  placeholder="Select Class Types"
+/>
+
+            </div>
             {!isUpdating && (
               <div className="flex flex-row gap-2">
                 <div>
                   <div className="mb-2 block">
                     <Label htmlFor="text" value="Country Code" />
                   </div>
-                  <Select
+                  <FlowbiteSelect
                     color={"primary"}
                     icon={FaGlobe}
                     value={countryCode}
@@ -397,7 +446,7 @@ const Instructor = () => {
                     }}
                   >
                     <Country />
-                  </Select>
+                  </FlowbiteSelect>
                 </div>
 
                 <div>
@@ -424,7 +473,7 @@ const Instructor = () => {
                 <div className="mb-2 block">
                   <Label htmlFor="text" value="Payment Type" />
                 </div>
-                <Select
+                <FlowbiteSelect
                   color={"primary"}
                   icon={MdPayment}
                   value={instructorPaymentType}
@@ -433,7 +482,7 @@ const Instructor = () => {
                   <option value="">Select Payment Type</option>
                   <option value="percent">Percent</option>
                   <option value="flat">Flat</option>
-                </Select>
+                </FlowbiteSelect>
               </div>
               <div>
                 <div className="mb-2 block">
@@ -504,23 +553,16 @@ const Instructor = () => {
         )}
         <div
           className={`grid grid-cols-1 gap-6 justify-center ${instructorList.length >= 3
-              ? "md:grid-cols-3"
-              : instructorList.length === 2
-                ? "md:grid-cols-2"
-                : "md:grid-cols-1"
+            ? "md:grid-cols-3"
+            : instructorList.length === 2
+              ? "md:grid-cols-2"
+              : "md:grid-cols-1"
             } bg`}
         >
           {instructorList.map(
             (instructor, i) =>
               instructor.name !== "cancelled" && (
-                <div
-                  className={`inst-card relative cursor-pointer`}
-                  key={i}
-                  onClick={() =>
-                    navigate(`/hybrid/?institution=${instructor.institution}&referral=${instructor.name}
-`)
-                  }
-                >
+                <div className={`inst-card relative`} key={i}>
                   {isAdmin && (
                     <div className="absolute top-2 right-2 flex flex-row gap-1.5">
                       <div
@@ -560,12 +602,17 @@ const Instructor = () => {
 
                   <Card
                     className={`Box`}
+                    onClick={() =>
+                      navigate(`/hybrid/?institution=${instructor.institution}&referral=${instructor.name}
+`)
+                    }
                     style={{
                       backgroundImage: `url(${instructor.image})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       height: "29rem",
                       borderRadius: "10px",
+                      cursor: "pointer",
                     }}
                   >
                     <div className={`overlay`}></div>
