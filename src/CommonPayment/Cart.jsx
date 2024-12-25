@@ -285,6 +285,14 @@ const Cart = ({ institution }) => {
         console.log("Payment failed:", response.error);
         displayError("Payment failed. Please try again.");
         setIsLoading(false);
+        setIsLoading1(false);
+        setTimeout(() => {
+          handlePaymentFailure(
+            "Payment failed. Please try again.",
+            navigate
+          );
+        }
+       );
       });
       paymentObject.open();
     } catch (error) {
@@ -292,6 +300,12 @@ const Cart = ({ institution }) => {
       displayError(error.response.data.error);
       setIsLoading(false);
       setIsLoading1(false);
+      setTimeout(() => {
+        handlePaymentFailure(
+          "The discount code you entered is invalid. Please check the referral code and try again.",
+          navigate
+        );
+      }, 1500);
     }
   };
 

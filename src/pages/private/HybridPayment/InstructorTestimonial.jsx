@@ -38,11 +38,14 @@ const InstructorTestimonial = () => {
   // console.log("Referral:", referral);
   // console.log("Institution:", institution);
 
+  const getFirstWord = (str) => {
+    return str?.split(" ")[0];
+  };
+
   useEffect(() => {
     setAbout(instructor?.instructorProfile?.about || "");
   }, [instructor]);
 
-  
   useEffect(() => {
     const fetchInstructorList = async () => {
       Util.setLoader(true); // Start loading
@@ -59,52 +62,64 @@ const InstructorTestimonial = () => {
           console.log("Fetched Instructors:", response.data);
           setInstructors((prev = []) => [
             ...prev,
-  ...(response?.data || []),
-  instructor?.instructorProfile,
-]);
-
+            ...(response?.data || []),
+            instructor?.instructorProfile,
+          ]);
         } else {
           const response = JSON.parse(
             localStorage.getItem(`instructorList_${institution}`)
           );
+          console.log("Cached Instructors:", response.data);
           setInstructors((prev = []) => [
-  ...prev,
-  ...(response?.data || []),
-  instructor?.instructorProfile,
-]);
+            ...prev,
+            ...(response?.data ),
+            instructor?.instructorProfile,
+          ]);
 
-console.log("Cached Instructors:", response.data);
-}
-} catch (error) {
-  console.error("Error fetching instructors:", error);
+        }
+      } catch (error) {
+        console.error("Error fetching instructors:", error);
       } finally {
         Util.setLoader(false); // End
       }
     };
     fetchInstructorList();
-  }, [institution,instructor]);
-  
+  }, [institution, instructor]);
+
   useEffect(() => {
     const fetchInstructor = async () => {
       Util.setLoader(true); // Start loading
       try {
-        const response = await API.get(
-          "main",
-          `/instructor/profile/${institution}?referral=${referral}`
-        );
-        
+        let response = {};
+        try {
+          response = await API.get(
+            "main",
+            `/instructor/profile/${institution}?referral=${referral}`
+          );
+        } catch (error) {
+          console.error("Error fetching instructor:", error);
+          response = {};
+        }
+
+        console.log("Instructors",instructors)
         // Find additional data and merge with the response
         const additionalData = instructors?.find(
-          (e) => e.name?.toUpperCase() === response?.referralCode?.toUpperCase()
+          (e) =>
+            e?.name?.toUpperCase().startsWith(referral?.toUpperCase()) ||
+            e?.name
+              ?.toUpperCase()
+              .startsWith(response?.referralCode?.toUpperCase())
         );
+        console.log("Additional Data:", additionalData);
+
 
         // Merge data before setting the instructor state
         setInstructor({
           ...response,
-          ...(additionalData || {}),
+          ...(additionalData),
         });
         console.log("Fetched Instructor:", response);
-        
+        console.log("Set Instructor:", instructor);
         console.log("Fetched Instructors:", instructors);
         // console.log("Fetched Instructor:", instructor);
       } catch (error) {
@@ -113,18 +128,20 @@ console.log("Cached Instructors:", response.data);
         Util.setLoader(false); // End loading
       }
     };
-    
+
     fetchInstructor();
   }, [institution, cognitoId]);
   useEffect(() => {
     if (instructor?.instructorProfile?.imgUrl) {
       setImgUrl(instructor?.instructorProfile?.imgUrl);
     }
-    console.log("Instructors:", instructors);
     const currentInstructor = instructors?.find(
-      (e) => (e?.name === instructor?.instructorProfile?.userName) || (e?.name === instructor?.referralCode)
+      (e) =>
+        getFirstWord(e?.name) ===
+      getFirstWord(instructor?.instructorProfile?.userName) ||
+      getFirstWord(e?.name) === instructor?.referralCode 
     );
-    if(currentInstructor?.image){
+    if (currentInstructor?.image) {
       setImgUrl(currentInstructor?.image);
     }
     console.log("Current Instructor:", currentInstructor);
@@ -135,7 +152,9 @@ console.log("Cached Instructors:", response.data);
   }, [instructors, instructor]);
   const getInitials = (name) => {
     const names = name?.split(" ");
-    const initials = names?.map((name) => name.charAt(0).toUpperCase()).join("");
+    const initials = names
+      ?.map((name) => name.charAt(0).toUpperCase())
+      .join("");
     return initials;
   };
   const onProfileUpdate = async (about) => {
@@ -200,15 +219,12 @@ console.log("Cached Instructors:", response.data);
             <div className="relative md:w-full w-[284px]">
               <div className="border border-gray-200 absolute w-[310px] md:w-full md:h-[27rem] h-[330px] top-0 left-0 bg-neutral-50 rounded-[21.77px] shadow-[0px_85.26px_181.4px_#15151526]" />
               <RiDoubleQuotesL className="relative text-8xl text-slate-500 bottom-8 -left-4 h-12 w-16" />
-             
 
-                    <img
-                      className="absolute w-[3.188rem] h-[5.78rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-8 right-0 object-cover rounded-md"
-                      alt="Unsplash ww"
-                      src={imgUrl}
-                    />
-
-              
+              <img
+                className="absolute w-[3.188rem] h-[5.78rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-8 right-0 object-cover rounded-md"
+                alt="Unsplash ww"
+                src={imgUrl}
+              />
 
               {!imagePresent === true && (
                 <div className="absolute w-[3.188rem] h-[5.78rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-8 right-0 object-cover rounded-md bg-gray-300">
@@ -216,8 +232,8 @@ console.log("Cached Instructors:", response.data);
                     <p className="text-[3rem] font-bold text-gray-700">
                       {getInitials(
                         instructor?.instructorProfile?.userName ||
-                          instructor.referralCode ||
-                          instructor.name
+                          instructor?.referralCode ||
+                          instructor?.name
                       )}
                     </p>
                   </div>
@@ -227,7 +243,8 @@ console.log("Cached Instructors:", response.data);
               <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-14 left-4">
                 <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[29px] relative w-fit tracking-[0] leading-[normal]">
                   <p className="text-3xl font-extrabold text-gray-900 md:text-4xl">
-                    {instructor?.instructorProfile?.userName || instructor.referralCode ||
+                    {instructor?.instructorProfile?.userName ||
+                      instructor.referralCode ||
                       instructor.name}
                   </p>
 
@@ -244,7 +261,7 @@ console.log("Cached Instructors:", response.data);
                     className={`flex justify-end md:justify-center mb-6 absolute top-16 right-0 md:right-[50%] lg:right-[50%] md:top-20 lg:top-20`}
                   >
                     <button
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105"
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center h-10"
                       onClick={() => setEditing(true)}
                     >
                       <FaPencilAlt className="inline mr-2" />
@@ -285,14 +302,14 @@ console.log("Cached Instructors:", response.data);
                             instructor?.instructorProfile?.cognitoId && (
                             <div className="flex justify-start space-x-4 mt-6 absolute top-[16rem] left-[2rem] md:top-[17rem] md:left-[6rem]">
                               <button
-                                className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105"
+                                className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center"
                                 onClick={() => setEditing(false)}
                               >
                                 <FaRegWindowClose className="inline mr-2" />{" "}
                                 Cancel
                               </button>
                               <button
-                                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105"
+                                className="bg-gradient-to-r bg-lightPrimaryColor hover:bg-primaryColor text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center"
                                 onClick={() => onProfileUpdate(about)}
                               >
                                 <FaRegSave className="inline mr-2" /> Save

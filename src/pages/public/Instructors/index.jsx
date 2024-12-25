@@ -115,6 +115,10 @@ const Instructor = () => {
     }
   }, [Loader, loaderInitialized, institutionData.InstitutionId]);
 
+  const getFirstWord = (str) => {
+    return str.split(" ")[0];
+  };
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     console.log("File selected:", file);
@@ -173,6 +177,7 @@ const Instructor = () => {
       return;
     }
     console.log(`+${countryCode}${phone}`);
+    console.log(imageURL);
 
     try {
       const data = {
@@ -551,11 +556,11 @@ const Instructor = () => {
                       </div>
                     </div>
                   )}
-
+                
                   <Card
                     className={`Box`}
                     onClick={() =>
-                      navigate(`/hybrid/?institution=${instructor.institution}&referral=${instructor.name}
+                      navigate(`/hybrid/?institution=${instructor.institution}&referral=${getFirstWord(instructor.name)}
 `)
                     }
                     style={{
