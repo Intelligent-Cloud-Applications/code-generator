@@ -112,9 +112,10 @@ function CreateUser({
         const createdCognitoId = response.user.cognitoId;
 
         if (userType === "instructor") {
-          // Member to instructor API
+          // Add cognitoId to the data object
+          data.cognitoId = createdCognitoId;
           await API.put("main", "/admin/member-to-instructor", { body: data });
-        }
+      }
 
         toast.success("User Created Successfully");
       } else {
