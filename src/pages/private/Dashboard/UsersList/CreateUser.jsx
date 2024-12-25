@@ -170,7 +170,7 @@ function CreateUser({
             />
             <InputComponent
               width={100}
-              label="Email (Optional)"
+              label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />

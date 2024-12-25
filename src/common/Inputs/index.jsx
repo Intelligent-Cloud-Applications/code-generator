@@ -94,6 +94,19 @@ export const BaseTextInput = (props) => {
   );
 };
 
+export const BaseTextInputWithValue = (props) => {
+  return (
+    <TextInput
+      type="text"
+      placeholder="Enter text here..."
+      icon={LuText}
+      value={props?.value || ""}
+      required
+      {...props}
+    />
+  );
+};
+
 export const PrimaryButton = ({ children, ...props }) => {
   const { PrimaryColor } = useContext(institutionContext).institutionData;
   //  const { PrimaryColor } = useSelector((state) => state.institutionData.data);

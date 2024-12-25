@@ -1,8 +1,9 @@
 import { API, Auth, Storage } from "aws-amplify";
-import { Label, Modal, TextInput } from "flowbite-react";
+import { Label, Modal, TextInput,Tooltip } from "flowbite-react";
 import React, { useContext, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { FaArrowCircleRight } from "react-icons/fa";
 import { FaArrowLeft, FaCalendarAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { Button2 } from "../../../../common/Inputs";
@@ -12,7 +13,8 @@ import InstitutionContext from "../../../../Context/InstitutionContext";
 import EditableInput from "./EditableInput";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
-import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
+
+// import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -34,6 +36,21 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
     const initials = names.map((name) => name.charAt(0).toUpperCase()).join("");
     return initials;
   };
+
+  let domain;
+  if (process.env.NODE_ENV === "development") {
+    domain = "http://localhost:3000";
+  } else if (process.env.REACT_APP_STAGE === "DEV") {
+    domain = process.env.REACT_APP_DOMAIN_BETA;
+  } else if (process.env.REACT_APP_STAGE === "PROD") {
+    domain = process.env.REACT_APP_DOMAIN_PROD;
+  }
+
+  let referralLink;
+  if (userData.userType === "instructor") {
+    referralLink = `${domain}/hybrid/?institution=${userData.institution}&referral=${userData.referral_code}`;
+  }
+
   const formatDate = (epochDate) => {
     epochDate = Number(epochDate);
     if (!epochDate) return "";
@@ -45,8 +62,8 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
     // Format day and month with leading zeros if necessary
     const formattedDay = day < 10 ? `0${day}` : day;
     const formattedMonth = month < 10 ? `0${month}` : month;
-
-    return UserCtx?.location?.countryCode === "IN"
+    const userLocation = localStorage.getItem("userLocation") || UserCtx?.location?.countryCode;
+    return userLocation === "IN"
       ? `${formattedDay}/${formattedMonth}/${year}`
       : `${formattedMonth}/${formattedDay}/${year}`;
   };
@@ -121,7 +138,8 @@ const ifDataChanged = () => {
 
       // Get the current authenticated user
       const currentUser = await Auth.currentAuthenticatedUser();
-      const cognitoId = currentUser.attributes.sub; // Cognito User ID
+      console.log(currentUser);
+      const cognitoId = currentUser.attributes?.sub || currentUser.userName; // Cognito User ID
       console.log(cognitoId);
 
       const blob = await fetch(base64File).then((res) => res.blob());
@@ -425,6 +443,45 @@ const ifDataChanged = () => {
                     </div>
                   </div>
                 </div>
+
+                <>
+                {
+                  UserCtx.userType === "instructor" && (
+
+                  <div className="flex flex-col gap-4 justify-center bg-gray-100 p-4 rounded-lg shadow-md w-full">
+                    {referralLink && (
+                      <div className="flex flex-col gap-2">
+                        <label className="ml-2 text-sm font-semibold text-gray-700">
+                          Referral Link
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            className="bg-white px-4 py-2 rounded-lg w-full border border-gray-300 shadow-sm text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                            type="text"
+                            value={referralLink}
+                            readOnly
+                          />
+                          <Tooltip
+                            content="Go to Link"
+                            position="top"
+                            arrow={false}
+                          >
+                            <button
+                              className="bg-primaryColor text-white rounded-lg py-2 px-4 shadow-md hover:bg-lightPrimaryColor hover:shadow-lg transition-transform transform hover:scale-105"
+                              onClick={() => {
+                                window.location.href = referralLink;
+                              }}
+                            >
+                              <FaArrowCircleRight className="h-6" />
+                            </button>
+                          </Tooltip>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  )
+                }
+                </>
                 <form className={`mt-6 flex flex-col gap-8 max560:w-full`}>
                   <div
                     className={`grid grid-cols-2 gap-4 max536:grid-cols-1 max536:w-full`}
@@ -472,11 +529,11 @@ const ifDataChanged = () => {
                   </div>
                   <div className="flex flex-col gap-1 justify-center">
                     <label className="ml-2">Email</label>
-                    <EditableInput
+                    <input
                       className="bg-inputBgColor rounded-lg py-2 w-full pl-4"
                       type="email"
                       value={currentEmail}
-                      onChange={(e) => setCurrentEmail(e.target.value)}
+                      readOnly
                     />
                   </div>
                   <div className="w-full">
@@ -746,9 +803,6 @@ const ifDataChanged = () => {
         <>
           <div>
             <ReferralCode />
-          </div>
-          <div>
-            <InsrtuctorReferral />
           </div>
         </>
       )}

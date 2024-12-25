@@ -16,19 +16,25 @@ const Subscription = () => {
 
   const [bgInView, setBgInView] = useState(false);
 
-  useEffect(() => {
-    try {
-      let data = [];
-      if (UserCtx?.location?.countryCode === "IN") {
-        data = productList.filter((item) => item.currency === "INR");
-      } else {
-        data = productList.filter((item) => item.currency !== "INR");
-      }
-      setProducts(data);
-    } catch (e) {
-      throw new Error(e);
-    }
-  }, [UserCtx?.location?.countryCode, productList]);
+useEffect(() => {
+  if (UserCtx?.location?.countryCode) {
+    localStorage.setItem("userLocation", `${UserCtx.location.countryCode}`);
+  } else {
+    console.warn("UserCtx.location.countryCode is undefined");
+  }
+}, [UserCtx?.location?.countryCode]);
+
+useEffect(() => {
+  // Only update the products when country code changes and avoid including 'products' in the dependency array
+  const storedLocation = localStorage.getItem("userLocation");
+
+  if (storedLocation === "IN") {
+    setProducts(productList.filter((item) => item.currency === "INR"));
+  } else {
+    setProducts(productList.filter((item) => item.currency !== "INR"));
+  }
+}, [UserCtx?.location?.countryCode, productList]);
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -55,14 +61,12 @@ const Subscription = () => {
     };
   }, []);
 
-  // console.log("filteredProductListINR", filteredProductListINR);
-  // console.log("filteredProductListUSD", filteredProductListUSD);
-  // console.log(UserCtx.location)
-
   const domain =
-    process.env.REACT_APP_STAGE === "DEV"
-      ? process.env.REACT_APP_DOMAIN_BETA
-      : process.env.REACT_APP_DOMAIN_PROD;
+    process.env.NODE_ENV === "development" ?
+      "http://localhost:3000" :
+      process.env.REACT_APP_STAGE === "DEV"
+        ? process.env.REACT_APP_DOMAIN_BETA
+        : process.env.REACT_APP_DOMAIN_PROD;
 
   const paymentHandler = (item) => {
     if (isAuth) {
@@ -122,7 +126,7 @@ const Subscription = () => {
   return (
     <div
       id="subscription-section"
-      className={`text-[1.5rem] flex flex-col items-center justify-center gap-[5rem] `}
+      className={`text-[1.5rem] flex flex-col items-center justify-center gap-[5rem] my-8 `}
       style={{
         backgroundImage: bgInView
           ? `url(${InstitutionData.SubscriptionBg})`

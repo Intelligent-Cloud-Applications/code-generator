@@ -70,7 +70,7 @@ export default function HappyprancerInstructorMonthly() {
   }, []);
 
   const paypalData = async (postData) => {
-    return await API.put("user", `/user/payment-update/happyprancer`, {
+    return await API.put("main", `/user/payment-update/happyprancer`, {
       body: postData,
     });
   };

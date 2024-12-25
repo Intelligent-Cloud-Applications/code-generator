@@ -28,7 +28,7 @@ const RazorpayPayment = ({ productId }) => {
     let response;
     try {
       response = await API.put(
-        "user",
+        "main",
         `/user/billing/regular/${InstitutionData.InstitutionId}`,
         {
           body: {
@@ -65,14 +65,14 @@ const RazorpayPayment = ({ productId }) => {
                 razorpaySignature: response.razorpay_signature,
               };
               const res = await API.put(
-                "user",
+                "main",
                 `/user/billing/regular/verify/${InstitutionData.InstitutionId}`,
                 {
                   body: resBody,
                 }
               );
               const tempUserdata = await API.get(
-                "user",
+                "main",
                 `/user/profile/${InstitutionData.InstitutionId}`
               );
               Ctx.setUserData(tempUserdata);
@@ -107,7 +107,7 @@ const RazorpayPayment = ({ productId }) => {
       const rzp1 = new window.Razorpay(options);
       rzp1.on("payment.failed", function (response) {
         // alert(response.error.code);
-        // alert(response.error.description);
+        alert(response.error.description);
         // alert(response.error.source);
         // alert(response.error.step);
         // alert(response.error.reason);
@@ -129,9 +129,11 @@ const RazorpayPayment = ({ productId }) => {
   // };
 
   const domain =
-    process.env.REACT_APP_STAGE === "DEV"
-      ? process.env.REACT_APP_DOMAIN_BETA
-      : process.env.REACT_APP_DOMAIN_PROD;
+    process.env.NODE_ENV === "development" ?
+      "http://localhost:3000" :
+      process.env.REACT_APP_STAGE === "DEV"
+        ? process.env.REACT_APP_DOMAIN_BETA
+        : process.env.REACT_APP_DOMAIN_PROD;
 
   return (
     <div className="z-1">
