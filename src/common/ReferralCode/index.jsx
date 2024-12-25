@@ -18,7 +18,9 @@ function ReferralCode() {
   const [members, setMembers] = useState(0);
   let domain;
 
-  if (process.env.REACT_APP_STAGE === "DEV") {
+  if (process.env.NODE_ENV === "development") {
+    domain = "http://localhost:3000";
+  } else if (process.env.REACT_APP_STAGE === "DEV") {
     domain = process.env.REACT_APP_DOMAIN_BETA;
   } else if (process.env.REACT_APP_STAGE === "PROD") {
     domain = process.env.REACT_APP_DOMAIN_PROD;

@@ -62,9 +62,11 @@ useEffect(() => {
   }, []);
 
   const domain =
-    process.env.REACT_APP_STAGE === "DEV"
-      ? process.env.REACT_APP_DOMAIN_BETA
-      : process.env.REACT_APP_DOMAIN_PROD;
+    process.env.NODE_ENV === "development" ?
+      "http://localhost:3000" :
+      process.env.REACT_APP_STAGE === "DEV"
+        ? process.env.REACT_APP_DOMAIN_BETA
+        : process.env.REACT_APP_DOMAIN_PROD;
 
   const paymentHandler = (item) => {
     if (isAuth) {
@@ -124,7 +126,7 @@ useEffect(() => {
   return (
     <div
       id="subscription-section"
-      className={`text-[1.5rem] flex flex-col items-center justify-center gap-[5rem] `}
+      className={`text-[1.5rem] flex flex-col items-center justify-center gap-[5rem] my-8 `}
       style={{
         backgroundImage: bgInView
           ? `url(${InstitutionData.SubscriptionBg})`
