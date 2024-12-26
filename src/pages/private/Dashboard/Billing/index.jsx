@@ -9,8 +9,8 @@ import { institution } from "../../../../utils/constants";
 
 const Billing = () => {
   // const {PrimaryColor} = useContext(institutionContext).institutionData;
-  const {userData, productList, util} = useContext(Context);
-  // const [renewDate, setRenewDate] = useState('');
+  const {userData, util} = useContext(Context);
+  const [renewDate, setRenewDate] = useState(userData.renewDate);
   const [amount, setAmount] = useState('$0');
   const [orderHistory, setOrderHistory] = useState([]);
 
@@ -23,9 +23,10 @@ const Billing = () => {
           `/getReciept/${institution}/${userData.cognitoId}`,
           {}
         );
+        console.log("Response:", response)
         const data = response.payments
           .map((object, index) => [
-            (new Date(object.paymentDate)).toDateString(),
+            (new Date(object.paymentDate)).toLocaleDateString(),
             response.profile.products[index].S,
             // 'hello',
             object.paymentMode,
@@ -34,6 +35,7 @@ const Billing = () => {
           // .flatMap(item => Array(6).fill(item));
         setOrderHistory(data);
         setAmount(data.slice(-1)[0][3]);
+        setRenewDate(response.payments[0].renewDate)
       } catch (error) {
         console.error('Error fetching payment history:', error);
       } finally {
@@ -48,12 +50,12 @@ const Billing = () => {
     <div className='mx-8 p-8 bg-gray-100 font-family'>
       <h2 className='text-2xl font-bold'>Membership Details</h2>
       <div className='bg-white my-4 p-4'>
-        <p className='bg-light-primary text-white font-bold w-fit -ml-6 my-2 py-2 px-4 rounded-r-full'>Member since {(new Date(userData.joiningDate).toDateString())}</p>
-        <p className='text-xl font-bold'>{userData.products.slice(-1)[0].S}</p>
+        <p className='bg-primaryColor text-white font-bold w-fit -ml-6 my-2 py-2 px-4 rounded-r-full'>Member since {(new Date(userData.joiningDate).toDateString())}</p>
+        <p className='text-xl font-bold'>{userData.products?.slice(-1)[0].S}</p>
         <p className='text-lg'>{amount}</p>
         <br />
         <p className='text-xl font-bold'>Next billing date</p>
-        <p>{(new Date(userData.renewDate)).toDateString()}</p>
+        <p>{(new Date(renewDate)).toLocaleDateString()}</p>
       </div>
 
       <h2 className='text-2xl font-bold mt-16'>Billing History</h2>

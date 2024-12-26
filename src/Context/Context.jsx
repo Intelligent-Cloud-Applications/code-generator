@@ -23,12 +23,19 @@ const Context = createContext({
   setProductList: () => {},
   instructorList: [],
   setInstructorList: () => {},
-  reloadClasses: () => {},
+  reloadClasses: () => { },
+  getUserList:()=>{ },
   checkSubscriptionStatus: () => {},
   Streak: [],
   setStreakData: () => {},
   ratings: [],
-  setRatings: () => {}
+  setRatings: () => {},
+  revenue: [],
+  getCartItems: () => { },
+  getPaymentHistory:() => { },
+  removeCartItem: () => { },
+  addCartItem: () => { },
+  paymentHistory: [],
 })
 
 export default Context

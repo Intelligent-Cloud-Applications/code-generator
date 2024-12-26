@@ -1,43 +1,50 @@
-import {BaseTextInput, CountrySelect, EmailInput, PhoneInput, PrimaryButton} from "../../../common/Inputs";
-import {useState} from "react";
-import {Link} from "react-router-dom";
+import {
+  BaseTextInput,
+  CountrySelect,
+  EmailInput,
+  PasswordInput,
+  PhoneInput,
+  PrimaryButton,
+  BaseTextInputWithValue
+} from "../../../common/Inputs";
+import { useEffect,useState } from "react";
+import { useLocation } from "react-router-dom";
 
-const SignupForm = () => {
-  const [errorText, setErrorText] = useState('')
+const SignupForm = ({ handler }) => {
+  const [referral_code, setReferralCode] = useState('');
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const referral = params?.get('referral');
+    if (referral) {
+      setReferralCode(referral);
+    }
+  }, [location.search]);
+
+
+  
   return (
     <form
-      className='grid grid-cols-2 items-center gap-x-4 gap-y-8'
+      onSubmit={handler}
+      className={
+        `flex flex-col items-center gap-6
+        w-full`
+      }
     >
-      <BaseTextInput
-        placeholder='First Name'
-        name='firstName'
-        className='rounded w-full'
-      />
-      <BaseTextInput
-        placeholder='Last Name'
-        name='lastName'
-        className='rounded w-full'
-      />
-      <EmailInput
-          name='email'
-          className='rounded w-full col-span-2'
-      />
-      <CountrySelect
-          name='country'
-          className='rounded w-full col-span-2'
-      />
-      <PhoneInput
-          name='phone'
-          className='rounded w-full col-span-2'
-      />
-      <PrimaryButton className='col-span-2 m-auto'>Send OTP</PrimaryButton>
-      <p className='text-red-400 col-span-2'>{errorText}</p>
-      <p className='col-span-2 text-center'>
-        *By creating an account you agree to our
-        <Link to='/signup'> Terms of use</Link> as well as
-        <Link to='/signup'> Privacy Policy</Link>
-      </p>
-      <p className='col-span-2 text-center'>Already have an account? <Link to='/signup'>Login</Link></p>
+      <BaseTextInput name='name' className='rounded w-full' placeholder='Name'/>
+      <EmailInput name='email' className='rounded w-full'/>
+      <CountrySelect name='country' className='rounded w-full'/>
+      <PhoneInput name='phone' className='rounded w-full'/>
+      <PasswordInput name='password' className='rounded w-full'/>
+      <PasswordInput name='password_confirmation' className='rounded w-full' placeholder='Confirm Password'/>
+      {
+        referral_code ? (
+          <BaseTextInputWithValue name='referral' className='rounded w-full' value={referral_code} required={false}/>
+        ):
+      <BaseTextInput name='referral' className='rounded w-full' placeholder='Referral Code (optional)'
+        required={false}/>
+      }
+      <PrimaryButton>Continue</PrimaryButton>
     </form>
   )
 }

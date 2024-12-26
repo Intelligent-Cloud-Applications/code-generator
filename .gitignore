@@ -131,3 +131,9 @@ dist
 
 # For jetbrains ides
 .idea/
+
+# For bun running
+*.lockb
+
+# Removes todo file
+TODO

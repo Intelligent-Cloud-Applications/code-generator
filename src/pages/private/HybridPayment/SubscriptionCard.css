@@ -1,0 +1,32 @@
+/* Defining color variable */
+:root {
+    --primary-color: #1b7571;
+}
+
+.card-color {
+    border-radius: 0.5rem;
+    background: linear-gradient(334deg, #2A5A58 7.56%, #225C59 49.52%, #84FFFF 130.63%);
+}
+
+.hybrid-heading {
+    font-family: "Josefin Sans", sans-serif;
+}
+
+/* custom.css */
+.custom-button {
+    background-color: black;
+    transition: background-color 0.3s;
+}
+
+.custom-button:hover {
+    background-color: var(--primary-color);
+}
+
+.bg-blur {
+    width: 63.28256rem;
+    height: 68.75rem;
+    transform: rotate(-21.328deg);
+    flex-shrink: 0;
+    fill: conic-gradient(from 126deg at 50.62% 50%, rgba(255, 255, 255, 0.00) 52.55991339683533deg, #225C59 182.5038743019104deg, rgba(255, 255, 255, 0.53) 360deg);
+    filter: blur(96px);
+}

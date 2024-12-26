@@ -251,6 +251,7 @@ const UserProfile = ({
                     className={` bg-inputBgColor px-4 py-2 rounded-lg`}
                     type="email"
                     value={email}
+                    readOnly
                     onChange={(e) => {
                       setEmail(e.target.value);
                     }}

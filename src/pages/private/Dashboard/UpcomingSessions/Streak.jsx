@@ -2,15 +2,24 @@ import React, { useState, useEffect, useContext } from 'react'
 import { fetchStreakCount } from './StreakFunctions'
 import './Streak.css'
 import InstitutionContext from '../../../../Context/InstitutionContext'
+import {API} from "aws-amplify";
 
 const Streak = () => {
-  const [streakData, setStreakData] = useState({ streakCount: 0, level: 0 })
+  const [streakData, setStreakData] = useState({ streakCount: 0, level: 0, attendance: 0 })
   const InstitutionData = useContext(InstitutionContext).institutionData
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchStreakCount(InstitutionData.InstitutionId)
+        let data = await fetchStreakCount(InstitutionData.InstitutionId);
+        console.log('STREAK DATA', data);
+        const attendance = await API.get(
+          'main',
+          `/user/list-attendance/${InstitutionData.InstitutionId}`,
+          {}
+        );
+        data.attendance = attendance.Count;
+        console.log('STREAK DATA', data);
         setStreakData(data)
       } catch (error) {
         console.error(error)
@@ -18,7 +27,7 @@ const Streak = () => {
     }
 
     fetchData()
-  }, [InstitutionData.InstitutionId])
+  }, [])
 
   return (
     <div
@@ -32,6 +41,10 @@ const Streak = () => {
         <p className="mov">
           Increase your potential and your level with your streak
         </p>
+      </div>
+      <div className="flex flex-col text-[17px] text-center lev">
+        ATTENDANCE
+        <p className="text-[35px] stk">{streakData.attendance}</p>
       </div>
       <div className="flex flex-col text-[17px] text-center lev">
         LEVEL
