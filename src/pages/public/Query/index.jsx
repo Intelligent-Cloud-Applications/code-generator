@@ -134,8 +134,8 @@ export default function Query() {
                       id="name"
                       name="name"
                       type="text"
-                      pattern="[A-Za-z]+"
-                      title="Name can only have characters"
+                      pattern="[A-Za-z ]+"
+                      title="Name can only have characters and spaces"
                       className={`rounded-md py-[0.4rem] px-2 max500:w-[100%] bg-[#d9d9d980]`}
                       // value={name}
                       // onChange={(e) => {

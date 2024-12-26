@@ -13,6 +13,7 @@ const groupScheduleByDay = (scheduleData) => {
     weekday: "long",
   });
 
+  // Group classes by day of the week
   scheduleData.forEach((classInfo) => {
     const date = new Date(classInfo.startTime);
     const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" });
@@ -28,21 +29,28 @@ const groupScheduleByDay = (scheduleData) => {
     groupedSchedule[dayOfWeek].push({ ...classInfo, startTime });
   });
 
-  // Sort the keys so that today appears first
-  const sortedDays = Object.keys(groupedSchedule).sort((a, b) => {
-    if (a === currentDay) return -1;
-    if (b === currentDay) return 1;
-    return 0;
-  });
+  // Define the order of days starting from Monday
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
-  // Create a new object with sorted keys
+  // Sort the days so that the order starts from Monday
   const sortedSchedule = {};
-  sortedDays.forEach((day) => {
-    sortedSchedule[day] = groupedSchedule[day];
+  daysOfWeek.forEach((day) => {
+    if (groupedSchedule[day]) {
+      sortedSchedule[day] = groupedSchedule[day];
+    }
   });
 
   return sortedSchedule;
 };
+
 
 const Schedule = () => {
   const [schedule, setSchedule] = useState({});

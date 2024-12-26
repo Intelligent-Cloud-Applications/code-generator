@@ -52,7 +52,33 @@ function App() {
       UtilCtx.current.setLoader(true);
 
       try {
-        await Auth.currentAuthenticatedUser();
+        const cognito = await Auth.currentAuthenticatedUser();
+        // console.log(cognito);
+        //
+        // const response = await API.post(
+        //   "main",
+        //   `/any/user-exists/${data.InstitutionId}`,
+        //   {
+        //     body: {
+        //       userPoolId: cognito.pool.userPoolId,
+        //       username: cognito.attributes.email,
+        //     }
+        //   }
+        // );
+        //
+        // if (!response.inInstitution) {
+        //   await API.post(
+        //     'main',
+        //     `/user/profile/${data.InstitutionId}`,
+        //     {
+        //       body: {
+        //         userName: cognito.attributes.name,
+        //         emailId: cognito.attributes.email,
+        //       },
+        //     }
+        //   );
+        // }
+
         const userdata = await API.get(
           "main",
           `/user/profile/${data && data.InstitutionId}`

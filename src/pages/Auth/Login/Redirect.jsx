@@ -14,7 +14,31 @@ const Redirect = () => {
     const redirect = async () => {
       util.setLoader(true);
       try {
-        await Auth.currentAuthenticatedUser();
+        const cognito = await Auth.currentAuthenticatedUser();
+
+        // const response = await API.post(
+        //   "main",
+        //   `/any/user-exists/${InstitutionId}`,
+        //   {
+        //     body: {
+        //       userPoolId: cognito.pool.userPoolId,
+        //       username: cognito.attributes.email,
+        //     }
+        //   }
+        // );
+        //
+        // if (!response.inInstitution) {
+        //   await API.post(
+        //     'main',
+        //     `/user/profile/${InstitutionId}`,
+        //     {
+        //       body: {
+        //         userName: cognito.attributes.name,
+        //         emailId: cognito.attributes.email,
+        //       },
+        //     }
+        //   );
+        // }
 
         const userdata = await API.get(
           'main',

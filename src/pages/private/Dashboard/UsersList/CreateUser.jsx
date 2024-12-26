@@ -40,6 +40,8 @@ function CreateUser({
   const { getUserList } = useContext(Context);
   const UtilCtx = useContext(Context).util;
   const [selectedClassTypes, setSelectedClassTypes] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState({});
+  const [paymentDate, setPaymentDate] = useState("");
 
   const classTypeOptions = InstitutionData.ClassTypes.map((classType) => ({
     value: classType,
@@ -79,6 +81,7 @@ function CreateUser({
     );
     setProductType(e.target.value);
     setSelectedProductAmount(selectedProduct ? selectedProduct.amount : "");
+    setSelectedProduct(selectedProduct);
   };
 
   console.log(countryCode);
@@ -103,6 +106,7 @@ function CreateUser({
       instructorPaymentAmount: userType === "instructor" ? instructorPaymentAmount : "",
       trialPeriod: status === "Trial" ? trialPeriod : "",
       classType: userType === "instructor" ? selectedClassTypes.map((type) => type.value) : [], // Add classType for instructor
+      product: selectedProduct.heading
     };
 
     try {
@@ -115,12 +119,41 @@ function CreateUser({
           // Add cognitoId to the data object
           data.cognitoId = createdCognitoId;
           await API.put("main", "/admin/member-to-instructor", { body: data });
+          window.localStorage.removeItem(
+            `instructorList_${InstitutionData.InstitutionId}`
+          );
       }
 
         toast.success("User Created Successfully");
       } else {
         // Updating an existing user
         await API.put("main", `/admin/update-user/${InstitutionData.InstitutionId}`, { body: data });
+        if (userType === "instructor") {
+          await API.put("main", "/admin/member-to-instructor", { body: data });
+          window.localStorage.removeItem(
+            `instructorList_${InstitutionData.InstitutionId}`
+          );
+        }
+        if (status === 'Active') {
+          const pdate = new Date(paymentDate).getTime();
+          await API.post('main', `/admin/user-payment-update/${InstitutionData.InstitutionId}`, {
+            body: {
+              cognitoId,
+              status,
+              institution: InstitutionData.InstitutionId,
+              productType,
+              amount: selectedProductAmount,
+              // paymentStatus: pstatus,
+              paymentDate: pdate,
+              emailId: email,
+              currency: selectedProduct.currency,
+              productId: selectedProduct.productId,
+              planId: selectedProduct.planId,
+              subscriptionType: selectedProduct.subscriptionType,
+            }
+          });
+        }
+
         toast.success("User Updated Successfully");
       }
 
@@ -280,7 +313,7 @@ function CreateUser({
             <div className="flex gap-2 justify-center items-center">
               <div className="flex w-full flex-col">
                 <label className="font-[500] ml-1">Payment Date</label>
-                <input type="date" className="py-[0.7rem] rounded" />
+                <input value={paymentDate} onChange={(event) => setPaymentDate(event.target.value)} type="date" className="py-[0.7rem] rounded" />
               </div>
               <div className="flex flex-col w-full">
                 <label className="font-[500] ml-1">Payment Status</label>
