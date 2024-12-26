@@ -103,8 +103,10 @@ const InstructorTestimonial = () => {
 
         console.log("Instructors",instructors)
         // Find additional data and merge with the response
+        console.log("Referral:", referral);
         const additionalData = instructors?.find(
           (e) =>
+             e?.referral_code === referral ||
             e?.name?.toUpperCase().startsWith(referral?.toUpperCase()) ||
             e?.name
               ?.toUpperCase()
@@ -120,8 +122,6 @@ const InstructorTestimonial = () => {
         });
         console.log("Fetched Instructor:", response);
         console.log("Set Instructor:", instructor);
-        console.log("Fetched Instructors:", instructors);
-        // console.log("Fetched Instructor:", instructor);
       } catch (error) {
         console.error("Error fetching instructor:", error);
       } finally {
@@ -132,11 +132,12 @@ const InstructorTestimonial = () => {
     fetchInstructor();
   }, [institution, cognitoId]);
   useEffect(() => {
-    if (instructor?.instructorProfile?.imgUrl) {
-      setImgUrl(instructor?.instructorProfile?.imgUrl);
+    if (instructor?.instructorProfile?.imgUrl || instructor?.image) {
+      setImgUrl(instructor?.instructorProfile?.imgUrl || instructor?.image);
     }
     const currentInstructor = instructors?.find(
       (e) =>
+        e?.referral_code === referral ||
         getFirstWord(e?.name) ===
       getFirstWord(instructor?.instructorProfile?.userName) ||
       getFirstWord(e?.name) === instructor?.referralCode 
