@@ -40,7 +40,7 @@ const Hero = () => {
 
   const initiateMultipartUpload = async (file) => {
     try {
-      const response = await API.post("main", "/admin/upload-hero-videos/happyprancer", {
+      const response = await API.post("main", `/admin/upload-hero-videos/${InstitutionData.InstitutionId}`, {
         body: {
           operation: "INITIATE_VIDEO_UPLOAD",
           fileName: file.name,
@@ -56,7 +56,7 @@ const Hero = () => {
 
   const getUploadUrl = async (uploadId, partNumber, key) => {
     try {
-      const response = await API.post("main", "/admin/upload-hero-videos/Bworkz", {
+      const response = await API.post("main", `/admin/upload-hero-videos/${InstitutionData.InstitutionId}`, {
         body: {
           operation: "GET_VIDEO_UPLOAD_URL",
           uploadId,
@@ -91,7 +91,7 @@ const Hero = () => {
 
   const completeMultipartUpload = async (uploadId, key, parts) => {
     try {
-      const response = await API.post("main", "/admin/upload-hero-videos/Bworkz", {
+      const response = await API.post("main", `/admin/upload-hero-videos/${InstitutionData.InstitutionId}`, {
         body: {
           operation: "COMPLETE_VIDEO_UPLOAD",
           uploadId,
