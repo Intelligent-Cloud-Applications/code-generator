@@ -26,6 +26,9 @@ const displayError = (errorCode) => {
   } else if (errorCode.includes("Payment failed. Please try again.")) {
     errorMessage =
       "We are facing some trouble completing your request at the moment. Please try again shortly.";
+  } else if (errorCode.includes("Discount code not found for institutionId: happyprancer, discountCode: rtiger")) {
+    errorMessage =
+      "The discount code you entered is invalid. Please check the code and try again.";
   }
   toast.error(errorMessage, {
     position: "top-right",
