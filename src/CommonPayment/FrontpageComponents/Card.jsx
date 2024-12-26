@@ -66,7 +66,7 @@ function Card({ product, setActiveComponent, userType, setIsEditPopupOpen, handl
               </li>
             ))
           ) : (
-            product.provides ? (
+            Array.isArray(product.provides) ? (
               product.provides.map((item, index) => (
                 <li key={index} className='flex items-start'>
                   <img className='mt-[8px]' src={tick} alt="" />

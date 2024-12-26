@@ -609,7 +609,7 @@ const Instructor = () => {
                   <Card
                     className={`Box`}
                     onClick={() =>
-                      navigate(`/hybrid/?institution=${instructor.institution}&referral=${getFirstWord(instructor.name)}
+                      navigate(`/hybrid/?institution=${instructor.institution}&referral=${instructor.referral_code || getFirstWord(instructor.name)}
                         `)
                     }
                     style={{

@@ -111,6 +111,28 @@
   color: #fff;
 }
 
+.free-demo:hover{
+  background: linear-gradient(180deg, #3c6b68 0%, #2a4746 100%);
+  box-shadow: 0px 2.4px 8px 0px rgba(0, 47, 96, 0.3),
+    var(--_layerPosition-layer5-layerX, 0px)
+      var(--_layerPosition-layer5-layerY, 0px) 52px 0px rgba(71, 126, 185, 0.2),
+    var(--_layerPosition-layer4-layerX, 0px)
+      var(--_layerPosition-layer4-layerY, 0px) 40px 0px rgba(0, 81, 167, 0.2),
+    var(--_layerPosition-layer3-layerX, 0px)
+      var(--_layerPosition-layer3-layerY, 0px) 28px 0px rgba(0, 81, 167, 0.2),
+    var(--_layerPosition-layer2-layerX, 0px)
+      var(--_layerPosition-layer2-layerY, 0px) 16px 0px rgba(0, 81, 167, 0.2),
+    var(--_layerPosition-layer1-layerX, 0px)
+      var(--_layerPosition-layer1-layerY, 0px) 9.6px 0px rgba(0, 81, 167, 0.15),
+    var(--_layerPosition-layer2-layerX, 0px)
+      var(--_layerPosition-layer2-layerY, 0px) 16px 0px rgba(255, 255, 255, 0.2)
+      inset,
+    var(--_layerPosition-layer1-layerX, 0px)
+      var(--_layerPosition-layer1-layerY, 0px) 6.4px 0px
+      rgba(255, 255, 255, 0.25) inset,
+    0px -3.2px 0.8px 0.8px rgba(0, 0, 0, 0.5) inset;
+}
+
 .free-demo:active {
   background: linear-gradient(180deg, #225c59 0%, #224341 100%);
   box-shadow: 0px 2.4px 8px 0px rgba(0, 47, 96, 0.3),
