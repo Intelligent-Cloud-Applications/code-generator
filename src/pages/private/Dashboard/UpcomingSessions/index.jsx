@@ -419,8 +419,13 @@ const UpcomingSessions = () => {
     setEmailIds("");
     checkboxes.forEach((checkbox) => {
       checkbox.closest(".grid").classList.remove(blurClass);
+      checkbox.disabled = false;
     });
   };
+
+  useEffect(() => {
+    handleCheckboxUnclick("", "");
+  }, [currentPageAttendance]);
 
   const adminPutAttendance = async () => {
     try {
