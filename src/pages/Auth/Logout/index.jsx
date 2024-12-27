@@ -14,7 +14,8 @@ const Logout = () => {
 
       try {
         await Auth.signOut();
-        await fetch(`https://${domain}/logout?client_id=${client_id}&&redirect_uri=${redirect}&&response_type=code`, {
+        // await fetch(`https://${domain}/logout?client_id=${client_id}&&redirect_uri=${redirect}&&response_type=code`, {
+        await fetch(`https://${domain}/logout?client_id=${client_id}&&logout_uri=${redirect}`, {
           redirect: 'follow',
           mode: 'no-cors',
         });
