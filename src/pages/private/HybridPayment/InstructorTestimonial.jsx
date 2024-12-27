@@ -12,16 +12,17 @@ import AboutInstructor from "./AboutInstructor";
 const InstructorTestimonial = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const Ctx = useContext(Context);
-  const Util = useContext(Context).util;
   const { isAuth, userData: UserCtx } = useContext(Context);
+  const { institutionData } = useContext(InstitutionContext);
   const [instructors, setInstructors] = useState([]);
   const [instructor, setInstructor] = useState({});
+  const [currentInstructor, setCurrentInstructor] = useState({});
   const [editing, setEditing] = useState(false);
   const [about, setAbout] = useState("");
   const [imagePresent, setImagePresent] = useState(false);
   const [imgUrl, setImgUrl] = useState("");
-  const { institutionData } = useContext(InstitutionContext);
   const Navigate = useNavigate();
+  const Util = Ctx.util;
 
   const location = useLocation();
   // console.log(Util);
@@ -106,12 +107,13 @@ const InstructorTestimonial = () => {
         console.log("Referral:", referral);
         const additionalData = instructors?.find(
           (e) =>
-             e?.referral_code === referral ||
+            e?.referral_code === referral ||
             e?.name?.toUpperCase().startsWith(referral?.toUpperCase()) ||
             e?.name
               ?.toUpperCase()
               .startsWith(response?.referralCode?.toUpperCase())
         );
+
         console.log("Additional Data:", additionalData);
 
 
@@ -119,6 +121,7 @@ const InstructorTestimonial = () => {
         setInstructor({
           ...response,
           ...(additionalData),
+          ...currentInstructor,
         });
         console.log("Fetched Instructor:", response);
         console.log("Set Instructor:", instructor);
@@ -130,7 +133,7 @@ const InstructorTestimonial = () => {
     };
 
     fetchInstructor();
-  }, [institution, cognitoId]);
+  }, [institution, cognitoId,currentInstructor]);
   useEffect(() => {
     if (instructor?.instructorProfile?.imgUrl || instructor?.image) {
       setImgUrl(instructor?.instructorProfile?.imgUrl || instructor?.image);
@@ -142,10 +145,14 @@ const InstructorTestimonial = () => {
       getFirstWord(instructor?.instructorProfile?.userName) ||
       getFirstWord(e?.name) === instructor?.referralCode 
     );
+    if (currentInstructor) {
+      setCurrentInstructor(currentInstructor);
+    }
     if (currentInstructor?.image) {
       setImgUrl(currentInstructor?.image);
     }
     console.log("Current Instructor:", currentInstructor);
+
     if (!currentInstructor?.image || !instructor?.instructorProfile?.imgUrl) {
       setImagePresent(false);
     }
@@ -244,9 +251,10 @@ const InstructorTestimonial = () => {
               <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-14 left-4">
                 <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[29px] relative w-fit tracking-[0] leading-[normal]">
                   <p className="text-3xl font-extrabold text-gray-900 md:text-4xl">
-                    {instructor?.instructorProfile?.userName ||
-                      instructor.referralCode ||
-                      instructor.name}
+                    {console.log(instructor)}
+                    {instructor?.name||instructor?.instructorProfile?.userName ||
+                      instructor?.referralCode
+                      }
                   </p>
 
                   <p className="text-lg font-medium text-gray-500 md:text-xl">
@@ -328,7 +336,7 @@ const InstructorTestimonial = () => {
 
         <div className="my-4"></div>
         <button className="free-demo" onClick={handleFreeTrial}>
-          Register for free trials
+          <span>Register for free trials</span>
         </button>
 
         <></>

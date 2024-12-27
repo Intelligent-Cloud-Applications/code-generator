@@ -82,76 +82,69 @@
 }
 
 .free-demo {
+  position: relative;
+  overflow: hidden;
   border-radius: 1.8rem;
-  border: 0.8px solid rgba(0, 0, 0, 0.03);
+  border: none;
   background: linear-gradient(180deg, #224341 0%, #225c59 100%);
-  box-shadow: 0px 2.4px 8px 0px rgba(0, 47, 96, 0.3),
-    var(--_layerPosition-layer5-layerX, 0px)
-      var(--_layerPosition-layer5-layerY, 0px) 52px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer4-layerX, 0px)
-      var(--_layerPosition-layer4-layerY, 0px) 40px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer3-layerX, 0px)
-      var(--_layerPosition-layer3-layerY, 0px) 28px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer2-layerX, 0px)
-      var(--_layerPosition-layer2-layerY, 0px) 16px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer1-layerX, 0px)
-      var(--_layerPosition-layer1-layerY, 0px) 9.6px 0px rgba(0, 81, 167, 0.15),
-    var(--_layerPosition-layer2-layerX, 0px)
-      var(--_layerPosition-layer2-layerY, 0px) 16px 0px rgba(255, 255, 255, 0.2)
-      inset,
-    var(--_layerPosition-layer1-layerX, 0px)
-      var(--_layerPosition-layer1-layerY, 0px) 6.4px 0px
-      rgba(255, 255, 255, 0.25) inset,
-    0px -3.2px 0.8px 0.8px rgba(0, 0, 0, 0.5) inset;
-  display: flex;
-  padding: 1.4rem 2.4rem 1.6rem 2.4rem;
+  display: inline-flex;
+  padding: 1.4rem 2.4rem;
   justify-content: center;
   align-items: center;
-  gap: 0.4rem;
   color: #fff;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: rgba(9, 87, 231, 0.16) 0px 10px 36px 0px, rgba(5, 178, 209, 0.06) 0px 0px 0px 1px;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
-.free-demo:hover{
-  background: linear-gradient(180deg, #3c6b68 0%, #2a4746 100%);
-  box-shadow: 0px 2.4px 8px 0px rgba(0, 47, 96, 0.3),
-    var(--_layerPosition-layer5-layerX, 0px)
-      var(--_layerPosition-layer5-layerY, 0px) 52px 0px rgba(71, 126, 185, 0.2),
-    var(--_layerPosition-layer4-layerX, 0px)
-      var(--_layerPosition-layer4-layerY, 0px) 40px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer3-layerX, 0px)
-      var(--_layerPosition-layer3-layerY, 0px) 28px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer2-layerX, 0px)
-      var(--_layerPosition-layer2-layerY, 0px) 16px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer1-layerX, 0px)
-      var(--_layerPosition-layer1-layerY, 0px) 9.6px 0px rgba(0, 81, 167, 0.15),
-    var(--_layerPosition-layer2-layerX, 0px)
-      var(--_layerPosition-layer2-layerY, 0px) 16px 0px rgba(255, 255, 255, 0.2)
-      inset,
-    var(--_layerPosition-layer1-layerX, 0px)
-      var(--_layerPosition-layer1-layerY, 0px) 6.4px 0px
-      rgba(255, 255, 255, 0.25) inset,
-    0px -3.2px 0.8px 0.8px rgba(0, 0, 0, 0.5) inset;
+.free-demo:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.free-demo::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  background: radial-gradient(circle, rgba(0, 255, 198, 0.3), transparent);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: rotate(45deg);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.free-demo:hover::before {
+  left: -170%;
+  top: -170%;
+}
+
+.free-demo::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2));
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.free-demo:hover::after {
+  opacity: 1;
+}
+
+.free-demo span {
+  position: relative;
+  z-index: 2;
 }
 
 .free-demo:active {
-  background: linear-gradient(180deg, #225c59 0%, #224341 100%);
-  box-shadow: 0px 2.4px 8px 0px rgba(0, 47, 96, 0.3),
-    var(--_layerPosition-layer5-layerX, 0px)
-      var(--_layerPosition-layer5-layerY, 0px) 52px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer4-layerX, 0px)
-      var(--_layerPosition-layer4-layerY, 0px) 40px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer3-layerX, 0px)
-      var(--_layerPosition-layer3-layerY, 0px) 28px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer2-layerX, 0px)
-      var(--_layerPosition-layer2-layerY, 0px) 16px 0px rgba(0, 81, 167, 0.2),
-    var(--_layerPosition-layer1-layerX, 0px)
-      var(--_layerPosition-layer1-layerY, 0px) 9.6px 0px rgba(0, 81, 167, 0.15),
-    var(--_layerPosition-layer2-layerX, 0px)
-      var(--_layerPosition-layer2-layerY, 0px) 16px 0px rgba(255, 255, 255, 0.2)
-      inset,
-    var(--_layerPosition-layer1-layerX, 0px)
-      var(--_layerPosition-layer1-layerY, 0px) 6.4px 0px
-      rgba(255, 255, 255, 0.25) inset,
-    0px -3.2px 0.8px 0.8px rgba(0, 0, 0, 0.5) inset;
-  transition: all 0.3s ease-in 0s;
+  transform: translateY(2px);
+
 }
