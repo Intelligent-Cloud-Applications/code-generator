@@ -55,6 +55,7 @@ const Instructor = () => {
   const [modalShow, setModalShow] = useState(false);
   const [alert, setAlert] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+
   const navigate = useNavigate();
   const { institutionData } = useContext(InstitutionContext); // Access InstitutionData
   const [selectedClassTypes, setSelectedClassTypes] = useState([]); // Track selected class types
@@ -133,6 +134,10 @@ const Instructor = () => {
     }
   }, [Loader, loaderInitialized, institutionData.InstitutionId]);
 
+  const getFirstWord = (str) => {
+    return str.split(" ")[0];
+  };
+
   useEffect(() => {
     if (Array.isArray(instructorList) && instructorList.length > 0) {
       const mappedClassTypes = instructorList.reduce((acc, instructor) => {
@@ -208,6 +213,7 @@ const Instructor = () => {
       return;
     }
     console.log(`+${countryCode}${phone}`);
+    console.log(imageURL);
     const instructorClassTypes = selectedClassTypes[instructorId]?.map((type) => type.value) || [];
     try {
       const data = {
@@ -423,12 +429,12 @@ const Instructor = () => {
             <div className="flex flex-col">
               <label className="font-medium">Class Types</label>
               <Select
-  isMulti
-  options={classTypeOptions}
-  value={selectedClassTypes[instructorId] || []}// Use the state variable directly
-  onChange={(selectedOptions) => handleClassTypeChange(selectedOptions, instructorId)}
-  placeholder="Select Class Types"
-/>
+                isMulti
+                options={classTypeOptions}
+                value={selectedClassTypes[instructorId] || []}// Use the state variable directly
+                onChange={(selectedOptions) => handleClassTypeChange(selectedOptions, instructorId)}
+                placeholder="Select Class Types"
+              />
 
             </div>
             {!isUpdating && (
@@ -599,12 +605,12 @@ const Instructor = () => {
                       </div>
                     </div>
                   )}
-
+                
                   <Card
                     className={`Box`}
                     onClick={() =>
-                      navigate(`/hybrid/?institution=${instructor.institution}&referral=${instructor.name}
-`)
+                      navigate(`/hybrid/?institution=${instructor.institution}&referral=${instructor.referral_code || getFirstWord(instructor.name)}
+                        `)
                     }
                     style={{
                       backgroundImage: `url(${instructor.image})`,
@@ -628,9 +634,12 @@ const Instructor = () => {
                 </div>
               )
           )}
+
         </div>
       </div>
+
       <Footer />
+
     </>
   );
 };

@@ -9,6 +9,7 @@ const apiPaths = {
   getStreak: `/user/streak-get/${institution}`,
   getRating: `/admin/rating-fetch/${institution}`,
   getUserLocation: "/user/check-user-location",
+  listAttendance: `/admin/list-attendance/${institution}`,
 };
 
 export default apiPaths;

@@ -1,16 +1,18 @@
 // RatingPage.tsx
 import React, {useContext, useState} from 'react';
-import { Button, Card, Label, Textarea } from 'flowbite-react';
+import {Button, Card, Label, Modal, Textarea} from 'flowbite-react';
 import { FaStar } from 'react-icons/fa6';
 import Context from "../../../Context/Context";
 import {API} from "aws-amplify";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import {toast} from "react-toastify";
 import {useNavigate} from "react-router-dom";
+import {PrimaryButton} from "../../../common/Inputs";
 
 const RatingPage = ({ instructorData, classData }) => {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
+  const [showModal, setShowModal] = useState(false);
   const { InstitutionId } = useContext(InstitutionContext).institutionData;
   const { userData, util } = useContext(Context);
   const navigate = useNavigate();
@@ -62,33 +64,39 @@ const RatingPage = ({ instructorData, classData }) => {
       <h1 className='font-bold text-center text-2xl max-w-2xl'>Your attendance for below class is marked. Have a
         great session ahead and Please Rate us after the session.</h1>
       <p className='font-bold text-xl'>{classData.classDescription} Class by {classData.instructorNames}</p>
-      <Card className="w-full max-w-lg">
-        <h2 className="text-xl font-semibold mb-4">Rating</h2>
-        <div className="flex justify-center mb-4">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <FaStar
-              key={star}
-              className={`w-8 h-8 cursor-pointer ${
-                star <= rating ? 'text-yellow-500' : 'text-gray-300'
-              }`}
-              onClick={() => handleRating(star)}
+      <div className="w-80"><PrimaryButton onClick={() => setShowModal(true)}>Give us a rating!</PrimaryButton></div>
+      <Modal show={showModal} onClose={() => setShowModal(false)}>
+        <Modal.Header className="p-2">Give us a rating</Modal.Header>
+        <Modal.Body className="flex flex-col items-center">
+          <Card className="w-full max-w-lg">
+            <h2 className="text-xl font-semibold mb-4">Rating</h2>
+            <div className="flex justify-center mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FaStar
+                  key={star}
+                  className={`w-8 h-8 cursor-pointer ${
+                    star <= rating ? 'text-yellow-500' : 'text-gray-300'
+                  }`}
+                  onClick={() => handleRating(star)}
+                />
+              ))}
+            </div>
+            <Label htmlFor="feedback" className="mb-2">
+              Feedback
+            </Label>
+            <Textarea
+              id="feedback"
+              placeholder="Write your feedback here..."
+              rows={4}
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
             />
-          ))}
-        </div>
-        <Label htmlFor="feedback" className="mb-2">
-          Feedback
-        </Label>
-        <Textarea
-          id="feedback"
-          placeholder="Write your feedback here..."
-          rows={4}
-          value={feedback}
-          onChange={(e) => setFeedback(e.target.value)}
-        />
-        <Button className="mt-4 bg-primaryColor hover:bg-lightPrimaryColor" onClick={handleSubmit}>
-          Submit
-        </Button>
-      </Card>
+            <Button className="mt-4 bg-primaryColor hover:bg-lightPrimaryColor" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </Card>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

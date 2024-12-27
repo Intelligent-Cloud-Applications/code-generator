@@ -176,7 +176,9 @@ useEffect(() => {
               </span>
             </div>
             <ul className="my-7 space-y-5 min-h-[12rem]">
-              {item.provides.map((provide, j) => (
+              {
+               item.provides && Array.isArray(item.provides) &&
+              item.provides.map((provide, j) => (
                 <li key={`${i}-provide-${j}`} className="flex space-x-3">
                   <svg
                     className="h-5 w-5 shrink-0 text-primaryColor dark:text-primaryColor"

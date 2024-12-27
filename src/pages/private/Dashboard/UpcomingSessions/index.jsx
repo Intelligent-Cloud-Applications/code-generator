@@ -44,6 +44,7 @@ const UpcomingSessions = () => {
   // const [classId, setClassId] = useState();
   const UserCtx = useContext(Context);
   const Ctx = useContext(Context);
+  const { userAttendance } = Ctx;
   const UtilCtx = useContext(Context).util;
   const [classTypeFilter, setClassTypeFilter] = useState("");
   const [instructorTypeFilter, setInstructorTypeFilter] = useState("");
@@ -201,7 +202,7 @@ const UpcomingSessions = () => {
             classType: classType,
             startTimeEst: new Date(datePicker + "T" + time).getTime(),
             instructorEmailId: Ctx.userData.emailId,
-            duration: 600,
+            duration: 60,
             instructorId: selectedInstructor.instructorId,
             instructorNames: selectedInstructor.name,
             classDescription: "",
@@ -305,7 +306,11 @@ const UpcomingSessions = () => {
 
   useEffect(() => {
     const activeUsers = userList.filter((user) => user.status === "Active");
-    setActiveUsers(activeUsers);
+    setActiveUsers(activeUsers.toSorted((a, b) => {
+      const x = userAttendance[a.cognitoId] || 0;
+      const y = userAttendance[b.cognitoId] || 0;
+      return y - x;
+    }));
     const attendedIds = attendedUsers.map((user) => user.cognitoId);
     const updatedStatus = {};
     activeUsers.forEach((user) => {
@@ -399,6 +404,7 @@ const UpcomingSessions = () => {
       } else {
         // Apply blur class to unchecked checkbox's parent container
         checkbox.closest(".grid").classList.add(blurClass);
+        checkbox.disabled = true;
       }
     });
   };
@@ -413,8 +419,13 @@ const UpcomingSessions = () => {
     setEmailIds("");
     checkboxes.forEach((checkbox) => {
       checkbox.closest(".grid").classList.remove(blurClass);
+      checkbox.disabled = false;
     });
   };
+
+  useEffect(() => {
+    handleCheckboxUnclick("", "");
+  }, [currentPageAttendance]);
 
   const adminPutAttendance = async () => {
     try {
@@ -970,22 +981,19 @@ const UpcomingSessions = () => {
                     className={`w-[100%] flex flex-col items-center justify-center p-2 `}
                   >
                     <div
-                      className={`flex w-[85%] max1050:w-[96%] justify-between font-bold max1050:justify-between relative pr-8 `}
+                      className={`flex w-[85%] max1050:w-[96%] justify-between font-bold relative pr-8 `}
                     >
-                      <p className={`overflow-hidden w-[9rem] `}>Date</p>
-                      <p className={`w-[7rem] mr-8 `}>Instructor</p>
+                      <p className={`overflow-hidden w-[7rem]`}>Date</p>
+                      <p className={`w-[7rem]`}>Instructor</p>
                       <p
-                        className={`w-[16%] text-center overflow-hidden mr-16 `}
+                        className={`w-[8rem] overflow-hidden `}
                       >
                         Description
                       </p>
-                      <p className={`mr-[1rem]`}>Time</p>
+                      <p className={`w-[8rem]`}>Time</p>
                       <p
                         className={
-                          `px-2 text-black max-h-[1.8rem] self-center` +
-                          (UserCtx.userData.userType === "admin"
-                            ? " ml-[4rem]"
-                            : " mr-[-1rem]")
+                          `w-[8rem] px-2 text-black max-h-[1.8rem] self-center`
                         }
                       >
                         {sortedFilteredClasses[0]?.zoomLink

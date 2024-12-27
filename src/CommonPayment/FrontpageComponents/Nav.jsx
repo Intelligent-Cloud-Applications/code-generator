@@ -1,12 +1,18 @@
 import React, { useContext } from 'react';
 import colors from '../../color.json';
 import Context from '../../Context/Context';
+import { useNavigate } from 'react-router-dom';
 
 function Nav({ institution, setActiveComponent, activeComponent, userType, setIsPopupOpen }) {
+  const { isAuth } = useContext(Context);
+  const navigate = useNavigate();
   const { itemCount } = useContext(Context);
   const color = colors[institution];
 
   const handleBackClick = () => {
+    if(!window.opener){
+      if(isAuth) navigate("/dashboard");
+    }
     window.close();
   };
 

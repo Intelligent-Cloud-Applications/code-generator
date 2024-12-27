@@ -52,7 +52,7 @@ export const dsDev = {
         userPoolWebClientId: process.env.REACT_APP_DEV_CLIENT_ID,
         oauth: {
             domain: process.env.REACT_APP_AUTH_DOMAIN_BETA,
-            scope: ['openid', 'email'],
+            scope: ['openid', 'email', 'profile'],
             redirectSignIn: process.env.NODE_ENV === 'development' ?
               'http://localhost:3000/redirect' : process.env.REACT_APP_DOMAIN_BETA + '/redirect',
             redirectSignOut: process.env.NODE_ENV === 'development' ?

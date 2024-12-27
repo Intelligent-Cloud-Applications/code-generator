@@ -143,7 +143,7 @@ const PreviousSessions = () => {
   );
 
   //attendance
-  const { userList } = useContext(Context);
+  const { userList, userAttendance } = useContext(Context);
   const [attendedUsers, setAttendedUsers] = useState([]);
   const [attendanceStatus, setAttendanceStatus] = useState({});
   const [activeUsers, setActiveUsers] = useState([]);
@@ -153,7 +153,11 @@ const PreviousSessions = () => {
   const usersPerPage = 10;
   useEffect(() => {
     const activeUsers = userList.filter((user) => user.status === "Active");
-    setActiveUsers(activeUsers);
+    setActiveUsers(activeUsers.toSorted((a, b) => {
+      const x = userAttendance[a.cognitoId] || 0;
+      const y = userAttendance[b.cognitoId] || 0;
+      return y - x;
+    }));
     const attendedIds = attendedUsers.map((user) => user.cognitoId);
     const updatedStatus = {};
     activeUsers.forEach((user) => {
@@ -250,6 +254,7 @@ const PreviousSessions = () => {
       } else {
         // Apply blur class to unchecked checkbox's parent container
         checkbox.closest(".grid").classList.add(blurClass);
+        checkbox.disabled = true;
       }
     });
   };
@@ -264,8 +269,13 @@ const PreviousSessions = () => {
     setEmailIds("");
     checkboxes.forEach((checkbox) => {
       checkbox.closest(".grid").classList.remove(blurClass);
+      checkbox.disabled = false;
     });
   };
+
+  useEffect(() => {
+    handleCheckboxUnclick("", "");
+  }, [currentPageAttendance]);
 
   const adminPutAttendance = async () => {
     try {
