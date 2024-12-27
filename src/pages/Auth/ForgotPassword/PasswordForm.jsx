@@ -10,7 +10,7 @@ const PasswordForm = ({ handler }) => {
       }
     >
       <PasswordInput name='password' className='rounded w-full'/>
-      <PasswordInput name='password_confirmation' className='rounded w-full'/>
+      <PasswordInput name='password_confirmation' className='rounded w-full' placeholder='Confirm Password' />
       <OtpInput name='otp' className='w-full rounded'/>
       <PrimaryButton>Change Password</PrimaryButton>
     </form>
