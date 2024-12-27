@@ -404,6 +404,7 @@ const UpcomingSessions = () => {
       } else {
         // Apply blur class to unchecked checkbox's parent container
         checkbox.closest(".grid").classList.add(blurClass);
+        checkbox.disabled = true;
       }
     });
   };
