@@ -15,6 +15,7 @@ const ContextProvider = (props) => {
   const [instructorList, setInstructorList] = useState([]);
   const [streakData, setStreakData] = useState({});
   const [ratings, setRatings] = useState([]);
+  const [userAttendance, setUserAttendance] = useState({});
 
   const onAuthLoad = async (auth, id) => {
     if (auth) {
@@ -89,6 +90,14 @@ const ContextProvider = (props) => {
         setRatings(response);
       } catch (error) {
         console.error("Error fetching ratings:", error);
+      }
+
+      try {
+        const response = await API.get("main", apiPaths.listAttendance, {});
+        console.log(response);
+        setUserAttendance(response.attendanceByUser);
+      } catch (e) {
+        console.log(e);
       }
 
       // try {
@@ -462,6 +471,8 @@ const ContextProvider = (props) => {
     cartItems,
     itemCount,
     isProductInCart,
+    userAttendance,
+    setUserAttendance
   };
 
   return (

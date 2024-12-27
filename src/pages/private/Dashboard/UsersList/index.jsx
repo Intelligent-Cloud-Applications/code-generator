@@ -21,7 +21,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const Ctx = useContext(Context);
   const [isUserAdd, setIsUserAdd] = useState(false);
   const [showUserAdd, setShowUserAdd] = useState(false);
-  const { getUserList } = useContext(Context);
+  const { getUserList, userAttendance } = useContext(Context);
   const [userName, setuserName] = useState("");
   const [lastName, setLastName] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
@@ -34,7 +34,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [createButton, setCreateButton] = useState("");
   const [cognitoId, setCognitoId] = useState("");
   const [name, setName] = useState("");
-  const [userStatus, setUserStatus] = useState("all");
+  const [userStatus, setUserStatus] = useState("Active");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [searchQuery, setSearchQuery] = useState("");
@@ -318,21 +318,22 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                   <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
                     <div className="d-flex justify-content-between w-[98%] max1050:w-[100%] mb-3 font-bold">
                       {/* List header content */}
-                      <div className="profilepic"></div>
-                      <div className="w-[15%]">Name</div>
-                      <div
-                        className="w-[13%] email-hover"
-                        onClick={() => requestSort("email")}
-                        style={{ cursor: "pointer" }}
-                      >
-                        Email
-                      </div>
-                      <div className="w-[11%] font-sans ml-[0.5rem]">Phone</div>
-                      <div className="w-[11%] font-sans">Joining Date</div>
-                      <div className="w-[14%] font-sans">Attendance</div>
-                      <div className="w-[8%] font-sans absolute right-[0rem]">
+                      <div className="w-[12%]"></div>
+                      <div className="w-[24%]">Name</div>
+                      {/*<div*/}
+                      {/*  className="w-[13%] email-hover"*/}
+                      {/*  onClick={() => requestSort("email")}*/}
+                      {/*  style={{ cursor: "pointer" }}*/}
+                      {/*>*/}
+                      {/*  Email*/}
+                      {/*</div>*/}
+                      {/*<div className="w-[11%] font-sans ml-[0.5rem]">Phone</div>*/}
+                      <div className="w-[20%] font-sans">Joining Date</div>
+                      <div className="w-[20%] font-sans">Classes Attended</div>
+                      <div className="w-[8%] font-sans">
                         Balance
                       </div>
+                      <div></div>
                       {/* Icons */}
                       <div className="w-10 font-sans h-10">
                         <img
@@ -391,28 +392,29 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                               <div className="w-[18%] font-[400] mr-2 font-sans truncate">
                                 {user.userName}
                               </div>
-                              <div
-                                className="w-[16%] font-[400] font-sans email-hover"
-                                onClick={() => requestSort("email")}
-                                style={{ cursor: "pointer" }}
-                                title={user.emailId}
-                              >
-                                {user.emailId?.split("@")[0]}@
-                              </div>
-                              <div className="w-[18%] font-[400] font-sans ml-[3.2rem]">
-                                {user.phoneNumber}
-                              </div>
+                              {/*<div*/}
+                              {/*  className="w-[16%] font-[400] font-sans email-hover"*/}
+                              {/*  onClick={() => requestSort("email")}*/}
+                              {/*  style={{ cursor: "pointer" }}*/}
+                              {/*  title={user.emailId}*/}
+                              {/*>*/}
+                              {/*  {user.emailId?.split("@")[0]}@*/}
+                              {/*</div>*/}
+                              {/*<div className="w-[18%] font-[400] font-sans ml-[3.2rem]">*/}
+                              {/*  {user.phoneNumber}*/}
+                              {/*</div>*/}
                               <div className="w-[12%] font-[400] font-sans">
                                 {formatDate(user.joiningDate)}
                               </div>
                               <div className="w-[15%] font-[400] font-sans overflow-hidden text-center mr-2">
-                                {user.currentMonthZPoints
-                                  ? user.currentMonthZPoints
-                                  : 0}
-                                /
-                                {user.lastMonthZPoints
-                                  ? user.lastMonthZPoints
-                                  : 0}
+                                {/*{user.currentMonthZPoints*/}
+                                {/*  ? user.currentMonthZPoints*/}
+                                {/*  : 0}*/}
+                                {/*/*/}
+                                {/*{user.lastMonthZPoints*/}
+                                {/*  ? user.lastMonthZPoints*/}
+                                {/*  : 0}*/}
+                                {userAttendance[user.cognitoId] || 0}
                               </div>
                               <div
                                 className="w-[7%] h-7 rounded px-2 text-center"

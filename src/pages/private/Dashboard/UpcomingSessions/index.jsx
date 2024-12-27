@@ -44,6 +44,7 @@ const UpcomingSessions = () => {
   // const [classId, setClassId] = useState();
   const UserCtx = useContext(Context);
   const Ctx = useContext(Context);
+  const { userAttendance } = Ctx;
   const UtilCtx = useContext(Context).util;
   const [classTypeFilter, setClassTypeFilter] = useState("");
   const [instructorTypeFilter, setInstructorTypeFilter] = useState("");
@@ -201,7 +202,7 @@ const UpcomingSessions = () => {
             classType: classType,
             startTimeEst: new Date(datePicker + "T" + time).getTime(),
             instructorEmailId: Ctx.userData.emailId,
-            duration: 600,
+            duration: 60,
             instructorId: selectedInstructor.instructorId,
             instructorNames: selectedInstructor.name,
             classDescription: "",
@@ -305,7 +306,11 @@ const UpcomingSessions = () => {
 
   useEffect(() => {
     const activeUsers = userList.filter((user) => user.status === "Active");
-    setActiveUsers(activeUsers);
+    setActiveUsers(activeUsers.toSorted((a, b) => {
+      const x = userAttendance[a.cognitoId] || 0;
+      const y = userAttendance[b.cognitoId] || 0;
+      return y - x;
+    }));
     const attendedIds = attendedUsers.map((user) => user.cognitoId);
     const updatedStatus = {};
     activeUsers.forEach((user) => {

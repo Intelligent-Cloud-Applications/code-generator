@@ -36,6 +36,8 @@ const Context = createContext({
   removeCartItem: () => { },
   addCartItem: () => { },
   paymentHistory: [],
+  userAttendance: {},
+  setUserAttendance: () => {},
 })
 
 export default Context

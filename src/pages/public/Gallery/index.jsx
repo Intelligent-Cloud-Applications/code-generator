@@ -14,6 +14,9 @@ import Footer from '../../../components/Footer'
 import 'react-lazy-load-image-component/src/effects/blur.css'
 import './Gallery.css'
 import 'react-loading-skeleton/dist/skeleton.css'
+import {MdEdit} from "react-icons/md";
+import {Modal} from "flowbite-react";
+import {BaseTextInput, PrimaryButton} from "../../../common/Inputs";
 
 const Gallery = () => {
   const [uploading, setUploading] = useState(false)
@@ -34,6 +37,7 @@ const Gallery = () => {
   const [showInput, setShowInput] = useState(false)
   const userData = useContext(Context)
   const user = userData.userData
+  const { setLoader } = userData.util
   const [selectedFile, setSelectedFile] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
   const bucketName = 'team-dev-testing'
@@ -45,6 +49,7 @@ const Gallery = () => {
   const [isDeleteing, setIsDeleteing] = useState(false)
   const [isDataUploading, setIsDataUploading] = useState(false)
   const [selectValve, setSelectValve] = useState('All')
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -200,6 +205,29 @@ const Gallery = () => {
     setModel(false)
   }
 
+  const dataEdit = async (event) => {
+    event.preventDefault();
+    const imageUrl = event.target.imageUrl.value;
+    const title = event.target.title.value;
+    const description = event.target.description.value;
+
+    setLoader(true)
+    try {
+      await API.put("main", `/admin/edit-image/${institution}`, {
+        body: {
+          imageUrl, title, description
+        }
+      });
+      setOpenEditModal(false);
+      toast.success("Message edited successfully.")
+    } catch (e) {
+      console.log(e);
+      toast.error(e.message);
+    } finally {
+      setLoader(false);
+    }
+  }
+
   const handleCancelUpload = () => {
     setShowInput(false)
     setSelectedFile('')
@@ -287,6 +315,28 @@ const Gallery = () => {
                     width={24}
                     onClick={() => dataDelete(tempImgSrc)}
                   />
+                )}
+                {isAdmin && (
+                  <MdEdit size={24} onClick={() => {
+                    setModel(false)
+                    setOpenEditModal(true)
+                  }} />
+                )}
+                {isAdmin && (
+                  <Modal className="z-50" show={openEditModal} onClose={() => setOpenEditModal(false)}>
+                    <Modal.Header />
+                    <Modal.Body>
+                      <form onSubmit={dataEdit} className="flex flex-col gap-2">
+                        <input name="imageUrl" value={tempImgSrc} hidden required />
+                        <BaseTextInput name="title" placeholder="Title" defaultValue={title} required />
+                        <textarea name="description" placeholder="Description" defaultValue={description} required />
+                        <div className="grid grid-cols-2 gap-2">
+                          <PrimaryButton>Save Changes</PrimaryButton>
+                          <button type="button" className="bg-red-500 text-white rounded-lg" onClick={() => setOpenEditModal(false)}>Cancel</button>
+                        </div>
+                      </form>
+                    </Modal.Body>
+                  </Modal>
                 )}
                 <X
                   height={24}
