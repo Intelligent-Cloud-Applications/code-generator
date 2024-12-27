@@ -981,22 +981,19 @@ const UpcomingSessions = () => {
                     className={`w-[100%] flex flex-col items-center justify-center p-2 `}
                   >
                     <div
-                      className={`flex w-[85%] max1050:w-[96%] justify-between font-bold max1050:justify-between relative pr-8 `}
+                      className={`flex w-[85%] max1050:w-[96%] justify-between font-bold relative pr-8 `}
                     >
-                      <p className={`overflow-hidden w-[9rem] `}>Date</p>
-                      <p className={`w-[7rem] mr-8 `}>Instructor</p>
+                      <p className={`overflow-hidden w-[7rem]`}>Date</p>
+                      <p className={`w-[7rem]`}>Instructor</p>
                       <p
-                        className={`w-[16%] text-center overflow-hidden mr-16 `}
+                        className={`w-[8rem] overflow-hidden `}
                       >
                         Description
                       </p>
-                      <p className={`mr-[1rem]`}>Time</p>
+                      <p className={`w-[8rem]`}>Time</p>
                       <p
                         className={
-                          `px-2 text-black max-h-[1.8rem] self-center` +
-                          (UserCtx.userData.userType === "admin"
-                            ? " ml-[4rem]"
-                            : " mr-[-1rem]")
+                          `w-[8rem] px-2 text-black max-h-[1.8rem] self-center`
                         }
                       >
                         {sortedFilteredClasses[0]?.zoomLink
