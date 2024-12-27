@@ -4,6 +4,7 @@ import {toast} from "react-toastify";
 import Context from "../../../Context/Context";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import {useNavigate} from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const Redirect = () => {
   const { util, setUserData, setIsAuth, onAuthLoad } = useContext(Context);
@@ -15,30 +16,31 @@ const Redirect = () => {
       util.setLoader(true);
       try {
         const cognito = await Auth.currentAuthenticatedUser();
+        const attributes = await jwtDecode(cognito.signInUserSession.idToken.jwtToken);
 
-        // const response = await API.post(
-        //   "main",
-        //   `/any/user-exists/${InstitutionId}`,
-        //   {
-        //     body: {
-        //       userPoolId: cognito.pool.userPoolId,
-        //       username: cognito.attributes.email,
-        //     }
-        //   }
-        // );
-        //
-        // if (!response.inInstitution) {
-        //   await API.post(
-        //     'main',
-        //     `/user/profile/${InstitutionId}`,
-        //     {
-        //       body: {
-        //         userName: cognito.attributes.name,
-        //         emailId: cognito.attributes.email,
-        //       },
-        //     }
-        //   );
-        // }
+        const response = await API.post(
+          "main",
+          `/any/user-exists/${InstitutionId}`,
+          {
+            body: {
+              userPoolId: cognito.pool.userPoolId,
+              username: attributes.email,
+            }
+          }
+        );
+
+        if (!response.inInstitution) {
+          await API.post(
+            'main',
+            `/user/profile/${InstitutionId}`,
+            {
+              body: {
+                userName: attributes.name,
+                emailId: attributes.email,
+              },
+            }
+          );
+        }
 
         const userdata = await API.get(
           'main',

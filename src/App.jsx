@@ -5,6 +5,7 @@ import RoutesContainer from "./routes";
 import LoaderProvider from "./components/LoaderProvider";
 import InstitutionContext from "./Context/InstitutionContext";
 import apiPaths from "./utils/api-paths";
+import {jwtDecode} from "jwt-decode";
 
 function App() {
   const UtilCtx = useRef(useContext(Context).util);
@@ -53,31 +54,31 @@ function App() {
 
       try {
         const cognito = await Auth.currentAuthenticatedUser();
-        // console.log(cognito);
-        //
-        // const response = await API.post(
-        //   "main",
-        //   `/any/user-exists/${data.InstitutionId}`,
-        //   {
-        //     body: {
-        //       userPoolId: cognito.pool.userPoolId,
-        //       username: cognito.attributes.email,
-        //     }
-        //   }
-        // );
-        //
-        // if (!response.inInstitution) {
-        //   await API.post(
-        //     'main',
-        //     `/user/profile/${data.InstitutionId}`,
-        //     {
-        //       body: {
-        //         userName: cognito.attributes.name,
-        //         emailId: cognito.attributes.email,
-        //       },
-        //     }
-        //   );
-        // }
+        const attributes = jwtDecode(cognito.signInUserSession.idToken.jwtToken);
+
+        const response = await API.post(
+          "main",
+          `/any/user-exists/${data.InstitutionId}`,
+          {
+            body: {
+              userPoolId: cognito.pool.userPoolId,
+              username: attributes.email,
+            }
+          }
+        );
+
+        if (!response.inInstitution) {
+          await API.post(
+            'main',
+            `/user/profile/${data.InstitutionId}`,
+            {
+              body: {
+                userName: attributes.name,
+                emailId: attributes.email,
+              },
+            }
+          );
+        }
 
         const userdata = await API.get(
           "main",
