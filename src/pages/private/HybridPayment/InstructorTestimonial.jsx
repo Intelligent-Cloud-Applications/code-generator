@@ -24,6 +24,8 @@ const InstructorTestimonial = () => {
   const Navigate = useNavigate();
   const Util = Ctx.util;
 
+  console.log("UserCtx: ",UserCtx)
+
   const location = useLocation();
   // console.log(Util);
   // Function to parse query parameters
@@ -238,11 +240,13 @@ const InstructorTestimonial = () => {
                 <div className="absolute w-[3.188rem] h-[5.78rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-8 right-0 object-cover rounded-md bg-gray-300">
                   <div className="flex items-center justify-center h-full">
                     <p className="text-[3rem] font-bold text-gray-700">
-                      {getInitials(
-                        instructor?.instructorProfile?.userName ||
-                          instructor?.referralCode ||
-                          instructor?.name
-                      )}
+                      <span className="text-[1.5rem] font-bold text-gray-700">
+                        {getInitials(
+                          instructor?.instructorProfile?.userName ||
+                            instructor?.referralCode ||
+                            instructor?.name
+                        )}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -250,11 +254,11 @@ const InstructorTestimonial = () => {
 
               <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-14 left-4">
                 <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[29px] relative w-fit tracking-[0] leading-[normal]">
+                  {/* Instructor Name */}
                   <p className="text-3xl font-extrabold text-gray-900 md:text-4xl">
-                    {console.log(instructor)}
-                    {instructor?.name||instructor?.instructorProfile?.userName ||
-                      instructor?.referralCode
-                      }
+                    {instructor?.name?.toUpperCase() ||
+                      instructor?.instructorProfile?.userName?.toUpperCase() ||
+                      instructor?.referralCode?.toUpperCase()}
                   </p>
 
                   <p className="text-lg font-medium text-gray-500 md:text-xl">
