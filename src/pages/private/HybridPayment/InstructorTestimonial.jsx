@@ -213,6 +213,15 @@ const InstructorTestimonial = () => {
     }
   };
 
+  function capitalizeWords(str) {
+    return str
+      ?.split(" ")
+      ?.map((word) => {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join(" ");
+  }
+
   if (Util.loader) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -253,12 +262,14 @@ const InstructorTestimonial = () => {
               )}
 
               <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-14 left-4">
-                <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[29px] relative w-fit tracking-[0] leading-[normal]">
+                <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[20px] md:text-[29px] relative w-fit tracking-[0] leading-[normal]">
                   {/* Instructor Name */}
-                  <p className="text-3xl font-extrabold text-gray-900 md:text-4xl">
-                    {instructor?.name?.toUpperCase() ||
-                      instructor?.instructorProfile?.userName?.toUpperCase() ||
-                      instructor?.referralCode?.toUpperCase()}
+                  <p className="text-3xl font-bold md:font-extrabold text-gray-900 md:text-4xl ">
+                    {capitalizeWords(instructor?.name) ||
+                      capitalizeWords(
+                        instructor?.instructorProfile?.userName
+                      ) ||
+                      capitalizeWords(instructor?.referralCode)}
                   </p>
 
                   <p className="text-lg font-medium text-gray-500 md:text-xl">
@@ -299,7 +310,7 @@ const InstructorTestimonial = () => {
                         />
                       </p>
                     ) : (
-                      <div>
+                      <div className="relative -top-12 md:top-0">
                         <textarea
                           className={`mt-2 absolute w-full 
                             max-w-[461px] max950:max-w-[322px]
