@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import Choreography from "./Choreography";
 import LeftBanner from "./LeftBanner";
 import PreviousSessions from "./PreviousSessions";
 import ProfileUpdate from "./ProfileUpdate";
@@ -14,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import Footer from "../../../components/Footer";
 import BirthdayModal from "./ProfileUpdate/BirthdayModal";
+import Main from "./Choreography/components/Main/index"
 
 const DashBoard = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -34,7 +34,7 @@ const DashBoard = () => {
         return <PreviousSessions />;
 
       case 2:
-        return <Choreography />;
+        return <Main />;
 
       case 3:
         return (

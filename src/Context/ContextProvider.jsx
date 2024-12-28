@@ -1,5 +1,5 @@
 import { API } from "aws-amplify";
-import React, { useState, useMemo, useEffect, useCallback} from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Context from "./Context";
 import web from "../utils/data.json";
 import apiPaths from "../utils/api-paths";
@@ -166,6 +166,63 @@ const ContextProvider = (props) => {
       });
   };
 
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (isAuth) {
+      fetchPlaylists();
+      fetchVideos()
+    }
+    // eslint-disable-next-line
+  }, [isAuth,userData]);
+
+  const fetchVideos = useCallback(async () => {
+    setLoading(true);
+    const institution = userData?.institution;
+    console.log(institution);
+    try {
+      const response = await API.get('main', `/user/fetch-videos/${institution}`);
+      if (response.videos && Array.isArray(response.videos)) {
+        setVideos(response.videos);
+      } else {
+        console.error('Unexpected response format:', response);
+        setError('Unexpected response format');
+      }
+    } catch (err) {
+      console.error('Error fetching videos:', err);
+      setError('Failed to fetch videos');
+    } finally {
+      setLoading(false);
+    }
+  }, [userData]);
+
+  const [playlists, setPlaylists] = useState([]);
+  const [loadingPlaylist, setLoadingPlaylist] = useState(true);
+  const [errorPlaylist, setErrorPlaylist] = useState(null);
+
+  const fetchPlaylists = async () => {
+    setLoadingPlaylist(true);
+    const institution = userData?.institution
+    try {
+      const response = await API.get('main', `/user/get-playlist/${institution}`);
+      console.log(response)
+      const uniquePlaylists = response.playlists.reduce((acc, playlist) => {
+        if (!acc.some((p) => p.playlistName === playlist.playlistName)) {
+          acc.push(playlist);
+        }
+        return acc;
+      }, []);
+      setPlaylists(uniquePlaylists);
+    } catch (err) {
+      console.error('Error fetching playlists:', err);
+      setErrorPlaylist('Failed to fetch playlists');
+    } finally {
+      setLoadingPlaylist(false);
+    }
+  };
+
   const setIsAuthFn = (data) => {
     setIsAuth(data);
   };
@@ -305,7 +362,7 @@ const ContextProvider = (props) => {
           body: {}, // Empty body as we don't need userId
         }
       );
-  
+
       if (statusResponse && statusResponse.status) {
         // Update the user status in the context
         setUserData((prevData) => ({
@@ -318,14 +375,14 @@ const ContextProvider = (props) => {
       console.log("Error fetching or updating user status:", e);
     }
   };
-  
+
   useEffect(() => {
     if (userData && userData.status) {
       // Check if user status requires renewal update
-        updateUserStatusRenew(userData.institution); // Just pass the institution to update status
+      updateUserStatusRenew(userData.institution); // Just pass the institution to update status
     }
   }, [userData]); // Trigger the effect whenever userData changes
-  
+
 
   // Call this function periodically or after certain actions
   useEffect(() => {
@@ -472,7 +529,21 @@ const ContextProvider = (props) => {
     itemCount,
     isProductInCart,
     userAttendance,
-    setUserAttendance
+    setUserAttendance,
+    videos,
+    setVideos,
+    error,
+    setError,
+    loading,
+    setLoading,
+    playlists,
+    setPlaylists,
+    errorPlaylist,
+    setErrorPlaylist,
+    loadingPlaylist,
+    setLoadingPlaylist,
+    fetchVideos: fetchVideos,
+    fetchPlaylists: fetchPlaylists
   };
 
   return (
