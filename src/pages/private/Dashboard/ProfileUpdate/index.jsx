@@ -453,7 +453,7 @@ const ifDataChanged = () => {
                     {referralLink && (
                       <div className="flex flex-col gap-2">
                         <label className="ml-2 text-sm font-semibold text-gray-700">
-                          Referral Link
+                          Hybrid Page Link
                         </label>
                         <div className="flex items-center gap-2">
                           <input
