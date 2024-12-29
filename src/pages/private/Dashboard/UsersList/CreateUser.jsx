@@ -240,6 +240,7 @@ function CreateUser({
                 >
                   <option value="Active">Active</option>
                   <option value="InActive">InActive</option>
+                  <option value="Trial">Trial</option>
                 </select>
               </div>
             )}
@@ -252,7 +253,6 @@ function CreateUser({
                   setUserType(e.target.value);
                 }}
               >
-                <option value="Trial">Trial</option>
                 <option value="member">Member</option>
                 <option value="instructor">Instructor</option>
                 <option value="admin">Admin</option>
