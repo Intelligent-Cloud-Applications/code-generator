@@ -7,10 +7,11 @@ import { FaArrowCircleRight } from "react-icons/fa";
 import { FaArrowLeft, FaCalendarAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { Button2 } from "../../../../common/Inputs";
-import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 import Context from "../../../../Context/Context";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import EditableInput from "./EditableInput";
+import HybridReferral from "../../../../common/ReferralCode/HybridReferral.jsx";
+import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
 
@@ -804,6 +805,13 @@ const ifDataChanged = () => {
           <div>
             <ReferralCode />
           </div>
+          {
+            userData.userType === "instructor" && (
+              <div>
+                <HybridReferral />
+              </div>
+            )
+          }
         </>
       )}
     </div>
