@@ -6,42 +6,42 @@ on:
       - prod
 
 jobs:
-#  deploy-beta:
-#    runs-on: ubuntu-latest
-#    if: github.ref == 'refs/heads/dev'
-#    steps:
-#      - name: Checkout Code
-#        uses: actions/checkout@v2
-#
-#      - name: Install Node.js
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: '20'
-#
-#      - name: Install dependencies
-#        run: yarn
-#
-#      - name: Build the React app
-#        run: |
-#          export NODE_OPTIONS=--max_old_space_size=4096
-#          yarn build
-#
-#      - name: Set up AWS CLI
-#        uses: aws-actions/configure-aws-credentials@v1
-#        with:
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws-region: us-east-1 # Replace with your desired AWS region
-#
-#      - name: Deploy to S3
-#        run: aws s3 sync ./build s3://betatemplateds.awsaiapp.com --delete
-#
-#      - name: Cloudfront Invalidation
-#        run: aws cloudfront create-invalidation --distribution-id E36I0B4BJRQ8X --paths "/*"
+  deploy-beta:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Build the React app
+        run: |
+          export NODE_OPTIONS=--max_old_space_size=4096
+          yarn build
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # Replace with your desired AWS region
+
+      - name: Deploy to S3
+        run: aws s3 sync ./build s3://betatemplateds.awsaiapp.com --delete
+
+      - name: Cloudfront Invalidation
+        run: aws cloudfront create-invalidation --distribution-id E36I0B4BJRQ8X --paths "/*"
 
   deploy-prod:
     runs-on: ubuntu-latest
-#    if: github.ref == 'refs/heads/prod'
+    if: github.ref == 'refs/heads/prod'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
