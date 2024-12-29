@@ -59,7 +59,7 @@ const SubscriptionCard = () => {
       );
     } else {
       toast.error("You have no accounts yet. Please sign up to continue.");
-      navigate(`/signup?referral=${referral}&institution=${institution}`);
+      navigate(`/signup?referral=${referral}&institution=${institution}&hybrid=true`);
     }
   };
 

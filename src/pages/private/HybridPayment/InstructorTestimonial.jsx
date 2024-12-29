@@ -24,7 +24,7 @@ const InstructorTestimonial = () => {
   const Navigate = useNavigate();
   const Util = Ctx.util;
 
-  console.log("UserCtx: ",UserCtx)
+  console.log("UserCtx: ", UserCtx);
 
   const location = useLocation();
   // console.log(Util);
@@ -65,8 +65,10 @@ const InstructorTestimonial = () => {
           console.log("Fetched Instructors:", response.data);
           setInstructors((prev = []) => [
             ...prev,
-            ...(response?.data || []),
-            instructor?.instructorProfile,
+            ...(Array.isArray(response?.data) ? response.data : []), // Ensure response.data is an array
+            ...(instructor?.instructorProfile
+              ? [instructor.instructorProfile]
+              : []), // Add only if instructorProfile exists
           ]);
         } else {
           const response = JSON.parse(
@@ -75,10 +77,11 @@ const InstructorTestimonial = () => {
           console.log("Cached Instructors:", response.data);
           setInstructors((prev = []) => [
             ...prev,
-            ...(response?.data ),
-            instructor?.instructorProfile,
+            ...(Array.isArray(response?.data) ? response.data : []), // Ensure response.data is an array
+            ...(instructor?.instructorProfile
+              ? [instructor.instructorProfile]
+              : []), // Add only if instructorProfile exists
           ]);
-
         }
       } catch (error) {
         console.error("Error fetching instructors:", error);
@@ -104,7 +107,7 @@ const InstructorTestimonial = () => {
           response = {};
         }
 
-        console.log("Instructors",instructors)
+        console.log("Instructors", instructors);
         // Find additional data and merge with the response
         console.log("Referral:", referral);
         const additionalData = instructors?.find(
@@ -118,11 +121,10 @@ const InstructorTestimonial = () => {
 
         console.log("Additional Data:", additionalData);
 
-
         // Merge data before setting the instructor state
         setInstructor({
           ...response,
-          ...(additionalData),
+          ...additionalData,
           ...currentInstructor,
         });
         console.log("Fetched Instructor:", response);
@@ -135,7 +137,7 @@ const InstructorTestimonial = () => {
     };
 
     fetchInstructor();
-  }, [institution, cognitoId,currentInstructor]);
+  }, [institution, cognitoId, currentInstructor]);
   useEffect(() => {
     if (instructor?.instructorProfile?.imgUrl || instructor?.image) {
       setImgUrl(instructor?.instructorProfile?.imgUrl || instructor?.image);
@@ -144,8 +146,8 @@ const InstructorTestimonial = () => {
       (e) =>
         e?.referral_code === referral ||
         getFirstWord(e?.name) ===
-      getFirstWord(instructor?.instructorProfile?.userName) ||
-      getFirstWord(e?.name) === instructor?.referralCode 
+          getFirstWord(instructor?.instructorProfile?.userName) ||
+        getFirstWord(e?.name) === instructor?.referralCode
     );
     if (currentInstructor) {
       setCurrentInstructor(currentInstructor);
@@ -208,7 +210,7 @@ const InstructorTestimonial = () => {
       if (userConfirmed) Navigate("/dashboard");
     } else {
       // Get the current url and append the trial query params
-      const url = `/signup?trial=true&trialPeriod=Monthly&referral=${referral}&institution=${institution}`;
+      const url = `/signup?trial=true&trialPeriod=Monthly&referral=${referral}&institution=${institution}&hybrid=true`;
       Navigate(url);
     }
   };
