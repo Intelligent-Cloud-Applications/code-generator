@@ -41,6 +41,7 @@ jobs:
 
   deploy-prod:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/prod'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
