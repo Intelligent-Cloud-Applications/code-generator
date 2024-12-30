@@ -26,7 +26,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [name, setName] = useState(UserCtx.userName);
   const [country] = useState(UserCtx.country);
   const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId);
-  const [about,setAbout] = useState(UserCtx.about)
+  const [about,setAbout] = useState(UserCtx.hasOwnProperty("about") && UserCtx.about)
 
   
   const [image, setImage] = useState(null);
