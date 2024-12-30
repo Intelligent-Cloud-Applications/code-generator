@@ -46,7 +46,12 @@ const InstructorTestimonial = () => {
   };
 
   useEffect(() => {
-    setAbout(instructor?.instructorProfile?.about || "");
+    setAbout(
+      instructor?.instructorProfile &&
+        instructor.instructorProfile.hasOwnProperty("about")
+        ? instructor.instructorProfile.about
+        : ""
+    );
   }, [instructor]);
 
   useEffect(() => {

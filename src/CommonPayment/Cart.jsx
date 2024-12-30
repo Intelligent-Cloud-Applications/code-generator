@@ -127,7 +127,7 @@ const Cart = ({ institution }) => {
     });
   };
 
-  const updateInstructorAmount = async (institutionId,referralCode) => {
+  const updateInstructorAmount = async (institutionId, referralCode) => {
     try {
       const updateInstructorAmount = await API.put(
         "main",
@@ -149,7 +149,11 @@ const Cart = ({ institution }) => {
     }
   };
 
-  const updateToPreviousAmount = async (institutionId, referralCode, prevAmount) => {
+  const updateToPreviousAmount = async (
+    institutionId,
+    referralCode,
+    prevAmount
+  ) => {
     try {
       const updateInstructorAmount = await API.put(
         "main",
@@ -158,7 +162,7 @@ const Cart = ({ institution }) => {
           body: {
             institution,
             referral: referralCode,
-            instructorPaymentAmount:prevAmount,
+            instructorPaymentAmount: prevAmount,
           },
           headers: {
             "Content-Type": "application/json",
@@ -192,13 +196,18 @@ const Cart = ({ institution }) => {
     }
 
     try {
-      if(userData.hybridPageUser){
-        const prevamount = await updateInstructorAmount(institutionId,referralCode);
+      if (
+        userData.hasOwnProperty("hybridPageUser") &&
+        userData.hybridPageUser
+      ) {
+        const prevamount = await updateInstructorAmount(
+          institutionId,
+          referralCode
+        );
         console.log("Previous instructor amount:", prevamount);
         prevAmouunt.current = prevamount;
         console.log("Previous instructor amount:", prevInstructorAmount);
       }
-
 
       const response = await API.put("awsaiapp", `/payment/checkout`, {
         body: {
@@ -294,7 +303,10 @@ const Cart = ({ institution }) => {
                     getPaymentHistory(institutionId, cognitoId);
                     getCartItems(institutionId, cognitoId);
                   }, 1500);
-                  if (userData.hybridPageUser) {
+                  if (
+                    userData.hasOwnProperty("hybridPageUser") &&
+                    userData.hybridPageUser
+                  ) {
                     await updateToPreviousAmount(
                       institutionId,
                       referralCode,
@@ -306,7 +318,10 @@ const Cart = ({ institution }) => {
                 }
               } catch (error) {
                 console.error("Payment verification error:", error);
-                if (userData.hybridPageUser) {
+                if (
+                  userData.hasOwnProperty("hybridPageUser") &&
+                  userData.hybridPageUser
+                ) {
                   await updateToPreviousAmount(
                     institutionId,
                     referralCode,

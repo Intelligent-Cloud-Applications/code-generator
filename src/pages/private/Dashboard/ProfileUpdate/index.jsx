@@ -26,7 +26,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [name, setName] = useState(UserCtx.userName);
   const [country] = useState(UserCtx.country);
   const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId);
-  const [about,setAbout] = useState(UserCtx.about)
+  const [about,setAbout] = useState(UserCtx.hasOwnProperty("about") && UserCtx.about)
 
   
   const [image, setImage] = useState(null);
@@ -453,7 +453,7 @@ const ifDataChanged = () => {
                     {referralLink && (
                       <div className="flex flex-col gap-2">
                         <label className="ml-2 text-sm font-semibold text-gray-700">
-                          Referral Link
+                          Hybrid Page Link
                         </label>
                         <div className="flex items-center gap-2">
                           <input
