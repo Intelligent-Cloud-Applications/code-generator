@@ -24,9 +24,11 @@ const Signup = () => {
   const [trialPeriod, setTrialPeriod] = useState(null);
   // const {trial,trialPeriod} = useParams();
   // Extract trial params from URL
+  console.log(location.pathname);
   const params = new URLSearchParams(location.search);
   const trial = params.get('trial');
   const period = params.get('trialPeriod');
+  const hybridPath = params.get('hybrid');
   useEffect(() => {
     console.log(trial)
     if (trial === "true" && period) {
@@ -98,6 +100,7 @@ const Signup = () => {
           queryStringParameters: {
           trial: trial,
           trialPeriod: trialPeriod,
+          hybrid: hybridPath,
         },
           body: {
             ...userData,

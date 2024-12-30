@@ -1,19 +1,19 @@
-import React, { useEffect, useState,useRef,useContext } from 'react';
-import { useParams } from 'react-router-dom';
-import AllPayment from './AllPayment';
-import Cart from './Cart';
-import Nav from './FrontpageComponents/Nav';
-import Query from '../pages/public/Query';
-import PaymentHistory from './PaymentHistory';
 import { API } from "aws-amplify";
-import CreateSubscriptionPopup from './CreateSubscriptionPopup';
-import UpdateSubscriptionPopup from './UpdateSubscriptionPopup';
-import Context from '../Context/Context';
-import { User } from 'lucide-react';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import Context from "../Context/Context";
+import Query from "../pages/public/Query";
+import apiPaths from "../utils/api-paths";
+import AllPayment from "./AllPayment";
+import Cart from "./Cart";
+import CreateSubscriptionPopup from "./CreateSubscriptionPopup";
+import Nav from "./FrontpageComponents/Nav";
+import PaymentHistory from "./PaymentHistory";
+import UpdateSubscriptionPopup from "./UpdateSubscriptionPopup";
 
 function HomePayment() {
   const { institution, cognitoId } = useParams();
-  const [activeComponent, setActiveComponent] = useState('AllPayment');
+  const [activeComponent, setActiveComponent] = useState("AllPayment");
   const [userType, setUserType] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
@@ -22,27 +22,58 @@ function HomePayment() {
   const [products, setProducts] = useState([]);
   const providesContainerRef = useRef(null);
   const util = useContext(Context).util;
-  const UserCtx = useContext(Context)?.userData;
 
-  const Userlocation = UserCtx?.location?.countryCode;
 
-  console.log(error);
+  const fetchAndSetProducts = async (data) => {
+    const userLocation = localStorage.getItem("userLocation");
+
+    if (userLocation) {
+      if (userLocation === "IN") {
+        setProducts(data.filter((product) => product.india === true));
+      } else {
+        setProducts(data.filter((product) => product.india === false));
+      }
+    } else {
+      try {
+        const location = await API.get("main", apiPaths?.getUserLocation);
+        console.log(location);
+
+        if (location.hasOwnProperty("countryCode")) {
+          localStorage.setItem("userLocation", location.countryCode);
+
+          if (location.countryCode === "IN") {
+            setProducts(data.filter((product) => product.india === true));
+          } else {
+            setProducts(data.filter((product) => product.india === false));
+          }
+        } else {
+          // Handle the case where countryCode is not present
+          console.error("countryCode not found in the location data");
+        }
+      } catch (error) {
+        console.error("Error fetching user location:", error);
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await API.get("awsaiapp", `/any/userdetailget/${institution}/${cognitoId}`);
+        const response = await API.get(
+          "awsaiapp",
+          `/any/userdetailget/${institution}/${cognitoId}`
+        );
         setUserType(response.userType);
       } catch (error) {
-        console.error('Error fetching user details:', error);
+        console.error("Error fetching user details:", error);
         setError(error.message);
       }
     };
 
     const fetchProducts = async () => {
       try {
-        const data = await API.get('main', `/any/products/${institution}`);
-        console.log(data);
-        localStorage.getItem("userLocation") === 'IN' ? setProducts(data.filter(product=> product.india === true)) : setProducts(data.filter(product => product.india === false));
+        const data = await API.get("main", `/any/products/${institution}`);
+        await fetchAndSetProducts(data);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -53,34 +84,33 @@ function HomePayment() {
   }, [institution, cognitoId]);
 
   const handleCloseEditPopup = () => {
-  setIsEditPopupOpen(false);
+    setIsEditPopupOpen(false);
     setSelectedProduct(null);
   };
-  
+
   const handleSetSelectedProduct = (product) => {
     setSelectedProduct(product);
     setIsEditPopupOpen(true);
   };
-  
 
   const handleCloseCreatePopup = () => {
     setIsPopupOpen(false);
   };
 
   const [formData, setFormData] = useState({
-    heading: '',
-    amount: '',
-    durationText: 'Monthly',
-    provides: [''],
+    heading: "",
+    amount: "",
+    durationText: "Monthly",
+    provides: [""],
   });
 
   useEffect(() => {
     if (!isPopupOpen) {
       setFormData({
-        heading: '',
-        amount: '',
-        durationText: 'Monthly',
-        provides: [''],
+        heading: "",
+        amount: "",
+        durationText: "Monthly",
+        provides: [""],
       });
     }
     if (selectedProduct) {
@@ -89,10 +119,10 @@ function HomePayment() {
         amount: selectedProduct.amount / 100,
         durationText: selectedProduct.durationText,
         provides: selectedProduct.provides,
-        classType:selectedProduct.classType
+        classType: selectedProduct.classType,
       });
     }
-  }, [selectedProduct,isPopupOpen]);
+  }, [selectedProduct, isPopupOpen]);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -100,8 +130,6 @@ function HomePayment() {
       [e.target.name]: e.target.value,
     });
   };
-
-
 
   const handleProvideChange = (index, value) => {
     const newProvides = [...formData.provides];
@@ -113,19 +141,20 @@ function HomePayment() {
   };
   const scrollContainer = (index) => {
     if (providesContainerRef.current) {
-      const itemHeight = 40; 
+      const itemHeight = 40;
       providesContainerRef.current.scrollTop = index * itemHeight;
     }
   };
   const scrollLatestInputIntoView = () => {
     if (providesContainerRef.current) {
-      providesContainerRef.current.scrollTop = providesContainerRef.current.scrollHeight;
+      providesContainerRef.current.scrollTop =
+        providesContainerRef.current.scrollHeight;
     }
   };
   const handleAddProvide = () => {
     setFormData({
       ...formData,
-      provides: [...formData.provides, ''],
+      provides: [...formData.provides, ""],
     });
     scrollLatestInputIntoView();
   };
@@ -140,252 +169,262 @@ function HomePayment() {
   };
   const handleMoveDown = (index) => {
     if (index < formData.provides.length - 1) {
-     
       scrollContainer(index + 1);
     }
   };
   const handleMoveUp = (index) => {
     if (index > 0) {
-    
       scrollContainer(index - 1);
     }
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      util.setLoader(true); 
+      util.setLoader(true);
       const { heading, amount, durationText, provides, classType } = formData;
       if (!heading || !amount) {
-        alert('Heading and Amount cannot be empty');
-        setIsPopupOpen(true); 
-        util.setLoader(false); 
+        alert("Heading and Amount cannot be empty");
+        setIsPopupOpen(true);
+        util.setLoader(false);
         return;
       }
       // setIsPopupOpen(false);
-    
-    
-    const amountInPaisa = parseInt(amount, 10) * 100;
 
-    
-    const filteredProvides = provides.filter(provide => provide.trim() !== '');
+      const amountInPaisa = parseInt(amount, 10) * 100;
 
-   console.log(filteredProvides);
-    const subscriptionType = durationText.toLowerCase();
-
-  
-    const calculatedurationInMilliseconds = (duration) => {
-      const now = new Date();
-      switch (duration) {
-        case 'weekly':
-          return 7 * 24 * 60 * 60 * 1000;
-        case 'monthly':
-          return 30 * 24 * 60 * 60 * 1000; 
-        case 'quarterly':
-          return 3 * 30 * 24 * 60 * 60 * 1000;
-        case 'yearly':
-          return 365 * 24 * 60 * 60 * 1000;
-        default:
-          return now.getTime();
-      }
-    };
-
-    const durationInMilliseconds = calculatedurationInMilliseconds(subscriptionType);
-
-    const confirmation = window.confirm('Do you want to proceed with this submission? Click "OK" to submit or "Cancel" to edit.');
-    if (!confirmation) {
-      setIsPopupOpen(true); 
-      util.setLoader(false);
-      return;
-    }
-    setIsPopupOpen(false);
-      await API.put("awsaiapp", "/user/development-form/subscriptions",
-        {
-          body: {
-            institution,
-            cognitoId,
-            heading,
-            amount: amountInPaisa, 
-            duration:durationInMilliseconds,
-            country:"india",
-            currency:"INR",
-            india:true,
-            durationText:subscriptionType,
-            subscriptionType:subscriptionType, 
-            provides,
-            classType
-        
-          },
-        }
+      const filteredProvides = provides.filter(
+        (provide) => provide.trim() !== ""
       );
 
+      console.log(filteredProvides);
+      const subscriptionType = durationText.toLowerCase();
+
+      const calculatedurationInMilliseconds = (duration) => {
+        const now = new Date();
+        switch (duration) {
+          case "weekly":
+            return 7 * 24 * 60 * 60 * 1000;
+          case "monthly":
+            return 30 * 24 * 60 * 60 * 1000;
+          case "quarterly":
+            return 3 * 30 * 24 * 60 * 60 * 1000;
+          case "yearly":
+            return 365 * 24 * 60 * 60 * 1000;
+          default:
+            return now.getTime();
+        }
+      };
+
+      const durationInMilliseconds =
+        calculatedurationInMilliseconds(subscriptionType);
+
+      const confirmation = window.confirm(
+        'Do you want to proceed with this submission? Click "OK" to submit or "Cancel" to edit.'
+      );
+      if (!confirmation) {
+        setIsPopupOpen(true);
+        util.setLoader(false);
+        return;
+      }
       setIsPopupOpen(false);
-      const data = await API.get('main', `/any/products/${institution}`);
-      setProducts(data);
-      console.log('Form Data:', formData);
-      setFormData({
-        heading: '',
-        amount: '',
-        durationText: 'Monthly',
-        provides: [''],
+      await API.put("awsaiapp", "/user/development-form/subscriptions", {
+        body: {
+          institution,
+          cognitoId,
+          heading,
+          amount: amountInPaisa,
+          duration: durationInMilliseconds,
+          country: "india",
+          currency: "INR",
+          india: true,
+          durationText: subscriptionType,
+          subscriptionType: subscriptionType,
+          provides,
+          classType,
+        },
       });
-      alert('Subscription created successfully');
-      util.setLoader(false); 
+
+      setIsPopupOpen(false);
+      const data = await API.get("main", `/any/products/${institution}`);
+      setProducts(data);
+      console.log("Form Data:", formData);
+      setFormData({
+        heading: "",
+        amount: "",
+        durationText: "Monthly",
+        provides: [""],
+      });
+      alert("Subscription created successfully");
+      util.setLoader(false);
     } catch (error) {
-      alert('Error creating subscription:', error);
-      util.setLoader(false); 
+      alert("Error creating subscription:", error);
+      util.setLoader(false);
     }
-    util.setLoader(false); 
+    util.setLoader(false);
   };
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      util.setLoader(true); 
+      util.setLoader(true);
       const { heading, amount, durationText, provides, classType } = formData;
       if (!heading || !amount) {
-        alert('Heading and Amount cannot be empty');
-        setIsEditPopupOpen(true); 
-        util.setLoader(false); 
+        alert("Heading and Amount cannot be empty");
+        setIsEditPopupOpen(true);
+        util.setLoader(false);
         return;
       }
-      const confirmation = window.confirm('Do you want to proceed with this submission? Click "OK" to submit or "Cancel" to edit.');
+      const confirmation = window.confirm(
+        'Do you want to proceed with this submission? Click "OK" to submit or "Cancel" to edit.'
+      );
       if (!confirmation) {
-        setIsEditPopupOpen(true); 
+        setIsEditPopupOpen(true);
         util.setLoader(false);
         return;
       }
       setIsEditPopupOpen(false);
-    
-    
-    const amountInPaisa = parseInt(amount, 10) * 100;
 
-    
-    const filteredProvides = provides.filter(provide => provide.trim() !== '');
+      const amountInPaisa = parseInt(amount, 10) * 100;
 
-   console.log(filteredProvides);
-    const subscriptionType = durationText.toLowerCase();
-
-  
-    const calculatedurationInMilliseconds = (duration) => {
-      const now = new Date();
-      switch (duration) {
-        case 'weekly':
-          return 7 * 24 * 60 * 60 * 1000;
-        case 'monthly':
-          return 30 * 24 * 60 * 60 * 1000; 
-        case 'quarterly':
-          return 3 * 30 * 24 * 60 * 60 * 1000;
-        case 'yearly':
-          return 365 * 24 * 60 * 60 * 1000;
-        default:
-          return now.getTime();
-      }
-    };
-
-    const durationInMilliseconds = calculatedurationInMilliseconds(subscriptionType);
-
-
-      await API.put("awsaiapp", "/user/development-form/update-subscription",
-        {
-          body: {
-            institution,
-            cognitoId,
-            heading,
-            amount: amountInPaisa, 
-            duration:durationInMilliseconds,
-            country:"india",
-            currency:"INR",
-            india:true,
-            durationText:subscriptionType,
-            subscriptionType:subscriptionType, 
-            provides,
-            productId:selectedProduct.productId,
-            classType
-          },
-        }
+      const filteredProvides = provides.filter(
+        (provide) => provide.trim() !== ""
       );
 
-      setIsEditPopupOpen(false);
-      const data = await API.get('main', `/any/products/${institution}`);
-      setProducts(data);
-      console.log('Form Data:', formData);
-      setFormData({
-        heading: '',
-        amount: '',
-        durationText: 'Monthly',
-        provides: [''],
+      console.log(filteredProvides);
+      const subscriptionType = durationText.toLowerCase();
+
+      const calculatedurationInMilliseconds = (duration) => {
+        const now = new Date();
+        switch (duration) {
+          case "weekly":
+            return 7 * 24 * 60 * 60 * 1000;
+          case "monthly":
+            return 30 * 24 * 60 * 60 * 1000;
+          case "quarterly":
+            return 3 * 30 * 24 * 60 * 60 * 1000;
+          case "yearly":
+            return 365 * 24 * 60 * 60 * 1000;
+          default:
+            return now.getTime();
+        }
+      };
+
+      const durationInMilliseconds =
+        calculatedurationInMilliseconds(subscriptionType);
+
+      await API.put("awsaiapp", "/user/development-form/update-subscription", {
+        body: {
+          institution,
+          cognitoId,
+          heading,
+          amount: amountInPaisa,
+          duration: durationInMilliseconds,
+          country: "india",
+          currency: "INR",
+          india: true,
+          durationText: subscriptionType,
+          subscriptionType: subscriptionType,
+          provides,
+          productId: selectedProduct.productId,
+          classType,
+        },
       });
-      alert('Subscription created successfully');
-      util.setLoader(false); 
+
+      setIsEditPopupOpen(false);
+      const data = await API.get("main", `/any/products/${institution}`);
+      setProducts(data);
+      console.log("Form Data:", formData);
+      setFormData({
+        heading: "",
+        amount: "",
+        durationText: "Monthly",
+        provides: [""],
+      });
+      alert("Subscription created successfully");
+      util.setLoader(false);
     } catch (error) {
-      alert('Error creating subscription:', error);
-      util.setLoader(false); 
+      alert("Error creating subscription:", error);
+      util.setLoader(false);
     }
   };
   const handleDeleteSubscription = async () => {
-    const confirmation = window.confirm('Do you want to proceed with this submission? Click "OK" to submit or "Cancel" to edit.');
+    const confirmation = window.confirm(
+      'Do you want to proceed with this submission? Click "OK" to submit or "Cancel" to edit.'
+    );
     if (!confirmation) {
-      setIsEditPopupOpen(true); 
+      setIsEditPopupOpen(true);
       util.setLoader(false);
       return;
     }
     setIsEditPopupOpen(false);
-    util.setLoader(true); 
+    util.setLoader(true);
     try {
-    console.log(selectedProduct.productId)
-     
+      console.log(selectedProduct.productId);
+
       await API.del(
-       "awsaiapp", 
-        `/user/development-form/delete-subscription/${institution}`, {
+        "awsaiapp",
+        `/user/development-form/delete-subscription/${institution}`,
+        {
           body: {
-          cognitoId,
-          productId:selectedProduct.productId },
-        } );
-        handleCloseEditPopup();
-      alert('Subscription deleted successfully');
-      const data = await API.get('main', `/any/products/${institution}`);
+            cognitoId,
+            productId: selectedProduct.productId,
+          },
+        }
+      );
+      handleCloseEditPopup();
+      alert("Subscription deleted successfully");
+      const data = await API.get("main", `/any/products/${institution}`);
 
       setProducts(data);
-      util.setLoader(false); 
+      util.setLoader(false);
     } catch (error) {
-     alert('Error deleting subscription:', error);
-     util.setLoader(false); 
-     handleCloseEditPopup();
+      alert("Error deleting subscription:", error);
+      util.setLoader(false);
+      handleCloseEditPopup();
     }
   };
   return (
-    <div className='z-1000'>
-      <Nav 
-        institution={institution} 
-        setActiveComponent={setActiveComponent} 
-        activeComponent={activeComponent} 
-        userType={userType} 
+    <div className="z-1000">
+      <Nav
+        institution={institution}
+        setActiveComponent={setActiveComponent}
+        activeComponent={activeComponent}
+        userType={userType}
         setIsPopupOpen={setIsPopupOpen}
       />
 
-      <div style={{ display: activeComponent === 'AllPayment' ? 'block' : 'none' }}>
-        <AllPayment 
-          institution={institution} 
+      <div
+        style={{ display: activeComponent === "AllPayment" ? "block" : "none" }}
+      >
+        <AllPayment
+          institution={institution}
           setActiveComponent={setActiveComponent}
-          userType={userType} 
-          products={products} 
-          handleSetSelectedProduct={handleSetSelectedProduct} 
+          userType={userType}
+          products={products}
+          handleSetSelectedProduct={handleSetSelectedProduct}
         />
       </div>
-      
-      <div style={{ display: activeComponent === 'Cart' ? 'block' : 'none' }}>
+
+      <div style={{ display: activeComponent === "Cart" ? "block" : "none" }}>
         <Cart institution={institution} />
       </div>
-            
-      <div style={{ display: activeComponent === 'contact' ? 'block' : 'none' }}>
-        <Query activeComponent={activeComponent}/>
+
+      <div
+        style={{ display: activeComponent === "contact" ? "block" : "none" }}
+      >
+        <Query activeComponent={activeComponent} />
       </div>
 
-      <div style={{ display: activeComponent === 'history' ? 'block' : 'none' }}>
-        <PaymentHistory institution={institution}  activeComponent={activeComponent}/>
+      <div
+        style={{ display: activeComponent === "history" ? "block" : "none" }}
+      >
+        <PaymentHistory
+          institution={institution}
+          activeComponent={activeComponent}
+        />
       </div>
-       <CreateSubscriptionPopup
-       isPopupOpen={isPopupOpen}
-       onClose={handleCloseCreatePopup}
+      <CreateSubscriptionPopup
+        isPopupOpen={isPopupOpen}
+        onClose={handleCloseCreatePopup}
         handleSubmit={handleSubmit}
         handleInputChange={handleInputChange}
         handleProvideChange={handleProvideChange}
@@ -399,8 +438,8 @@ function HomePayment() {
       />
 
       <UpdateSubscriptionPopup
-       isEditPopupOpen={isEditPopupOpen}
-       onClose={handleCloseEditPopup}
+        isEditPopupOpen={isEditPopupOpen}
+        onClose={handleCloseEditPopup}
         handleSubmit={handleEditSubmit}
         handleInputChange={handleInputChange}
         handleProvideChange={handleProvideChange}
@@ -412,7 +451,6 @@ function HomePayment() {
         handleMoveUp={handleMoveUp}
         handleMoveDown={handleMoveDown}
         handleDeleteSubscription={handleDeleteSubscription}
-        
       />
     </div>
   );

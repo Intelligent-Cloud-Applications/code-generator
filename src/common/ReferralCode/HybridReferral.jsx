@@ -1,29 +1,26 @@
+import { animated, useSpring } from "@react-spring/web";
 import React, { useContext, useEffect, useState } from "react";
-import { useSpring, animated } from "@react-spring/web";
 import Context from "../../Context/Context";
 import InstitutionContext from "../../Context/InstitutionContext";
 import copy from "../../utils/Png/copy.png";
+import Facebook from "../../utils/Png/Facebook.svg";
 import share from "../../utils/Png/share.png";
 import Telegram from "../../utils/Png/Telegram.svg";
 import Twitter from "../../utils/Png/Twitter.svg";
-import Facebook from "../../utils/Png/Facebook.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
+// import './Referral.css';
 import { API } from "aws-amplify";
 
-function ReferralCode() {
+function HybridReferral() {
   const { userData } = useContext(Context);
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const [shareClicked, setShareClicked] = useState(false);
   const [members, setMembers] = useState(0);
-
-  const { number } = useSpring({
-    from: { number: 0 },
-    to: { number: members },
-    config: { tension: 200, friction: 20 },
-  });
-
   let domain;
-  if (process.env.REACT_APP_STAGE === "DEV") {
+
+  if (process.env.NODE_ENV === "development") {
+    domain = "http://localhost:3000";
+  } else if (process.env.REACT_APP_STAGE === "DEV") {
     domain = process.env.REACT_APP_DOMAIN_BETA;
   } else if (process.env.REACT_APP_STAGE === "PROD") {
     domain = process.env.REACT_APP_DOMAIN_PROD;
@@ -31,7 +28,7 @@ function ReferralCode() {
 
   let referralLink;
   if (userData.userType === "instructor") {
-    referralLink = `${domain}/signup?referral=${userData.referral_code}`;
+    referralLink = `${domain}/hybrid/?institution=${userData.institution}&referral=${userData.referral_code}`;
   } else if (userData.userType === "admin") {
     referralLink = `${domain}/signup?referral=${userData.institution}`;
   }
@@ -73,7 +70,6 @@ function ReferralCode() {
     }
     window.open(url, "_blank");
   };
-
   useEffect(() => {
     async function fetchReferralData() {
       try {
@@ -81,15 +77,21 @@ function ReferralCode() {
           "main",
           `/instructor/referred-members/${userData.referral_code}`
         );
-        console.log(response);
+        console.log("Response:", response);
         setMembers(response.referredMembers.length);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching referral data:", error);
       }
     }
-
     fetchReferralData();
   }, [userData.referral_code]);
+
+  const { number } = useSpring({
+    from: { number: 0 },
+    number: members,
+    delay: 200,
+    config: { duration: 1000 },
+  });
 
   return (
     <div className="Poppins w-full flex flex-col justify-center items-center">
@@ -138,7 +140,7 @@ function ReferralCode() {
         <div className="flex flex-col gap-2">
           <div className="w-[15rem] bg-white shadow-md h-[50%]">
             <div
-              className="text-center text-white"
+              className="text-center text-white "
               style={{ backgroundColor: InstitutionData.PrimaryColor }}
             >
               MEMBERS
@@ -152,7 +154,7 @@ function ReferralCode() {
           </div>
           <div className="w-[15rem] bg-white shadow-sm h-[50%]">
             <div
-              className="text-center text-white"
+              className="text-center text-white "
               style={{ backgroundColor: InstitutionData.PrimaryColor }}
             >
               EARNINGS
@@ -168,7 +170,7 @@ function ReferralCode() {
       </div>
       {shareClicked && (
         <div
-          className="bg-[#ffffff] mt-3 mb-4 flex flex-col items-center px-5 p-2 fade-down"
+          className={`bg-[#ffffff] mt-3 mb-4 flex flex-col items-center px-5 p-2 fade-down`}
           style={{ boxShadow: "0 0 8px rgba(0, 0, 0, 0.2)" }}
         >
           <div className="flex justify-center items-center gap-5">
@@ -215,4 +217,4 @@ function ReferralCode() {
   );
 }
 
-export default ReferralCode;
+export default HybridReferral;

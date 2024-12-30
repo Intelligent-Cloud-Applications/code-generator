@@ -72,7 +72,7 @@ const DashBoard = () => {
       <NavBar />
       <div className={`flex flex-col items-center w-screen `}>
         {
-          Ctx.userData.dob && (<BirthdayModal />)
+          Ctx?.userData && Ctx.userData.hasOwnProperty("dob") && Ctx.userData.dob && (<BirthdayModal />)
         }
         <div
           className={`w-full rounded-3xl flex max1050:w-screen max1050:ml-0 max536:rounded-none items-top ml-0 h-full relative`}

@@ -7,10 +7,11 @@ import { FaArrowCircleRight } from "react-icons/fa";
 import { FaArrowLeft, FaCalendarAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { Button2 } from "../../../../common/Inputs";
-import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 import Context from "../../../../Context/Context";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import EditableInput from "./EditableInput";
+import HybridReferral from "../../../../common/ReferralCode/HybridReferral.jsx";
+import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
 
@@ -25,7 +26,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [name, setName] = useState(UserCtx.userName);
   const [country] = useState(UserCtx.country);
   const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId);
-  const [about,setAbout] = useState(UserCtx.about)
+  const [about,setAbout] = useState(UserCtx.hasOwnProperty("about") && UserCtx.about)
 
   
   const [image, setImage] = useState(null);
@@ -452,7 +453,7 @@ const ifDataChanged = () => {
                     {referralLink && (
                       <div className="flex flex-col gap-2">
                         <label className="ml-2 text-sm font-semibold text-gray-700">
-                          Referral Link
+                          Hybrid Page Link
                         </label>
                         <div className="flex items-center gap-2">
                           <input
@@ -804,6 +805,13 @@ const ifDataChanged = () => {
           <div>
             <ReferralCode />
           </div>
+          {
+            userData.userType === "instructor" && (
+              <div>
+                <HybridReferral />
+              </div>
+            )
+          }
         </>
       )}
     </div>

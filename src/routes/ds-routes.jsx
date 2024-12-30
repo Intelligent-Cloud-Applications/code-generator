@@ -55,9 +55,9 @@ const RoutesContainer = () => {
       <Route path="/privacypolicy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/refund" element={<Refund />} />
-      <Route path="/login" element={process.env.REACT_APP_STAGE === "PROD" ? <PhoneAuth /> : <Login />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
-      <Route path="/signup" element={process.env.REACT_APP_STAGE === "PROD" ? <Error /> : <Signup />} />
+      <Route path="/signup" element={<Signup />} />
       <Route path="/dashboard" element={<DashBoard />} />
       <Route path="/meeting" element={<Meeting />} />
       <Route path="/query" element={<Query />} />
