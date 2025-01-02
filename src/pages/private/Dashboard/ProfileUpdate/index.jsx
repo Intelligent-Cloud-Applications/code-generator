@@ -14,11 +14,12 @@ import HybridReferral from "../../../../common/ReferralCode/HybridReferral.jsx";
 import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
-import countries from '../../../../common/Inputs/countries.json';
+import Countries from '../../../../common/Inputs/countries.json';
 
 // import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
+  const countries = [{countryCode: '', value: '', name: ''}, ...Countries]
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const Ctx = useContext(Context);
   const UserCtx = useContext(Context).userData;
@@ -191,7 +192,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const onProfileUpdate = async (e) => {
     e.preventDefault();
 
-    if (!phoneNumber.startsWith('+' + country.value)) {
+    if (country.value !== '' && !phoneNumber.startsWith('+' + country.value)) {
       toast.error("Invalid country code. Phone number must start with +" + country.value);
       return;
     }
@@ -201,7 +202,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
 
     UtilCtx.setLoader(true);
     if (ifDataChanged()) {
-      if (phoneNumber.length >= 10) {
+      // if (phoneNumber.length >= 10) {
         try {
           const formattedDob = tempDob
             ? String(new Date(tempDob).getTime())
@@ -238,10 +239,10 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
           toast.warn(e.message);
           UtilCtx.setLoader(false);
         }
-      } else {
-        toast.warn("Entered Phone Number is Not Valid");
-        UtilCtx.setLoader(false);
-      }
+      // } else {
+      //   toast.warn("Entered Phone Number is Not Valid");
+      //   UtilCtx.setLoader(false);
+      // }
     } else {
       toast.warn("Nothing is to be changed");
       UtilCtx.setLoader(false);
