@@ -24,6 +24,7 @@ function HybridReferral() {
     const [paymentDates, setPaymentDates] = useState({});
     const [isLoadingDates, setIsLoadingDates] = useState(true);
   
+    
     useEffect(() => {
       const loadPaymentDates = async () => {
         const dates = {};
@@ -291,7 +292,8 @@ function HybridReferral() {
           </div>
         </div>
       )}
-
+      {
+        membersLength>0 &&
       <Modal show={isOpen} onClose={() => setIsOpen(false)} size="5xl">
         <Modal.Header close="icon"></Modal.Header>
         <Modal.Body>
@@ -339,6 +341,7 @@ function HybridReferral() {
           </div>
         </Modal.Body>
       </Modal>
+      }
     </div>
   );
 }

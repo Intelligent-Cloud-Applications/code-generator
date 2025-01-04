@@ -285,7 +285,8 @@ function ReferralCode() {
           </div>
         </div>
       )}
-
+      {
+        membersLength >0 && 
       <Modal show={isOpen} onClose={() => setIsOpen(false)} size="5xl">
         <Modal.Header></Modal.Header>
         <Modal.Body>
@@ -333,6 +334,7 @@ function ReferralCode() {
           </div>
         </Modal.Body>
       </Modal>
+      }
     </div>
   );
 }
