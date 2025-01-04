@@ -192,7 +192,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const onProfileUpdate = async (e) => {
     e.preventDefault();
 
-    if (country.value !== '' && !phoneNumber.startsWith('+' + country.value)) {
+    if (country.value !== '' && phoneNumber !== '' && !phoneNumber.startsWith('+' + country.value)) {
       toast.error("Invalid country code. Phone number must start with +" + country.value);
       return;
     }
