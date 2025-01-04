@@ -143,9 +143,9 @@ function PaymentDetails() {
               <div className='text-[2rem] font-[700]'>
                 {formatAmountWithCurrency(totalOnlineAmount, currency)}
               </div>
-              <div className='text-[0.9rem] font-[500] text-[gray]'>
-                Last Cashout amount is <span className='text-green-600 text-bold'>₹{cashoutAmount?.amount}</span> on date {cashoutAmount?.paymentDate}
-              </div>
+              {/*<div className='text-[0.9rem] font-[500] text-[gray]'>*/}
+              {/*  Last Cashout amount is <span className='text-green-600 text-bold'>₹{cashoutAmount?.amount}</span> on date {cashoutAmount?.paymentDate}*/}
+              {/*</div>*/}
             </div>
           </div>
           <div className="flex flex-col w-1/2 max850:w-full">

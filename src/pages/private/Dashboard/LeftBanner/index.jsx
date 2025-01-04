@@ -262,11 +262,9 @@ const LeftBanner = ({ displayAfterClick }) => {
               text="Subscriptions"
               onClickFn={() => {
                 const baseUrl =
-                  process.env.NODE_ENV === "development" ?
-                    "http://localhost:3000" :
-                    process.env.REACT_APP_STAGE === 'PROD'
-                      ? process.env.REACT_APP_DOMAIN_PROD
-                      : process.env.REACT_APP_DOMAIN_BETA
+                  process.env.REACT_APP_STAGE === "DEV"
+                    ? "https://beta.happyprancer.com"
+                    : "https://happyprancer.com";
 
                 const url = `${baseUrl}/allpayment/${web.InstitutionId}/${UserCtx.userData.cognitoId}/${UserCtx.userData.emailId}`
                 window.open(url, '_blank', 'noopener,noreferrer')

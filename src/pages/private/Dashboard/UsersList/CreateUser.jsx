@@ -305,7 +305,7 @@ function CreateUser({
                 <InputComponent
                   width={100}
                   label="Amount"
-                  value={selectedProductAmount}
+                  value={selectedProductAmount/100}
                   readOnly
                 />
               </div>
