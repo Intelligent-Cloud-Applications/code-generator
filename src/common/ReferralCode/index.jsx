@@ -1,24 +1,45 @@
+import { animated, useSpring } from "@react-spring/web";
+import { API } from "aws-amplify";
+import { Modal, Badge } from "flowbite-react";
 import React, { useContext, useEffect, useState } from "react";
-import { useSpring, animated } from "@react-spring/web";
 import Context from "../../Context/Context";
 import InstitutionContext from "../../Context/InstitutionContext";
 import copy from "../../utils/Png/copy.png";
+import Facebook from "../../utils/Png/Facebook.svg";
 import share from "../../utils/Png/share.png";
 import Telegram from "../../utils/Png/Telegram.svg";
 import Twitter from "../../utils/Png/Twitter.svg";
-import Facebook from "../../utils/Png/Facebook.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
-import { API } from "aws-amplify";
+import { PaginatedTable } from "../DataDisplay";
 
 function ReferralCode() {
   const { userData } = useContext(Context);
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const [shareClicked, setShareClicked] = useState(false);
-  const [members, setMembers] = useState(0);
+  const [membersLength, setMembersLength] = useState(0);
+  const [members, setMembers] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [paymentDates, setPaymentDates] = useState({});
+  const [isLoadingDates, setIsLoadingDates] = useState(true);
+
+  useEffect(() => {
+    const loadPaymentDates = async () => {
+      const dates = {};
+      for (const member of members) {
+        dates[member.cognitoId] = await getPaymentDate(member);
+      }
+      setPaymentDates(dates);
+      setIsLoadingDates(false);
+    };
+
+    if (members.length > 0) {
+      loadPaymentDates();
+    }
+  }, [members]);
 
   const { number } = useSpring({
     from: { number: 0 },
-    to: { number: members },
+    to: { number: membersLength },
     config: { tension: 200, friction: 20 },
   });
 
@@ -43,6 +64,28 @@ function ReferralCode() {
 
   const handleShare = () => {
     setShareClicked(!shareClicked);
+  };
+
+  const getDate = (epochTime) => {
+    const date = new Date(Number(epochTime)); // Creating a Date object
+    // To convert the date to local time
+    const localDate = date.toLocaleString();
+    return localDate.split(",")[0];
+  };
+
+  const getPaymentDate = async (user) => {
+    try {
+      const response = await API.get(
+        "awsaiapp",
+        `/getReciept/${user.institution}/${user.cognitoId}`,
+        {}
+      );
+      const data = response.payments[0].paymentDate;
+      const date = getDate(data);
+      return date;
+    } catch (error) {
+      console.error("Error fetching payment history:", error);
+    }
   };
 
   const shareMessage = `I'm inviting you to join ${InstitutionData.InstitutionId}. Just click the link below.\n${referralLink}`;
@@ -81,8 +124,9 @@ function ReferralCode() {
           "main",
           `/instructor/referred-members/${userData.referral_code}`
         );
-        console.log(response);
-        setMembers(response.referredMembers.length);
+        // console.log(response);
+        setMembers(response.referredMembers);
+        setMembersLength(response.referredMembers.length);
       } catch (error) {
         console.error(error);
       }
@@ -90,6 +134,35 @@ function ReferralCode() {
 
     fetchReferralData();
   }, [userData.referral_code]);
+
+  const getInitials = (name) => {
+    if (!name) return "";
+    const initials = name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("");
+    return initials;
+  };
+
+  const getColor = (name) => {
+    if (!name) return "#888888";
+    const colors = [
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+    ];
+    const index = name.length % colors.length;
+    return colors[index];
+  };
 
   return (
     <div className="Poppins w-full flex flex-col justify-center items-center">
@@ -144,8 +217,9 @@ function ReferralCode() {
               MEMBERS
             </div>
             <animated.div
-              className="text-[2rem] p-2 text-center font-bold Inter"
+              className="text-[2rem] p-2 text-center font-bold Inter hover:cursor-pointer"
               style={{ color: InstitutionData.PrimaryColor }}
+              onClick={() => setIsOpen(true)}
             >
               {number.to((n) => n.toFixed(0))}
             </animated.div>
@@ -211,6 +285,54 @@ function ReferralCode() {
           </div>
         </div>
       )}
+
+      <Modal show={isOpen} onClose={() => setIsOpen(false)} size="5xl">
+        <Modal.Header></Modal.Header>
+        <Modal.Body>
+          <div className="overflow-x-auto">
+            {/* {console.log("Members: ", members)} */}
+            <PaginatedTable
+              head={["Profile Picture", "Name", "Type", "Plan", "Payment Date"]}
+              data={members.map((member) => [
+                member.hasOwnProperty("imgUrl") ? (
+                  <img
+                    src={member.imgUrl}
+                    alt={member.userName}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className={`rounded-full p-2 h-12 w-12 flex items-center justify-center text-[1rem] text-white`}
+                    style={{
+                      backgroundColor: getColor(member.userName),
+                    }}
+                  >
+                    {getInitials(member.userName)}
+                  </div>
+                ),
+                member.userName,
+                member.hasOwnProperty("hybridPageUser") &&
+                member.hybridPageUser === true ? (
+                  <Badge color="info" icon="off" size="xs">
+                    Hybrid
+                  </Badge>
+                ) : (
+                  <Badge color="gray" icon="off" >
+                    Referral
+                  </Badge>
+                ),
+                member.hasOwnProperty("products") && member.products?.length > 0
+                  ? member.products[0].S
+                  : "---",
+                isLoadingDates
+                  ? "Loading..."
+                  : paymentDates[member.cognitoId] || "---",
+              ])}
+              itemsPerPage={10}
+            />
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }
