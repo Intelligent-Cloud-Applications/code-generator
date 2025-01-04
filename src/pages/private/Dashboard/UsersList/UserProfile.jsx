@@ -375,7 +375,7 @@ const UserProfile = ({
                   <input
                     className={` bg-inputBgColor px-4 py-2 rounded-lg`}
                     type="text"
-                    value={selectedProductAmount}
+                    value={selectedProductAmount/100}
                     readOnly // Make the input read-only
                   />
                 </div>

@@ -129,11 +129,9 @@ const RazorpayPayment = ({ productId }) => {
   // };
 
   const domain =
-    process.env.NODE_ENV === "development" ?
-      "http://localhost:3000" :
-      process.env.REACT_APP_STAGE === "DEV"
-        ? process.env.REACT_APP_DOMAIN_BETA
-        : process.env.REACT_APP_DOMAIN_PROD;
+    process.env.REACT_APP_STAGE === "DEV"
+      ? "https://beta.happyprancer.com"
+      : "https://happyprancer.com";
 
   return (
     <div className="z-1">

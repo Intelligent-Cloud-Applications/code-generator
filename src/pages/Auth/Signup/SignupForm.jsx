@@ -8,7 +8,7 @@ import {
   BaseTextInputWithValue
 } from "../../../common/Inputs";
 import { useEffect,useState } from "react";
-import { useLocation } from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 
 const SignupForm = ({ handler }) => {
   const [referral_code, setReferralCode] = useState('');
@@ -39,12 +39,13 @@ const SignupForm = ({ handler }) => {
       <PasswordInput name='password_confirmation' className='rounded w-full' placeholder='Confirm Password'/>
       {
         referral_code ? (
-          <BaseTextInputWithValue name='referral' className='rounded w-full' value={referral_code} required={false}/>
-        ):
-      <BaseTextInput name='referral' className='rounded w-full' placeholder='Referral Code (optional)'
-        required={false}/>
+            <BaseTextInputWithValue name='referral' className='rounded w-full' value={referral_code} required={false}/>
+          ) :
+          <BaseTextInput name='referral' className='rounded w-full' placeholder='Referral Code (optional)'
+                         required={false}/>
       }
       <PrimaryButton>Continue</PrimaryButton>
+      <p className='text-center'>Already have an account or want to use Google? <Link className='underline' to={'/login'}>Login</Link></p>
     </form>
   )
 }

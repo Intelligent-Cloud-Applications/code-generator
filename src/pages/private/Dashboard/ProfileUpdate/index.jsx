@@ -1,5 +1,5 @@
 import { API, Auth, Storage } from "aws-amplify";
-import { Label, Modal, TextInput,Tooltip } from "flowbite-react";
+import {Label, Modal, Select, TextInput, Tooltip} from "flowbite-react";
 import React, { useContext, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
@@ -14,21 +14,23 @@ import HybridReferral from "../../../../common/ReferralCode/HybridReferral.jsx";
 import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
+import Countries from '../../../../common/Inputs/countries.json';
 
 // import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
+  const countries = [{countryCode: '', value: '', name: ''}, ...Countries]
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const Ctx = useContext(Context);
   const UserCtx = useContext(Context).userData;
   const UtilCtx = useContext(Context).util;
   const { userData, setUserData } = useContext(Context);
   const [name, setName] = useState(UserCtx.userName);
-  const [country] = useState(UserCtx.country);
+  const [country, setCountry] = useState(countries.find(country => country.name.startsWith(UserCtx.country)) || countries[0]);
   const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId);
   const [about,setAbout] = useState(UserCtx.hasOwnProperty("about") && UserCtx.about)
 
-  
+
   const [image, setImage] = useState(null);
   const [editor, setEditor] = useState(null);
   const [scale, setScale] = useState(1);
@@ -72,7 +74,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [joiningDate] = useState(formatDate(UserCtx?.joiningDate));
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const [dob, setDob] = useState(UserCtx.dob || "");
   const [address, setAddress] = useState(UserCtx.address || "");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -83,24 +85,24 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [phoneCode, setPhoneCode] = useState("");
   const [isPhoneChange, setIsPhoneChange] = useState(false);
   const [isPhoneCode, setIsPhoneCode] = useState(false);
-  
-const [tempDob, setTempDob] = useState(
-  dob ? new Date(Number(dob)).toISOString().split("T")[0] : ""
-);
 
-
-
-
-const ifDataChanged = () => {
-  return !(
-    name.trim() === UserCtx.userName.trim() &&
-    phoneNumber.trim() === UserCtx.phoneNumber &&
-    country.trim() === UserCtx.country &&
-    joiningDate.trim() === UserCtx.joiningDate &&
-    Number(dob) === Number(UserCtx.dob) && // Directly compare as epoch timestamps
-    address.trim() === UserCtx.address
+  const [tempDob, setTempDob] = useState(
+    dob ? new Date(Number(dob)).toISOString().split("T")[0] : ""
   );
-};
+
+
+
+
+  const ifDataChanged = () => {
+    return !(
+      name.trim() === UserCtx.userName.trim() &&
+      phoneNumber.trim() === UserCtx.phoneNumber &&
+      country.name.startsWith(UserCtx.country) &&
+      joiningDate.trim() === UserCtx.joiningDate &&
+      Number(dob) === Number(UserCtx.dob) && // Directly compare as epoch timestamps
+      address.trim() === UserCtx.address
+    );
+  };
 
 
   const handleImageChange = (e) => {
@@ -148,7 +150,7 @@ const ifDataChanged = () => {
       // Upload the file to S3 with the filename as Cognito User ID
       const response = await Storage.put(
         `${InstitutionData.InstitutionId}/${cognitoId}/profile.jpg?v=` +
-          new Date().getTime(),
+        new Date().getTime(),
         blob,
         {
           level: "public", // or "protected" depending on your access needs
@@ -190,9 +192,17 @@ const ifDataChanged = () => {
   const onProfileUpdate = async (e) => {
     e.preventDefault();
 
+    if (country.value !== '' && !phoneNumber.startsWith('+' + country.value)) {
+      toast.error("Invalid country code. Phone number must start with +" + country.value);
+      return;
+    }
+
+    const countryName = country.name.split(' (')[0];
+    console.log(countryName);
+
     UtilCtx.setLoader(true);
     if (ifDataChanged()) {
-      if (phoneNumber.length >= 10) {
+      // if (phoneNumber.length >= 10) {
         try {
           const formattedDob = tempDob
             ? String(new Date(tempDob).getTime())
@@ -206,7 +216,7 @@ const ifDataChanged = () => {
                 emailId: UserCtx.emailId,
                 userName: name,
                 phoneNumber: phoneNumber,
-                country: country,
+                country: countryName,
                 joiningDate: joiningDate,
                 dob: formattedDob,
                 address: address,
@@ -229,10 +239,10 @@ const ifDataChanged = () => {
           toast.warn(e.message);
           UtilCtx.setLoader(false);
         }
-      } else {
-        toast.warn("Entered Phone Number is Not Valid");
-        UtilCtx.setLoader(false);
-      }
+      // } else {
+      //   toast.warn("Entered Phone Number is Not Valid");
+      //   UtilCtx.setLoader(false);
+      // }
     } else {
       toast.warn("Nothing is to be changed");
       UtilCtx.setLoader(false);
@@ -446,42 +456,42 @@ const ifDataChanged = () => {
                 </div>
 
                 <>
-                {
-                  UserCtx.userType === "instructor" && (
+                  {
+                    UserCtx.userType === "instructor" && (
 
-                  <div className="flex flex-col gap-4 justify-center bg-gray-100 p-4 rounded-lg shadow-md w-full">
-                    {referralLink && (
-                      <div className="flex flex-col gap-2">
-                        <label className="ml-2 text-sm font-semibold text-gray-700">
-                          Hybrid Page Link
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            className="bg-white px-4 py-2 rounded-lg w-full border border-gray-300 shadow-sm text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-                            type="text"
-                            value={referralLink}
-                            readOnly
-                          />
-                          <Tooltip
-                            content="Go to Link"
-                            position="top"
-                            arrow={false}
-                          >
-                            <button
-                              className="bg-primaryColor text-white rounded-lg py-2 px-4 shadow-md hover:bg-lightPrimaryColor hover:shadow-lg transition-transform transform hover:scale-105"
-                              onClick={() => {
-                                window.location.href = referralLink;
-                              }}
-                            >
-                              <FaArrowCircleRight className="h-6" />
-                            </button>
-                          </Tooltip>
-                        </div>
+                      <div className="flex flex-col gap-4 justify-center bg-gray-100 p-4 rounded-lg shadow-md w-full">
+                        {referralLink && (
+                          <div className="flex flex-col gap-2">
+                            <label className="ml-2 text-sm font-semibold text-gray-700">
+                              Hybrid Page Link
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                className="bg-white px-4 py-2 rounded-lg w-full border border-gray-300 shadow-sm text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                                type="text"
+                                value={referralLink}
+                                readOnly
+                              />
+                              <Tooltip
+                                content="Go to Link"
+                                position="top"
+                                arrow={false}
+                              >
+                                <button
+                                  className="bg-primaryColor text-white rounded-lg py-2 px-4 shadow-md hover:bg-lightPrimaryColor hover:shadow-lg transition-transform transform hover:scale-105"
+                                  onClick={() => {
+                                    window.location.href = referralLink;
+                                  }}
+                                >
+                                  <FaArrowCircleRight className="h-6" />
+                                </button>
+                              </Tooltip>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  )
-                }
+                    )
+                  }
                 </>
                 <form className={`mt-6 flex flex-col gap-8 max560:w-full`}>
                   <div
@@ -498,11 +508,11 @@ const ifDataChanged = () => {
                     </div>
                     <div className={`flex flex-col gap-1`}>
                       <label className={`ml-2`}>Phone Number</label>
-                      <input
+                      <EditableInput
                         className={`  bg-inputBgColor  px-4 py-2 rounded-lg w-full`}
                         type="text"
                         value={phoneNumber}
-                        readOnly
+                        onChange={(e) => setPhoneNumber(e.target.value)}
                       />
                     </div>
                   </div>
@@ -511,12 +521,19 @@ const ifDataChanged = () => {
                   >
                     <div className={`flex flex-col gap-1 justify-center`}>
                       <label className={`ml-2`}>Country</label>
-                      <input
-                        className={`bg-inputBgColor px-4 py-2 rounded-lg w-full`}
-                        type="text"
-                        value={country}
-                        readOnly
-                      />
+                      {/*<EditableInput*/}
+                      {/*  className={`bg-inputBgColor px-4 py-2 rounded-lg w-full`}*/}
+                      {/*  type="text"*/}
+                      {/*  value={country}*/}
+                      {/*  onChange={(e) => setCountry(e.target.value)}*/}
+                      {/*/>*/}
+                      <select defaultValue={countries.findIndex(e => e.name === country.name)} onChange={(e) => setCountry(countries[e.target.value])} className={`bg-inputBgColor px-4 py-2 rounded-lg w-full`}>
+                        {countries.map((item, index) => (
+                          <option key={index} value={index}>
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className={`flex flex-col gap-1`}>
                       <label className={`ml-2`}>Joining Date</label>
