@@ -5,7 +5,7 @@ import { API } from "aws-amplify";
 import { PaginatedTable } from "../../../../common/DataDisplay";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import Context from "../../../../Context/Context";
-import { institution } from "../../../../util/constants";
+import { institution } from "../../../../utils/constants";
 
 const Billing = () => {
   // const {PrimaryColor} = useContext(institutionContext).institutionData;
