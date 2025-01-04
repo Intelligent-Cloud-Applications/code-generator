@@ -140,6 +140,28 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     setSelectedOption(event.target.value);
   };
 
+  //for profile pic
+  const getInitials = (name) => {
+    if (!name) return '';
+    const initials = name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
+    return initials;
+  };
+
+  const getColor = (name) => {
+    if (!name) return '#888888';
+    const colors = [
+      '#FF5733', '#33FF57', '#5733FF', 
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF'
+    ];
+    const index = name.length % colors.length;
+    return colors[index];
+  };
+
   const mobileProps = {
     userCheck,
     setUserCheck,
@@ -375,16 +397,19 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                           >
                             <div className="flex justify-between w-[100%] items-center">
                               {/* Profile picture - shifted left and made circular */}
-                              <div className="w-[4%] h-8 flex justify-start items-center mr-3 rounded-full overflow-hidden">
+                              <div className="w-[4%] h-8 flex justify-start items-center mr-3">
                                 {user.imgUrl ? (
                                   <img
                                     src={user.imgUrl}
-                                    alt={user.userName?.charAt(0).toUpperCase()}
-                                    className="w-full h-full object-cover rounded-full"
+                                    alt={user.userName}
+                                    className="h-[35px] w-[35px] rounded-full object-cover"
                                   />
                                 ) : (
-                                  <div className="w-full h-full bg-primaryColor flex justify-center items-center text-white font-bold text-lg rounded-full">
-                                    {user.userName?.charAt(0).toUpperCase()}
+                                  <div
+                                    className="h-[35px] w-[35px] rounded-full flex items-center justify-center text-white text-sm font-medium"
+                                    style={{ backgroundColor: getColor(user.userName) }}
+                                  >
+                                    {getInitials(user.userName)}
                                   </div>
                                 )}
                               </div>
