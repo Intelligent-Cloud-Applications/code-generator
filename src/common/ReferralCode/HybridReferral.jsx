@@ -10,9 +10,8 @@ import Twitter from "../../utils/Png/Twitter.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
 // import './Referral.css';
 import { API } from "aws-amplify";
-import { Modal, Badge } from "flowbite-react";
+import { Badge, Modal } from "flowbite-react";
 import { PaginatedTable } from "../DataDisplay";
-
 
 function HybridReferral() {
   const { userData } = useContext(Context);
@@ -21,25 +20,25 @@ function HybridReferral() {
   const [membersLength, setMembersLength] = useState(0);
   const [members, setMembers] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-    const [paymentDates, setPaymentDates] = useState({});
-    const [isLoadingDates, setIsLoadingDates] = useState(true);
-  
-    
-    useEffect(() => {
-      const loadPaymentDates = async () => {
-        const dates = {};
-        for (const member of members) {
-          dates[member.cognitoId] = await getPaymentDate(member);
-        }
-        setPaymentDates(dates);
-        setIsLoadingDates(false);
-      };
-  
-      if (members.length > 0) {
-        loadPaymentDates();
-      }
-    }, [members]);
+  const [paymentDates, setPaymentDates] = useState({});
+  const [isLoadingDates, setIsLoadingDates] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState("all");
+  const [filteredMembers, setFilteredMembers] = useState([]);
 
+  useEffect(() => {
+    const loadPaymentDates = async () => {
+      const dates = {};
+      for (const member of members) {
+        dates[member.cognitoId] = await getPaymentDate(member);
+      }
+      setPaymentDates(dates);
+      setIsLoadingDates(false);
+    };
+
+    if (members.length > 0) {
+      loadPaymentDates();
+    }
+  }, [members]);
 
   let domain;
 
@@ -67,28 +66,27 @@ function HybridReferral() {
     setShareClicked(!shareClicked);
   };
 
-    const getDate = (epochTime) => {
-      const date = new Date(Number(epochTime)); // Creating a Date object
-      // To convert the date to local time
-      const localDate = date.toLocaleString();
-      return localDate.split(",")[0];
-    };
-  
-    const getPaymentDate = async (user) => {
-      try {
-        const response = await API.get(
-          "awsaiapp",
-          `/getReciept/${user.institution}/${user.cognitoId}`,
-          {}
-        );
-        const data = response.payments[0].paymentDate;
-        const date = getDate(data);
-        return date;
-      } catch (error) {
-        console.error("Error fetching payment history:", error);
-      }
-    };
-  
+  const getDate = (epochTime) => {
+    const date = new Date(Number(epochTime)); // Creating a Date object
+    // To convert the date to local time
+    const localDate = date.toLocaleString();
+    return localDate.split(",")[0];
+  };
+
+  const getPaymentDate = async (user) => {
+    try {
+      const response = await API.get(
+        "awsaiapp",
+        `/getReciept/${user.institution}/${user.cognitoId}`,
+        {}
+      );
+      const data = response.payments.map((e) => e.paymentDate);
+      const date = data.map((e) => getDate(e));
+      return date;
+    } catch (error) {
+      console.error("Error fetching payment history:", error);
+    }
+  };
 
   const shareMessage = `I'm inviting you to join ${InstitutionData.InstitutionId}. Just click the link below.\n${referralLink}`;
 
@@ -142,34 +140,106 @@ function HybridReferral() {
     config: { duration: 1000 },
   });
 
-    const getInitials = (name) => {
-      if (!name) return "";
-      const initials = name
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase())
-        .join("");
-      return initials;
-    };
+  const getInitials = (name) => {
+    if (!name) return "";
+    const initials = name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("");
+    return initials;
+  };
 
-    const getColor = (name) => {
-      if (!name) return "#888888";
-      const colors = [
-        "#FF5733",
-        "#33FF57",
-        "#5733FF",
-        "#FF5733",
-        "#33FF57",
-        "#5733FF",
-        "#FF5733",
-        "#33FF57",
-        "#5733FF",
-        "#FF5733",
-        "#33FF57",
-        "#5733FF",
-      ];
-      const index = name.length % colors.length;
-      return colors[index];
+  const getColor = (name) => {
+    if (!name) return "#888888";
+    const colors = [
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+    ];
+    const index = name.length % colors.length;
+    return colors[index];
+  };
+
+  useEffect(() => {
+    const transformedData = () => {
+      const data = members.flatMap((member) => {
+        // Map each product for the member to create separate rows
+        return (
+          member.products?.map((product, productIndex) => [
+            // Image column
+            member.hasOwnProperty("imgUrl") ? (
+              <img
+                src={member.imgUrl}
+                alt={member.userName}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className={`rounded-full p-2 h-12 w-12 flex items-center justify-center text-[1rem] text-white`}
+                style={{ backgroundColor: getColor(member.userName) }}
+              >
+                {getInitials(member.userName)}
+              </div>
+            ),
+            // Name column
+            member.userName,
+            // Type column
+            member.hasOwnProperty("hybridPageUser") &&
+            member.hybridPageUser === true ? (
+              <Badge color="info" icon="off" size="xs">
+                Hybrid
+              </Badge>
+            ) : (
+              <Badge color="gray" icon="off">
+                Referral
+              </Badge>
+            ),
+            // Product column
+            product?.S || "---",
+            // Payment date column
+            isLoadingDates
+              ? "Loading..."
+              : paymentDates[member.cognitoId]?.[productIndex] || "---",
+          ]) || []
+        );
+      });
+
+      // Filter data based on selected month
+      const filteredData = data.filter((row) => {
+        if (selectedMonth === "all") return true;
+        const month = new Date(row[4]).getMonth();
+        return month === Number(selectedMonth);
+      });
+
+      setFilteredMembers(filteredData);
     };
+    transformedData();
+  }, [selectedMonth, members, isLoadingDates, paymentDates]);
+
+  const monthOptions = [
+    { value: "all", label: "All Months" },
+    { value: "0", label: "January" },
+    { value: "1", label: "February" },
+    { value: "2", label: "March" },
+    { value: "3", label: "April" },
+    { value: "4", label: "May" },
+    { value: "5", label: "June" },
+    { value: "6", label: "July" },
+    { value: "7", label: "August" },
+    { value: "8", label: "September" },
+    { value: "9", label: "October" },
+    { value: "10", label: "November" },
+    { value: "11", label: "December" },
+  ];
 
   return (
     <div className="Poppins w-full flex flex-col justify-center items-center">
@@ -292,56 +362,40 @@ function HybridReferral() {
           </div>
         </div>
       )}
-      {
-        membersLength>0 &&
-      <Modal show={isOpen} onClose={() => setIsOpen(false)} size="5xl">
-        <Modal.Header close="icon"></Modal.Header>
-        <Modal.Body>
-          <div className="overflow-x-auto">
-            {/* {console.log("Members: ", members)} */}
-            <PaginatedTable
-              head={["Profile Picture", "Name", "Type", "Plan", "Payment Date"]}
-              data={members.map((member) => [
-                member.hasOwnProperty("imgUrl") ? (
-                  <img
-                    src={member.imgUrl}
-                    alt={member.userName}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div
-                    className={`rounded-full p-2 h-12 w-12 flex items-center justify-center text-[1rem] text-white`}
-                    style={{
-                      backgroundColor: getColor(member.userName),
-                    }}
-                  >
-                    {getInitials(member.userName)}
-                  </div>
-                ),
-                member.userName,
-                member.hasOwnProperty("hybridPageUser") &&
-                member.hybridPageUser === true ? (
-                  <Badge color="info" icon="off" size="xs">
-                    Hybrid
-                  </Badge>
-                ) : (
-                  <Badge color="gray" icon="off">
-                    Referral
-                  </Badge>
-                ),
-                member.hasOwnProperty("products") && member.products?.length > 0
-                  ? member.products[0].S
-                  : "---",
-                isLoadingDates
-                  ? "Loading..."
-                  : paymentDates[member.cognitoId] || "---",
-              ])}
-              itemsPerPage={10}
-            />
-          </div>
-        </Modal.Body>
-      </Modal>
-      }
+      {membersLength > 0 && (
+        <Modal show={isOpen} onClose={() => setIsOpen(false)} size="5xl">
+          <Modal.Header>
+            <div className="w-48">
+              <select
+                className="bg-lighestPrimaryColor border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+              >
+                {monthOptions.map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="overflow-x-auto">
+              <PaginatedTable
+                head={[
+                  "Profile Picture",
+                  "Name",
+                  "Type",
+                  "Plan",
+                  "Payment Date",
+                ]}
+                data={filteredMembers}
+                itemsPerPage={10}
+              />
+            </div>
+          </Modal.Body>
+        </Modal>
+      )}
     </div>
   );
 }
