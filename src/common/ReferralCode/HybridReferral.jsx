@@ -66,11 +66,16 @@ function HybridReferral() {
     setShareClicked(!shareClicked);
   };
 
+  function isMilliseconds(epoch) {
+    return epoch.toString().length === 13;
+  }
   const getDate = (epochTime) => {
-    const date = new Date(Number(epochTime)); // Creating a Date object
-    // To convert the date to local time
-    const localDate = date.toLocaleString();
-    return localDate.split(",")[0];
+    if (!epochTime) return "---";
+    if (isMilliseconds(epochTime)) epochTime = epochTime / 1000;
+
+    const date = new Date(epochTime * 1000);
+    const loccalDate = date.toLocaleDateString();
+    return loccalDate;
   };
 
   const getPaymentDate = async (user) => {
@@ -123,7 +128,6 @@ function HybridReferral() {
           "main",
           `/instructor/referred-members/${userData.referral_code}`
         );
-        console.log("Response:", response);
         setMembers(response.referredMembers);
         setMembersLength(response.referredMembers.length);
       } catch (error) {
@@ -367,7 +371,7 @@ function HybridReferral() {
           <Modal.Header>
             <div className="w-48">
               <select
-                className="bg-lighestPrimaryColor border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
               >
@@ -390,7 +394,7 @@ function HybridReferral() {
                   "Payment Date",
                 ]}
                 data={filteredMembers}
-                itemsPerPage={10}
+                itemsPerPage={5}
               />
             </div>
           </Modal.Body>
