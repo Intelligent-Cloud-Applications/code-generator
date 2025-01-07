@@ -1,46 +1,76 @@
-// Packages
-//import { useSelector } from 'react-redux';
-
-// Local
-import AuthBar from "./AuthBar";
-import NavBar from "./NavBar";
-import institutionData from "../../utils/constants";
 import { useContext } from "react";
 import institutionContext from "../../Context/InstitutionContext";
 import Context from "../../Context/Context";
+import AuthBar from "./AuthBar";
+import NavBar from "./NavBar";
 
-// Code
 const Header = () => {
   const { isAuth, userData } = useContext(Context);
-  //  const { isAuth, data } = useSelector((state) => state.userData);
-  const { profileImageUrl, userName, status } = userData;
+  const { imgUrl, userName, status } = userData;
 
-  const profileImage = (
+  const getInitials = (name) => {
+    if (!name) return '';
+    const initials = name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
+    return initials;
+  };
+
+  const getColor = (name) => {
+    if (!name) return '#888888';
+    const colors = [
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF'
+    ];
+    const index = name.length % colors.length;
+    return colors[index];
+  };
+
+  const profileImage = imgUrl ? (
     <img
-      src={profileImageUrl || institutionData.defaultProfileImageUrl}
-      alt="Profile"
-      width="30"
-      height="30"
-      className={`border-[3px] ${status === "Active" ? 'border-lighestPrimaryColor' : 'border-red-500'} rounded-full`}
+      className={`h-[30px] w-[30px] rounded-full bg-white border-[3px] ${status === "Active"
+        ? 'border-lightestPrimaryColor'
+        : status === "Trial"
+          ? 'border-yellow-500'
+          : 'border-red-500'}
+       rounded-full`}
+      src={imgUrl}
+      alt="profile"
     />
+  ) : (
+    <div
+      className={`rounded-full h-[30px] w-[30px] flex items-center justify-center text-sm text-white border-[3px] ${status === "Active"
+        ? 'border-lightestPrimaryColor'
+        : status === "Trial"
+          ? 'border-yellow-500'
+          : 'border-red-500'}
+       rounded-full`}
+      style={{
+        backgroundColor: getColor(userName),
+      }}
+    >
+      {getInitials(userName)}
+    </div>
   );
 
   const authBarContent = isAuth
     ? [
-        { label: `Welcome, ${userName.split(' ')[0]}`, path: "/dashboard" },
-        { label: "Dashboard", path: "/dashboard" },
-        { label: profileImage, path: "/dashboard" },
-      ]
+      { label: `Welcome, ${userName?.split(' ')[0]}`, path: "/dashboard" },
+      { label: "Dashboard", path: "/dashboard" },
+      { label: profileImage, path: "/dashboard" },
+    ]
     : [
-        { label: 'Login', path: '/login' },
-        { label: 'Join Now', path: '/signup' },
-        { label: process.env.REACT_APP_STAGE !== 'PROD' && "Dev", path: "/auth" },
-      ];
+      { label: 'Login', path: '/login' },
+      { label: 'Join Now', path: '/signup' },
+      // { label: process.env.REACT_APP_STAGE !== 'PROD' && "Dev", path: "/auth" },
+    ];
 
-  let navBarContent = [
+  const navBarContent = [
     { label: "ABOUT US", path: "/aboutus" },
     { label: "INSTRUCTOR", path: "/instructor" },
-    //    { label: 'SETTINGS', path: '/settings' },
     { label: "GALLERY", path: "/gallery" },
     { label: "SCHEDULE", path: "/schedule" },
   ];
