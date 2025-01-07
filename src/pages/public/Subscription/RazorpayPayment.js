@@ -5,7 +5,7 @@ import InstitutionContext from "../../../Context/InstitutionContext";
 // import SubscriptionPopup from "../../pages/SubscriptionPopup";
 import { useNavigate } from "react-router-dom";
 import Context from "../../../Context/Context";
-import web from "../../../utils/data.json";
+import institutionData from "../../../utils/constants";
 
 const RazorpayPayment = ({ productId }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -132,8 +132,8 @@ const RazorpayPayment = ({ productId }) => {
     process.env.NODE_ENV === "development" ?
       "http://localhost:3000" :
       process.env.REACT_APP_STAGE === "DEV"
-        ? process.env.REACT_APP_DOMAIN_BETA
-        : process.env.REACT_APP_DOMAIN_PROD;
+        ? institutionData.BETA_DOMAIN
+        : institutionData.PROD_DOMAIN;
 
   return (
     <div className="z-1">
@@ -142,7 +142,7 @@ const RazorpayPayment = ({ productId }) => {
         className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
         onClick={() => {
           window.open(
-            `${domain}/allpayment/${web.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}`,
+            `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}`,
             "_blank",
             "noopener,noreferrer"
           );

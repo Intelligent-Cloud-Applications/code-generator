@@ -9,6 +9,7 @@ import Twitter from "../../utils/Png/Twitter.svg";
 import Facebook from "../../utils/Png/Facebook.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
 import { API } from "aws-amplify";
+import institutionData from "../../utils/constants";
 
 function ReferralCode() {
   const { userData } = useContext(Context);
@@ -24,9 +25,9 @@ function ReferralCode() {
 
   let domain;
   if (process.env.REACT_APP_STAGE === "DEV") {
-    domain = process.env.REACT_APP_DOMAIN_BETA;
+    domain = institutionData.BETA_DOMAIN;
   } else if (process.env.REACT_APP_STAGE === "PROD") {
-    domain = process.env.REACT_APP_DOMAIN_PROD;
+    domain = institutionData.PROD_DOMAIN;
   }
 
   let referralLink;

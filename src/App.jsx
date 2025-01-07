@@ -5,21 +5,21 @@ import RoutesContainer from "./routes";
 import LoaderProvider from "./components/LoaderProvider";
 import InstitutionContext from "./Context/InstitutionContext";
 import apiPaths from "./utils/api-paths";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import institutionData from './utils/constants'
 
 function App() {
   const UtilCtx = useRef(useContext(Context).util);
   const RefCtx = useRef(useContext(Context));
   const RefInstitutionCtx = useRef(useContext(InstitutionContext));
   const InsitutionCtx = useContext(InstitutionContext);
-
+  
   useEffect(() => {
     const dataLoadFn = async () => {
       try {
-        let data = require("./utils/data.json");
-        data = await API.get(
+        const data = await API.get(
           "prod",
-          `/any/get-institution-data/${data && data.InstitutionId}`
+          `/any/get-institution-data/${institutionData.InstitutionId}`
         );
         data.InstitutionId = data.institutionid;
 

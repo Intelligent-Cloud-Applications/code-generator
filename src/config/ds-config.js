@@ -1,3 +1,5 @@
+import institutionData from "../utils/constants"
+
 export const dsProd = {
     Auth: {
         mandatorySignIn: true,
@@ -9,9 +11,9 @@ export const dsProd = {
             domain: process.env.REACT_APP_AUTH_DOMAIN_PROD,
             scope: ['openid', 'email', 'profile'],
             redirectSignIn: process.env.NODE_ENV === 'development' ?
-              'http://localhost:3000/redirect' : process.env.REACT_APP_DOMAIN_PROD + '/redirect',
+              'http://localhost:3000/redirect' : institutionData.PROD_DOMAIN + '/redirect',
             redirectSignOut: process.env.NODE_ENV === 'development' ?
-              'http://localhost:3000' : process.env.REACT_APP_DOMAIN_PROD,
+              'http://localhost:3000' : institutionData.PROD_DOMAIN,
             responseType: 'code',
         }
     },
@@ -54,9 +56,9 @@ export const dsDev = {
             domain: process.env.REACT_APP_AUTH_DOMAIN_BETA,
             scope: ['openid', 'email', 'profile'],
             redirectSignIn: process.env.NODE_ENV === 'development' ?
-              'http://localhost:3000/redirect' : process.env.REACT_APP_DOMAIN_BETA + '/redirect',
+              'http://localhost:3000/redirect' : institutionData.BETA_DOMAIN + '/redirect',
             redirectSignOut: process.env.NODE_ENV === 'development' ?
-              'http://localhost:3000' : process.env.REACT_APP_DOMAIN_BETA,
+              'http://localhost:3000' : institutionData.BETA_DOMAIN,
             responseType: 'code',
         }
     },

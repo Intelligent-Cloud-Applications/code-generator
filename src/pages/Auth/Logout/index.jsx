@@ -1,16 +1,17 @@
 import { Auth } from 'aws-amplify'
 import React, { useEffect } from 'react'
+import institutionData from '../../../utils/constants'
 
 const Logout = () => {
   useEffect(() => {
     const onLoad = async () => {
       const domain = process.env.REACT_APP_STAGE === 'PROD' ?
-        process.env.REACT_APP_AUTH_DOMAIN_PROD : process.env.REACT_APP_AUTH_DOMAIN_BETA;
+      institutionData.BETA_DOMAIN : institutionData.BETA_DOMAIN;
       const client_id = process.env.REACT_APP_STAGE === 'PROD' ?
         process.env.REACT_APP_PROD_CLIENT_ID : process.env.REACT_APP_DEV_CLIENT_ID;
       const redirect = process.env.NODE_ENV === 'development' ?
         'http://localhost:3000' : process.env.REACT_APP_STAGE === 'PROD' ?
-        process.env.REACT_APP_DOMAIN_PROD : process.env.REACT_APP_DOMAIN_BETA;
+        institutionData.PROD_DOMAIN : institutionData.BETA_DOMAIN;
 
       try {
         await Auth.signOut();

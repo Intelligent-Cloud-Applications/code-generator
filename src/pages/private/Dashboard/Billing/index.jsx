@@ -1,14 +1,11 @@
 import { Card, Table } from 'flowbite-react';
 import {useContext, useEffect, useState} from "react";
-import institutionContext from "../../../../Context/InstitutionContext";
 import {API} from "aws-amplify";
 import { PaginatedTable } from "../../../../common/DataDisplay";
-import InstitutionContext from "../../../../Context/InstitutionContext";
 import Context from "../../../../Context/Context";
-import { institution } from "../../../../utils/constants";
+import institutionData from "../../../../utils/constants";
 
 const Billing = () => {
-  // const {PrimaryColor} = useContext(institutionContext).institutionData;
   const {userData, util} = useContext(Context);
   const [renewDate, setRenewDate] = useState(userData.renewDate);
   const [amount, setAmount] = useState('$0');
@@ -20,7 +17,7 @@ const Billing = () => {
       try {
         const response = await API.get(
           'awsaiapp',
-          `/getReciept/${institution}/${userData.cognitoId}`,
+          `/getReciept/${institutionData.InstitutionId}/${userData.cognitoId}`,
           {}
         );
         console.log("Response:", response)

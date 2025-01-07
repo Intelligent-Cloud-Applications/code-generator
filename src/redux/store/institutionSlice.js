@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { API } from 'aws-amplify';
-import { institution } from '../../utils/constants.js';
+import institutionData from '../../utils/constants';
 
 export const fetchInstitutionData = createAsyncThunk(
     'institution/fetchInstitutionData',
     async () => {
         return await API.get(
             'prod',
-            `/any/get-institution-data/${ institution }`,
+            `/any/get-institution-data/${institutionData.InstitutionId }`,
             {}
         );
     }

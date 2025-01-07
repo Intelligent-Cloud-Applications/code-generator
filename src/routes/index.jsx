@@ -1,12 +1,12 @@
 // Local
-import { institutionType } from "../utils/constants";
+import institutionData from "../utils/constants";
 import DSRoutes from './ds-routes';
 
 
 // Code
 let RoutesContainer;
 
-switch (institutionType) {
+switch (institutionData.institutionType) {
     case 'ds':
         RoutesContainer = DSRoutes;
         break;

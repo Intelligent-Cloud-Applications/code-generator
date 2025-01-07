@@ -5,8 +5,7 @@ import Context from "../../../Context/Context";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import HappyprancerPaypalHybrid from "../Subscription/HappyprancerPaypalHybrid";
 import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly";
-import web from "../../../utils/data.json";
-import RazorpayPayment from "../Subscription/RazorpayPayment";
+import institutionData from "../../../utils/constants";
 
 const Subscription = () => {
   const { institutionData: InstitutionData } = useContext(InstitutionContext);
@@ -65,8 +64,8 @@ useEffect(() => {
     process.env.NODE_ENV === "development" ?
       "http://localhost:3000" :
       process.env.REACT_APP_STAGE === "DEV"
-        ? process.env.REACT_APP_DOMAIN_BETA
-        : process.env.REACT_APP_DOMAIN_PROD;
+        ? institutionData.BETA_DOMAIN
+        : institutionData.PROD_DOMAIN;
 
   const paymentHandler = (item) => {
     if (isAuth) {
@@ -97,7 +96,7 @@ useEffect(() => {
               className="mt-4 first-letter:inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
               onClick={() => {
                 window.open(
-                  `${domain}/allpayment/${web.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}`,
+                  `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}`,
                   "_blank",
                   "noopener,noreferrer"
                 );

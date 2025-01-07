@@ -4,7 +4,7 @@
 // Local
 import AuthBar from "./AuthBar";
 import NavBar from "./NavBar";
-import { defaultProfileImageUrl } from "../../utils/constants";
+import institutionData from "../../utils/constants";
 import { useContext } from "react";
 import institutionContext from "../../Context/InstitutionContext";
 import Context from "../../Context/Context";
@@ -17,7 +17,7 @@ const Header = () => {
 
   const profileImage = (
     <img
-      src={profileImageUrl || defaultProfileImageUrl}
+      src={profileImageUrl || institutionData.defaultProfileImageUrl}
       alt="Profile"
       width="30"
       height="30"

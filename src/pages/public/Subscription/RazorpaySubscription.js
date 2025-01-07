@@ -5,6 +5,7 @@ import InstitutionContext from '../../../Context/InstitutionContext'
 // import SubscriptionPopup from "../../pages/SubscriptionPopup";
 import { useNavigate } from 'react-router-dom'
 import Context from '../../../Context/Context'
+import institutionData from '../../../utils/constants'
 
 const RazorpaySubscription = ({ productId }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData
@@ -124,8 +125,8 @@ const RazorpaySubscription = ({ productId }) => {
     process.env.NODE_ENV === "development" ?
       "http://localhost:3000" :
       process.env.REACT_APP_STAGE === "DEV"
-        ? process.env.REACT_APP_DOMAIN_BETA
-        : process.env.REACT_APP_DOMAIN_PROD;
+      ? institutionData.BETA_DOMAIN
+      : institutionData.PROD_DOMAIN;
 
   return (
     <div className="z-1">

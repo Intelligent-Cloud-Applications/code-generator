@@ -8,8 +8,8 @@ import share from "../../utils/Png/share.png";
 import Telegram from "../../utils/Png/Telegram.svg";
 import Twitter from "../../utils/Png/Twitter.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
-// import './Referral.css';
 import { API } from "aws-amplify";
+import institutionData from "../../utils/constants";
 
 function HybridReferral() {
   const { userData } = useContext(Context);
@@ -21,9 +21,9 @@ function HybridReferral() {
   if (process.env.NODE_ENV === "development") {
     domain = "http://localhost:3000";
   } else if (process.env.REACT_APP_STAGE === "DEV") {
-    domain = process.env.REACT_APP_DOMAIN_BETA;
+    domain = institutionData.BETA_DOMAIN;
   } else if (process.env.REACT_APP_STAGE === "PROD") {
-    domain = process.env.REACT_APP_DOMAIN_PROD;
+    domain = institutionData.PROD_DOMAIN;
   }
 
   let referralLink;

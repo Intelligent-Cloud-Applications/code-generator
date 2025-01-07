@@ -14,6 +14,7 @@ import HybridReferral from "../../../../common/ReferralCode/HybridReferral.jsx";
 import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
+import institutionData from "../../../../utils/constants.js";
 
 // import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
 
@@ -42,9 +43,9 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   if (process.env.NODE_ENV === "development") {
     domain = "http://localhost:3000";
   } else if (process.env.REACT_APP_STAGE === "DEV") {
-    domain = process.env.REACT_APP_DOMAIN_BETA;
+    domain = institutionData.BETA_DOMAIN;
   } else if (process.env.REACT_APP_STAGE === "PROD") {
-    domain = process.env.REACT_APP_DOMAIN_PROD;
+    domain = institutionData.PROD_DOMAIN;
   }
 
   let referralLink;

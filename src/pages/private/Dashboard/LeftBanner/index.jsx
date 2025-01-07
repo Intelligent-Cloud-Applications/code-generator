@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Context from '../../../../Context/Context'
 import InstitutionContext from '../../../../Context/InstitutionContext'
-import web from '../../../../utils/data.json'
+import institutionData from '../../../../utils/constants'
 import {
   FaUser,
   FaCalendarAlt,
@@ -265,10 +265,10 @@ const LeftBanner = ({ displayAfterClick }) => {
                   process.env.NODE_ENV === "development" ?
                     "http://localhost:3000" :
                     process.env.REACT_APP_STAGE === 'PROD'
-                      ? process.env.REACT_APP_DOMAIN_PROD
-                      : process.env.REACT_APP_DOMAIN_BETA
+                      ? institutionData.PROD_DOMAIN
+                      : institutionData.BETA_DOMAIN
 
-                const url = `${baseUrl}/allpayment/${web.InstitutionId}/${UserCtx.userData.cognitoId}/${UserCtx.userData.emailId}`
+                const url = `${baseUrl}/allpayment/${institutionData.InstitutionId}/${UserCtx.userData.cognitoId}/${UserCtx.userData.emailId}`
                 window.open(url, '_blank', 'noopener,noreferrer')
               }}
             />

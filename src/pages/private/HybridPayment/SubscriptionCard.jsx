@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Context from "../../../Context/Context";
 import apiPaths from "../../../utils/api-paths";
-import web from "../../../utils/data.json";
+import institutionData from "../../../utils/constants";
 import "./SubscriptionCard.css";
 
 const SubscriptionCard = () => {
@@ -55,7 +55,7 @@ const SubscriptionCard = () => {
   const handleChoosePlan = () => {
     if (isAuth) {
       navigate(
-        `/allpayment/${web?.InstitutionId}/${UserCtx?.cognitoId}/${UserCtx?.emailId}`
+        `/allpayment/${institutionData?.InstitutionId}/${UserCtx?.cognitoId}/${UserCtx?.emailId}`
       );
     } else {
       toast.error("You have no accounts yet. Please sign up to continue.");

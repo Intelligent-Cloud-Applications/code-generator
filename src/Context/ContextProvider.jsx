@@ -1,8 +1,8 @@
 import { API } from "aws-amplify";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Context from "./Context";
-import web from "../utils/data.json";
 import apiPaths from "../utils/api-paths";
+import institutionData from '../utils/constants'
 
 const ContextProvider = (props) => {
   const [isAuth, setIsAuth] = useState(false);
@@ -279,7 +279,7 @@ const ContextProvider = (props) => {
     try {
       const response = await API.get(
         "main",
-        `/user/get-imageUrl/${web.InstitutionId}`
+        `/user/get-imageUrl/${institutionData.InstitutionId}`
       );
       setImageUrls(response.GalleryImagesLinks || []);
       if (imageUrl) {

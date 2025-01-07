@@ -1,15 +1,15 @@
-import { institution } from './constants';
+import institutionData from './constants';
 
 const apiPaths = {
-  getProducts: `/any/products/${institution}`,
-  getInstructors: `/any/instructor-list/${institution}`,
-  getUpcomingSchedule: `/user/upcoming-schedule/${institution}`,
-  getPreviousScedule: `/user/previous-schedule/${institution}`,
-  getMembers: `/admin/profile-list/${institution}`,
-  getStreak: `/user/streak-get/${institution}`,
-  getRating: `/admin/rating-fetch/${institution}`,
+  getProducts: `/any/products/${institutionData.InstitutionId}`,
+  getInstructors: `/any/instructor-list/${institutionData.InstitutionId}`,
+  getUpcomingSchedule: `/user/upcoming-schedule/${institutionData.InstitutionId}`,
+  getPreviousScedule: `/user/previous-schedule/${institutionData.InstitutionId}`,
+  getMembers: `/admin/profile-list/${institutionData.InstitutionId}`,
+  getStreak: `/user/streak-get/${institutionData.InstitutionId}`,
+  getRating: `/admin/rating-fetch/${institutionData.InstitutionId}`,
   getUserLocation: "/user/check-user-location",
-  listAttendance: `/admin/list-attendance/${institution}`,
+  listAttendance: `/admin/list-attendance/${institutionData.InstitutionId}`,
 };
 
 export default apiPaths;

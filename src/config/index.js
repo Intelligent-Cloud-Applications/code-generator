@@ -1,10 +1,10 @@
-import { institutionType } from '../utils/constants';
+import institutionData from '../utils/constants';
 import { dsProd, dsDev } from './ds-config';
 
 let config;
 
 if (process.env.REACT_APP_STAGE === 'PROD') {
-    switch (institutionType) {
+    switch (institutionData.institutionType) {
         case 'ds':
             config = dsProd;
             break;
@@ -13,7 +13,7 @@ if (process.env.REACT_APP_STAGE === 'PROD') {
             break;
     }
 } else {
-    switch (institutionType) {
+    switch (institutionData.institutionType) {
         case 'ds':
             config = dsDev;
             break;
