@@ -22,7 +22,7 @@ jobs:
 
       - name: Create temp config reader
         run: |
-          echo "import institutionData from '../src/constants.js';
+          echo "import institutionData from '${{ github.workspace }}/src/constants.js';
           const branch = process.env.GITHUB_REF.split('/').pop();
           const config = institutionData.deployment[branch];
           if (config) {
