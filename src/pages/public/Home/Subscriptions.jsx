@@ -145,7 +145,7 @@ useEffect(() => {
             fontWeight: "bold",
           }}
         >
-          Membership Subscription
+          Membership Subscriptions
         </h1>
         <h3
           className="text-[1rem] mt-2 max850:text-[.7rem] font-[600]"
