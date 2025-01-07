@@ -10,7 +10,7 @@ const institutionData = {
     deployment: {
         [`beta-${institutionName}`]: {  // Updated to use beta-institutionName format
             s3Bucket: `beta.${institutionName}.com`,
-            cloudfrontId: 'E1C7GIH35TQC7G'
+            cloudfrontId: 'E263LXOGXF3H0N'
         },
         [institutionName]: {  // This will use the institution name as the branch name
             s3Bucket: `${institutionName}.com`,

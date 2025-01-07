@@ -63,7 +63,7 @@ jobs:
         with:
           aws-access-key-id: AKIA5NNTYGDW2XCPH5GL
           aws-secret-access-key: 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
-          aws-region: us-east-2
+          aws-region: us-east-1
 
       - name: Deploy to S3
         if: steps.config.outputs.should_deploy == 'true'
