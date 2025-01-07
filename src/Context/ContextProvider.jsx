@@ -2,7 +2,7 @@ import { API } from "aws-amplify";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Context from "./Context";
 import apiPaths from "../utils/api-paths";
-import institutionData from '../utils/constants'
+import institutionData from '../constants'
 
 const ContextProvider = (props) => {
   const [isAuth, setIsAuth] = useState(false);

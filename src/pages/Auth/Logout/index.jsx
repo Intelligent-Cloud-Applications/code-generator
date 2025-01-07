@@ -1,6 +1,6 @@
 import { Auth } from 'aws-amplify'
 import React, { useEffect } from 'react'
-import institutionData from '../../../utils/constants'
+import institutionData from '../../../constants'
 
 const Logout = () => {
   useEffect(() => {

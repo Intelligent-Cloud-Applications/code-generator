@@ -9,7 +9,7 @@ import Twitter from "../../utils/Png/Twitter.svg";
 import Facebook from "../../utils/Png/Facebook.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
 import { API } from "aws-amplify";
-import institutionData from "../../utils/constants";
+import institutionData from "../../constants";
 
 function ReferralCode() {
   const { userData } = useContext(Context);

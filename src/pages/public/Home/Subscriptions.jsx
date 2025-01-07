@@ -5,7 +5,7 @@ import Context from "../../../Context/Context";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import HappyprancerPaypalHybrid from "../Subscription/HappyprancerPaypalHybrid";
 import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly";
-import institutionData from "../../../utils/constants";
+import institutionData from "../../../constants";
 
 const Subscription = () => {
   const { institutionData: InstitutionData } = useContext(InstitutionContext);

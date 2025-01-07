@@ -9,7 +9,7 @@ import Telegram from "../../utils/Png/Telegram.svg";
 import Twitter from "../../utils/Png/Twitter.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
 import { API } from "aws-amplify";
-import institutionData from "../../utils/constants";
+import institutionData from "../../constants";
 
 function HybridReferral() {
   const { userData } = useContext(Context);

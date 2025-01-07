@@ -1,4 +1,4 @@
-import institutionData from "../utils/constants"
+import institutionData from "../constants"
 
 export const dsProd = {
     Auth: {

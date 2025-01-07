@@ -1,4 +1,4 @@
-import institutionData from '../utils/constants';
+import institutionData from '../constants';
 import { dsProd, dsDev } from './ds-config';
 
 let config;

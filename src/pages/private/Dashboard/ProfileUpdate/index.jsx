@@ -14,7 +14,7 @@ import HybridReferral from "../../../../common/ReferralCode/HybridReferral.jsx";
 import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
-import institutionData from "../../../../utils/constants.js";
+import institutionData from "../../../../constants.js";
 
 // import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
 

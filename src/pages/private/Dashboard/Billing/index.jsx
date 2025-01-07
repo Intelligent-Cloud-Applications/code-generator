@@ -3,7 +3,7 @@ import {useContext, useEffect, useState} from "react";
 import {API} from "aws-amplify";
 import { PaginatedTable } from "../../../../common/DataDisplay";
 import Context from "../../../../Context/Context";
-import institutionData from "../../../../utils/constants";
+import institutionData from "../../../../constants";
 
 const Billing = () => {
   const {userData, util} = useContext(Context);

@@ -1,4 +1,4 @@
-import institutionData from './constants';
+import institutionData from '../constants';
 
 const apiPaths = {
   getProducts: `/any/products/${institutionData.InstitutionId}`,

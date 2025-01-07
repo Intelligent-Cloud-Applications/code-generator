@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Context from "../../../Context/Context";
 import apiPaths from "../../../utils/api-paths";
-import institutionData from "../../../utils/constants";
+import institutionData from "../../../constants";
 import "./SubscriptionCard.css";
 
 const SubscriptionCard = () => {

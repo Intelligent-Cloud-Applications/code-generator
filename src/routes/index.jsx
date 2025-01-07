@@ -1,5 +1,5 @@
 // Local
-import institutionData from "../utils/constants";
+import institutionData from "../constants";
 import DSRoutes from './ds-routes';
 
 

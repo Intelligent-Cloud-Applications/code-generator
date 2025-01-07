@@ -7,7 +7,7 @@ import LoaderProvider from "./components/LoaderProvider";
 import InstitutionContext from "./Context/InstitutionContext";
 import apiPaths from "./utils/api-paths";
 import { jwtDecode } from "jwt-decode";
-import institutionData from "./utils/constants";
+import institutionData from "./constants";
 
 function App() {
   const UtilCtx = useRef(useContext(Context).util);
