@@ -6,6 +6,7 @@ const institutionData = {
     InstitutionId: institutionName,
     institution: institutionName,
     institutionType: 'ds',
+    GTM_ID: 'GTM-5DW548R',
     deployment: {
         [`beta-${institutionName}`]: {  // Updated to use beta-institutionName format
             s3Bucket: `beta${institutionName}.awsaiapp.com`,
