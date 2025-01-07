@@ -22,7 +22,7 @@ jobs:
 
       - name: Create temp config reader
         run: |
-          echo '{"type": "module"}' > package.json
+          echo '{"type": "module"}' > temp-package.json
           echo "import institutionData from '${{ github.workspace }}/src/constants.js';
           const branch = process.env.GITHUB_REF.split('/').pop();
           const config = institutionData.deployment[branch];
@@ -43,7 +43,10 @@ jobs:
       - name: Get deployment configuration
         id: config
         run: |
+          cp package.json original-package.json
+          cp temp-package.json package.json
           CONFIG_JSON=$(node configReader.mjs)
+          cp original-package.json package.json
           echo "s3_bucket=$(echo $CONFIG_JSON | jq -r .s3Bucket)" >> $GITHUB_OUTPUT
           echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
           echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
@@ -52,7 +55,7 @@ jobs:
         if: steps.config.outputs.should_deploy == 'true'
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
-          yarn build
+          yarn react-scripts build || yarn build:prod || yarn build:production || yarn build
 
       - name: Set up AWS CLI
         if: steps.config.outputs.should_deploy == 'true'
