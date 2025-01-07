@@ -1,20 +1,23 @@
-const institutionName = 'happyprancer'; // Change this for different institutions
+const institutionName = 'happyprancer'; // Change this variable to configure for different institutions
 
 const institutionData = {
-    BETA_DOMAIN: `https://beta.${institutionName}.com`,
-    PROD_DOMAIN: `https://${institutionName}.com`,
+    BETA_DOMAIN: `https://beta.${institutionName}.com`, // Beta environment URL
+    PROD_DOMAIN: `https://${institutionName}.com`,      // Production environment URL
     InstitutionId: institutionName,
     institution: institutionName,
     institutionType: 'ds',
-    GTM_ID: 'GTM-5DW548R',
+    GTM_ID: 'GTM-5DW548R',                             // Google Tag Manager ID (adjust as needed for the institution)
+
     deployment: {
-        [`beta-${institutionName}`]: {  // Updated to use beta-institutionName format
-            s3Bucket: `beta.${institutionName}.com`,
-            cloudfrontId: 'E263LXOGXF3H0N'
+        // Configuration for the beta environment
+        [`beta-${institutionName}`]: {
+            s3Bucket: `beta.${institutionName}.com`,   // Name of the S3 bucket where the beta frontend is deployed
+            cloudfrontId: 'E263LXOGXF3H0N'            // CloudFront distribution ID for the beta environment
         },
-        [institutionName]: {  // This will use the institution name as the branch name
-            s3Bucket: `${institutionName}.com`,
-            cloudfrontId: 'E470TC368F952'
+        // Configuration for the production environment
+        [institutionName]: {
+            s3Bucket: `${institutionName}.com`,        // Name of the S3 bucket where the production frontend is deployed
+            cloudfrontId: 'E470TC368F952'             // CloudFront distribution ID for the production environment
         }
     }
 };
