@@ -138,6 +138,7 @@ useEffect(() => {
       }}
     >
       <div className="text-center sans-serif mt-4">
+      <div className="text-[5rem]">Hello</div>
         <h1
           className="text-[3rem] max850:text-[1.5rem] font-[700] max800:px-3"
           style={{

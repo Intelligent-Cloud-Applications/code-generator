@@ -257,7 +257,6 @@ const Hero = () => {
                 rightIcon={MdEdit}
               />
             </div>
-            Hello
           </div>
         </Modal.Body>
         <Modal.Footer>
