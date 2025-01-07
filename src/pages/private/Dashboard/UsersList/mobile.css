@@ -1,0 +1,135 @@
+/* Example CSS for input fields */
+.input-field {
+  background-color: #e9e9e9;
+  color: rgba(0, 0, 0, 0.393);
+  font-family: sans-serif;
+  font-size: 0.9rem;
+  padding: 4px;
+  border-radius: 0.4rem;
+  align-items: center;
+  /* Add any additional styling you want */
+}
+
+/* Add attractive styles to the select dropdown */
+.attractive-dropdown {
+  appearance: none; /* Remove the default arrow in some browsers */
+  background-color: #00ffc300; /* Set the background color of the dropdown */
+  color: #000000; /* Set the text color of the dropdown */
+  padding: 0.5rem 1rem; /* Add padding to make it visually appealing */
+  border: none; /* Remove the default border */
+  border-radius: 0.51rem; /* Set the border radius */
+  font-size: 1rem; /* Set the font size */
+  font-weight: bold; /* Set the font weight */
+  cursor: pointer; /* Show the pointer cursor on hover */
+}
+
+.attractive-dropdown2 {
+  appearance: none;
+  background-color: #00ffc300;
+  color: #000000;
+  margin-left: 2rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.51rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Add custom styles to the selected option */
+.attractive-dropdown option:checked {
+  background-color: #262626; /* Set the background color of the selected option */
+  color: #fffffff4; /* Set the text color of the selected option */
+}
+
+.attractive-dropdown-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  font-weight: bold;
+  gap: 1rem;
+}
+
+.dropdown-wrapper {
+  position: relative;
+  display: flex;
+}
+
+.dropdown-wrapper2 {
+  position: relative;
+  display: flex;
+  width: 1rem;
+}
+
+.dropdown-arrow {
+  position: absolute;
+  top: 51%;
+  left: 5.9rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #000;
+}
+
+.dropdown-arrow2 {
+  position: absolute;
+  top: 51%;
+  left: 6.3rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #000;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Subscribe-button {
+  display: inline-flex;
+  padding: 10px 28px 10px 22px;
+  align-items: center;
+  gap: 5px;
+  color: #fff;
+  width: 12rem;
+  height: 3.8rem;
+  font-family: Poppins;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  border-radius: 1.7rem;
+  position: relative;
+  background-color: #1b7571;
+}
+
+.Latch {
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.Lock {
+  width: 5.5px;
+  height: 20px;
+  background-color: #1b7571;
+  border-radius: 0.2rem;
+  position: absolute;
+  left: 22%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.UnlockText {
+  position: absolute;
+  right: 20px;
+}
