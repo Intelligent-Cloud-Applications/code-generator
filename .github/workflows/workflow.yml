@@ -1,14 +1,13 @@
-name: Deploy to S3
+name: Dynamic Institution Deploy to S3
+
 on:
   push:
     branches:
-      - dev # Replace 'Signup' with the branch you want to deploy
-      - prod
+      - '*'
 
 jobs:
-  deploy-beta:
+  deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -21,53 +20,51 @@ jobs:
       - name: Install dependencies
         run: yarn
 
+      - name: Create temp config reader
+        run: |
+          echo "import institutionData from '../src/constants.js';
+          const branch = process.env.GITHUB_REF.split('/').pop();
+          const config = institutionData.deployment[branch];
+          if (config) {
+            console.log(JSON.stringify({
+              s3Bucket: config.s3Bucket,
+              cloudfrontId: config.cloudfrontId,
+              shouldDeploy: true
+            }));
+          } else {
+            console.log(JSON.stringify({
+              s3Bucket: '',
+              cloudfrontId: '',
+              shouldDeploy: false
+            }));
+          }" > configReader.mjs
+
+      - name: Get deployment configuration
+        id: config
+        run: |
+          CONFIG_JSON=$(node configReader.mjs)
+          echo "s3_bucket=$(echo $CONFIG_JSON | jq -r .s3Bucket)" >> $GITHUB_OUTPUT
+          echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
+          echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
+
       - name: Build the React app
+        if: steps.config.outputs.should_deploy == 'true'
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
           yarn build
 
       - name: Set up AWS CLI
+        if: steps.config.outputs.should_deploy == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # Replace with your desired AWS region
+          aws-region: us-east-1
 
       - name: Deploy to S3
-        run: aws s3 sync ./build s3://betatemplateds.awsaiapp.com --delete
+        if: steps.config.outputs.should_deploy == 'true'
+        run: aws s3 sync ./build s3://${{ steps.config.outputs.s3_bucket }} --delete
 
       - name: Cloudfront Invalidation
-        run: aws cloudfront create-invalidation --distribution-id E36I0B4BJRQ8X --paths "/*"
-
-  deploy-prod:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/prod'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: yarn
-
-      - name: Build the React app
-        run: |
-          export NODE_OPTIONS=--max_old_space_size=4096
-          yarn build
-
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # Replace with your desired AWS region
-
-      - name: Deploy to S3
-        run: aws s3 sync ./build s3://templateds.awsaiapp.com --delete
-
-      - name: Cloudfront Invalidation
-        run: aws cloudfront create-invalidation --distribution-id E470TC368F952 --paths "/*"
+        if: steps.config.outputs.should_deploy == 'true'
+        run: aws cloudfront create-invalidation --distribution-id ${{ steps.config.outputs.cloudfront_id }} --paths "/*"

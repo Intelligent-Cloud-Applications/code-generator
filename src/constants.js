@@ -9,11 +9,11 @@ const institutionData = {
     GTM_ID: 'GTM-5DW548R',
     deployment: {
         [`beta-${institutionName}`]: {  // Updated to use beta-institutionName format
-            s3Bucket: `beta${institutionName}.awsaiapp.com`,
-            cloudfrontId: 'E36I0B4BJRQ8X'
+            s3Bucket: `beta.${institutionName}.com`,
+            cloudfrontId: 'E1C7GIH35TQC7G'
         },
         [institutionName]: {  // This will use the institution name as the branch name
-            s3Bucket: `${institutionName}.awsaiapp.com`,
+            s3Bucket: `${institutionName}.com`,
             cloudfrontId: 'E470TC368F952'
         }
     }
