@@ -75,8 +75,8 @@ export default function DashboardRating() {
       }
     });
 
-    console.log(allRatings);
-    
+  console.log(allRatings);
+
   // Calculate average ratings by date
   const calculateAverageRatings = () => {
     // Group ratings by date
@@ -150,7 +150,10 @@ export default function DashboardRating() {
   if (UserCtx.userData.userType === "instructor") {
     const instructorAverageRatings = calculateAverageRatings();
     return (
-      <div className="instructor-dashboard-container">
+      <div className="instructor-dashboard-container w-full">
+        <h2 className="pl-5 font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold text-center mt-4 w-[80%] mx-auto">
+          Reviews
+        </h2>
         <div className="h-[100vh] ml-[6rem] max1050:ml-[0] max1050:mt-0">
           <div
             className={`w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-10`}
@@ -158,22 +161,19 @@ export default function DashboardRating() {
               backgroundColor: InstitutionData.LightestPrimaryColor,
             }}
           >
-            <h2 className="pl-5 font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold]">
-              Reviews
-            </h2>
             <div className="overflow-x-auto w-full">
               <ul
                 className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-col rounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] max536:bg-gradient-to-b max536:from-[#dad7c6] max536:to-[#fdd00891]"
-                style={{
-                  backgroundColor: InstitutionData.PrimaryColor,
-                }}
+              // style={{
+              //   backgroundColor: InstitutionData.PrimaryColor,
+              // }}
               >
                 <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
                   <div className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-5 font-bold">
-                    <div className="col-span-6 text-center text-white">
+                    <div className="col-span-6 text-center text-black">
                       Date
                     </div>
-                    <div className="col-span-6 text-center text-white">
+                    <div className="col-span-6 text-center text-black">
                       Average Rating
                     </div>
                   </div>
@@ -182,7 +182,7 @@ export default function DashboardRating() {
                       key={date}
                       className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-4"
                     >
-                      <div className="col-span-6 text-center text-white">
+                      <div className="col-span-6 text-center text-black">
                         {date}
                       </div>
                       <div className="col-span-6 text-center">
@@ -209,7 +209,10 @@ export default function DashboardRating() {
 
   if (UserCtx.userData.userType === "member") {
     return (
-      <div className="instructor-dashboard-container">
+      <div className="w-full member-dashboard-conatainer">
+        <h2 className="font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold text-center mt-4 w-[80%] mx-auto">
+          Reviews
+        </h2>
         <div className="h-[100vh] ml-[6rem] max1050:ml-[0] max1050:mt-0">
           <div
             className={`w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-10`}
@@ -217,28 +220,25 @@ export default function DashboardRating() {
               backgroundColor: InstitutionData.LightestPrimaryColor,
             }}
           >
-            <h2 className="pl-5 font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold]">
-              Reviews
-            </h2>
             <div className="overflow-x-auto w-full">
               <ul
                 className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-col rounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] max536:bg-gradient-to-b max536:from-[#dad7c6] max536:to-[#fdd00891]"
-                style={{
-                  backgroundColor: InstitutionData.PrimaryColor,
-                }}
+              // style={{
+              //   backgroundColor: InstitutionData.PrimaryColor,
+              // }}
               >
                 <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
                   <div className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-5 font-bold">
-                    <div className="col-span-3 text-center text-white">
+                    <div className="col-span-3 text-center text-black">
                       Instructor
                     </div>
-                    <div className="col-span-3 text-center text-white">
+                    <div className="col-span-3 text-center text-black">
                       Date
                     </div>
-                    <div className="col-span-3 text-center text-white">
+                    <div className="col-span-3 text-center text-black">
                       Time
                     </div>
-                    <div className="col-span-3 text-center text-white">
+                    <div className="col-span-3 text-center text-black">
                       Rating
                     </div>
                   </div>
@@ -252,15 +252,15 @@ export default function DashboardRating() {
                         key={rating.ratingId}
                         className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-4 "
                       >
-                        <div className="col-span-3 text-center text-white">
+                        <div className="col-span-3 text-center text-black">
                           {rating.instructorName}
                         </div>
-                        <div className="col-span-3 text-center text-white">
+                        <div className="col-span-3 text-center text-black">
                           {new Date(
                             parseInt(rating.timestamp)
                           ).toLocaleDateString()}
                         </div>
-                        <div className="col-span-3 text-center text-white">
+                        <div className="col-span-3 text-center text-black">
                           {new Date(
                             parseInt(rating.timestamp)
                           ).toLocaleTimeString()}
@@ -271,11 +271,10 @@ export default function DashboardRating() {
                             {Array.from({ length: 5 }, (_, index) => (
                               <span
                                 key={index}
-                                className={`text-2xl mx-1 ${
-                                  index < rating.rating
-                                    ? "text-yellow-500"
-                                    : "text-gray-300"
-                                }`}
+                                className={`text-2xl mx-1 ${index < rating.rating
+                                  ? "text-yellow-500"
+                                  : "text-gray-300"
+                                  }`}
                               >
                                 ★
                               </span>
@@ -302,11 +301,17 @@ export default function DashboardRating() {
   }
 
   return (
-    <div className="admin-dashboard-container">
+    //for
+    <div className="admin-dashboard-container w-full">
+      <h2 className="pl-5 font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold text-center mt-4 w-[80%] mx-auto">
+        Reviews
+      </h2>
       <div className="h-[100vh] ml-[6rem] max1050:ml-[0] max1050:mt-0">
         <div className="w-[85%] flex justify-end mt-4">
           <Button
-            color={"primary"}
+            style={{
+              backgroundColor: InstitutionData.LightPrimaryColor,
+            }}
             onClick={() => {
               setShowFilters(!showFilters);
             }}
@@ -375,9 +380,6 @@ export default function DashboardRating() {
             backgroundColor: InstitutionData.LightestPrimaryColor,
           }}
         >
-          <h2 className="pl-5 font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold">
-            Reviews
-          </h2>
           <div className="overflow-x-auto w-full">
             <ul className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-col rounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] max536:bg-gradient-to-b max536:from-[#dad7c6] max536:to-[#fdd00891]">
               <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
@@ -429,11 +431,10 @@ export default function DashboardRating() {
                           {Array.from({ length: 5 }, (_, index) => (
                             <span
                               key={index}
-                              className={`text-2xl mx-1 ${
-                                index < rating.rating
-                                  ? "text-yellow-500"
-                                  : "text-gray-300"
-                              }`}
+                              className={`text-2xl mx-1 ${index < rating.rating
+                                ? "text-yellow-500"
+                                : "text-gray-300"
+                                }`}
                             >
                               ★
                             </span>
@@ -446,15 +447,15 @@ export default function DashboardRating() {
                     </div>
                   ))}
               </li>
-              <div className="absolute bottom-3 flex justify-center items-center w-full">
-                <Pagination
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                  onPageChange={(value) => setCurrentPage(value)}
-                  style={{ margin: "0 auto" }}
-                />
-              </div>
             </ul>
+            <div className="absolute bottom-0 flex justify-center items-center w-full">
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={(value) => setCurrentPage(value)}
+                style={{ margin: "0 auto" }}
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -59,6 +59,7 @@ const Instructor = () => {
   const navigate = useNavigate();
   const { institutionData } = useContext(InstitutionContext); // Access InstitutionData
   const [selectedClassTypes, setSelectedClassTypes] = useState([]); // Track selected class types
+  const InstitutionData = useContext(InstitutionContext).institutionData;
 
   // Prepare class type options
   const classTypeOptions = institutionData.ClassTypes.map((classType) => ({
@@ -72,7 +73,7 @@ const Instructor = () => {
       [instructorId]: selectedOptions || [], // Update class types for the specific instructor
     }));
   };
-  
+
   useEffect(() => {
     const fetchInstructorList = async () => {
       try {
@@ -107,17 +108,17 @@ const Instructor = () => {
             timestamp: Date.now(),
           })
         );
-      
+
         setInstructorList(sortedInstructors);
-        console.log("hello1",sortedInstructor);
-       
+        console.log("hello1", sortedInstructor);
+
       } catch (error) {
         console.error("Error fetching instructors:", error);
       } finally {
         Loader.setLoader(false);
       }
     };
-    console.log("hello",selectedClassTypes)
+    console.log("hello", selectedClassTypes)
 
     const cachedInstructorList = localStorage.getItem(
       `instructorList_${institutionData.InstitutionId}`
@@ -143,17 +144,17 @@ const Instructor = () => {
       const mappedClassTypes = instructorList.reduce((acc, instructor) => {
         acc[instructor.instructorId] = Array.isArray(instructor.classType)
           ? instructor.classType.map((type) => ({
-              value: type,
-              label: type,
-            }))
+            value: type,
+            label: type,
+          }))
           : [];
         return acc;
       }, {});
       setSelectedClassTypes(mappedClassTypes);
-      
+
     }
   }, [instructorList]);
-  
+
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -230,7 +231,7 @@ const Instructor = () => {
         instructorPaymentAmount: instructorPaymentAmount
           ? instructorPaymentAmount
           : "",
-        classType:  instructorClassTypes,
+        classType: instructorClassTypes,
       };
       const response = await API.post("main", `/admin/create-user`, {
         body: data,
@@ -276,7 +277,7 @@ const Instructor = () => {
             instructorPaymentType: instructorPaymentType,
             instructorPaymentAmount: instructorPaymentAmount,
             emailId: email,
-            classType:  instructorClassTypes,
+            classType: instructorClassTypes,
           },
         }
       );
@@ -526,7 +527,9 @@ const Instructor = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button
-            color={"primary"}
+            style={{
+              backgroundColor: InstitutionData.PrimaryColor
+            }}
             onClick={() => {
               setModalShow(false);
               isUpdating ? handleUpdateInstructor() : handleAddInstructor();
@@ -549,7 +552,11 @@ const Instructor = () => {
       >
         {isAdmin && (
           <div className="absolute top-[1rem] right-[1.5rem] z-20">
-            <Button color={"primary"} onClick={() => setModalShow(true)}>
+            <Button
+            style={{
+              backgroundColor: InstitutionData.PrimaryColor
+            }}
+            onClick={() => setModalShow(true)}>
               <div className="flex gap-2 justify-center items-center">
                 <FaUserEdit size={18} />
                 Add
@@ -559,11 +566,16 @@ const Instructor = () => {
         )}
         <div
           className={`grid grid-cols-1 gap-6 justify-center ${instructorList.length >= 3
-            ? "md:grid-cols-3"
-            : instructorList.length === 2
-              ? "md:grid-cols-2"
-              : "md:grid-cols-1"
-            } bg`}
+              ? "md:grid-cols-3"
+              : instructorList.length === 2
+                ? "md:grid-cols-2"
+                : "md:grid-cols-1"
+            } bg instructor-container`}
+          style={{
+            borderBottom: `2px solid ${institutionData.PrimaryColor}`,
+            marginTop: '1.5rem',
+            paddingBottom: '3rem'
+          }}
         >
           {instructorList.map(
             (instructor, i) =>
@@ -605,7 +617,7 @@ const Instructor = () => {
                       </div>
                     </div>
                   )}
-                
+
                   <Card
                     className={`Box`}
                     onClick={() =>
@@ -624,6 +636,9 @@ const Instructor = () => {
                     <div className={`overlay`}></div>
                     <div
                       className={`instructor-card-text flex flex-col items-center`}
+                      style={{
+                        background: `linear-gradient(180deg, #ffffff00 0%, ${institutionData.PrimaryColor} 100%)`
+                      }}
                     >
                       <h4 className={`text-[1.3rem] font-semibold`}>
                         {instructor.name}

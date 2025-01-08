@@ -17,7 +17,7 @@ import { Button, Label, Modal, TextInput, Select } from "flowbite-react";
 import { FaUserTie, FaCalendarAlt } from "react-icons/fa";
 import { HiOutlineLink } from "react-icons/hi";
 import { GrYoga } from "react-icons/gr";
-import {FaQrcode} from "react-icons/fa6";
+import { FaQrcode } from "react-icons/fa6";
 
 const UpcomingSessionsMobile = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -113,11 +113,11 @@ const UpcomingSessionsMobile = () => {
       const updatedClasses = Ctx.upcomingClasses.map((c) =>
         c.classId === classId
           ? {
-              ...c,
-              instructorNames: editedInstructorNames,
-              instructorId,
-              classType: editedClassType,
-            }
+            ...c,
+            instructorNames: editedInstructorNames,
+            instructorId,
+            classType: editedClassType,
+          }
           : c
       );
       await API.put(
@@ -478,7 +478,6 @@ const UpcomingSessionsMobile = () => {
                 onChange={(e) => {
                   setZoomLink(e.target.value);
                 }}
-                color={"primary"}
                 icon={HiOutlineLink}
                 value={zoomLink}
                 required
@@ -537,7 +536,6 @@ const UpcomingSessionsMobile = () => {
               </div>
               <TextInput
                 icon={FaCalendarAlt}
-                color={"primary"}
                 placeholder="Select Date and Time"
                 type={"datetime-local"}
                 value={date}
@@ -550,7 +548,10 @@ const UpcomingSessionsMobile = () => {
         </Modal.Body>
         <Modal.Footer>
           <div className="w-full flex justify-center">
-            <Button color="primary" onClick={onScheduleCreate}>
+            <Button style={{
+              backgroundColor: InstitutionData.PrimaryColor,
+            }}
+              onClick={onScheduleCreate}>
               Create
             </Button>
           </div>
@@ -559,15 +560,15 @@ const UpcomingSessionsMobile = () => {
       <div className={`w-full px-2 pb-4`}>
         {(Ctx.userData.userType === "admin" ||
           Ctx.userData.userType === "instructor") && (
-          <div className={`container`}>
-            <button
-              className={`filter-button w-full m-[1rem] h-[2.1rem] rounded-[0.3rem] text-snow bg-black text-white`}
-              onClick={() => setShowScheduleForm(true)}
-            >
-              CREATE A NEW SESSION
-            </button>
-          </div>
-        )}
+            <div className={`container`}>
+              <button
+                className={`filter-button w-full m-[1rem] h-[2.1rem] rounded-[0.3rem] text-snow bg-black text-white`}
+                onClick={() => setShowScheduleForm(true)}
+              >
+                CREATE A NEW SESSION
+              </button>
+            </div>
+          )}
         <div>
           {isMember && (
             <div
@@ -601,27 +602,6 @@ const UpcomingSessionsMobile = () => {
             >
               Upcoming Sessions
             </h2>
-            {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(27, 117, 113)" className={`w-10 h-[2rem] ${!openedOnce ? '' : 'shake'} cursor-pointer`} onClick={handleSvgClick}>
-            <path d="M5.85 3.5a.75.75 0 0 0-1.117-1 9.719 9.719 0 0 0-2.348 4.876.75.75 0 0 0 1.479.248A8.219 8.219 0 0 1 5.85 3.5ZM19.267 2.5a.75.75 0 1 0-1.118 1 8.22 8.22 0 0 1 1.987 4.124.75.75 0 0 0 1.48-.248A9.72 9.72 0 0 0 19.266 2.5Z" />
-            <path fillRule="evenodd" d="M12 2.25A6.75 6.75 0 0 0 5.25 9v.75a8.217 8.217 0 0 1-2.119 5.52.75.75 0 0 0 .298 1.206c1.544.57 3.16.99 4.831 1.243a3.75 3.75 0 1 0 7.48 0 24.583 24.583 0 0 0 4.83-1.244.75.75 0 0 0 .298-1.205 8.217 8.217 0 0 1-2.118-5.52V9A6.75 6.75 0 0 0 12 2.25ZM9.75 18c0-.034 0-.067.002-.1a25.05 25.05 0 0 0 4.496 0l.002.1a2.25 2.25 0 1 1-4.5 0Z" clipRule="evenodd" />
-          </svg>
-          {openedOnce && (
-            <p className="absolute w-[1rem] h-[1rem] text-center rounded-[100%] text-[12px] font-bold bg-[#f81818e0] top-[-9%] right-[0%]">
-              1
-            </p>
-          )} */}
-            {/* {showForm && (
-            <div className="animate-slide-in absolute flex flex-col items-center w-[90vw] bg-white bg-opacity-50 p-4 rounded right-5 top-2 z-20" style={{ backdropFilter: 'blur(10px)', boxShadow: 'rgba(0, 0, 0, 0.1) 0px 0px 8px 6px' }}>
-              <div className='flex items-center justify-center'>
-                <p className='mt-2 ml-10 text-[1.1rem] font-bold'>🕺 Don't Miss a Step! Get Reminders on WhatsApp!</p>
-                <img className='w-[1.3rem] mr-7 mt-4' src={wp} alt="" />
-              </div>
-              <p className='mt-2 text-[1.2rem] font-bold'>Scan the QR</p>
-              <QRCode value={whatsappLink} size={256} />
-              <p className='mt-2 text-[1.2rem] text-[#125b43] font-bold'>OR</p>
-              <button className='bg-[#2b7f7b] rounded-[4px] w-full p-2 text-white font-[600]' onClick={() => { window.open(whatsappLink, '_blank') }}>Click Here</button>
-            </div>
-          )} */}
           </div>
           {!attendanceList ? (
             <div>
@@ -637,7 +617,7 @@ const UpcomingSessionsMobile = () => {
                       <div
                         className={`rounded-lg p-3 md:p-4 shadow-md relative`}
                         style={{
-                          background: InstitutionData.SecondaryColor,
+                          background: InstitutionData.LightestPrimaryColor,
                           boxShadow: "0 0px 15px rgba(0, 0, 0, 0.4)",
                           borderRadius: "1.8rem",
                         }}
@@ -650,13 +630,13 @@ const UpcomingSessionsMobile = () => {
                             >
                               {/* Show the dropdowns only to admin and instructor users */}
                               {Ctx.userData.userType === "admin" ||
-                              Ctx.userData.userType === "instructor" ? (
+                                Ctx.userData.userType === "instructor" ? (
                                 <div className={`dropdown-wrapper`}>
                                   <select
-                                    className={`rounded-[0.51rem] px-1 attractive-dropdown`}
+                                    className={`rounded-[0.51rem] px-4 attractive-dropdown`}
                                     style={{
                                       backgroundColor:
-                                      InstitutionData.SecondaryColor,
+                                        InstitutionData.LightestPrimaryColor,
                                     }}
                                     value={
                                       getInstructor(clas.instructorNames)?.name
@@ -676,14 +656,13 @@ const UpcomingSessionsMobile = () => {
                                       </option>
                                     ))}
                                   </select>
-                                  <div className={`dropdown-arrow`}></div>
                                 </div>
                               ) : (
                                 <p
                                   className={`rounded-[0.51rem] pr-4 max600:bg-[#09edb900] `}
                                   style={{
                                     backgroundColor:
-                                    InstitutionData.SecondaryColor,
+                                      InstitutionData.LightestPrimaryColor,
                                   }}
                                 >
                                   {clas.instructorNames}
@@ -691,13 +670,13 @@ const UpcomingSessionsMobile = () => {
                               )}
 
                               {Ctx.userData.userType === "admin" ||
-                              Ctx.userData.userType === "instructor" ? (
+                                Ctx.userData.userType === "instructor" ? (
                                 <div className={`dropdown-wrapper2`}>
                                   <select
                                     className={`rounded-[0.51rem] px-1 attractive-dropdown2`}
                                     style={{
                                       backgroundColor:
-                                      InstitutionData.SecondaryColor,
+                                        InstitutionData.LightestPrimaryColor,
                                     }}
                                     value={clas.classType}
                                     onChange={(e) => {
@@ -716,14 +695,13 @@ const UpcomingSessionsMobile = () => {
                                       </option>
                                     ))}
                                   </select>
-                                  <div className={`dropdown-arrow2`}></div>
                                 </div>
                               ) : (
                                 <p
                                   className={`rounded-[0.51rem] max600:bg-[#09edb900] `}
                                   style={{
                                     backgroundColor:
-                                    InstitutionData.SecondaryColor,
+                                      InstitutionData.LightestPrimaryColor,
                                   }}
                                 >
                                   {clas.classType}
@@ -778,14 +756,6 @@ const UpcomingSessionsMobile = () => {
                               </button>
                             )}
                           </div>
-                          {/*{UserCtx.userData.userType !== "member" && <div*/}
-                          {/*  className={*/}
-                          {/*    "w-fit"*/}
-                          {/*  }*/}
-                          {/*>*/}
-                          {/*  <a href={`https://qrtag.net/api/qr_4.png?url=https://beta.happyprancer.com/put-attendance/${clas.classId}`}*/}
-                          {/*     target='_blank'><FaQrcode/></a>*/}
-                          {/*</div>}*/}
                         </div>
                       </div>
                     </div>
@@ -847,7 +817,7 @@ const UpcomingSessionsMobile = () => {
                     <div
                       className={`rounded-lg p-3 md:p-4 shadow-md relative mb-4`}
                       style={{
-                        background: InstitutionData.SecondaryColor,
+                        background: InstitutionData.LightestPrimaryColor,
                         boxShadow: "0 0px 15px rgba(0, 0, 0, 0.4)",
                         borderRadius: "1.8rem",
                       }}
@@ -883,13 +853,13 @@ const UpcomingSessionsMobile = () => {
                             onChange={(event) =>
                               event.target.checked
                                 ? handleCheckboxClick(
-                                    user.cognitoId,
-                                    user.emailId
-                                  )
+                                  user.cognitoId,
+                                  user.emailId
+                                )
                                 : handleCheckboxUnclick(
-                                    user.cognitoId,
-                                    user.emailId
-                                  )
+                                  user.cognitoId,
+                                  user.emailId
+                                )
                             }
                           />
                         </label>

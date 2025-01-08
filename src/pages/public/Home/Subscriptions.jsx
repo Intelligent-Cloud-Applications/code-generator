@@ -101,6 +101,9 @@ useEffect(() => {
                   "noopener,noreferrer"
                 );
               }}
+              style={{
+                backgroundColor: InstitutionData.PrimaryColor,
+              }}
             >
               Subscribe
             </button>
@@ -115,6 +118,9 @@ useEffect(() => {
             Navigate("/signup");
           }}
           className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+          style={{
+            backgroundColor: InstitutionData.LightPrimaryColor,
+          }}  
         >
           Sign up
         </button>
@@ -181,7 +187,7 @@ useEffect(() => {
                 <li key={`${i}-provide-${j}`} className="flex space-x-3">
                   <svg
                     className="h-5 w-5 shrink-0 text-primaryColor dark:text-primaryColor"
-                    fill="currentColor"
+                    fill="primaryColor"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
                   >
@@ -197,12 +203,6 @@ useEffect(() => {
                 </li>
               ))}
             </ul>
-            {/* <button
-              type="button"
-              className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
-            >
-              Choose plan
-            </button> */}
             {paymentHandler(item)}
           </Card>
         ))}

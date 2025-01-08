@@ -80,7 +80,7 @@ const Hero = () => {
           'Content-Type': 'application/octet-stream'
         }
       });
-      
+
       const etag = response.headers.get('ETag');
       return etag ? etag.replaceAll('"', '') : null;
     } catch (error) {
@@ -144,7 +144,7 @@ const Hero = () => {
 
       // Step 3: Complete multipart upload
       const result = await completeMultipartUpload(uploadId, key, parts);
-      
+
       // Update video URL
       setVideoURL(result.videoUrl);
       toast.success("Video uploaded successfully!", {
@@ -216,8 +216,8 @@ const Hero = () => {
               {uploadProgress > 0 && uploadProgress < 100 && (
                 <div className="mt-2">
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div 
-                      className="bg-blue-600 h-2.5 rounded-full" 
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full"
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
@@ -278,7 +278,9 @@ const Hero = () => {
       <div className={`flex items-center justify-center h-[30rem] pb-20 relative`}>
         {isAdmin && (
           <Button
-            color={"primary"}
+            style={{
+              backgroundColor: InstitutionData.PrimaryColor
+            }}
             className="absolute top-4 right-4"
             onClick={() => setModalShow(true)}
           >

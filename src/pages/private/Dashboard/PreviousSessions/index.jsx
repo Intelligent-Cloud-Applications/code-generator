@@ -425,7 +425,9 @@ const PreviousSessions = () => {
             </div> */}
             <div className="w-[75%] flex justify-end">
               <Button
-                color={"primary"}
+                style={{
+                  backgroundColor: InstitutionData.LightPrimaryColor,
+                }}
                 onClick={() => {
                   setShowFilters(!showFilters);
                 }}
@@ -608,7 +610,7 @@ const PreviousSessions = () => {
                           >
                             <div className={`w-[25%] overflow-hidden relative`}>
                               {Ctx.userData.userType === "admin" ||
-                              Ctx.userData.userType === "instructor" ? (
+                                Ctx.userData.userType === "instructor" ? (
                                 <select
                                   className={`rounded-[0.51rem] pr-[1.5rem] pl-[0rem]`}
                                   style={{
@@ -641,7 +643,7 @@ const PreviousSessions = () => {
                                           <option
                                             key={i.name}
                                             value={i.name}
-                                            onChange={(e) => {}}
+                                            onChange={(e) => { }}
                                           >
                                             {i.name}
                                           </option>
@@ -650,7 +652,7 @@ const PreviousSessions = () => {
                                   <option
                                     key="cancelled"
                                     value="cancelled"
-                                    onChange={(e) => {}}
+                                    onChange={(e) => { }}
                                   >
                                     cancelled
                                   </option>
@@ -692,7 +694,7 @@ const PreviousSessions = () => {
                                 ) : (
                                   <div className="w-[9rem] rounded-[4px] px-2 max-h-[1.8rem] self-center flex justify-center items-start">
                                     {Ctx.userData.userType === "admin" ||
-                                    Ctx.userData.userType === "instructor" ? (
+                                      Ctx.userData.userType === "instructor" ? (
                                       <div>
                                         {classId === clas.classId ? (
                                           <button
@@ -806,13 +808,13 @@ const PreviousSessions = () => {
                                 onChange={(event) =>
                                   event.target.checked
                                     ? handleCheckboxClick(
-                                        user.cognitoId,
-                                        user.emailId
-                                      )
+                                      user.cognitoId,
+                                      user.emailId
+                                    )
                                     : handleCheckboxUnclick(
-                                        user.cognitoId,
-                                        user.emailId
-                                      )
+                                      user.cognitoId,
+                                      user.emailId
+                                    )
                                 }
                               />
                             </label>

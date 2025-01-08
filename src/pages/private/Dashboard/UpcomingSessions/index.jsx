@@ -77,7 +77,7 @@ const UpcomingSessions = () => {
   // }
   const [instructorClassTypes, setInstructorClassTypes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchInstructorData = async () => {
       if (Ctx.userData.userType === "instructor") {
@@ -103,8 +103,8 @@ const UpcomingSessions = () => {
     };
 
     fetchInstructorData(); // Call the async function
-  }, [Ctx.userData.userType, InstitutionData.InstitutionId]); 
-  
+  }, [Ctx.userData.userType, InstitutionData.InstitutionId]);
+
   const getInstructor = (name) => {
     return Ctx.instructorList.find(
       (i) => i.name?.toString().trim() === name?.toString().trim()
@@ -662,7 +662,11 @@ const UpcomingSessions = () => {
         </Modal.Body>
         <Modal.Footer>
           <div className="w-full flex justify-center">
-            <Button color="primary" onClick={onScheduleCreate}>
+            <Button 
+            style={{
+              backgroundColor: InstitutionData.PrimaryColor
+            }}
+            onClick={onScheduleCreate}>
               Create
             </Button>
           </div>
@@ -723,81 +727,6 @@ const UpcomingSessions = () => {
               </div>
             )}
 
-          {/* {(Ctx.userData.userType === "admin" ||
-            Ctx.userData.userType === "instructor") && (
-            <form className={`flex flex-col gap-6 w-[90%] max1050:hidden`}>
-              <div className={`flex gap-6`}>
-                <select
-                  className={` font-[500] text-[0.95rem] px-2 pb-1 rounded-lg w-[10rem]`}
-                  style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor,
-                  }}
-                  value={classType}
-                  onChange={(e) => {
-                    setClassType(e.target.value);
-                  }}
-                >
-                  <option value="">Select Class Type</option>
-                  {classTypeNameArray.map((classType) => (
-                    <option key={classType} value={classType}>
-                      {classType}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  className={` font-[500] text-[0.95rem] px-2 pb-1 rounded-lg w-[10rem]`}
-                  style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor,
-                  }}
-                  value={
-                    selectedInstructor
-                      ? selectedInstructor.name
-                        ? selectedInstructor.name
-                        : "none"
-                      : "none"
-                  }
-                  onChange={(e) => {
-                    setselectedInstructor(getInstructor(e.target.value));
-                  }}
-                >
-                  <option value="none">Select Instructor</option>
-                  {Ctx.instructorList.map((i) => (
-                    <option key={i.name} value={i.name}>
-                      {i.name}
-                    </option>
-                  ))}
-                </select>
-
-                <textarea
-                  className={` px-2 pt-4 rounded-lg text-[0.95rem] w-[10rem]  flex justify-center items-center flex-grow`}
-                  style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor,
-                  }}
-                  placeholder="Zoom Link"
-                  value={zoomLink}
-                  onChange={(e) => {
-                    setZoomLink(e.target.value);
-                  }}
-                />
-
-                <input
-                  className={` px-2 pb-1 text-[1rem] rounded-lg w-[10rem]`}
-                  style={{
-                    backgroundColor: InstitutionData.LightestPrimaryColor,
-                  }}
-                  placeholder="Date"
-                  type={"datetime-local"}
-                  value={date}
-                  onChange={(e) => {
-                    setDate(e.target.value);
-                  }}
-                />
-              </div>
-              <Button2 data={"Post"} fn={onScheduleCreate} />
-            </form>
-          )} */}
-
           <div className={`mt-8 w-[80%] max1050:w-[92%] flex justify-between`}>
             <div className={`w-[100%]`}>
               <h3 className={`text-center text-[1.7rem] pl-3 mb-4 font-bold`}>
@@ -806,19 +735,25 @@ const UpcomingSessions = () => {
 
               <div
                 className={`flex ${Ctx.userData.userType === "admin" ||
-                    Ctx.userData.userType === "instructor"
-                    ? "justify-between"
-                    : "justify-end"
+                  Ctx.userData.userType === "instructor"
+                  ? "justify-between"
+                  : "justify-end"
                   } relative`}
               >
                 {(Ctx.userData.userType === "admin" ||
                   Ctx.userData.userType === "instructor") && (
-                    <Button color="primary" onClick={() => setModal(true)}>
+                    <Button
+                      style={{
+                        backgroundColor: InstitutionData.PrimaryColor,
+                      }}
+                      onClick={() => setModal(true)}>
                       Create Class
                     </Button>
                   )}
                 <Button
-                  color="primary"
+                  style={{
+                    backgroundColor: InstitutionData.PrimaryColor,
+                  }}
                   onClick={() => setShowFilters((e) => !e)}
                 >
                   Filters
@@ -967,7 +902,7 @@ const UpcomingSessions = () => {
               )}
               <ul
                 className={`h-[28rem] relative pb-[3rem] flex flex-col overflow-auto pt-6 ${(Ctx.userData.userType === "admin" ||
-                    Ctx.userData.userType === "instructor") &&
+                  Ctx.userData.userType === "instructor") &&
                   (attendanceList
                     ? "h-[32rem] relative pb-[3rem]"
                     : "h-[28rem] relative pb-[3rem]")

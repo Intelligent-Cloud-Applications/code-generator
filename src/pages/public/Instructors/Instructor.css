@@ -10,7 +10,7 @@
   .instructor-contanier {
     margin-top: 1.5rem;
     padding-bottom: 3rem;
-    border-bottom: 2px solid #225c59;
+    /* border-bottom: 2px solid #225c59; */
   }
   
   .row {
@@ -19,7 +19,7 @@
   
   .instructor-headline {
     text-align: center;
-    background-color: #225c59;
+    /* background-color: #225c59; */
     color: #ffffff;
     padding: 8px 20px;
     box-shadow: 2px 2px #3b393998;

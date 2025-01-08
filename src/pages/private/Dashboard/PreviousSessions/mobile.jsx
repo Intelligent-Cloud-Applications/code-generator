@@ -457,7 +457,9 @@ const PreviousSessionsMobile = () => {
 
           <div className="w-full flex justify-end mb-3 mr-2">
             <Button
-              color={"primary"}
+              style={{
+                backgroundColor: InstitutionData.LightPrimaryColor,
+              }}
               onClick={() => {
                 setShowFilters(!showFilters);
               }}
@@ -531,7 +533,7 @@ const PreviousSessionsMobile = () => {
                   <div
                     className={`rounded-lg p-3 md:p-4 shadow-md relative`}
                     style={{
-                      background: InstitutionData.SecondaryColor,
+                      background: InstitutionData.LightestPrimaryColor,
                       boxShadow: "0 0px 15px rgba(0, 0, 0, 0.4)",
                       borderRadius: "1.8rem",
                     }}
@@ -545,7 +547,7 @@ const PreviousSessionsMobile = () => {
                             <select
                               className={`rounded-[0.51rem] px-1 attractive-dropdown" // Add the CSS class "attractive-dropdown`}
                               style={{
-                                backgroundColor: InstitutionData.SecondaryColor,
+                                backgroundColor: InstitutionData.LightestPrimaryColor,
                               }}
                               value={clas.instructorNames}
                               onChange={(e) =>
@@ -740,7 +742,7 @@ const PreviousSessionsMobile = () => {
                     <div
                       className={`rounded-lg p-3 md:p-4 shadow-md relative mb-4`}
                       style={{
-                        background: InstitutionData.SecondaryColor,
+                        background: InstitutionData.LightestPrimaryColor,
                         boxShadow: "0 0px 15px rgba(0, 0, 0, 0.4)",
                         borderRadius: "1.8rem",
                       }}
