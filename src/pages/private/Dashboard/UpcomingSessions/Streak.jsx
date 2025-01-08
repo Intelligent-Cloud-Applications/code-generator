@@ -1,25 +1,21 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { fetchStreakCount } from './StreakFunctions';
-import './Streak.css';
-import InstitutionContext from '../../../../Context/InstitutionContext';
-import { API } from "aws-amplify";
-import { MdInfo } from "react-icons/md";
-import { Modal } from "flowbite-react";
+import React, { useState, useEffect, useContext } from 'react'
+import { fetchStreakCount } from './StreakFunctions'
+import './Streak.css'
+import InstitutionContext from '../../../../Context/InstitutionContext'
+import {API} from "aws-amplify";
+import {MdInfo} from "react-icons/md";
+import {Modal, Popover} from "flowbite-react";
 
 const Streak = () => {
-  const [streakData, setStreakData] = useState({ 
-    streakCount: 0, 
-    level: 0, 
-    attendance: 0, 
-    attendanceByClassTypes: {} 
-  });
+  const [streakData, setStreakData] = useState({ streakCount: 0, level: 0, attendance: 0, attendanceByClassTypes: {} })
   const [openModal, setOpenModal] = useState(false);
-  const InstitutionData = useContext(InstitutionContext).institutionData;
+  const InstitutionData = useContext(InstitutionContext).institutionData
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         let data = await fetchStreakCount(InstitutionData.InstitutionId);
+        console.log('STREAK DATA', data);
         const attendance = await API.get(
           'main',
           `/user/list-attendance/${InstitutionData.InstitutionId}`,
@@ -27,39 +23,29 @@ const Streak = () => {
         );
         let attendanceByClassTypes = {};
         for (let classType of InstitutionData.ClassTypes) {
-          attendanceByClassTypes[classType] = attendance.Items.reduce(
-            (acc, item) => acc + (item.classType === classType ? 1 : 0), 
-            0
-          );
+          attendanceByClassTypes[classType] = attendance.Items.reduce((acc, item) => acc + (item.classType === classType ? 1 : 0), 0);
         }
+        console.log(attendanceByClassTypes);
         data.attendance = attendance.Count;
         data.attendanceByClassTypes = attendanceByClassTypes;
-        setStreakData(data);
+        console.log('STREAK DATA', data);
+        setStreakData(data)
       } catch (error) {
-        console.error(error);
+        console.error(error)
       }
-    };
+    }
 
-    fetchData();
-  }, []);
-
-  const mainStyle = {
-    background: `linear-gradient(to bottom, ${InstitutionData.LightestPrimaryColor}, ${InstitutionData.PrimaryColor})`,
-    boxShadow: '0 0 15px rgba(0, 0, 0, 0.4)',
-    borderRadius: '1.8rem',
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    padding: '2rem 1.5rem',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    border: '1px solid',
-    height: '15%',
-  };
+    fetchData()
+  }, [])
 
   return (
     <>
-      <div className="main" style={mainStyle}>
+      <div
+        className="w-[100%] flex flex-row p-[2rem] px-[1.5rem] items-center justify-between border h-[15%] main"
+        style={{
+          backgroundColor: InstitutionData.LightestPrimaryColor
+        }}
+      >
         <div className="flex flex-col">
           <h2 className="stkm">Your Streak:</h2>
           <p className="mov">
@@ -70,7 +56,7 @@ const Streak = () => {
           ATTENDANCE
           <p className="text-[35px] stk flex justify-center items-center gap-2">
             {streakData.attendance}
-            <MdInfo className="inline" size={24} onClick={() => setOpenModal(true)} />
+            <MdInfo className="inline" size={24} onClick={() => setOpenModal(true)}/>
           </p>
         </div>
         <div className="flex flex-col text-[17px] text-center lev">
@@ -82,7 +68,6 @@ const Streak = () => {
           <p className="text-[35px] stk">{streakData.streakCount}</p>
         </div>
       </div>
-
       <Modal show={openModal} onClose={() => setOpenModal(false)}>
         <Modal.Header className="p-2">Attendance</Modal.Header>
         <Modal.Body className="flex justify-center gap-4">
@@ -95,7 +80,7 @@ const Streak = () => {
         </Modal.Body>
       </Modal>
     </>
-  );
-};
+  )
+}
 
-export default Streak;
+export default Streak
