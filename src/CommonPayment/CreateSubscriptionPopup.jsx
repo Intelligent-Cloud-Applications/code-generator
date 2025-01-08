@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import InstitutionContext from '../Context/InstitutionContext';
 import Popup from 'reactjs-popup';
 import Select from 'react-select';
-import colors from './../color.json';
+import { useSearchParams } from 'react-router-dom';
 
 const CreateSubscriptionPopup = ({
   isPopupOpen,
@@ -25,8 +25,11 @@ const CreateSubscriptionPopup = ({
     value: classType,
     label: classType,
   }));
-  const color = colors[institution];
-
+  const [searchParams] = useSearchParams();
+  const color = {
+    primary: searchParams.get('primary') || '#000',
+    secondary: searchParams.get('secondary') || '#000'
+  };
   // Handle multi-select changes
   const handleClassTypeChange = (selectedOptions) => {
     setSelectedClassTypes(selectedOptions); // Update selected options state

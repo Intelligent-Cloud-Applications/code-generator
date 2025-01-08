@@ -1,11 +1,10 @@
 import { animated, useSpring } from "@react-spring/web";
 import { API } from "aws-amplify";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { BarLoader } from "react-spinners";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import colors from "../color.json";
 import Context from "../Context/Context";
 import CartTable from "./Cart/CartTable";
 import displayError from "./Errors";
@@ -30,13 +29,16 @@ const Cart = ({ institution }) => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [prevInstructorAmount, setPrevInstructorAmount] = useState(0);
   const prevAmouunt = useRef();
-  const color = colors[institution];
   const animation = useSpring({
     opacity: isModalOpen ? 1 : 0,
     transform: isModalOpen ? "translateY(0)" : "translateY(-20px)",
     config: { tension: 200, friction: 20 },
   });
-
+  const [searchParams] = useSearchParams();
+  const color = {
+    primary: searchParams.get('primary') || '#000',
+    secondary: searchParams.get('secondary') || '#000'
+  };
   const navigate = useNavigate();
   const handlePaymentFailure = (message, navigate) => {
     navigate("/payment-error", { state: { message } });
@@ -480,9 +482,8 @@ const Cart = ({ institution }) => {
     <div className="Poppins mx-auto h-screen w-screen flex flex-col justify-around items-center border-b py-5 inter max767:h-full max767:flex-col max767:justify-center">
       <ToastContainer />
       <div
-        className={`w-full max767:mt-[3rem] flex justify-center ${
-          isModalOpen ? "hidden" : ""
-        }`}
+        className={`w-full max767:mt-[3rem] flex justify-center ${isModalOpen ? "hidden" : ""
+          }`}
       >
         <CartTable
           product={productItems}
@@ -493,9 +494,8 @@ const Cart = ({ institution }) => {
       </div>
 
       <div
-        className={`w-full Poppins max767:w-[98vw] ${
-          isModalOpen ? "hidden" : ""
-        }`}
+        className={`w-full Poppins max767:w-[98vw] ${isModalOpen ? "hidden" : ""
+          }`}
       >
         <section className="mx-auto px-[1rem] min-w-[35vw]">
           <div className="w-full flex justify-evenly max767:flex-col-reverse">
@@ -513,9 +513,8 @@ const Cart = ({ institution }) => {
                 <p>
                   {discountType === "%"
                     ? `${discountPercentage}${discountType}`
-                    : `${cartState.currencySymbol}${
-                        discountAmount ? discountAmount.toFixed(2) : 0
-                      }`}
+                    : `${cartState.currencySymbol}${discountAmount ? discountAmount.toFixed(2) : 0
+                    }`}
                 </p>
               </div>
               <div className="flex justify-between py-[1.25rem] font-bold text-lg">
@@ -542,15 +541,15 @@ const Cart = ({ institution }) => {
                     color: referralSubmitted
                       ? "green"
                       : referralError
-                      ? "red"
-                      : "gray",
+                        ? "red"
+                        : "gray",
                   }}
                 >
                   {referralSubmitted
                     ? "code submitted"
                     : referralError
-                    ? "Invalid referral code"
-                    : "If you have a Referral or discount code, enter it here"}
+                      ? "Invalid referral code"
+                      : "If you have a Referral or discount code, enter it here"}
                 </p>
                 <div className="flex justify-center items-center">
                   <input
@@ -588,15 +587,15 @@ const Cart = ({ institution }) => {
                     color: referralSubmitted
                       ? "green"
                       : referralError
-                      ? "red"
-                      : "gray",
+                        ? "red"
+                        : "gray",
                   }}
                 >
                   {referralSubmitted
                     ? "code submitted"
                     : referralError
-                    ? "Invalid discount code"
-                    : "If you have a discount code, enter it here"}
+                      ? "Invalid discount code"
+                      : "If you have a discount code, enter it here"}
                 </p>
                 <div className="flex justify-center items-center">
                   <input

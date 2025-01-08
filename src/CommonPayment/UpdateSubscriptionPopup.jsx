@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import InstitutionContext from '../Context/InstitutionContext';
 import Select from 'react-select';
 import Popup from 'reactjs-popup';
-import colors from '../color.json';
+import { useSearchParams } from 'react-router-dom';
 
 const UpdateSubscriptionPopup = ({
   isEditPopupOpen,
@@ -18,7 +18,11 @@ const UpdateSubscriptionPopup = ({
   handleMoveUp,
   handleMoveDown, handleDeleteSubscription
 }) => {
-  const color = colors[institution];
+  const [searchParams] = useSearchParams();
+  const color = {
+    primary: searchParams.get('primary') || '#000',
+    secondary: searchParams.get('secondary') || '#000'
+  };
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedClassTypes, setSelectedClassTypes] = useState([]);
   const InstitutionData = useContext(InstitutionContext).institutionData;
