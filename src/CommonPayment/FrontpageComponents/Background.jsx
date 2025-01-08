@@ -1,9 +1,12 @@
 import React from 'react';
-import colors from '../../color.json'
+import { useSearchParams } from 'react-router-dom';
 
 function Background({ institution }) {
-  const color = colors[institution]
-
+  const [searchParams] = useSearchParams();
+  const color = {
+    primary: searchParams.get('primary') || '#000',
+    secondary: searchParams.get('secondary') || '#000'
+  };
   return (
     <div className='relative flex flex-col w-full h-screen overflow-hidden'>
       <div className='absolute inset-0 z-10 flex justify-center items-center'>

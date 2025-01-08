@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useParams } from 'react-router-dom';
-import colors from '../../color.json';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { API } from 'aws-amplify';
 import Context from '../../Context/Context';
 
@@ -11,8 +10,11 @@ const CartTable = ({ product, removeItem }) => {
   const [deletingIndex, setDeletingIndex] = useState(null);
   const { getCartItems } = useContext(Context);
   const { institution, cognitoId } = useParams();
-  const color = colors[institution];
-
+  const [searchParams] = useSearchParams();
+  const color = {
+    primary: searchParams.get('primary') || '#000',
+    secondary: searchParams.get('secondary') || '#000'
+  };
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);

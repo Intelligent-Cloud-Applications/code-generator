@@ -142,7 +142,7 @@ const RazorpayPayment = ({ productId }) => {
         className="inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
         onClick={() => {
           window.open(
-            `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${InstitutionData.PrimaryColor}&secondary=${InstitutionData.SecondaryColor}`,
+            `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor)}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor)}`,
             "_blank",
             "noopener,noreferrer"
           );

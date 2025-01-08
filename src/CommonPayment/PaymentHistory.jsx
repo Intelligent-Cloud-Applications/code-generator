@@ -1,13 +1,16 @@
 import React, { useContext } from 'react';
 import jsPDF from 'jspdf';
 import { format } from 'date-fns';
-import colors from '../color.json';
 import Context from '../Context/Context';
+import { useSearchParams } from 'react-router-dom';
 
 const PaymentHistory = ({ institution }) => {
   const { paymentHistory } = useContext(Context);
-  const color = colors[institution];
-  console.log(paymentHistory)
+  const [searchParams] = useSearchParams();
+  const color = {
+    primary: searchParams.get('primary') || '#000',
+    secondary: searchParams.get('secondary') || '#000'
+  };
 
   if (!color) {
     return <div>Error: Institution color not found</div>;
