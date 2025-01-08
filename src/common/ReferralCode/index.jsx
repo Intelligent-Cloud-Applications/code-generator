@@ -1,6 +1,6 @@
 import { animated, useSpring } from "@react-spring/web";
 import { API } from "aws-amplify";
-import { Modal, Badge } from "flowbite-react";
+import { Badge, Modal } from "flowbite-react";
 import React, { useContext, useEffect, useState } from "react";
 import Context from "../../Context/Context";
 import InstitutionContext from "../../Context/InstitutionContext";
@@ -21,6 +21,8 @@ function ReferralCode() {
   const [isOpen, setIsOpen] = useState(false);
   const [paymentDates, setPaymentDates] = useState({});
   const [isLoadingDates, setIsLoadingDates] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState("all");
+  const [filteredMembers, setFilteredMembers] = useState([]);
 
   useEffect(() => {
     const loadPaymentDates = async () => {
@@ -66,11 +68,17 @@ function ReferralCode() {
     setShareClicked(!shareClicked);
   };
 
+  function isMilliseconds(epoch) {
+    return epoch.toString().length === 13;
+  }
   const getDate = (epochTime) => {
-    const date = new Date(Number(epochTime)); // Creating a Date object
-    // To convert the date to local time
-    const localDate = date.toLocaleString();
-    return localDate.split(",")[0];
+    if(!epochTime) return "---";
+    if(isMilliseconds(epochTime)) epochTime = epochTime/1000;
+    
+    const date = new Date(epochTime * 1000);
+    const loccalDate = date.toLocaleDateString();
+    return loccalDate;
+    
   };
 
   const getPaymentDate = async (user) => {
@@ -80,8 +88,8 @@ function ReferralCode() {
         `/getReciept/${user.institution}/${user.cognitoId}`,
         {}
       );
-      const data = response.payments[0].paymentDate;
-      const date = getDate(data);
+      const data = response.payments.map((e) => e.paymentDate);
+      const date = data.map((e) => getDate(e));
       return date;
     } catch (error) {
       console.error("Error fetching payment history:", error);
@@ -163,6 +171,79 @@ function ReferralCode() {
     const index = name.length % colors.length;
     return colors[index];
   };
+
+  useEffect(() => {
+    const transformedData = () => {
+      const data = members.flatMap((member) => {
+        // Map each product for the member to create separate rows
+        return (
+          member.products?.map((product, productIndex) => [
+            // Image column
+            member.hasOwnProperty("imgUrl") ? (
+              <img
+                src={member.imgUrl}
+                alt={member.userName}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className={`rounded-full p-2 h-12 w-12 flex items-center justify-center text-[1rem] text-white`}
+                style={{ backgroundColor: getColor(member.userName) }}
+              >
+                {getInitials(member.userName)}
+              </div>
+            ),
+            // Name column
+            member.userName,
+            // Type column
+            member.hasOwnProperty("hybridPageUser") &&
+            member.hybridPageUser === true ? (
+              <Badge color="info" icon="off" size="xs">
+                Hybrid
+              </Badge>
+            ) : (
+              <Badge color="gray" icon="off">
+                Referral
+              </Badge>
+            ),
+            // Product column
+            product?.S || "---",
+            // Payment date column
+            isLoadingDates
+              ? "Loading..."
+              : paymentDates[member.cognitoId]?.[productIndex] || "---",
+          ]) || []
+        );
+      });
+
+      // Filter data based on selected month
+      const filteredData = data.filter((row) => {
+        if (selectedMonth === "all") return true;
+        const month = new Date(row[4]).getMonth();
+        return month === Number(selectedMonth);
+      });
+
+      setFilteredMembers(filteredData);
+
+    };
+    transformedData();
+  }, [selectedMonth, members, isLoadingDates, paymentDates]);
+
+  const monthOptions = [
+    { value: "all", label: "All Months" },
+    { value: "0", label: "January" },
+    { value: "1", label: "February" },
+    { value: "2", label: "March" },
+    { value: "3", label: "April" },
+    { value: "4", label: "May" },
+    { value: "5", label: "June" },
+    { value: "6", label: "July" },
+    { value: "7", label: "August" },
+    { value: "8", label: "September" },
+    { value: "9", label: "October" },
+    { value: "10", label: "November" },
+    { value: "11", label: "December" },
+  ];
 
   return (
     <div className="Poppins w-full flex flex-col justify-center items-center">
@@ -285,54 +366,40 @@ function ReferralCode() {
           </div>
         </div>
       )}
-
-      <Modal show={isOpen} onClose={() => setIsOpen(false)} size="5xl">
-        <Modal.Header></Modal.Header>
-        <Modal.Body>
-          <div className="overflow-x-auto">
-            {/* {console.log("Members: ", members)} */}
-            <PaginatedTable
-              head={["Profile Picture", "Name", "Type", "Plan", "Payment Date"]}
-              data={members.map((member) => [
-                member.hasOwnProperty("imgUrl") ? (
-                  <img
-                    src={member.imgUrl}
-                    alt={member.userName}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div
-                    className={`rounded-full p-2 h-12 w-12 flex items-center justify-center text-[1rem] text-white`}
-                    style={{
-                      backgroundColor: getColor(member.userName),
-                    }}
-                  >
-                    {getInitials(member.userName)}
-                  </div>
-                ),
-                member.userName,
-                member.hasOwnProperty("hybridPageUser") &&
-                member.hybridPageUser === true ? (
-                  <Badge color="info" icon="off" size="xs">
-                    Hybrid
-                  </Badge>
-                ) : (
-                  <Badge color="gray" icon="off" >
-                    Referral
-                  </Badge>
-                ),
-                member.hasOwnProperty("products") && member.products?.length > 0
-                  ? member.products[0].S
-                  : "---",
-                isLoadingDates
-                  ? "Loading..."
-                  : paymentDates[member.cognitoId] || "---",
-              ])}
-              itemsPerPage={10}
-            />
-          </div>
-        </Modal.Body>
-      </Modal>
+      {membersLength > 0 && (
+        <Modal show={isOpen} onClose={() => setIsOpen(false)} size="5xl">
+          <Modal.Header>
+            <div className="w-48">
+              <select
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+              >
+                {monthOptions.map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="overflow-x-auto">
+              <PaginatedTable
+                head={[
+                  "Profile Picture",
+                  "Name",
+                  "Type",
+                  "Plan",
+                  "Payment Date",
+                ]}
+                data={filteredMembers}
+                itemsPerPage={5}
+              />
+            </div>
+          </Modal.Body>
+        </Modal>
+      )}
     </div>
   );
 }
