@@ -106,6 +106,10 @@ const UpcomingSessions = () => {
   }, [Ctx.userData.userType, InstitutionData.InstitutionId]);
 
   const getInstructor = (name) => {
+    Ctx.instructorList.push({
+      name: "Cancelled",
+      instructorId: "Cancelled",
+    });    
     return Ctx.instructorList.find(
       (i) => i.name?.toString().trim() === name?.toString().trim()
     );
@@ -646,11 +650,11 @@ const UpcomingSessions = () => {
         </Modal.Body>
         <Modal.Footer>
           <div className="w-full flex justify-center">
-            <Button 
-            style={{
-              backgroundColor: InstitutionData.PrimaryColor
-            }}
-            onClick={onScheduleCreate}>
+            <Button
+              style={{
+                backgroundColor: InstitutionData.PrimaryColor
+              }}
+              onClick={onScheduleCreate}>
               Create
             </Button>
           </div>
@@ -945,63 +949,57 @@ const UpcomingSessions = () => {
                               </p>
 
                               <div className={`w-[7rem] ml-8`}>
-                                {Ctx.userData.userType === "admin" ||
-                                  Ctx.userData.userType === "instructor" ? (
+                                {Ctx.userData.userType === "admin" || Ctx.userData.userType === "instructor" ? (
                                   <select
                                     className={`rounded-[0.51rem] px-4 `}
                                     style={{
-                                      backgroundColor:
-                                        InstitutionData.LightestPrimaryColor,
+                                      backgroundColor: InstitutionData.LightestPrimaryColor,
                                     }}
-                                    value={
-                                      getInstructor(clas.instructorNames)?.name
-                                    }
+                                    value={getInstructor(clas.instructorNames)?.name}
                                     onChange={(e) => {
-                                      onClassUpdated(
-                                        clas.classId,
-                                        getInstructor(e.target.value).name,
-                                        clas.classType,
-                                        getInstructor(e.target.value)
-                                          .instructorId,
-                                        clas.date
-                                      );
+                                      // Check if "Cancelled" is selected
+                                      if (e.target.value === "Cancelled") {
+                                        onClassUpdated(
+                                          clas.classId,
+                                          "Cancelled", // name
+                                          clas.classType,
+                                          "Cancelled", // instructorId
+                                          clas.date
+                                        );
+                                      } else {
+                                        // For other instructors, use getInstructor
+                                        const instructor = getInstructor(e.target.value);
+                                        onClassUpdated(
+                                          clas.classId,
+                                          instructor.name,
+                                          clas.classType,
+                                          instructor.instructorId,
+                                          clas.date
+                                        );
+                                      }
                                     }}
                                   >
                                     {Ctx.instructorList
                                       .sort(function (a, b) {
-                                        if (a.name < b.name) {
-                                          return -1;
-                                        }
-                                        if (a.name > b.name) {
-                                          return 1;
-                                        }
+                                        if (a.name < b.name) return -1;
+                                        if (a.name > b.name) return 1;
                                         return 0;
                                       })
                                       .map(
                                         (i) =>
                                           i.name !== "Cancelled" && (
-                                            <option
-                                              key={i.name}
-                                              value={i.name}
-                                              onChange={(e) => { }}
-                                            >
+                                            <option key={i.name} value={i.name}>
                                               {i.name}
                                             </option>
                                           )
                                       )}
-                                    <option
-                                      value="Cancelled"
-                                      onChange={(e) => { }}
-                                    >
-                                      Cancelled
-                                    </option>
+                                    <option value="Cancelled">Cancelled</option>
                                   </select>
                                 ) : (
                                   <p
                                     className={`rounded-[0.51rem] px-4 `}
                                     style={{
-                                      backgroundColor:
-                                        InstitutionData.LightestPrimaryColor,
+                                      backgroundColor: InstitutionData.LightestPrimaryColor,
                                     }}
                                   >
                                     {getInstructor(clas.instructorNames)?.name}
