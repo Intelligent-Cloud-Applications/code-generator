@@ -178,43 +178,77 @@ function HybridReferral() {
       const data = members.flatMap((member) => {
         // Map each product for the member to create separate rows
         return (
-          member.products?.map((product, productIndex) => [
-            // Image column
-            member.hasOwnProperty("imgUrl") ? (
-              <img
-                src={member.imgUrl}
-                alt={member.userName}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-            ) : (
-              <div
-                className={`rounded-full p-2 h-12 w-12 flex items-center justify-center text-[1rem] text-white`}
-                style={{ backgroundColor: getColor(member.userName) }}
-              >
-                {getInitials(member.userName)}
-              </div>
-            ),
-            // Name column
-            member.userName,
-            // Type column
-            member.hasOwnProperty("hybridPageUser") &&
-            member.hybridPageUser === true ? (
-              <Badge color="info" icon="off" size="xs">
-                Hybrid
-              </Badge>
-            ) : (
-              <Badge color="gray" icon="off">
-                Referral
-              </Badge>
-            ),
-            // Product column
-            product?.S || "---",
-            // Payment date column
-            isLoadingDates
-              ? "Loading..."
-              : paymentDates[member.cognitoId]?.[productIndex] || "---",
-          ]) || []
-        );
+                  member.hasOwnProperty("products") ? member.products?.map((product, productIndex) => [
+                    // Image column
+                    member.hasOwnProperty("imgUrl") ? (
+                      <img
+                        src={member.imgUrl}
+                        alt={member.userName}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className={`rounded-full p-2 h-12 w-12 flex items-center justify-center text-[1rem] text-white`}
+                        style={{ backgroundColor: getColor(member.userName) }}
+                      >
+                        {getInitials(member.userName)}
+                      </div>
+                    ),
+                    // Name column
+                    member.userName,
+                    // Type column
+                    member.hasOwnProperty("hybridPageUser") &&
+                    member.hybridPageUser === true ? (
+                      <Badge color="info" icon="off" size="xs">
+                        Hybrid
+                      </Badge>
+                    ) : (
+                      <Badge color="gray" icon="off">
+                        Referral
+                      </Badge>
+                    ),
+                    // Product column
+                    product?.S || "---",
+                    // Payment date column
+                    isLoadingDates
+                      ? "Loading..."
+                      : paymentDates[member.cognitoId]?.[productIndex] || "---",
+                  ]) :
+                  [
+                   [ // Image column
+                    member.hasOwnProperty("imgUrl") ? (
+                      <img
+                        src={member.imgUrl}
+                        alt={member.userName}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className={`rounded-full p-2 h-12 w-12 flex items-center justify-center text-[1rem] text-white`}
+                        style={{ backgroundColor: getColor(member.userName) }}
+                      >
+                        {getInitials(member.userName)}
+                      </div>
+                    ),
+                    // Name column
+                    member.userName,
+                    // Type column
+                    member.hasOwnProperty("hybridPageUser") &&
+                    member.hybridPageUser === true ? (
+                      <Badge color="info" icon="off" size="xs">
+                        Hybrid
+                      </Badge>
+                    ) : (
+                      <Badge color="gray" icon="off">
+                        Referral
+                      </Badge>
+                    ),
+                    // Product column
+                    "---",
+                    // Payment date column
+                    "---",]
+                  ]
+                );
       });
 
       // Filter data based on selected month
