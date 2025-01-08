@@ -1,8 +1,7 @@
 import jsPDF from "jspdf";
 import React from "react";
-import colors from "../../color.json";
 import invoice from "../utils/check.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const ReceiptCard = ({
   subscriptionIds = [],
@@ -14,7 +13,11 @@ const ReceiptCard = ({
   email,
   renewalDate,
 }) => {
-  const color = colors[institution];
+  const [searchParams] = useSearchParams();
+  const color = {
+    primary: searchParams.get('primary') || '#000',
+    secondary: searchParams.get('secondary') || '#000'
+  };
   const plans = planDetails.split(", ");
   const navigate = useNavigate();
   const handleBackClick = () => {

@@ -8,32 +8,31 @@ import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly
 import institutionData from "../../../constants";
 
 const Subscription = () => {
-  const { institutionData: InstitutionData } = useContext(InstitutionContext);
+  const InstitutionData = useContext(InstitutionContext).institutionData;
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const [products, setProducts] = useState([]);
   const Navigate = useNavigate();
 
   const [bgInView, setBgInView] = useState(false);
 
-useEffect(() => {
-  if (UserCtx?.location?.countryCode) {
-    localStorage.setItem("userLocation", `${UserCtx.location.countryCode}`);
-  } else {
-    console.warn("UserCtx.location.countryCode is undefined");
-  }
-}, [UserCtx?.location?.countryCode]);
+  useEffect(() => {
+    if (UserCtx?.location?.countryCode) {
+      localStorage.setItem("userLocation", `${UserCtx.location.countryCode}`);
+    } else {
+      console.warn("UserCtx.location.countryCode is undefined");
+    }
+  }, [UserCtx?.location?.countryCode]);
 
-useEffect(() => {
-  // Only update the products when country code changes and avoid including 'products' in the dependency array
-  const storedLocation = localStorage.getItem("userLocation");
+  useEffect(() => {
+    // Only update the products when country code changes and avoid including 'products' in the dependency array
+    const storedLocation = localStorage.getItem("userLocation");
 
-  if (storedLocation === "IN") {
-    setProducts(productList.filter((item) => item.currency === "INR"));
-  } else {
-    setProducts(productList.filter((item) => item.currency !== "INR"));
-  }
-}, [UserCtx?.location?.countryCode, productList]);
-
+    if (storedLocation === "IN") {
+      setProducts(productList.filter((item) => item.currency === "INR"));
+    } else {
+      setProducts(productList.filter((item) => item.currency !== "INR"));
+    }
+  }, [UserCtx?.location?.countryCode, productList]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -96,7 +95,7 @@ useEffect(() => {
               className="mt-4 first-letter:inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
               onClick={() => {
                 window.open(
-                  `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}`,
+                  `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor)}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor)}`,
                   "_blank",
                   "noopener,noreferrer"
                 );

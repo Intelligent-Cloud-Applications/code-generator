@@ -66,8 +66,20 @@ jobs:
       - name: Update .env file
         if: steps.config.outputs.should_deploy == 'true'
         run: |
-          echo "Updating .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}"
-          echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" > .env
+          if [ -f .env ]; then
+            # If .env exists, replace or add REACT_APP_STAGE
+            if grep -q "^REACT_APP_STAGE=" .env; then
+              # Replace existing REACT_APP_STAGE line
+              sed -i "s/^REACT_APP_STAGE=.*/REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}/" .env
+            else
+              # Add REACT_APP_STAGE if it doesn't exist
+              echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" >> .env
+            fi
+          else
+            # Create new .env file if it doesn't exist
+            echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" > .env
+          fi
+          echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }} while preserving other variables"
 
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'

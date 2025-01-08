@@ -7,7 +7,6 @@ const institutionData = {
     institution: institutionName,
     institutionType: 'ds',
     GTM_ID: 'GTM-5DW548R',                             // Google Tag Manager ID (adjust as needed for the institution)
-
     deployment: {
         // Configuration for the beta environment
         [`beta-${institutionName}`]: {
