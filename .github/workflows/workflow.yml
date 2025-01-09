@@ -23,10 +23,13 @@ jobs:
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
-          echo "import data from '${{ github.workspace }}/src/data.json' assert { type: 'json' };
-          import metaTags from '${{ github.workspace }}/src/metatags.json' assert { type: 'json' };
+          echo "import fs from 'fs';
+          
+          const data = JSON.parse(fs.readFileSync('./src/data.json', 'utf8'));
+          const metaTags = JSON.parse(fs.readFileSync('./src/metatags.json', 'utf8'));
           
           const { institutionId } = data;
+          
           function splitInstitutionId() {
               const parts = institutionId.split(/(\d+)/).filter(Boolean);
               return {
@@ -42,12 +45,12 @@ jobs:
           const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
           
           const deployment = {
-              [`beta-${institutionName}`]: {
-                  s3Bucket: `beta.${institutionName}.com`,
+              [\`beta-\${institutionName}\`]: {
+                  s3Bucket: \`beta.\${institutionName}.com\`,
                   cloudfrontId: data.cloudFrontId
               },
               [institutionName]: {
-                  s3Bucket: `${institutionName}.com`,
+                  s3Bucket: \`\${institutionName}.com\`,
                   cloudfrontId: data.cloudFrontId
               }
           };
