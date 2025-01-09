@@ -1,5 +1,5 @@
 import { API, Auth, Storage } from "aws-amplify";
-import { Label, Modal, TextInput,Tooltip } from "flowbite-react";
+import { Label, Modal, TextInput, Tooltip } from "flowbite-react";
 import React, { useContext, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
@@ -27,16 +27,30 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [name, setName] = useState(UserCtx.userName);
   const [country] = useState(UserCtx.country);
   const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId);
-  const [about,setAbout] = useState(UserCtx.hasOwnProperty("about") && UserCtx.about)
+  const [about, setAbout] = useState(UserCtx.hasOwnProperty("about") && UserCtx.about)
 
-  
+
   const [image, setImage] = useState(null);
   const [editor, setEditor] = useState(null);
   const [scale, setScale] = useState(1);
+  // Current function
   const getInitials = (name) => {
     const names = name?.split(" ");
     const initials = names.map((name) => name.charAt(0).toUpperCase()).join("");
     return initials;
+  };
+
+  // Add this function right after getInitials
+  const getColor = (name) => {
+    if (!name) return '#888888';
+    const colors = [
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF'
+    ];
+    const index = name.length % colors.length;
+    return colors[index];
   };
 
   let domain;
@@ -73,7 +87,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [joiningDate] = useState(formatDate(UserCtx?.joiningDate));
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const [dob, setDob] = useState(UserCtx.dob || "");
   const [address, setAddress] = useState(UserCtx.address || "");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -84,24 +98,24 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [phoneCode, setPhoneCode] = useState("");
   const [isPhoneChange, setIsPhoneChange] = useState(false);
   const [isPhoneCode, setIsPhoneCode] = useState(false);
-  
-const [tempDob, setTempDob] = useState(
-  dob ? new Date(Number(dob)).toISOString().split("T")[0] : ""
-);
 
-
-
-
-const ifDataChanged = () => {
-  return !(
-    name.trim() === UserCtx.userName.trim() &&
-    phoneNumber.trim() === UserCtx.phoneNumber &&
-    country.trim() === UserCtx.country &&
-    joiningDate.trim() === UserCtx.joiningDate &&
-    Number(dob) === Number(UserCtx.dob) && // Directly compare as epoch timestamps
-    address.trim() === UserCtx.address
+  const [tempDob, setTempDob] = useState(
+    dob ? new Date(Number(dob)).toISOString().split("T")[0] : ""
   );
-};
+
+
+
+
+  const ifDataChanged = () => {
+    return !(
+      name.trim() === UserCtx.userName.trim() &&
+      phoneNumber.trim() === UserCtx.phoneNumber &&
+      country.trim() === UserCtx.country &&
+      joiningDate.trim() === UserCtx.joiningDate &&
+      Number(dob) === Number(UserCtx.dob) && // Directly compare as epoch timestamps
+      address.trim() === UserCtx.address
+    );
+  };
 
 
   const handleImageChange = (e) => {
@@ -149,7 +163,7 @@ const ifDataChanged = () => {
       // Upload the file to S3 with the filename as Cognito User ID
       const response = await Storage.put(
         `${InstitutionData.InstitutionId}/${cognitoId}/profile.jpg?v=` +
-          new Date().getTime(),
+        new Date().getTime(),
         blob,
         {
           level: "public", // or "protected" depending on your access needs
@@ -211,7 +225,7 @@ const ifDataChanged = () => {
                 joiningDate: joiningDate,
                 dob: formattedDob,
                 address: address,
-                about:about,
+                about: about,
               },
             }
           );
@@ -417,10 +431,11 @@ const ifDataChanged = () => {
                       />
                     ) : (
                       <div
-                        className="w-full h-full rounded-full bg-gray-300 flex items-center justify-center cursor-pointer"
+                        className="w-full h-full rounded-full flex items-center justify-center cursor-pointer"
+                        style={{ backgroundColor: getColor(UserCtx.userName) }}
                         onClick={handleEditClick}
                       >
-                        <span className="text-[3rem] font-bold text-gray-700">
+                        <span className="text-[3rem] font-bold text-white">
                           {getInitials(UserCtx.userName)}
                         </span>
                       </div>
@@ -447,42 +462,42 @@ const ifDataChanged = () => {
                 </div>
 
                 <>
-                {
-                  UserCtx.userType === "instructor" && (
+                  {
+                    UserCtx.userType === "instructor" && (
 
-                  <div className="flex flex-col gap-4 justify-center bg-gray-100 p-4 rounded-lg shadow-md w-full">
-                    {referralLink && (
-                      <div className="flex flex-col gap-2">
-                        <label className="ml-2 text-sm font-semibold text-gray-700">
-                          Hybrid Page Link
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            className="bg-white px-4 py-2 rounded-lg w-full border border-gray-300 shadow-sm text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-                            type="text"
-                            value={referralLink}
-                            readOnly
-                          />
-                          <Tooltip
-                            content="Go to Link"
-                            position="top"
-                            arrow={false}
-                          >
-                            <button
-                              className="bg-primaryColor text-white rounded-lg py-2 px-4 shadow-md hover:bg-lightPrimaryColor hover:shadow-lg transition-transform transform hover:scale-105"
-                              onClick={() => {
-                                window.location.href = referralLink;
-                              }}
-                            >
-                              <FaArrowCircleRight className="h-6" />
-                            </button>
-                          </Tooltip>
-                        </div>
+                      <div className="flex flex-col gap-4 justify-center bg-gray-100 p-4 rounded-lg shadow-md w-full">
+                        {referralLink && (
+                          <div className="flex flex-col gap-2">
+                            <label className="ml-2 text-sm font-semibold text-gray-700">
+                              Hybrid Page Link
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                className="bg-white px-4 py-2 rounded-lg w-full border border-gray-300 shadow-sm text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                                type="text"
+                                value={referralLink}
+                                readOnly
+                              />
+                              <Tooltip
+                                content="Go to Link"
+                                position="top"
+                                arrow={false}
+                              >
+                                <button
+                                  className="bg-primaryColor text-white rounded-lg py-2 px-4 shadow-md hover:bg-lightPrimaryColor hover:shadow-lg transition-transform transform hover:scale-105"
+                                  onClick={() => {
+                                    window.location.href = referralLink;
+                                  }}
+                                >
+                                  <FaArrowCircleRight className="h-6" />
+                                </button>
+                              </Tooltip>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  )
-                }
+                    )
+                  }
                 </>
                 <form className={`mt-6 flex flex-col gap-8 max560:w-full`}>
                   <div
@@ -575,9 +590,8 @@ const ifDataChanged = () => {
                       )}
                     </div>
                     <EditableTextArea
-                      placeholder={`Enter ${
-                        UserCtx.userType === "admin" && "Institution"
-                      } Address`}
+                      placeholder={`Enter ${UserCtx.userType === "admin" && "Institution"
+                        } Address`}
                       type={"text"}
                       className=" bg-inputBgColor min-w-full rounded-lg pl-4 py-2"
                       minimumHeight={"min-h-16"}
@@ -802,19 +816,19 @@ const ifDataChanged = () => {
 
       {(userData.userType === "instructor" ||
         userData.userType === "admin") && (
-        <>
-          <div>
-            <ReferralCode />
-          </div>
-          {
-            userData.userType === "instructor" && (
-              <div>
-                <HybridReferral />
-              </div>
-            )
-          }
-        </>
-      )}
+          <>
+            <div>
+              <ReferralCode />
+            </div>
+            {
+              userData.userType === "instructor" && (
+                <div>
+                  <HybridReferral />
+                </div>
+              )
+            }
+          </>
+        )}
     </div>
   );
 };
