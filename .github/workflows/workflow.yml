@@ -22,6 +22,62 @@ jobs:
 
       - name: Create temp config reader
         run: |
+          echo "const fs = require('fs');
+          const path = require('path');
+
+          try {
+            const data = {
+              institutionId: 'happyprancer1234',
+              s3BucketName: 'beta.happyprancer.com',
+              cloudFrontId: 'E263LXOGXF3H0N',
+              domain: 'https://beta.happyprancer.com'
+            };
+
+            const branch = process.env.GITHUB_REF.split('/').pop();
+            const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
+            
+            const deploymentConfig = {
+              'beta-happyprancer': {
+                s3Bucket: 'beta.happyprancer.com',
+                cloudfrontId: data.cloudFrontId
+              },
+              'happyprancer': {
+                s3Bucket: 'happyprancer.com',
+                cloudfrontId: data.cloudFrontId
+              }
+            };
+            
+            const config = deploymentConfig[branch];
+            
+            if (config) {
+              console.log(JSON.stringify({
+                s3Bucket: config.s3Bucket,
+                cloudfrontId: config.cloudfrontId,
+                shouldDeploy: true,
+                reactAppStage: stage
+              }));
+            } else {
+              console.log(JSON.stringify({
+                s3Bucket: '',
+                cloudfrontId: '',
+                shouldDeploy: false,
+                reactAppStage: ''
+              }));
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            process.exit(1);
+          }" > configReader.js
+
+      - name: Get deployment configuration
+        id: config
+        run: |
+          CONFIG_JSON=$(node configReader.js)
+          echo "s3_bucket=$(echo $CONFIG_JSON | jq -r .s3Bucket)" >> $GITHUB_OUTPUT
+          echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
+          echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
+          echo "react_app_stage=$(echo $CONFIG_JSON | jq -r .reactAppStage)" >> $GITHUB_OUTPUT
+        run: |
           echo "const data = require('./data.json');
           
           const { institutionId } = data;
