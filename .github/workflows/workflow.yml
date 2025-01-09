@@ -77,53 +77,6 @@ jobs:
           echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
           echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
           echo "react_app_stage=$(echo $CONFIG_JSON | jq -r .reactAppStage)" >> $GITHUB_OUTPUT
-        run: |
-          echo "const data = require('./data.json');
-          
-          const { institutionId } = data;
-          const parts = institutionId.split(/(\d+)/).filter(Boolean);
-          const institutionName = parts[0];
-          
-          const branch = process.env.GITHUB_REF.split('/').pop();
-          const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
-          
-          const deploymentConfig = {
-            [`beta-${institutionName}`]: {
-              s3Bucket: `beta.${institutionName}.com`,
-              cloudfrontId: data.cloudFrontId
-            },
-            [institutionName]: {
-              s3Bucket: `${institutionName}.com`,
-              cloudfrontId: data.cloudFrontId
-            }
-          };
-          
-          const config = deploymentConfig[branch];
-          
-          if (config) {
-            console.log(JSON.stringify({
-              s3Bucket: config.s3Bucket,
-              cloudfrontId: config.cloudfrontId,
-              shouldDeploy: true,
-              reactAppStage: stage
-            }));
-          } else {
-            console.log(JSON.stringify({
-              s3Bucket: '',
-              cloudfrontId: '',
-              shouldDeploy: false,
-              reactAppStage: ''
-            }));
-          }" > configReader.js
-
-      - name: Get deployment configuration
-        id: config
-        run: |
-          CONFIG_JSON=$(node configReader.js)
-          echo "s3_bucket=$(echo $CONFIG_JSON | jq -r .s3Bucket)" >> $GITHUB_OUTPUT
-          echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
-          echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
-          echo "react_app_stage=$(echo $CONFIG_JSON | jq -r .reactAppStage)" >> $GITHUB_OUTPUT
 
       - name: Log Deployment Details
         if: steps.config.outputs.should_deploy == 'true'
