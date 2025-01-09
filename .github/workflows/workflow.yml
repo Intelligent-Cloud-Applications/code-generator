@@ -23,7 +23,9 @@ jobs:
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
-          echo "import institutionData from '${{ github.workspace }}/src/constants.js';
+          echo "const fs = await import('fs');
+          const data = JSON.parse(await fs.promises.readFile('${{ github.workspace }}/src/constants.js', 'utf8'));
+          const institutionData = data.default;
           const branch = process.env.GITHUB_REF.split('/').pop();
           const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
           const config = institutionData.deployment[branch];

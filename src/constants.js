@@ -1,44 +1,40 @@
-import data from './data.json';  // Importing data for institution details
-import metaTags from './metatags.json'; // Importing meta tags dynamically
+// constants.js
+import data from './data.json';
+import metaTags from './metatags.json';
 
-const { institutionId } = data; // Extract institutionId
+const { institutionId } = data;
 function splitInstitutionId() {
-    const parts = institutionId.split(/(\d+)/).filter(Boolean); // Split into text and numbers
+    const parts = institutionId.split(/(\d+)/).filter(Boolean);
     return {
-        institution: parts[0], // The text portion
-        id: parts[1] // The numeric portion
+        institution: parts[0],
+        id: parts[1]
     };
 }
 
-// Usage
 const result = splitInstitutionId();
-
-const institutionName = result.institution; // Change this variable to configure for different institutions
+const institutionName = result.institution;
 
 const institutionData = {
-    BETA_DOMAIN: `https://beta.${institutionName}.com`, // Beta environment URL
-    PROD_DOMAIN: `https://${institutionName}.com`,      // Production environment URL
+    BETA_DOMAIN: `https://beta.${institutionName}.com`,
+    PROD_DOMAIN: `https://${institutionName}.com`,
     InstitutionId: institutionName,
     institution: institutionName,
     institutionType: 'ds',
-    GTM_ID: metaTags.gtmId,                             // Dynamic Google Tag Manager ID
+    GTM_ID: metaTags.gtmId,
     deployment: {
-        // Configuration for the beta environment
         [`beta-${institutionName}`]: {
-            s3Bucket: `beta.${institutionName}.com`,   // Name of the S3 bucket where the beta frontend is deployed
-            cloudfrontId: data.cloudFrontId            // CloudFront distribution ID for the beta environment
+            s3Bucket: `beta.${institutionName}.com`,
+            cloudfrontId: data.cloudFrontId
         },
-        // Configuration for the production environment
         [institutionName]: {
-            s3Bucket: `${institutionName}.com`,        // Name of the S3 bucket where the production frontend is deployed
-            cloudfrontId: data.cloudFrontId            // CloudFront distribution ID for the production environment
+            s3Bucket: `${institutionName}.com`,
+            cloudfrontId: data.cloudFrontId
         }
     },
-    // change these SEO meta tags according to the institutions
     seo: {
-        title: metaTags.title,         // Dynamic title
-        description: metaTags.description, // Dynamic description
-        keywords: metaTags.keywords    // Dynamic keywords
+        title: metaTags.title,
+        description: metaTags.description,
+        keywords: metaTags.keywords
     }
 };
 
