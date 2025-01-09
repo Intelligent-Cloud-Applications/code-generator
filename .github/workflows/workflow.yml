@@ -23,24 +23,55 @@ jobs:
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
-          echo "import institutionData from '${{ github.workspace }}/src/constants.js';
-          const branch = process.env.GITHUB_REF.split('/').pop();
-          const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
-          const config = institutionData.deployment[branch];
-          if (config) {
-            console.log(JSON.stringify({
-              s3Bucket: config.s3Bucket,
-              cloudfrontId: config.cloudfrontId,
-              shouldDeploy: true,
-              reactAppStage: stage
-            }));
-          } else {
-            console.log(JSON.stringify({
-              s3Bucket: '',
-              cloudfrontId: '',
-              shouldDeploy: false,
-              reactAppStage: ''
-            }));
+          echo "import { readFile } from 'fs/promises';
+          import { join, dirname } from 'path';
+          import { fileURLToPath } from 'url';
+
+          const __dirname = dirname(fileURLToPath(import.meta.url));
+          const dataPath = join(__dirname, 'data.json');
+          
+          try {
+            const rawData = await readFile(dataPath, 'utf8');
+            const data = JSON.parse(rawData);
+            
+            const { institutionId } = data;
+            const parts = institutionId.split(/(\d+)/).filter(Boolean);
+            const institutionName = parts[0];
+            
+            const branch = process.env.GITHUB_REF.split('/').pop();
+            const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
+            
+            const deploymentConfig = {
+              [`beta-${institutionName}`]: {
+                s3Bucket: `beta.${institutionName}.com`,
+                cloudfrontId: data.cloudFrontId
+              },
+              [institutionName]: {
+                s3Bucket: `${institutionName}.com`,
+                cloudfrontId: data.cloudFrontId
+              }
+            };
+            
+            const config = deploymentConfig[branch];
+            
+            if (config) {
+              console.log(JSON.stringify({
+                s3Bucket: config.s3Bucket,
+                cloudfrontId: config.cloudfrontId,
+                shouldDeploy: true,
+                reactAppStage: stage
+              }));
+            } else {
+              console.log(JSON.stringify({
+                s3Bucket: '',
+                cloudfrontId: '',
+                shouldDeploy: false,
+                reactAppStage: ''
+              }));
+            }
+          } catch (error) {
+            console.error('Error reading configuration:', error);
+            process.exit(1);
           }" > configReader.mjs
 
       - name: Get deployment configuration
