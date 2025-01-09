@@ -23,27 +23,50 @@ jobs:
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
-          echo "const fs = await import('fs');
-          const data = JSON.parse(await fs.promises.readFile('${{ github.workspace }}/src/constants.js', 'utf8'));
-          const institutionData = data.default;
-          const branch = process.env.GITHUB_REF.split('/').pop();
-          const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
-          const config = institutionData.deployment[branch];
-          if (config) {
-            console.log(JSON.stringify({
-              s3Bucket: config.s3Bucket,
-              cloudfrontId: config.cloudfrontId,
-              shouldDeploy: true,
-              reactAppStage: stage
-            }));
-          } else {
-            console.log(JSON.stringify({
-              s3Bucket: '',
-              cloudfrontId: '',
-              shouldDeploy: false,
-              reactAppStage: ''
-            }));
-          }" > configReader.mjs
+          echo 'import { readFile } from "fs/promises";
+
+          try {
+            const fileContent = await readFile("${{ github.workspace }}/src/constants.js", "utf8");
+            
+            // Extract the deployment object using regex
+            const match = fileContent.match(/deployment:\s*({[\s\S]*?})/);
+            if (!match) {
+              throw new Error("Could not find deployment configuration in constants.js");
+            }
+            
+            // Convert the matched string to valid JSON
+            const deploymentString = match[1]
+              .replace(/(["\'])?([a-zA-Z0-9_]+)(["\'])?:/g, "\"$2\":")  // Ensure proper JSON property quotes
+              .replace(/\'/g, "\"");  // Replace single quotes with double quotes
+            
+            const deployment = JSON.parse(deploymentString);
+            
+            // Get branch name and determine stage
+            const branch = process.env.GITHUB_REF.split("/").pop();
+            const stage = branch.startsWith("beta-") ? "DEV" : "PROD";
+            
+            // Get config for current branch
+            const config = deployment[branch];
+            
+            if (config) {
+              console.log(JSON.stringify({
+                s3Bucket: config.s3Bucket,
+                cloudfrontId: config.cloudfrontId,
+                shouldDeploy: true,
+                reactAppStage: stage
+              }));
+            } else {
+              console.log(JSON.stringify({
+                s3Bucket: "",
+                cloudfrontId: "",
+                shouldDeploy: false,
+                reactAppStage: ""
+              }));
+            }
+          } catch (error) {
+            console.error("Error reading configuration:", error);
+            process.exit(1);
+          }' > configReader.mjs
 
       - name: Get deployment configuration
         id: config
