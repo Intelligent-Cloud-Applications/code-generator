@@ -19,7 +19,6 @@ import "./index.css";
 
 // Code
 Amplify.configure(config);
-console.log(config)
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
