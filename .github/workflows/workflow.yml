@@ -87,17 +87,23 @@ jobs:
           fi
           echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}"
 
-      - name: Setup data.json for React build
+      # Modified steps to handle data.json correctly
+      - name: Copy data.json to src directory
         run: |
-          cp data.json src/data.json
+          cp data.json src/
+          echo "Copied data.json to src directory"
+          
+      - name: Update package.json
+        run: |
+          sed -i 's/"react-scripts build"/"react-scripts build GENERATE_SOURCEMAP=false"/' package.json
+          echo "Updated package.json build command"
 
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
-        run: |
-          export NODE_OPTIONS=--max_old_space_size=4096
-          export GENERATE_SOURCEMAP=false
-          echo "Building React app with REACT_APP_STAGE from .env"
-          yarn react-scripts build
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          CI: false
+        run: yarn build
 
       - name: Set up AWS CLI
         if: steps.config.outputs.should_deploy == 'true'
