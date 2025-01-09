@@ -206,7 +206,7 @@ function PaymentDetails() {
                     <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${payment.paymentMode === "offline" ? "bg-purple-100 text-purple-600" : "bg-green-100 text-green-600"}`}>
-                        {payment.paymentMode === "offline" ? "Offline" : "Razorpay"}
+                        {payment.paymentMode === "offline" ? "Offline" : "Online"}
                       </span>
                     </Table.Cell>
                     <Table.Cell className='whitespace-nowrap text-sm text-gray-500 text-center bg-white'>

@@ -57,42 +57,46 @@ export const PaginatedTable = ({ head, data, itemsPerPage = 10, ...props }) => {
   };
 
   return (
-    <div className="w-full overflow-x-auto shadow-md rounded-lg">
-      <table className="w-full text-sm text-left">
-        <thead className="text-xs uppercase bg-gray-100">
-          <tr>
-            {head.map((item, i) => (
-              <th
-                key={i}
-                className="px-6 py-3 font-medium tracking-wider"
-              >
-                {item}
-              </th>
-            ))}
-          </tr>
-        </thead>
-
-        <tbody className="divide-y divide-gray-200">
-          {paginatedData.map((array, i) => (
-            <tr
-              key={i}
-              className="bg-white hover:bg-gray-50 transition-colors duration-200"
-            >
-              {array.map((item, index) => (
-                <td
-                  key={index}
-                  className="px-6 py-4 whitespace-nowrap"
+    <div className="space-y-4">
+      {/* Table Component */}
+      <div className="w-full overflow-x-auto shadow-md rounded-lg">
+        <table className="w-full text-sm text-left">
+          <thead className="text-xs uppercase bg-gray-100">
+            <tr>
+              {head.map((item, i) => (
+                <th
+                  key={i}
+                  className="px-6 py-3 font-medium tracking-wider"
                 >
                   {item}
-                </td>
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
 
+          <tbody className="divide-y divide-gray-200">
+            {paginatedData.map((array, i) => (
+              <tr
+                key={i}
+                className="bg-white hover:bg-gray-50 transition-colors duration-200"
+              >
+                {array.map((item, index) => (
+                  <td
+                    key={index}
+                    className="px-6 py-4 whitespace-nowrap"
+                  >
+                    {item}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 py-4 bg-white border-t">
+        <div className="flex items-center justify-center gap-2 py-4">
           <button
             onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
@@ -108,7 +112,7 @@ export const PaginatedTable = ({ head, data, itemsPerPage = 10, ...props }) => {
                 onClick={() => typeof pageNum === 'number' && handlePageChange(pageNum)}
                 className={`px-3 py-1 rounded-lg ${
                   pageNum === currentPage
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-gray-300 text-white'
                     : 'hover:bg-gray-100'
                 } ${typeof pageNum !== 'number' ? 'cursor-default' : ''}`}
               >
