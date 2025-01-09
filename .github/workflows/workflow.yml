@@ -23,24 +23,50 @@ jobs:
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
-          echo "import institutionData from '${{ github.workspace }}/src/constants.js';
+          echo "import data from '${{ github.workspace }}/src/data.json' assert { type: 'json' };
+          import metaTags from '${{ github.workspace }}/src/metatags.json' assert { type: 'json' };
+          
+          const { institutionId } = data;
+          function splitInstitutionId() {
+              const parts = institutionId.split(/(\d+)/).filter(Boolean);
+              return {
+                  institution: parts[0],
+                  id: parts[1]
+              };
+          }
+          
+          const result = splitInstitutionId();
+          const institutionName = result.institution;
+          
           const branch = process.env.GITHUB_REF.split('/').pop();
           const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
-          const config = institutionData.deployment[branch];
+          
+          const deployment = {
+              [`beta-${institutionName}`]: {
+                  s3Bucket: `beta.${institutionName}.com`,
+                  cloudfrontId: data.cloudFrontId
+              },
+              [institutionName]: {
+                  s3Bucket: `${institutionName}.com`,
+                  cloudfrontId: data.cloudFrontId
+              }
+          };
+          
+          const config = deployment[branch];
           if (config) {
-            console.log(JSON.stringify({
-              s3Bucket: config.s3Bucket,
-              cloudfrontId: config.cloudfrontId,
-              shouldDeploy: true,
-              reactAppStage: stage
-            }));
+              console.log(JSON.stringify({
+                  s3Bucket: config.s3Bucket,
+                  cloudfrontId: config.cloudfrontId,
+                  shouldDeploy: true,
+                  reactAppStage: stage
+              }));
           } else {
-            console.log(JSON.stringify({
-              s3Bucket: '',
-              cloudfrontId: '',
-              shouldDeploy: false,
-              reactAppStage: ''
-            }));
+              console.log(JSON.stringify({
+                  s3Bucket: '',
+                  cloudfrontId: '',
+                  shouldDeploy: false,
+                  reactAppStage: ''
+              }));
           }" > configReader.mjs
 
       - name: Get deployment configuration
@@ -67,16 +93,12 @@ jobs:
         if: steps.config.outputs.should_deploy == 'true'
         run: |
           if [ -f .env ]; then
-            # If .env exists, replace or add REACT_APP_STAGE
             if grep -q "^REACT_APP_STAGE=" .env; then
-              # Replace existing REACT_APP_STAGE line
               sed -i "s/^REACT_APP_STAGE=.*/REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}/" .env
             else
-              # Add REACT_APP_STAGE if it doesn't exist
               echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" >> .env
             fi
           else
-            # Create new .env file if it doesn't exist
             echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" > .env
           fi
           echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }} while preserving other variables"
