@@ -1,4 +1,4 @@
-import data from 'data.json';
+import data from 'data.json';  // This will work because of the symlink in node_modules
 
 const { institutionId } = data; // Extract institutionId
 function splitInstitutionId() {

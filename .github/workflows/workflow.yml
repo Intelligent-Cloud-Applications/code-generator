@@ -87,22 +87,26 @@ jobs:
           fi
           echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}"
 
-      # Modified steps to handle data.json correctly
-      - name: Copy data.json to src directory
+      # Setup symbolic link for data.json
+      - name: Setup data.json symbolic link
         run: |
-          cp data.json src/
-          echo "Copied data.json to src directory"
+          mkdir -p node_modules
+          ln -sf "$PWD/data.json" "$PWD/node_modules/data.json"
+          echo "Created symbolic link for data.json in node_modules"
           
-      - name: Update package.json
+      # Verify the link and file
+      - name: Verify data.json setup
         run: |
-          sed -i 's/"react-scripts build"/"react-scripts build GENERATE_SOURCEMAP=false"/' package.json
-          echo "Updated package.json build command"
+          ls -la node_modules/data.json
+          cat node_modules/data.json
+          echo "Verified data.json symbolic link and content"
 
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
           CI: false
+          GENERATE_SOURCEMAP: false
         run: yarn build
 
       - name: Set up AWS CLI
