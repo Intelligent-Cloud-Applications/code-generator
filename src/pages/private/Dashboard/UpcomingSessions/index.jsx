@@ -109,7 +109,7 @@ const UpcomingSessions = () => {
     Ctx.instructorList.push({
       name: "Cancelled",
       instructorId: "Cancelled",
-    });    
+    });
     return Ctx.instructorList.find(
       (i) => i.name?.toString().trim() === name?.toString().trim()
     );
@@ -878,96 +878,103 @@ const UpcomingSessions = () => {
                 }}
               >
                 {!attendanceList && (
-                  <li
-                    className={`w-[100%] flex flex-col items-center justify-center p-2 `}
-                  >
+                  <li className="w-full px-4 md:px-8 py-2">
                     <div
-                      className={`flex w-[85%] max1050:w-[96%] justify-between font-bold relative pr-8 `}
+                      className={`hidden md:grid gap-2 font-bold ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
+                          ? 'md:grid-cols-6'
+                          : 'md:grid-cols-5'
+                        }`}
                     >
-                      <p className={`overflow-hidden w-[7rem]`}>Date</p>
-                      <p className={`w-[7rem]`}>Instructor</p>
-                      <p
-                        className={`w-[8rem] overflow-hidden `}
-                      >
-                        Description
-                      </p>
-                      <p className={`w-[8rem]`}>Time</p>
-                      <p
-                        className={
-                          `w-[8rem] px-2 text-black max-h-[1.8rem] self-center`
-                        }
-                      >
-                        {sortedFilteredClasses[0]?.zoomLink
-                          ? "Join"
-                          : "Attendance"}
-                      </p>
+                      <div className="text-center">Date</div>
+                      <div className="text-center">Instructor</div>
+                      <div className="text-center">Description</div>
+                      <div className="text-center">Time</div>
+                      <div className="text-center">
+                        {sortedFilteredClasses[0]?.zoomLink ? 'Join' : 'Attendance'}
+                      </div>
+                      {(Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor') && (
+                        <div className="w-16"></div>
+                      )}
                     </div>
                   </li>
                 )}
 
+                {/* Attendance List */}
                 {!attendanceList ? (
-                  <div
-                    className={
-                      UserCtx.userData.userType === "admin"
-                        ? `overflow-auto flex flex-col gap-2 py-4`
-                        : "overflow-auto flex flex-col gap-2 py-4"
-                    }
-                  >
-                    {sortedFilteredClasses
-                      .slice(startIndex, endIndex)
-                      .filter((clas) => {
-                        if (instructorTypeFilter === "") {
-                          return true;
-                        } else {
+                  <div className="overflow-auto flex flex-col gap-2 py-2 px-4 md:px-8">
+                    <div className="w-full divide-y">
+                      {sortedFilteredClasses
+                        .slice(startIndex, endIndex)
+                        .filter((clas) => {
+                          if (instructorTypeFilter === '') return true;
                           return clas.instructorNames === instructorTypeFilter;
-                        }
-                      })
-                      .filter((clas) => {
-                        // If user is an instructor, filter by class types they are associated with
-                        if (Ctx.userData.userType === "instructor") {
-                          // Check if classType exists in the instructor's allowed classTypes
-                          return instructorClassTypes.includes(clas.classType);
-                        }
-                        if (classTypeFilter === "") {
-                          return true;
-                        } else {
+                        })
+                        .filter((clas) => {
+                          if (Ctx.userData.userType === 'instructor') {
+                            return instructorClassTypes.includes(clas.classType);
+                          }
+                          if (classTypeFilter === '') return true;
                           return clas.classType === classTypeFilter;
-                        }
-                      })
-                      .map((clas, i) => {
-                        return (
+                        })
+                        .map((clas, i) => (
                           <li
                             key={clas.classId}
-                            className={`w-[100%] flex flex-col items-center justify-center ${editingIndex === i ? "bg-[#fdd00823]" : ""
-                              } `}
+                            className={`w-full ${editingIndex === i ? 'bg-[#fdd00823]' : ''}`}
                           >
                             <div
-                              className={`flex w-[85%] max1050:w-[96%] justify-between items-center max1050:justify-between relative pr-8`}
+                              className={`flex flex-col md:grid gap-2 py-2 items-center ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
+                                  ? 'md:grid-cols-6'
+                                  : 'md:grid-cols-5'
+                                }`}
                             >
-                              <p className={`overflow-hidden w-[5.6rem] m-0`}>
-                                {formatDate(parseInt(clas.date))}
-                              </p>
+                              {/* Mobile Labels + Values */}
+                              <div className="md:hidden space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold">Date:</span>
+                                  <span>{formatDate(parseInt(clas.date))}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold">Time:</span>
+                                  <span>
+                                    {new Date(parseInt(clas.date)).toLocaleString('en-us', {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                    })}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold">Instructor:</span>
+                                  <span>{getInstructor(clas.instructorNames)?.name}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold">Description:</span>
+                                  <span>{clas.classType}</span>
+                                </div>
+                              </div>
 
-                              <div className={`w-[7rem] ml-8`}>
-                                {Ctx.userData.userType === "admin" || Ctx.userData.userType === "instructor" ? (
+                              {/* Desktop View */}
+                              <div className="hidden md:block text-center">
+                                {formatDate(parseInt(clas.date))}
+                              </div>
+
+                              <div className="hidden md:block w-full">
+                                {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
                                   <select
-                                    className={`rounded-[0.51rem] px-4 `}
+                                    className="w-full h-10 px-2 rounded border border-gray-500 focus:outline-none focus:border-blue-500 text-sm"
                                     style={{
                                       backgroundColor: InstitutionData.LightestPrimaryColor,
                                     }}
                                     value={getInstructor(clas.instructorNames)?.name}
                                     onChange={(e) => {
-                                      // Check if "Cancelled" is selected
-                                      if (e.target.value === "Cancelled") {
+                                      if (e.target.value === 'Cancelled') {
                                         onClassUpdated(
                                           clas.classId,
-                                          "Cancelled", // name
+                                          'Cancelled',
                                           clas.classType,
-                                          "Cancelled", // instructorId
+                                          'Cancelled',
                                           clas.date
                                         );
                                       } else {
-                                        // For other instructors, use getInstructor
                                         const instructor = getInstructor(e.target.value);
                                         onClassUpdated(
                                           clas.classId,
@@ -980,14 +987,10 @@ const UpcomingSessions = () => {
                                     }}
                                   >
                                     {Ctx.instructorList
-                                      .sort(function (a, b) {
-                                        if (a.name < b.name) return -1;
-                                        if (a.name > b.name) return 1;
-                                        return 0;
-                                      })
+                                      .sort((a, b) => a.name.localeCompare(b.name))
                                       .map(
                                         (i) =>
-                                          i.name !== "Cancelled" && (
+                                          i.name !== 'Cancelled' && (
                                             <option key={i.name} value={i.name}>
                                               {i.name}
                                             </option>
@@ -997,30 +1000,25 @@ const UpcomingSessions = () => {
                                   </select>
                                 ) : (
                                   <p
-                                    className={`rounded-[0.51rem] px-4 `}
-                                    style={{
-                                      backgroundColor: InstitutionData.LightestPrimaryColor,
-                                    }}
+                                    className="h-10 flex items-center justify-center rounded border border-gray-300 text-sm"
                                   >
                                     {getInstructor(clas.instructorNames)?.name}
                                   </p>
                                 )}
                               </div>
-                              <div className={`w-[7rem]`}>
-                                {Ctx.userData.userType === "admin" ||
-                                  Ctx.userData.userType === "instructor" ? (
+
+                              <div className="hidden md:block w-full">
+                                {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
                                   <select
-                                    className={`rounded-[0.51rem] px-4 `}
+                                    className="w-full h-10 px-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 text-sm"
                                     style={{
-                                      backgroundColor:
-                                        InstitutionData.LightestPrimaryColor,
+                                      backgroundColor: InstitutionData.LightestPrimaryColor,
                                     }}
                                     value={clas.classType}
                                     onChange={(e) => {
                                       onClassUpdated(
                                         clas.classId,
-                                        getInstructor(clas.instructorNames)
-                                          ?.name,
+                                        getInstructor(clas.instructorNames)?.name,
                                         e.target.value,
                                         clas.instructorId,
                                         clas.date
@@ -1028,168 +1026,107 @@ const UpcomingSessions = () => {
                                     }}
                                   >
                                     {classTypeNameArray.map((name) => (
-                                      <option
-                                        key={name}
-                                        value={name}
-                                        onChange={(e) => { }}
-                                      >
+                                      <option key={name} value={name}>
                                         {name}
                                       </option>
                                     ))}
                                   </select>
                                 ) : (
                                   <p
-                                    className={`rounded-[0.51rem] px-4`}
-                                    style={{
-                                      backgroundColor:
-                                        InstitutionData.LightestPrimaryColor,
-                                    }}
+                                    className="h-10 flex items-center justify-center rounded border border-gray-300 bg-lightest-primary text-sm"
                                   >
                                     {clas.classType}
                                   </p>
                                 )}
                               </div>
-                              {Ctx.userData.userType === "admin" ||
-                                Ctx.userData.userType === "instructor" ? (
-                                <input
-                                  value={getTime(clas.date)}
-                                  type="time"
-                                  className="border border-black rounded bg-transparent"
-                                  onChange={(e) => {
-                                    onClassUpdated(
-                                      clas.classId,
-                                      getInstructor(clas.instructorNames)?.name,
-                                      clas.classType,
-                                      clas.instructorId,
-                                      new Date(getDate(clas.date) + "T" + e.target.value).getTime()
-                                    );
-                                  }}
-                                />
-                              ) : (
-                                <p className={`m-0 `}>
-                                  {new Date(parseInt(clas.date)).toLocaleString(
-                                    "en-us",
-                                    {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    }
-                                  )}
-                                </p>
-                              )}
 
-                              <div className="flex gap-4 justify-center items-center">
-                                {clas.zoomLink ? (
-                                  <button
-                                    className={`px-2 max-h-[1.8rem] w-[9rem] ml-1 text-white no-underline rounded-1 mr-[-1rem] `}
-                                    style={{
-                                      backgroundColor:
-                                        InstitutionData.PrimaryColor,
+                              <div className="hidden md:block w-full">
+                                {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
+                                  <input
+                                    value={getTime(clas.date)}
+                                    type="time"
+                                    className="w-full h-10 px-2 border border-gray-300 rounded bg-transparent text-center focus:outline-none focus:border-blue-500 text-sm"
+                                    onChange={(e) => {
+                                      onClassUpdated(
+                                        clas.classId,
+                                        getInstructor(clas.instructorNames)?.name,
+                                        clas.classType,
+                                        clas.instructorId,
+                                        new Date(getDate(clas.date) + 'T' + e.target.value).getTime()
+                                      );
                                     }}
-                                    onClick={() => {
-                                      if (
-                                        UserCtx.userData.userType === "member"
-                                      ) {
-                                        const meetingNumberRegex =
-                                          /(?:https?:\/\/)?(?:www\.)?zoom\.us\/j\/(\d+)/;
-                                        const meetingNumberMatch =
-                                          clas.zoomLink.match(
-                                            meetingNumberRegex
-                                          );
-                                        const meetingNumber = meetingNumberMatch
-                                          ? meetingNumberMatch[1]
-                                          : "";
+                                  />
+                                ) : (
+                                  <p className="h-10 flex items-center justify-center text-sm">
+                                    {new Date(parseInt(clas.date)).toLocaleString('en-us', {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                    })}
+                                  </p>
+                                )}
+                              </div>
+
+                              <div className="w-full">
+                                <button
+                                  className="w-full h-10 text-white rounded transition-colors duration-200 text-sm"
+                                  onClick={() => {
+                                    if (clas.zoomLink) {
+                                      if (UserCtx.userData.userType === 'member') {
+                                        const meetingNumberRegex = /(?:https?:\/\/)?(?:www\.)?zoom\.us\/j\/(\d+)/;
+                                        const meetingNumberMatch = clas.zoomLink.match(meetingNumberRegex);
+                                        const meetingNumber = meetingNumberMatch ? meetingNumberMatch[1] : '';
 
                                         const passwordRegex = /[?&]pwd=([^&]+)/;
-                                        const passwordMatch =
-                                          clas.zoomLink.match(passwordRegex);
-                                        const password = passwordMatch
-                                          ? passwordMatch[1]
-                                          : "";
+                                        const passwordMatch = clas.zoomLink.match(passwordRegex);
+                                        const password = passwordMatch ? passwordMatch[1] : '';
 
                                         Navigate(
                                           `/meeting?instructorId=${clas.instructorId}&meetingNumber=${meetingNumber}&password=${password}`
                                         );
                                       } else {
-                                        window.open(
-                                          clas.zoomLink,
-                                          "_blank",
-                                          "noreferrer"
-                                        );
+                                        window.open(clas.zoomLink, '_blank', 'noreferrer');
                                       }
-                                      onJoinClass(
-                                        InstitutionData.InstitutionId
-                                      );
-                                    }}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
-                                    Join
-                                  </button>
-                                ) : (
-                                  <button
-                                    className="px-2 max-h-[1.8rem] w-[9rem] ml-1 text-white no-underline rounded-1 mr-[-1rem]"
-                                    style={{
-                                      backgroundColor:
-                                        InstitutionData.PrimaryColor,
-                                    }}
-                                    onClick={() => markAttendance(clas.classId)}
-                                  >
-                                    {attendanceStatus[clas.classId] ||
-                                      "Mark Attendance"}
-                                  </button>
-                                )}
-                                <div
-                                  className={
-                                    "w-fit" +
-                                    (UserCtx.userData.userType === "member"
-                                      ? " hidden"
-                                      : " ")
-                                  }
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1.5}
-                                    stroke="currentColor"
-                                    className="w-6 h-6 cursor-pointer"
-                                    onClick={() =>
-                                      showMembersAttended(clas.classId)
+                                      onJoinClass(InstitutionData.InstitutionId);
+                                    } else {
+                                      markAttendance(clas.classId);
                                     }
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"
-                                    />
-                                  </svg>
-                                </div>
-                                {/*{UserCtx.userData.userType !== "member" && (*/}
-                                {/*  <div*/}
-                                {/*    className={*/}
-                                {/*      "w-fit" +*/}
-                                {/*      (UserCtx.userData.userType === "member"*/}
-                                {/*        ? " hidden"*/}
-                                {/*        : " ")*/}
-                                {/*    }*/}
-                                {/*  >*/}
-                                {/*    <a*/}
-                                {/*      href={`https://qrtag.net/api/qr_4.png?url=https://beta.happyprancer.com/put-attendance/${clas.classId}`}*/}
-                                {/*      target="_blank"*/}
-                                {/*    >*/}
-                                {/*      <FaQrcode />*/}
-                                {/*    </a>*/}
-                                {/*  </div>*/}
-                                {/*)}*/}
+                                  }}
+                                  style={{
+                                    backgroundColor: InstitutionData.PrimaryColor,
+                                  }}
+                                >
+                                  {clas.zoomLink ? 'Join' : attendanceStatus[clas.classId] || 'Mark Attendance'}
+                                </button>
                               </div>
+
+                              {(Ctx.userData.userType === 'admin' ||
+                                Ctx.userData.userType === 'instructor') && (
+                                  <div className="flex justify-center">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={1.5}
+                                      stroke="currentColor"
+                                      className="w-6 h-6 cursor-pointer"
+                                      onClick={() => showMembersAttended(clas.classId)}
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"
+                                      />
+                                    </svg>
+                                  </div>
+                                )}
                             </div>
                           </li>
-                        );
-                      })}
+                        ))}
+                    </div>
                   </div>
                 ) : (
                   <>
-                    <div className="grid grid-cols-6 text-black text-[1.1rem] font-[600]">
+                    <div className="grid grid-cols-6 text-black text-[1.1rem] font-[600] ml-8">
                       <p>User Name</p>
                       <p className="col-span-2">Email ID</p>
                       <p>Phone Number</p>
@@ -1200,7 +1137,7 @@ const UpcomingSessions = () => {
                       {currentUsers.map((user) => (
                         <div
                           key={user.cognitoId}
-                          className="grid grid-cols-6 text-black font-[400]"
+                          className="grid grid-cols-6 text-black font-[400] ml-8"
                         >
                           <p>{user.userName}</p>
                           <p className="col-span-2">{user.emailId}</p>

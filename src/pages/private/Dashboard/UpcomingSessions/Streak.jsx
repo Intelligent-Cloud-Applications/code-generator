@@ -47,9 +47,9 @@ const Streak = () => {
         }}
       >
         <div className="flex flex-col">
-          <h2 className="stkm">Your Streak:</h2>
+          <h2 className="stkm font-bold">Unleash Your Momentum:</h2>
           <p className="mov">
-            Increase your potential and your level with your streak
+          Keep the energy alive and rise higher with your performance and milstones
           </p>
         </div>
         <div className="flex flex-col text-[17px] text-center lev">
