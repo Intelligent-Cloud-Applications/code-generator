@@ -22,48 +22,35 @@ jobs:
 
       - name: Create temp config reader
         run: |
-          echo "const fs = require('fs');
-          const path = require('path');
-
-          try {
+          echo "try {
             const data = {
               institutionId: 'happyprancer1234',
               s3BucketName: 'beta.happyprancer.com',
               cloudFrontId: 'E263LXOGXF3H0N',
               domain: 'https://beta.happyprancer.com'
             };
-
+            
             const branch = process.env.GITHUB_REF.split('/').pop();
             const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
             
             const deploymentConfig = {
               'beta-happyprancer': {
                 s3Bucket: 'beta.happyprancer.com',
-                cloudfrontId: data.cloudFrontId
+                cloudfrontId: 'E263LXOGXF3H0N'
               },
               'happyprancer': {
                 s3Bucket: 'happyprancer.com',
-                cloudfrontId: data.cloudFrontId
+                cloudfrontId: 'E263LXOGXF3H0N'
               }
             };
             
             const config = deploymentConfig[branch];
-            
-            if (config) {
-              console.log(JSON.stringify({
-                s3Bucket: config.s3Bucket,
-                cloudfrontId: config.cloudfrontId,
-                shouldDeploy: true,
-                reactAppStage: stage
-              }));
-            } else {
-              console.log(JSON.stringify({
-                s3Bucket: '',
-                cloudfrontId: '',
-                shouldDeploy: false,
-                reactAppStage: ''
-              }));
-            }
+            console.log(JSON.stringify({
+              s3Bucket: config ? config.s3Bucket : '',
+              cloudfrontId: config ? config.cloudfrontId : '',
+              shouldDeploy: !!config,
+              reactAppStage: stage
+            }));
           } catch (error) {
             console.error('Error:', error);
             process.exit(1);
@@ -100,12 +87,17 @@ jobs:
           fi
           echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}"
 
+      - name: Setup data.json for React build
+        run: |
+          cp data.json src/data.json
+
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
+          export GENERATE_SOURCEMAP=false
           echo "Building React app with REACT_APP_STAGE from .env"
-          yarn react-scripts build || yarn build:prod || yarn build:production || yarn build
+          yarn react-scripts build
 
       - name: Set up AWS CLI
         if: steps.config.outputs.should_deploy == 'true'
