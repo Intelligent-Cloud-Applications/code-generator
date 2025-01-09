@@ -1,4 +1,5 @@
-import data from 'data.json';  // This will work because of the symlink in node_modules
+import data from './data.json';  // Importing data for institution details
+import metaTags from './metatags.json'; // Importing meta tags dynamically
 
 const { institutionId } = data; // Extract institutionId
 function splitInstitutionId() {
@@ -20,7 +21,7 @@ const institutionData = {
     InstitutionId: institutionName,
     institution: institutionName,
     institutionType: 'ds',
-    GTM_ID: 'GTM-5DW548R',                             // Google Tag Manager ID (adjust as needed for the institution)
+    GTM_ID: metaTags.gtmId,                             // Dynamic Google Tag Manager ID
     deployment: {
         // Configuration for the beta environment
         [`beta-${institutionName}`]: {
@@ -30,14 +31,14 @@ const institutionData = {
         // Configuration for the production environment
         [institutionName]: {
             s3Bucket: `${institutionName}.com`,        // Name of the S3 bucket where the production frontend is deployed
-            cloudfrontId: data.cloudFrontId,             // CloudFront distribution ID for the production environment
+            cloudfrontId: data.cloudFrontId            // CloudFront distribution ID for the production environment
         }
     },
     // change these SEO meta tags according to the institutions
     seo: {
-        title: 'Welcome to Happyprancer: Dance Your Way to Fun and Fitness!',
-        description: 'Discover fun fitness at Happyprancer! Join our Zumba, Bollywood, and yoga classes online. Sign up today and let\'s dance, sweat, and celebrate your health!',
-        keywords: 'happyprancer, dance fitness online, zumba classes, bollywood dance fitness, virtual yoga sessions, online dance workouts, inclusive fitness programs, home fitness classes, fun workout routines, live online fitness classes, calorie-burning dance workouts, accessible fitness for all, group dance fitness sessions, energetic dance workouts, fitness through dance, affordable online yoga, virtual yoga sessions, online yoga classes, wellness and dance, stress relief through movement, dance your way to fitness, community fitness classes, happyprancer fitness experience'
+        title: metaTags.title,         // Dynamic title
+        description: metaTags.description, // Dynamic description
+        keywords: metaTags.keywords    // Dynamic keywords
     }
 };
 
