@@ -18,6 +18,12 @@ const institutionData = {
             s3Bucket: `${institutionName}.com`,        // Name of the S3 bucket where the production frontend is deployed
             cloudfrontId: 'E470TC368F952'             // CloudFront distribution ID for the production environment
         }
+    },
+    // change these SEO meta tags according to the institutions
+    seo: {
+        title: 'Welcome to Happyprancer: Dance Your Way to Fun and Fitness!',
+        description: 'Discover fun fitness at Happyprancer! Join our Zumba, Bollywood, and yoga classes online. Sign up today and let\'s dance, sweat, and celebrate your health!',
+        keywords: 'happyprancer, dance fitness online, zumba classes, bollywood dance fitness, virtual yoga sessions, online dance workouts, inclusive fitness programs, home fitness classes, fun workout routines, live online fitness classes, calorie-burning dance workouts, accessible fitness for all, group dance fitness sessions, energetic dance workouts, fitness through dance, affordable online yoga, virtual yoga sessions, online yoga classes, wellness and dance, stress relief through movement, dance your way to fitness, community fitness classes, happyprancer fitness experience'
     }
 };
 

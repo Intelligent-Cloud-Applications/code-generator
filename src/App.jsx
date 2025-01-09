@@ -160,16 +160,19 @@ function App() {
 
   return (
     <HelmetProvider>
-      {/* Dynamic Title */}
       <Helmet>
+        {/* Keeping the original dynamic title logic */}
         <title>
           {`Welcome to ${
             InstitutionCtx.institutionData?.companyName
               ? InstitutionCtx.institutionData.companyName.charAt(0).toUpperCase() +
                 InstitutionCtx.institutionData.companyName.slice(1)
-              : "Institution" // Fallback string for undefined companyName
+              : "Institution"
           }!`}
         </title>
+        {/* Adding the new SEO meta tags */}
+        <meta name="description" content={institutionData.seo.description} />
+        <meta name="keywords" content={institutionData.seo.keywords} />
       </Helmet>
       <LoaderProvider>
         {InstitutionCtx.institutionData && <RoutesContainer />}
