@@ -22,65 +22,48 @@ jobs:
 
       - name: Create temp config reader
         run: |
-          echo '{"type": "module"}' > temp-package.json
-          echo "import { readFile } from 'fs/promises';
-          import { join, dirname } from 'path';
-          import { fileURLToPath } from 'url';
-
-          const __dirname = dirname(fileURLToPath(import.meta.url));
-          const dataPath = join(__dirname, 'data.json');
+          echo "const data = require('./data.json');
           
-          try {
-            const rawData = await readFile(dataPath, 'utf8');
-            const data = JSON.parse(rawData);
-            
-            const { institutionId } = data;
-            const parts = institutionId.split(/(\d+)/).filter(Boolean);
-            const institutionName = parts[0];
-            
-            const branch = process.env.GITHUB_REF.split('/').pop();
-            const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
-            
-            const deploymentConfig = {
-              [`beta-${institutionName}`]: {
-                s3Bucket: `beta.${institutionName}.com`,
-                cloudfrontId: data.cloudFrontId
-              },
-              [institutionName]: {
-                s3Bucket: `${institutionName}.com`,
-                cloudfrontId: data.cloudFrontId
-              }
-            };
-            
-            const config = deploymentConfig[branch];
-            
-            if (config) {
-              console.log(JSON.stringify({
-                s3Bucket: config.s3Bucket,
-                cloudfrontId: config.cloudfrontId,
-                shouldDeploy: true,
-                reactAppStage: stage
-              }));
-            } else {
-              console.log(JSON.stringify({
-                s3Bucket: '',
-                cloudfrontId: '',
-                shouldDeploy: false,
-                reactAppStage: ''
-              }));
+          const { institutionId } = data;
+          const parts = institutionId.split(/(\d+)/).filter(Boolean);
+          const institutionName = parts[0];
+          
+          const branch = process.env.GITHUB_REF.split('/').pop();
+          const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
+          
+          const deploymentConfig = {
+            [`beta-${institutionName}`]: {
+              s3Bucket: `beta.${institutionName}.com`,
+              cloudfrontId: data.cloudFrontId
+            },
+            [institutionName]: {
+              s3Bucket: `${institutionName}.com`,
+              cloudfrontId: data.cloudFrontId
             }
-          } catch (error) {
-            console.error('Error reading configuration:', error);
-            process.exit(1);
-          }" > configReader.mjs
+          };
+          
+          const config = deploymentConfig[branch];
+          
+          if (config) {
+            console.log(JSON.stringify({
+              s3Bucket: config.s3Bucket,
+              cloudfrontId: config.cloudfrontId,
+              shouldDeploy: true,
+              reactAppStage: stage
+            }));
+          } else {
+            console.log(JSON.stringify({
+              s3Bucket: '',
+              cloudfrontId: '',
+              shouldDeploy: false,
+              reactAppStage: ''
+            }));
+          }" > configReader.js
 
       - name: Get deployment configuration
         id: config
         run: |
-          cp package.json original-package.json
-          cp temp-package.json package.json
-          CONFIG_JSON=$(node configReader.mjs)
-          cp original-package.json package.json
+          CONFIG_JSON=$(node configReader.js)
           echo "s3_bucket=$(echo $CONFIG_JSON | jq -r .s3Bucket)" >> $GITHUB_OUTPUT
           echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
           echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
@@ -98,19 +81,15 @@ jobs:
         if: steps.config.outputs.should_deploy == 'true'
         run: |
           if [ -f .env ]; then
-            # If .env exists, replace or add REACT_APP_STAGE
             if grep -q "^REACT_APP_STAGE=" .env; then
-              # Replace existing REACT_APP_STAGE line
               sed -i "s/^REACT_APP_STAGE=.*/REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}/" .env
             else
-              # Add REACT_APP_STAGE if it doesn't exist
               echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" >> .env
             fi
           else
-            # Create new .env file if it doesn't exist
             echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" > .env
           fi
-          echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }} while preserving other variables"
+          echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}"
 
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
@@ -123,8 +102,8 @@ jobs:
         if: steps.config.outputs.should_deploy == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: AKIA5NNTYGDW2XCPH5GL
-          aws-secret-access-key: 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
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
       - name: Deploy to S3
