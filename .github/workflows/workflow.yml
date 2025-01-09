@@ -113,8 +113,8 @@ jobs:
         if: steps.config.outputs.should_deploy == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: AKIA5NNTYGDW2XCPH5GL
+          aws-secret-access-key: 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
           aws-region: us-east-1
 
       - name: Deploy to S3
