@@ -7,7 +7,8 @@
     "dev": "react-scripts start",
     "build": "set \"GENERATE_SOURCEMAP=false\" &&  react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start:prod": "yarn build && yarn serve"
   },
   "dependencies": {
     "@aws-amplify/auth": "^4.3.43",
@@ -60,6 +61,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "env-cmd": "^10.1.0",
     "tailwindcss": "^3.4.4"
   }
 }

@@ -1,13 +1,38 @@
 // constants.js
-import data from './data.json';
-import metaTags from './metatags.json';
+let data = {};
+let metaTags = {};
 
-const { institutionId } = data;
+// Helper function to safely parse JSON with better error handling
+const safeJSONParse = (envVar, varName) => {
+    try {
+        if (!envVar) {
+            console.warn(`${varName} is not defined in environment variables`);
+            return {};
+        }
+        return JSON.parse(envVar);
+    } catch (error) {
+        console.error(`Error parsing ${varName}:`, error);
+        console.log('Raw value:', envVar);
+        return {};
+    }
+};
+
+// Parse environment variables
+data = safeJSONParse(process.env.REACT_APP_INSTITUTION_DATA, 'REACT_APP_INSTITUTION_DATA');
+metaTags = safeJSONParse(process.env.REACT_APP_META_TAGS, 'REACT_APP_META_TAGS');
+
+// Destructure with default value to prevent undefined
+const { institutionId = '' } = data;
+
 function splitInstitutionId() {
+    if (!institutionId) {
+        console.warn('institutionId is empty or undefined');
+        return { institution: '', id: '' };
+    }
     const parts = institutionId.split(/(\d+)/).filter(Boolean);
     return {
-        institution: parts[0],
-        id: parts[1]
+        institution: parts[0] || '',
+        id: parts[1] || '',
     };
 }
 
@@ -15,27 +40,33 @@ const result = splitInstitutionId();
 const institutionName = result.institution;
 
 const institutionData = {
-    BETA_DOMAIN: `https://beta.${institutionName}.com`,
-    PROD_DOMAIN: `https://${institutionName}.com`,
+    BETA_DOMAIN: institutionName ? `https://beta.${institutionName}.com` : '',
+    PROD_DOMAIN: institutionName ? `https://${institutionName}.com` : '',
     InstitutionId: institutionName,
     institution: institutionName,
     institutionType: 'ds',
     GTM_ID: metaTags.gtmId,
-    deployment: {
+    deployment: institutionName ? {
         [`beta-${institutionName}`]: {
             s3Bucket: `beta.${institutionName}.com`,
-            cloudfrontId: data.cloudFrontId
+            cloudfrontId: data.cloudFrontId,
         },
         [institutionName]: {
             s3Bucket: `${institutionName}.com`,
-            cloudfrontId: data.cloudFrontId
-        }
-    },
+            cloudfrontId: data.cloudFrontId,
+        },
+    } : {},
     seo: {
-        title: metaTags.title,
-        description: metaTags.description,
-        keywords: metaTags.keywords
-    }
+        title: metaTags.title || '',
+        description: metaTags.description || '',
+        keywords: metaTags.keywords || [],
+    },
 };
+
+// Debug logging in development
+if (process.env.NODE_ENV === 'development') {
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Institution Data:', institutionData);
+}
 
 export default institutionData;
