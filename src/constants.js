@@ -63,10 +63,4 @@ const institutionData = {
     },
 };
 
-// Debug logging in development
-if (process.env.NODE_ENV === 'development') {
-    console.log('Environment:', process.env.NODE_ENV);
-    console.log('Institution Data:', institutionData);
-}
-
 export default institutionData;
