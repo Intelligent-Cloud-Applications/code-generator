@@ -21,36 +21,96 @@ jobs:
         run: yarn
 
       - name: Setup Environment Files
+        if: steps.config.outputs.should_deploy == 'true'
         run: |
-          # Create .env file with proper formatting
-          echo "REACT_APP_INSTITUTION_DATA={\"institutionId\":\"happyprancer\",\"s3BucketName\":\"beta.happyprancer.com\",\"cloudFrontId\":\"E263LXOGXF3H0N\",\"domain\":\"https://beta.happyprancer.com\"}" > .env
-          echo "REACT_APP_META_TAGS={\"title\":\"Welcome to Happyprancer: Dance Your Way to Fun and Fitness!\",\"description\":\"Discover fun fitness at Happyprancer! Join our Zumba, Bollywood, and yoga classes online. Sign up today and let's dance, sweat, and celebrate your health!\",\"keywords\":[\"happyprancer\",\"dance fitness online\",\"zumba classes\",\"bollywood dance fitness\",\"virtual yoga sessions\"],\"gtmId\":\"GTM-5DW548R\"}" >> .env
-          echo "GENERATE_SOURCEMAP=false" >> .env
-          echo "REACT_APP_STAGE=PROD" >> .env
+          # Ensure both files exist
+          touch .env
+          touch .env.production
           
-          # Display .env content for debugging
-          echo "Current .env content:"
-          cat .env
+          # Remove any BOM characters and extra whitespace
+          sed -i 's/\r$//' .env
+          sed -i 's/\r$//' .env.production
+          
+          # Create a temporary file for merged content
+          touch .env.temp
+          
+          # Process and merge environment files
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            # Skip empty lines and comments
+            [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+            
+            # Extract the variable name
+            var_name=$(echo "$line" | cut -d'=' -f1)
+            
+            # If this is a JSON variable, ensure it's on one line
+            if [[ "$var_name" == "REACT_APP_INSTITUTION_DATA" ]] || [[ "$var_name" == "REACT_APP_META_TAGS" ]]; then
+              # Capture all lines until we find a complete JSON object
+              json_content=""
+              while IFS= read -r json_line || [[ -n "$json_line" ]]; do
+                json_content+="$json_line"
+                if [[ "$json_content" =~ ^\{.*\}$ ]]; then
+                  break
+                fi
+              done
+              # Write the complete JSON on a single line
+              echo "$var_name=$json_content" >> .env.temp
+            else
+              echo "$line" >> .env.temp
+            fi
+          done < .env
+          
+          # Do the same for .env.production, overwriting any duplicate variables
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+            var_name=$(echo "$line" | cut -d'=' -f1)
+            
+            if [[ "$var_name" == "REACT_APP_INSTITUTION_DATA" ]] || [[ "$var_name" == "REACT_APP_META_TAGS" ]]; then
+              json_content=""
+              while IFS= read -r json_line || [[ -n "$json_line" ]]; do
+                json_content+="$json_line"
+                if [[ "$json_content" =~ ^\{.*\}$ ]]; then
+                  break
+                fi
+              done
+              # Remove any existing value and add the new one
+              sed -i "/^$var_name=/d" .env.temp
+              echo "$var_name=$json_content" >> .env.temp
+            else
+              # Remove any existing value and add the new one
+              sed -i "/^$var_name=/d" .env.temp
+              echo "$line" >> .env.temp
+            fi
+          done < .env.production
+          
+          # Replace the original .env with our merged content
+          mv .env.temp .env
+          
+          echo "Environment files merged successfully"
+          echo "Preview of environment variables (excluding sensitive data):"
+          grep -v "_SECRET\|_KEY\|_TOKEN" .env || true
 
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
           echo 'import fs from "fs";
-
+          
           try {
             const envContent = fs.readFileSync(".env", "utf8");
             
-            // Extract institution data using regex
-            const institutionMatch = envContent.match(/REACT_APP_INSTITUTION_DATA=({.*?})/);
-            if (!institutionMatch) {
-              throw new Error("Could not find REACT_APP_INSTITUTION_DATA in .env file");
+            // Helper function to extract JSON from env content
+            const extractJSON = (envContent, varName) => {
+              const match = envContent.match(new RegExp(`${varName}=({[\\s\\S]*?})(?:\\n|$)`));
+              return match ? JSON.parse(match[1]) : null;
+            };
+            
+            const data = extractJSON(envContent, "REACT_APP_INSTITUTION_DATA");
+            if (!data) {
+              throw new Error("Could not find or parse REACT_APP_INSTITUTION_DATA");
             }
             
-            const data = JSON.parse(institutionMatch[1]);
             const { institutionId } = data;
-            
             if (!institutionId) {
-              throw new Error("Invalid or missing institutionId in data");
+              throw new Error("institutionId is missing from data");
             }
             
             const parts = institutionId.split(/(\d+)/).filter(Boolean);
@@ -71,20 +131,10 @@ jobs:
             };
             
             const config = deployment[branch];
-            if (!config) {
-              console.log(JSON.stringify({
-                s3Bucket: "",
-                cloudfrontId: "",
-                shouldDeploy: false,
-                reactAppStage: ""
-              }));
-              process.exit(0);
-            }
-            
             console.log(JSON.stringify({
-              s3Bucket: config.s3Bucket,
-              cloudfrontId: config.cloudfrontId,
-              shouldDeploy: true,
+              s3Bucket: config ? config.s3Bucket : "",
+              cloudfrontId: config ? config.cloudfrontId : "",
+              shouldDeploy: !!config,
               reactAppStage: stage
             }));
           } catch (error) {
@@ -104,14 +154,6 @@ jobs:
           echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
           echo "react_app_stage=$(echo $CONFIG_JSON | jq -r .reactAppStage)" >> $GITHUB_OUTPUT
 
-      - name: Log Deployment Details
-        if: steps.config.outputs.should_deploy == 'true'
-        run: |
-          echo "Deploying to S3 Bucket: ${{ steps.config.outputs.s3_bucket }}"
-          echo "CloudFront Distribution ID: ${{ steps.config.outputs.cloudfront_id }}"
-          echo "Branch name: ${GITHUB_REF#refs/heads/}"
-          echo "React App Stage: ${{ steps.config.outputs.react_app_stage }}"
-
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
         env:
@@ -119,7 +161,7 @@ jobs:
           GENERATE_SOURCEMAP: false
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
-          echo "Building React app with environment variables..."
+          echo "Building React app with merged environment variables..."
           yarn build
 
       - name: Set up AWS CLI
