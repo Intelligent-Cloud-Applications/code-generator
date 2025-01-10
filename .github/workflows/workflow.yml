@@ -23,54 +23,63 @@ jobs:
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
-          echo "import fs from 'fs';
+          echo 'import fs from "fs";
+          import path from "path";
           
-          const data = JSON.parse(fs.readFileSync('./src/data.json', 'utf8'));
-          const metaTags = JSON.parse(fs.readFileSync('./src/metatags.json', 'utf8'));
-          
-          const { institutionId } = data;
-          
-          function splitInstitutionId() {
+          try {
+            // Read and parse .env file for institution data
+            const envContent = fs.readFileSync(".env", "utf8");
+            const prodEnvContent = fs.readFileSync(".env.production", "utf8");
+            
+            // Extract REACT_APP_INSTITUTION_DATA from env files
+            const institutionDataMatch = (envContent + "\n" + prodEnvContent).match(/REACT_APP_INSTITUTION_DATA=({[\s\S]*?})/);
+            const metaTagsMatch = (envContent + "\n" + prodEnvContent).match(/REACT_APP_META_TAGS=({[\s\S]*?})/);
+            
+            if (!institutionDataMatch) {
+              throw new Error("Could not find REACT_APP_INSTITUTION_DATA in env files");
+            }
+            
+            const data = JSON.parse(institutionDataMatch[1]);
+            const metaTags = metaTagsMatch ? JSON.parse(metaTagsMatch[1]) : {};
+            
+            const { institutionId } = data;
+            
+            function splitInstitutionId() {
               const parts = institutionId.split(/(\d+)/).filter(Boolean);
               return {
-                  institution: parts[0],
-                  id: parts[1]
+                institution: parts[0],
+                id: parts[1]
               };
-          }
-          
-          const result = splitInstitutionId();
-          const institutionName = result.institution;
-          
-          const branch = process.env.GITHUB_REF.split('/').pop();
-          const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
-          
-          const deployment = {
+            }
+            
+            const result = splitInstitutionId();
+            const institutionName = result.institution;
+            
+            const branch = process.env.GITHUB_REF.split("/").pop();
+            const stage = branch.startsWith("beta-") ? "DEV" : "PROD";
+            
+            const deployment = {
               [`beta-${institutionName}`]: {
-                  s3Bucket: `beta.${institutionName}.com`,
-                  cloudfrontId: data.cloudFrontId
+                s3Bucket: `beta.${institutionName}.com`,
+                cloudfrontId: data.cloudFrontId
               },
               [institutionName]: {
-                  s3Bucket: `${institutionName}.com`,
-                  cloudfrontId: data.cloudFrontId
+                s3Bucket: `${institutionName}.com`,
+                cloudfrontId: data.cloudFrontId
               }
-          };
-          
-          const config = deployment[branch];
-          if (config) {
-              console.log(JSON.stringify({
-                  s3Bucket: config.s3Bucket,
-                  cloudfrontId: config.cloudfrontId,
-                  shouldDeploy: true,
-                  reactAppStage: stage
-              }));
-          } else {
-              console.log(JSON.stringify({
-                  s3Bucket: '',
-                  cloudfrontId: '',
-                  shouldDeploy: false,
-                  reactAppStage: ''
-              }));
-          }" > configReader.mjs
+            };
+            
+            const config = deployment[branch];
+            console.log(JSON.stringify({
+              s3Bucket: config ? config.s3Bucket : "",
+              cloudfrontId: config ? config.cloudfrontId : "",
+              shouldDeploy: !!config,
+              reactAppStage: stage
+            }));
+          } catch (error) {
+            console.error("Error in config reader:", error);
+            process.exit(1);
+          }' > configReader.mjs
 
       - name: Get deployment configuration
         id: config
@@ -111,11 +120,6 @@ jobs:
           
           echo "Environment files merged. Current environment variables:"
           cat .env
-          
-          # Also update .env.production with the stage
-          if [ "${{ steps.config.outputs.react_app_stage }}" = "PROD" ]; then
-            echo "REACT_APP_STAGE=PROD" >> .env.production
-          fi
 
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
