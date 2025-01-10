@@ -301,12 +301,11 @@ export default function DashboardRating() {
   }
 
   return (
-    //for
     <div className="admin-dashboard-container w-full">
       <h2 className="pl-5 font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold text-center mt-4 w-[80%] mx-auto">
         Reviews
       </h2>
-      <div className="h-[100vh] ml-[6rem] max1050:ml-[0] max1050:mt-0">
+      <div className="min-h-screen ml-[6rem] max1050:ml-[0] max1050:mt-0">
         <div className="w-[85%] flex justify-end mt-4">
           <Button
             style={{
@@ -352,7 +351,7 @@ export default function DashboardRating() {
                 Rating:{" "}
               </label>
               <select
-                className={`rounded-[0.51rem] px-4 `}
+                className={`rounded-[0.51rem] px-4`}
                 style={{
                   backgroundColor: InstitutionData.LightestPrimaryColor,
                 }}
@@ -373,82 +372,76 @@ export default function DashboardRating() {
             </div>
           </div>
         </div>
-
+  
         <div
           className={`w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-4`}
           style={{
             backgroundColor: InstitutionData.LightestPrimaryColor,
           }}
         >
-          <div className="overflow-x-auto w-full">
-            <ul className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-col rounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] max536:bg-gradient-to-b max536:from-[#dad7c6] max536:to-[#fdd00891]">
-              <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
-                <div className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-5 font-bold">
-                  <div className="col-span-2 text-center text-black">
-                    User Name
+          <div className="w-full h-full relative">
+            <div className="overflow-x-auto w-full h-full pb-16">
+              <ul className="w-[95%] max-w-[1700px] mx-auto flex flex-col rounded-3xl items-center justify-start pt-6 max536:gap-3">
+                <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
+                  <div className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-5 font-bold">
+                    <div className="col-span-2 text-center text-black">
+                      User Name
+                    </div>
+                    <div className="col-span-2 text-center text-black">
+                      Instructor
+                    </div>
+                    <div className="col-span-2 text-center text-black">Date</div>
+                    <div className="col-span-2 text-center text-black">Time</div>
+                    <div className="col-span-2 text-center text-black">Rating</div>
+                    <div className="col-span-2 text-center text-black">Review</div>
                   </div>
-                  <div className="col-span-2 text-center text-black">
-                    Instructor
-                  </div>
-                  <div className="col-span-2 text-center text-black">Date</div>
-                  <div className="col-span-2 text-center text-black">Time</div>
-                  <div className="col-span-2 text-center text-black">
-                    Rating
-                  </div>
-                  <div className="col-span-2 text-center text-black">
-                    Review
-                  </div>
-                </div>
-                {allRatings
-                  .sort((a, b) => {
-                    a.timestamp - b.timestamp ? -1 : 1;
-                  })
-                  .slice(startIndex, endIndex)
-                  .map((rating) => (
-                    <div
-                      key={rating.ratingId}
-                      className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-4"
-                    >
-                      <div className="col-span-2 text-center text-black">
-                        {rating.userName.split(" ")[0]}
-                      </div>
-                      <div className="col-span-2 text-center text-black">
-                        {rating.instructorName}
-                      </div>
-                      <div className="col-span-2 text-center text-black">
-                        {new Date(
-                          parseInt(rating.timestamp)
-                        ).toLocaleDateString()}
-                      </div>
-                      <div className="col-span-2 text-center text-black">
-                        {new Date(
-                          parseInt(rating.timestamp)
-                        ).toLocaleTimeString()}
-                      </div>
-                      <div className="col-span-2 text-center">
-                        {/* Integrate the StarRating component here with Tailwind classes */}
-                        <div className="flex items-center justify-center">
-                          {Array.from({ length: 5 }, (_, index) => (
-                            <span
-                              key={index}
-                              className={`text-2xl mx-1 ${index < rating.rating
-                                ? "text-yellow-500"
-                                : "text-gray-300"
+                  {allRatings
+                    .sort((a, b) => {
+                      a.timestamp - b.timestamp ? -1 : 1;
+                    })
+                    .slice(startIndex, endIndex)
+                    .map((rating) => (
+                      <div
+                        key={rating.ratingId}
+                        className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-4"
+                      >
+                        <div className="col-span-2 text-center text-black">
+                          {rating.userName.split(" ")[0]}
+                        </div>
+                        <div className="col-span-2 text-center text-black">
+                          {rating.instructorName}
+                        </div>
+                        <div className="col-span-2 text-center text-black">
+                          {new Date(parseInt(rating.timestamp)).toLocaleDateString()}
+                        </div>
+                        <div className="col-span-2 text-center text-black">
+                          {new Date(parseInt(rating.timestamp)).toLocaleTimeString()}
+                        </div>
+                        <div className="col-span-2 text-center">
+                          <div className="flex items-center justify-center">
+                            {Array.from({ length: 5 }, (_, index) => (
+                              <span
+                                key={index}
+                                className={`text-2xl mx-1 ${
+                                  index < rating.rating
+                                    ? "text-yellow-500"
+                                    : "text-gray-300"
                                 }`}
-                            >
-                              ★
-                            </span>
-                          ))}
+                              >
+                                ★
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="col-span-2 text-center text-black">
+                          {rating.review}
                         </div>
                       </div>
-                      <div className="col-span-2 text-center text-black">
-                        {rating.review}
-                      </div>
-                    </div>
-                  ))}
-              </li>
-            </ul>
-            <div className="absolute bottom-0 flex justify-center items-center w-full">
+                    ))}
+                </li>
+              </ul>
+            </div>
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center">
               <Pagination
                 totalPages={totalPages}
                 currentPage={currentPage}

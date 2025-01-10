@@ -960,7 +960,7 @@ const UpcomingSessions = () => {
                               <div className="hidden md:block w-full">
                                 {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
                                   <select
-                                    className="w-full h-10 px-2 rounded border border-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                    className="w-full h-10 px-2 rounded focus:outline-none focus:border-blue-500 text-sm"
                                     style={{
                                       backgroundColor: InstitutionData.LightestPrimaryColor,
                                     }}
@@ -1000,7 +1000,7 @@ const UpcomingSessions = () => {
                                   </select>
                                 ) : (
                                   <p
-                                    className="h-10 flex items-center justify-center rounded border border-gray-300 text-sm"
+                                    className="h-10 flex items-center justify-center rounded border border-gray-300 text-md"
                                   >
                                     {getInstructor(clas.instructorNames)?.name}
                                   </p>
@@ -1010,7 +1010,7 @@ const UpcomingSessions = () => {
                               <div className="hidden md:block w-full">
                                 {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
                                   <select
-                                    className="w-full h-10 px-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 text-sm"
+                                    className="w-full h-10 px-2 rounded focus:outline-none focus:border-blue-500 text-sm"
                                     style={{
                                       backgroundColor: InstitutionData.LightestPrimaryColor,
                                     }}
@@ -1033,7 +1033,7 @@ const UpcomingSessions = () => {
                                   </select>
                                 ) : (
                                   <p
-                                    className="h-10 flex items-center justify-center rounded border border-gray-300 bg-lightest-primary text-sm"
+                                    className="h-10 flex items-center justify-center rounded border border-gray-300 bg-lightest-primary text-md"
                                   >
                                     {clas.classType}
                                   </p>
@@ -1045,7 +1045,7 @@ const UpcomingSessions = () => {
                                   <input
                                     value={getTime(clas.date)}
                                     type="time"
-                                    className="w-full h-10 px-2 border border-gray-300 rounded bg-transparent text-center focus:outline-none focus:border-blue-500 text-sm"
+                                    className="w-full h-10 px-2 rounded bg-transparent text-center focus:outline-none focus:border-blue-500 text-sm"
                                     onChange={(e) => {
                                       onClassUpdated(
                                         clas.classId,
@@ -1057,7 +1057,7 @@ const UpcomingSessions = () => {
                                     }}
                                   />
                                 ) : (
-                                  <p className="h-10 flex items-center justify-center text-sm">
+                                  <p className="h-10 flex items-center justify-center text-md">
                                     {new Date(parseInt(clas.date)).toLocaleString('en-us', {
                                       hour: '2-digit',
                                       minute: '2-digit',
