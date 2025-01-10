@@ -20,40 +20,41 @@ jobs:
       - name: Install dependencies
         run: yarn
 
+      - name: Setup Environment Files
+        run: |
+          # Create .env file with proper formatting
+          echo "REACT_APP_INSTITUTION_DATA={\"institutionId\":\"happyprancer\",\"s3BucketName\":\"beta.happyprancer.com\",\"cloudFrontId\":\"E263LXOGXF3H0N\",\"domain\":\"https://beta.happyprancer.com\"}" > .env
+          echo "REACT_APP_META_TAGS={\"title\":\"Welcome to Happyprancer: Dance Your Way to Fun and Fitness!\",\"description\":\"Discover fun fitness at Happyprancer! Join our Zumba, Bollywood, and yoga classes online. Sign up today and let's dance, sweat, and celebrate your health!\",\"keywords\":[\"happyprancer\",\"dance fitness online\",\"zumba classes\",\"bollywood dance fitness\",\"virtual yoga sessions\"],\"gtmId\":\"GTM-5DW548R\"}" >> .env
+          echo "GENERATE_SOURCEMAP=false" >> .env
+          echo "REACT_APP_STAGE=PROD" >> .env
+          
+          # Display .env content for debugging
+          echo "Current .env content:"
+          cat .env
+
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
           echo 'import fs from "fs";
-          import path from "path";
-          
+
           try {
-            // Read and parse .env file for institution data
             const envContent = fs.readFileSync(".env", "utf8");
-            const prodEnvContent = fs.readFileSync(".env.production", "utf8");
             
-            // Extract REACT_APP_INSTITUTION_DATA from env files
-            const institutionDataMatch = (envContent + "\n" + prodEnvContent).match(/REACT_APP_INSTITUTION_DATA=({[\s\S]*?})/);
-            const metaTagsMatch = (envContent + "\n" + prodEnvContent).match(/REACT_APP_META_TAGS=({[\s\S]*?})/);
-            
-            if (!institutionDataMatch) {
-              throw new Error("Could not find REACT_APP_INSTITUTION_DATA in env files");
+            // Extract institution data using regex
+            const institutionMatch = envContent.match(/REACT_APP_INSTITUTION_DATA=({.*?})/);
+            if (!institutionMatch) {
+              throw new Error("Could not find REACT_APP_INSTITUTION_DATA in .env file");
             }
             
-            const data = JSON.parse(institutionDataMatch[1]);
-            const metaTags = metaTagsMatch ? JSON.parse(metaTagsMatch[1]) : {};
-            
+            const data = JSON.parse(institutionMatch[1]);
             const { institutionId } = data;
             
-            function splitInstitutionId() {
-              const parts = institutionId.split(/(\d+)/).filter(Boolean);
-              return {
-                institution: parts[0],
-                id: parts[1]
-              };
+            if (!institutionId) {
+              throw new Error("Invalid or missing institutionId in data");
             }
             
-            const result = splitInstitutionId();
-            const institutionName = result.institution;
+            const parts = institutionId.split(/(\d+)/).filter(Boolean);
+            const institutionName = parts[0];
             
             const branch = process.env.GITHUB_REF.split("/").pop();
             const stage = branch.startsWith("beta-") ? "DEV" : "PROD";
@@ -70,14 +71,24 @@ jobs:
             };
             
             const config = deployment[branch];
+            if (!config) {
+              console.log(JSON.stringify({
+                s3Bucket: "",
+                cloudfrontId: "",
+                shouldDeploy: false,
+                reactAppStage: ""
+              }));
+              process.exit(0);
+            }
+            
             console.log(JSON.stringify({
-              s3Bucket: config ? config.s3Bucket : "",
-              cloudfrontId: config ? config.cloudfrontId : "",
-              shouldDeploy: !!config,
+              s3Bucket: config.s3Bucket,
+              cloudfrontId: config.cloudfrontId,
+              shouldDeploy: true,
               reactAppStage: stage
             }));
           } catch (error) {
-            console.error("Error in config reader:", error);
+            console.error("Error in config reader:", error.message);
             process.exit(1);
           }' > configReader.mjs
 
@@ -101,26 +112,6 @@ jobs:
           echo "Branch name: ${GITHUB_REF#refs/heads/}"
           echo "React App Stage: ${{ steps.config.outputs.react_app_stage }}"
 
-      - name: Setup Environment Files
-        if: steps.config.outputs.should_deploy == 'true'
-        run: |
-          # Ensure both .env and .env.production exist
-          touch .env
-          touch .env.production
-          
-          # Create a merged environment file
-          cat .env > .env.merged
-          cat .env.production >> .env.merged
-          
-          # Set REACT_APP_STAGE
-          echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" >> .env.merged
-          
-          # Override .env with merged content
-          mv .env.merged .env
-          
-          echo "Environment files merged. Current environment variables:"
-          cat .env
-
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
         env:
@@ -128,7 +119,7 @@ jobs:
           GENERATE_SOURCEMAP: false
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
-          echo "Building React app with merged environment variables..."
+          echo "Building React app with environment variables..."
           yarn build
 
       - name: Set up AWS CLI
