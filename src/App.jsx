@@ -1,13 +1,13 @@
 import { useContext, useEffect, useRef } from "react";
 import { Auth, API } from "aws-amplify";
 import { HelmetProvider, Helmet } from "react-helmet-async";
-import Context from "./Context/Context";
-import RoutesContainer from "./routes";
-import LoaderProvider from "./components/LoaderProvider";
-import InstitutionContext from "./Context/InstitutionContext";
-import apiPaths from "./utils/api-paths";
+import Context from "./Development/Context/Context";
+import RoutesContainer from "./Development/routes";
+import LoaderProvider from "./Development/components/LoaderProvider";
+import InstitutionContext from "./Development/Context/InstitutionContext";
+import apiPaths from "./Development/utils/api-paths";
 import { jwtDecode } from "jwt-decode";
-import institutionData from "./constants";
+import institutionData from "./Development/constants";
 
 function App() {
   const UtilCtx = useRef(useContext(Context).util);
@@ -163,12 +163,11 @@ function App() {
       <Helmet>
         {/* Keeping the original dynamic title logic */}
         <title>
-          {`Welcome to ${
-            InstitutionCtx.institutionData?.companyName
+          {`Welcome to ${InstitutionCtx.institutionData?.companyName
               ? InstitutionCtx.institutionData.companyName.charAt(0).toUpperCase() +
-                InstitutionCtx.institutionData.companyName.slice(1)
+              InstitutionCtx.institutionData.companyName.slice(1)
               : "Institution"
-          }!`}
+            }!`}
         </title>
         {/* Adding the new SEO meta tags */}
         <meta name="description" content={institutionData.seo.description} />

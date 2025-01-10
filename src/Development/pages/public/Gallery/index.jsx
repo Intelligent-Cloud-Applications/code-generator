@@ -6,7 +6,7 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import { Image, Trash2Icon, Upload, X } from 'lucide-react'
 import { toast } from 'react-toastify'
 
-import Spinner from '../../../spinner'
+import Spinner from '../../../utils/spinner'
 import { FadeLoader } from 'react-spinners'
 import NavBar from '../../../components/Header'
 import Footer from '../../../components/Footer'

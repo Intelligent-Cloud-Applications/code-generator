@@ -8,13 +8,13 @@ import { Amplify } from "aws-amplify";
 // Local
 import App from "./App";
 //import { store } from './redux/store';
-import config from "./config";
-import { ContextProvider } from "./Context/ContextProvider";
-import { InstitutionContextProvider } from "./Context/InstitutionContextProvider";
+import config from "./Development/config";
+import { ContextProvider } from "./Development/Context/ContextProvider";
+import { InstitutionContextProvider } from "./Development/Context/InstitutionContextProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Flowbite } from "flowbite-react";
-import customTheme from "./common/Flowbite/customTheme";
+import customTheme from "./Development/common/Flowbite/customTheme";
 import "./index.css";
 
 // Code
