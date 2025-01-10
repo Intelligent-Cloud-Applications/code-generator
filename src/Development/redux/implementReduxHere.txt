@@ -1,2 +1,0 @@
-Implement Redux State Management in this folder.
-Also replace context with redux in all pages and components.
