@@ -96,9 +96,9 @@ As a member of the operations team, you'll be responsible for updating the follo
 ### Step 1: Create a New Branch
 
 1. Navigate to the repository on GitHub
-2. Click on the branch dropdown (typically showing "development")
+2. Click on the branch dropdown (typically showing "dev")
 3. Enter a new branch name following the format: `institutionId`
-4. Select "Create branch: ops/config-update from 'development'"
+4. Select "Create branch: named as 'institutionId' from 'dev'"
 
 ### Step 2: Navigate to Configuration Files
 
