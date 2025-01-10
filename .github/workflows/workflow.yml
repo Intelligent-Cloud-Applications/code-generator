@@ -23,23 +23,45 @@ jobs:
       - name: Setup Environment Files
         run: |
           # Create a temporary file for merged environment variables
-          cp .env .env.temp || touch .env.temp
+          touch .env.temp
           
-          # If .env.production exists, append its contents
+          # Function to properly append a line with newline
+          append_line() {
+            echo "$1" >> .env.temp
+            echo "" >> .env.temp  # Add an empty line after each variable
+          }
+          
+          # Process .env file
+          if [ -f .env ]; then
+            while IFS= read -r line || [ -n "$line" ]; do
+              # Skip empty lines and comments
+              [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+              append_line "$line"
+            done < .env
+          fi
+          
+          # Process .env.production file
           if [ -f .env.production ]; then
             while IFS= read -r line || [ -n "$line" ]; do
-              if [[ $line =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
-                # Extract variable name
-                var_name="${line%%=*}"
-                # Remove existing definition if any
+              # Skip empty lines and comments
+              [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+              
+              # Extract variable name
+              var_name="${line%%=*}"
+              
+              # Remove existing variable if it exists
+              if [ -n "$var_name" ]; then
                 sed -i "/^${var_name}=/d" .env.temp
               fi
-              # Append the line
-              echo "$line" >> .env.temp
+              
+              append_line "$line"
             done < .env.production
           fi
           
-          # Replace original .env with merged content
+          # Clean up any multiple consecutive empty lines
+          sed -i '/^$/N;/^\n$/D' .env.temp
+          
+          # Move temporary file to .env
           mv .env.temp .env
           
           # Display non-sensitive env vars for debugging
@@ -56,7 +78,7 @@ jobs:
             
             // Function to extract value for a key from .env content
             const getEnvValue = (content, key) => {
-              const regex = new RegExp(`${key}=(.+?)(?=\\n[A-Z]|$)`, "s");
+              const regex = new RegExp(`${key}=([\\s\\S]*?)(?=\\n[A-Z]|$)`, "m");
               const match = content.match(regex);
               return match ? match[1].trim() : null;
             };
