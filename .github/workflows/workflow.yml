@@ -45,12 +45,12 @@ jobs:
           const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
           
           const deployment = {
-              [\`beta-\${institutionName}\`]: {
-                  s3Bucket: \`beta.\${institutionName}.com\`,
+              [`beta-${institutionName}`]: {
+                  s3Bucket: `beta.${institutionName}.com`,
                   cloudfrontId: data.cloudFrontId
               },
               [institutionName]: {
-                  s3Bucket: \`\${institutionName}.com\`,
+                  s3Bucket: `${institutionName}.com`,
                   cloudfrontId: data.cloudFrontId
               }
           };
@@ -92,33 +92,47 @@ jobs:
           echo "Branch name: ${GITHUB_REF#refs/heads/}"
           echo "React App Stage: ${{ steps.config.outputs.react_app_stage }}"
 
-      - name: Update .env file
+      - name: Setup Environment Files
         if: steps.config.outputs.should_deploy == 'true'
         run: |
-          if [ -f .env ]; then
-            if grep -q "^REACT_APP_STAGE=" .env; then
-              sed -i "s/^REACT_APP_STAGE=.*/REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}/" .env
-            else
-              echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" >> .env
-            fi
-          else
-            echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" > .env
+          # Ensure both .env and .env.production exist
+          touch .env
+          touch .env.production
+          
+          # Create a merged environment file
+          cat .env > .env.merged
+          cat .env.production >> .env.merged
+          
+          # Set REACT_APP_STAGE
+          echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" >> .env.merged
+          
+          # Override .env with merged content
+          mv .env.merged .env
+          
+          echo "Environment files merged. Current environment variables:"
+          cat .env
+          
+          # Also update .env.production with the stage
+          if [ "${{ steps.config.outputs.react_app_stage }}" = "PROD" ]; then
+            echo "REACT_APP_STAGE=PROD" >> .env.production
           fi
-          echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }} while preserving other variables"
 
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
+        env:
+          CI: false
+          GENERATE_SOURCEMAP: false
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
-          echo "Building React app with REACT_APP_STAGE from .env"
-          yarn react-scripts build || yarn build:prod || yarn build:production || yarn build
+          echo "Building React app with merged environment variables..."
+          yarn build
 
       - name: Set up AWS CLI
         if: steps.config.outputs.should_deploy == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: AKIA5NNTYGDW2XCPH5GL
-          aws-secret-access-key: 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
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
       - name: Deploy to S3
