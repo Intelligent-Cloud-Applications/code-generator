@@ -20,84 +20,52 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - name: Setup Environment Files
-        run: |
-          # Create a temporary file for merged environment variables
-          touch .env.temp
-          
-          # Function to properly append a line with newline
-          append_line() {
-            echo "$1" >> .env.temp
-            echo "" >> .env.temp  # Add an empty line after each variable
-          }
-          
-          # Process .env file
-          if [ -f .env ]; then
-            while IFS= read -r line || [ -n "$line" ]; do
-              # Skip empty lines and comments
-              [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-              append_line "$line"
-            done < .env
-          fi
-          
-          # Process .env.production file
-          if [ -f .env.production ]; then
-            while IFS= read -r line || [ -n "$line" ]; do
-              # Skip empty lines and comments
-              [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-              
-              # Extract variable name
-              var_name="${line%%=*}"
-              
-              # Remove existing variable if it exists
-              if [ -n "$var_name" ]; then
-                sed -i "/^${var_name}=/d" .env.temp
-              fi
-              
-              append_line "$line"
-            done < .env.production
-          fi
-          
-          # Clean up any multiple consecutive empty lines
-          sed -i '/^$/N;/^\n$/D' .env.temp
-          
-          # Move temporary file to .env
-          mv .env.temp .env
-          
-          # Display non-sensitive env vars for debugging
-          echo "Environment variables (excluding sensitive data):"
-          grep -v "SECRET\|KEY\|PASSWORD" .env || true
-
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
           echo 'import fs from "fs";
           
           try {
+            // Read both environment files
             const envContent = fs.readFileSync(".env", "utf8");
+            const prodEnvContent = fs.readFileSync(".env.production", "utf8");
             
-            // Function to extract value for a key from .env content
-            const getEnvValue = (content, key) => {
-              const regex = new RegExp(`${key}=([\\s\\S]*?)(?=\\n[A-Z]|$)`, "m");
+            // Function to extract JSON value from environment content
+            const extractEnvJson = (content, varName) => {
+              const regex = new RegExp(`${varName}\\s*=\\s*({[\\s\\S]*?})(?:\\s*(?=\\w+\\s*=|$))`, "m");
               const match = content.match(regex);
-              return match ? match[1].trim() : null;
+              if (!match) return null;
+              try {
+                return JSON.parse(match[1]);
+              } catch (e) {
+                console.error(`Error parsing ${varName}:`, e);
+                return null;
+              }
             };
             
-            // Get and parse institution data
-            const institutionDataRaw = getEnvValue(envContent, "REACT_APP_INSTITUTION_DATA");
-            if (!institutionDataRaw) {
-              throw new Error("Could not find REACT_APP_INSTITUTION_DATA in .env");
+            // Try to get institution data from both files
+            let institutionData = extractEnvJson(prodEnvContent, "REACT_APP_INSTITUTION_DATA") || 
+                                extractEnvJson(envContent, "REACT_APP_INSTITUTION_DATA");
+            
+            if (!institutionData) {
+              throw new Error("Could not find or parse REACT_APP_INSTITUTION_DATA in environment files");
             }
             
-            const data = JSON.parse(institutionDataRaw);
-            const { institutionId } = data;
-            
+            const { institutionId } = institutionData;
             if (!institutionId) {
               throw new Error("institutionId is missing from REACT_APP_INSTITUTION_DATA");
             }
             
-            const parts = institutionId.split(/(\d+)/).filter(Boolean);
-            const institutionName = parts[0];
+            function splitInstitutionId() {
+              const parts = institutionId.split(/(\d+)/).filter(Boolean);
+              return {
+                institution: parts[0] || "",
+                id: parts[1] || ""
+              };
+            }
+            
+            const result = splitInstitutionId();
+            const institutionName = result.institution;
             
             const branch = process.env.GITHUB_REF.split("/").pop();
             const stage = branch.startsWith("beta-") ? "DEV" : "PROD";
@@ -105,21 +73,32 @@ jobs:
             const deployment = {
               [`beta-${institutionName}`]: {
                 s3Bucket: `beta.${institutionName}.com`,
-                cloudfrontId: data.cloudFrontId
+                cloudfrontId: institutionData.cloudFrontId
               },
               [institutionName]: {
                 s3Bucket: `${institutionName}.com`,
-                cloudfrontId: data.cloudFrontId
+                cloudfrontId: institutionData.cloudFrontId
               }
             };
             
             const config = deployment[branch];
-            console.log(JSON.stringify({
-              s3Bucket: config ? config.s3Bucket : "",
-              cloudfrontId: config ? config.cloudfrontId : "",
-              shouldDeploy: !!config,
-              reactAppStage: stage
-            }));
+            if (config) {
+              console.log(JSON.stringify({
+                s3Bucket: config.s3Bucket,
+                cloudfrontId: config.cloudfrontId,
+                shouldDeploy: true,
+                reactAppStage: stage,
+                institutionData: JSON.stringify(institutionData)
+              }));
+            } else {
+              console.log(JSON.stringify({
+                s3Bucket: "",
+                cloudfrontId: "",
+                shouldDeploy: false,
+                reactAppStage: "",
+                institutionData: ""
+              }));
+            }
           } catch (error) {
             console.error("Error in config reader:", error.message);
             process.exit(1);
@@ -136,14 +115,19 @@ jobs:
           echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
           echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
           echo "react_app_stage=$(echo $CONFIG_JSON | jq -r .reactAppStage)" >> $GITHUB_OUTPUT
+          echo "institution_data=$(echo $CONFIG_JSON | jq -r .institutionData)" >> $GITHUB_OUTPUT
 
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
         env:
           CI: false
           GENERATE_SOURCEMAP: false
+          REACT_APP_STAGE: ${{ steps.config.outputs.react_app_stage }}
+          REACT_APP_INSTITUTION_DATA: ${{ steps.config.outputs.institution_data }}
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
+          echo "Building React app with environment variables..."
+          echo "REACT_APP_INSTITUTION_DATA=$REACT_APP_INSTITUTION_DATA"
           yarn build
 
       - name: Set up AWS CLI
