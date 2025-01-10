@@ -26,7 +26,7 @@ jobs:
           echo "import fs from 'fs';
           
           const data = JSON.parse(fs.readFileSync('./src/Operation/data.json', 'utf8'));
-          const metaTags = JSON.parse(fs.readFileSync('./src/metatags.json', 'utf8'));
+          const metaTags = JSON.parse(fs.readFileSync('./Operation/src/metatags.json', 'utf8'));
           
           const { institutionId } = data;
           
