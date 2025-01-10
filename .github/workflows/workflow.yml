@@ -21,73 +21,30 @@ jobs:
         run: yarn
 
       - name: Setup Environment Files
-        if: steps.config.outputs.should_deploy == 'true'
         run: |
-          # Ensure both files exist
-          touch .env
-          touch .env.production
+          # Create a temporary file for merged environment variables
+          cp .env .env.temp || touch .env.temp
           
-          # Remove any BOM characters and extra whitespace
-          sed -i 's/\r$//' .env
-          sed -i 's/\r$//' .env.production
-          
-          # Create a temporary file for merged content
-          touch .env.temp
-          
-          # Process and merge environment files
-          while IFS= read -r line || [[ -n "$line" ]]; do
-            # Skip empty lines and comments
-            [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-            
-            # Extract the variable name
-            var_name=$(echo "$line" | cut -d'=' -f1)
-            
-            # If this is a JSON variable, ensure it's on one line
-            if [[ "$var_name" == "REACT_APP_INSTITUTION_DATA" ]] || [[ "$var_name" == "REACT_APP_META_TAGS" ]]; then
-              # Capture all lines until we find a complete JSON object
-              json_content=""
-              while IFS= read -r json_line || [[ -n "$json_line" ]]; do
-                json_content+="$json_line"
-                if [[ "$json_content" =~ ^\{.*\}$ ]]; then
-                  break
-                fi
-              done
-              # Write the complete JSON on a single line
-              echo "$var_name=$json_content" >> .env.temp
-            else
+          # If .env.production exists, append its contents
+          if [ -f .env.production ]; then
+            while IFS= read -r line || [ -n "$line" ]; do
+              if [[ $line =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+                # Extract variable name
+                var_name="${line%%=*}"
+                # Remove existing definition if any
+                sed -i "/^${var_name}=/d" .env.temp
+              fi
+              # Append the line
               echo "$line" >> .env.temp
-            fi
-          done < .env
+            done < .env.production
+          fi
           
-          # Do the same for .env.production, overwriting any duplicate variables
-          while IFS= read -r line || [[ -n "$line" ]]; do
-            [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-            var_name=$(echo "$line" | cut -d'=' -f1)
-            
-            if [[ "$var_name" == "REACT_APP_INSTITUTION_DATA" ]] || [[ "$var_name" == "REACT_APP_META_TAGS" ]]; then
-              json_content=""
-              while IFS= read -r json_line || [[ -n "$json_line" ]]; do
-                json_content+="$json_line"
-                if [[ "$json_content" =~ ^\{.*\}$ ]]; then
-                  break
-                fi
-              done
-              # Remove any existing value and add the new one
-              sed -i "/^$var_name=/d" .env.temp
-              echo "$var_name=$json_content" >> .env.temp
-            else
-              # Remove any existing value and add the new one
-              sed -i "/^$var_name=/d" .env.temp
-              echo "$line" >> .env.temp
-            fi
-          done < .env.production
-          
-          # Replace the original .env with our merged content
+          # Replace original .env with merged content
           mv .env.temp .env
           
-          echo "Environment files merged successfully"
-          echo "Preview of environment variables (excluding sensitive data):"
-          grep -v "_SECRET\|_KEY\|_TOKEN" .env || true
+          # Display non-sensitive env vars for debugging
+          echo "Environment variables (excluding sensitive data):"
+          grep -v "SECRET\|KEY\|PASSWORD" .env || true
 
       - name: Create temp config reader
         run: |
@@ -97,20 +54,24 @@ jobs:
           try {
             const envContent = fs.readFileSync(".env", "utf8");
             
-            // Helper function to extract JSON from env content
-            const extractJSON = (envContent, varName) => {
-              const match = envContent.match(new RegExp(`${varName}=({[\\s\\S]*?})(?:\\n|$)`));
-              return match ? JSON.parse(match[1]) : null;
+            // Function to extract value for a key from .env content
+            const getEnvValue = (content, key) => {
+              const regex = new RegExp(`${key}=(.+?)(?=\\n[A-Z]|$)`, "s");
+              const match = content.match(regex);
+              return match ? match[1].trim() : null;
             };
             
-            const data = extractJSON(envContent, "REACT_APP_INSTITUTION_DATA");
-            if (!data) {
-              throw new Error("Could not find or parse REACT_APP_INSTITUTION_DATA");
+            // Get and parse institution data
+            const institutionDataRaw = getEnvValue(envContent, "REACT_APP_INSTITUTION_DATA");
+            if (!institutionDataRaw) {
+              throw new Error("Could not find REACT_APP_INSTITUTION_DATA in .env");
             }
             
+            const data = JSON.parse(institutionDataRaw);
             const { institutionId } = data;
+            
             if (!institutionId) {
-              throw new Error("institutionId is missing from data");
+              throw new Error("institutionId is missing from REACT_APP_INSTITUTION_DATA");
             }
             
             const parts = institutionId.split(/(\d+)/).filter(Boolean);
@@ -161,7 +122,6 @@ jobs:
           GENERATE_SOURCEMAP: false
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
-          echo "Building React app with merged environment variables..."
           yarn build
 
       - name: Set up AWS CLI
