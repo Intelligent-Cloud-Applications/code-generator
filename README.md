@@ -72,8 +72,8 @@ Our sophisticated deployment pipeline automatically handles everything from buil
 
 ```mermaid
 graph TD
-    A[Main Branch] --> B[Production: institutionName]
-    A --> C[Development: beta-institutionName]
+    A[Main Branch] --> B[Production: institutionId]
+    A --> C[Development: beta-institutionId]
 ```
 
 | Branch Type | Pattern | Example | Environment |
