@@ -25,51 +25,60 @@ jobs:
           echo '{"type": "module"}' > temp-package.json
           echo "import fs from 'fs';
           
-          const data = JSON.parse(fs.readFileSync('./src/Operation/data.json', 'utf8'));
-          const metaTags = JSON.parse(fs.readFileSync('./Operation/src/metatags.json', 'utf8'));
-          
-          const { institutionId } = data;
-          
-          function splitInstitutionId() {
-              const parts = institutionId.split(/(\d+)/).filter(Boolean);
-              return {
-                  institution: parts[0],
-                  id: parts[1]
-              };
-          }
-          
-          const result = splitInstitutionId();
-          const institutionName = result.institution;
-          
-          const branch = process.env.GITHUB_REF.split('/').pop();
-          const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
-          
-          const deployment = {
-              [\`beta-\${institutionName}\`]: {
-                  s3Bucket: \`beta.\${institutionName}.com\`,
-                  cloudfrontId: data.cloudFrontId
-              },
-              [institutionName]: {
-                  s3Bucket: \`\${institutionName}.com\`,
-                  cloudfrontId: data.cloudFrontId
-              }
-          };
-          
-          const config = deployment[branch];
-          if (config) {
-              console.log(JSON.stringify({
-                  s3Bucket: config.s3Bucket,
-                  cloudfrontId: config.cloudfrontId,
-                  shouldDeploy: true,
-                  reactAppStage: stage
-              }));
-          } else {
-              console.log(JSON.stringify({
-                  s3Bucket: '',
-                  cloudfrontId: '',
-                  shouldDeploy: false,
-                  reactAppStage: ''
-              }));
+          try {
+            console.log('Current working directory:', process.cwd());
+            console.log('Listing directory contents:', fs.readdirSync('./'));
+            console.log('Listing src directory:', fs.readdirSync('./src'));
+            
+            const data = JSON.parse(fs.readFileSync('./src/Operation/data.json', 'utf8'));
+            const metaTags = JSON.parse(fs.readFileSync('./src/Operation/metatags.json', 'utf8'));
+            
+            const { institutionId } = data;
+
+            function splitInstitutionId() {
+                const parts = institutionId.split(/(\d+)/).filter(Boolean);
+                return {
+                    institution: parts[0],
+                    id: parts[1]
+                };
+            }
+
+            const result = splitInstitutionId();
+            const institutionName = result.institution;
+            
+            const branch = process.env.GITHUB_REF.split('/').pop();
+            const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
+            
+            const deployment = {
+                [\`beta-\${institutionName}\`]: {
+                    s3Bucket: \`beta.\${institutionName}.com\`,
+                    cloudfrontId: data.cloudFrontId
+                },
+                [institutionName]: {
+                    s3Bucket: \`\${institutionName}.com\`,
+                    cloudfrontId: data.cloudFrontId
+                }
+            };
+            
+            const config = deployment[branch];
+            if (config) {
+                console.log(JSON.stringify({
+                    s3Bucket: config.s3Bucket,
+                    cloudfrontId: config.cloudfrontId,
+                    shouldDeploy: true,
+                    reactAppStage: stage
+                }));
+            } else {
+                console.log(JSON.stringify({
+                    s3Bucket: '',
+                    cloudfrontId: '',
+                    shouldDeploy: false,
+                    reactAppStage: ''
+                }));
+            }
+          } catch (error) {
+            console.error('Error reading files:', error);
+            process.exit(1);
           }" > configReader.mjs
 
       - name: Get deployment configuration
