@@ -41,14 +41,24 @@ Houses critical configuration files:
 
     "cloudFrontId": "E263LXOGXF3H0N",             # The cloudfrontId attached with the particular institution
 
-    "domain": "https://beta.happyprancer.com"
+    "domain": "https://beta.happyprancer.com"     # The domain name where the institution is hosted
 }
 ```
 
 #### `metatags.json`
 ```json
 {
-  // Meta configurations for SEO and display
+    "title": "Welcome to Happyprancer: Dance Your Way to Fun and Fitness!",     # Change the title here 
+
+    "description": "Discover fun fitness at Happyprancer! Join our Zumba, Bollywood, and yoga classes online. Sign up today and let's dance, sweat, and celebrate your health!",   # Change the description here
+
+    "keywords": [                                                              # Add some keywords here
+        "happyprancer",
+        "dance fitness online",
+        "zumba classes",
+        "bollywood dance fitness"
+    ],
+    "gtmId": "GTM-5DW548R"                                                    # Change the GTMID here
 }
 ```
 
@@ -68,74 +78,111 @@ graph TD
 
 | Branch Type | Pattern | Example | Environment |
 |------------|---------|---------|-------------|
-| Production | `institutionName` | `dance` | `PROD` |
-| Development | `beta-institutionName` | `beta-dance` | `DEV` |
+| Production | `institutionId` | `dance` | `PROD` |
+| Development | `beta-institutionId` |`beta-dance` | `DEV` |
 
-### 📦 Deployment Process
+# Operations Team Configuration Guide
 
-1. **🔍 Branch Detection**
-   ```bash
-   # Production branch
-   dance → dance.com
-   
-   # Development branch
-   beta-dance → beta.dance.com
+Welcome to the Operations Configuration Guide! This document provides step-by-step instructions for making configuration changes through the GitHub web interface.
+
+## 📋 Overview
+
+As a member of the operations team, you'll be responsible for updating the following configuration files:
+- `src/Operation/data.json`
+- `src/Operation/metatags.json`
+
+## 🚀 Making Configuration Changes in GitHub
+
+### Step 1: Create a New Branch
+
+1. Navigate to the repository on GitHub
+2. Click on the branch dropdown (typically showing "development")
+3. Enter a new branch name following the format: `institutionId`
+4. Select "Create branch: ops/config-update from 'development'"
+
+### Step 2: Navigate to Configuration Files
+
+1. Navigate to the `src` folder
+2. Enter the `Operation` folder
+3. Locate the configuration files:
+   - `data.json`
+   - `metatags.json`
+
+### Step 3: Edit JSON Files
+
+1. Select the file you wish to edit (e.g., `data.json`)
+2. Click the pencil icon (Edit file) in the top right corner
+3. Make your desired changes
+4. Verify JSON validity:
+   - Watch for red squiggly lines indicating errors
+   - Address any validation issues before proceeding
+
+### Step 4: Commit Your Changes
+
+1. Scroll to the bottom of the page
+2. Provide a descriptive commit message:
    ```
-
-2. **🛠️ Build Configuration**
-   - Production: `REACT_APP_STAGE=PROD`
-   - Development: `REACT_APP_STAGE=DEV`
-
-3. **📤 Deployment Steps**
-   ```mermaid
-   graph LR
-       A[Code Checkout] --> B[Setup Node.js]
-       B --> C[Install Dependencies]
-       C --> D[Read Configs]
-       D --> E[Build React App]
-       E --> F[Deploy to S3]
-       F --> G[Invalidate CloudFront]
+   Update configuration: [Brief description]
+   - Changed X in data.json
    ```
+3. Ensure "Commit directly to the ops/config-update branch" is selected
+4. Click "Commit changes"
 
----
+### Step 5: Create a Pull Request
 
-## 👩‍💻 Development Guidelines
+1. Look for the notification about your recent changes
+2. Click "Compare & pull request"
+3. Verify:
+   - Base branch is set to `dev`
+   - Compare branch is your `institutionId` branch
+4. Add a detailed description of your changes
+5. Click "Create pull request"
 
-### Starting New Development
+## 🔍 Best Practices
 
-1. Create a new branch from appropriate base
-   ```bash
-   # For new feature in development
-   git checkout -b beta-dance/new-feature
-   
-   # For production fixes
-   git checkout -b dance/hotfix
-   ```
+### Branch Naming
+- Always include the `Operation/` prefix
+- Use descriptive names:
+  - `ops/update-meta-tags`
+  - `ops/modify-data-config`
 
-2. Work within the Development directory
-   ```bash
-   cd src/Development/
-   ```
+### JSON Editing
+- Utilize GitHub's built-in editor
+- Pay attention to red underlines indicating JSON errors
+- Review changes in preview mode before committing
 
-3. Test thoroughly before pushing
-   ```bash
-   yarn test
-   yarn build
-   ```
+### Commit Messages
+Structure your messages clearly:
+```
+Update configuration: [Brief description]
+- Changed X in data.json
+- Updated Y in metatags.json
 
-### Making Operational Changes
+```
 
-1. Navigate to Operation directory
-   ```bash
-   cd src/Operation/
-   ```
+## ⚠️ Important Notes
 
-2. Validate JSON before committing
-   ```bash
-   yarn validate-json
-   ```
+1. **Only** modify files in `src/Operation/`
+2. **Always** create branches from `dev`
+3. **Check** for JSON validation errors before committing
+4. **Never** commit directly to the development branch
 
----
+## 🆘 Need Help?
+
+- For technical issues: Contact the development team
+- For access issues: Contact your team lead
+- For GitHub navigation: Check GitHub's documentation
+
+## 🔄 Quick Reference
+
+1. Create branch from development
+2. Navigate to Operation folder
+3. Edit JSON files
+4. Commit changes
+5. Create pull request
+6. Await review
+
+Remember: The GitHub interface will help validate your JSON. If you see red squiggly lines, fix those errors before committing!
 
 ## 🔒 Security Best Practices
 
@@ -158,8 +205,15 @@ If deployment fails, follow these steps:
 2. **Verify Institution ID**
    ```json
    // Operation/data.json
+   // Should match expected format
    {
-     "institutionId": "dance123" // Should match expected format
+     "institutionId": "dance123"
+   
+    "s3BucketName": "beta.happyprancer.com",
+
+    "cloudFrontId": "E263LXOGXF3H0N",
+
+    "domain": "https://beta.happyprancer.com"
    }
    ```
 
