@@ -1,4 +1,3 @@
-// UsersList.jsx
 import React, { useState } from "react";
 import { useMediaQuery } from "../../../../utils/helpers";
 import UsersListMobile from "./moblie";
@@ -114,14 +113,16 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     }
   };
 
-  // Format date helper
   const formatDate = (epochDate) => {
+    if (!epochDate || isNaN(new Date(epochDate))) return "NA"; // Handle null, undefined, or invalid dates
+
     const date = new Date(epochDate);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
+
 
   // Sort functionality
   const requestSort = (key) => {
@@ -138,6 +139,28 @@ const UsersList = ({ userCheck, setUserCheck }) => {
 
   const handleSelectChange = (event) => {
     setSelectedOption(event.target.value);
+  };
+
+  //for profile pic
+  const getInitials = (name) => {
+    if (!name) return '';
+    const initials = name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
+    return initials;
+  };
+
+  const getColor = (name) => {
+    if (!name) return '#888888';
+    const colors = [
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF',
+      '#FF5733', '#33FF57', '#5733FF'
+    ];
+    const index = name.length % colors.length;
+    return colors[index];
   };
 
   const mobileProps = {
@@ -328,9 +351,10 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                       {/*  Email*/}
                       {/*</div>*/}
                       {/*<div className="w-[11%] font-sans ml-[0.5rem]">Phone</div>*/}
-                      <div className="w-[20%] font-sans">Joining Date</div>
-                      <div className="w-[20%] font-sans">Classes Attended</div>
-                      <div className="w-[8%] font-sans">
+                      <div className="w-[21%] font-sans">Joining Date</div>
+                      <div className="w-[20%] font-sans">Renew Date</div>
+                      <div className="w-[23%] font-sans">Classes Attended</div>
+                      <div className="w-[10%] font-sans">
                         Balance
                       </div>
                       <div></div>
@@ -376,16 +400,19 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                           >
                             <div className="flex justify-between w-[100%] items-center">
                               {/* Profile picture - shifted left and made circular */}
-                              <div className="w-[4%] h-8 flex justify-start items-center mr-3 rounded-full overflow-hidden">
+                              <div className="w-[4%] h-8 flex justify-start items-center mr-3">
                                 {user.imgUrl ? (
                                   <img
                                     src={user.imgUrl}
-                                    alt={user.userName?.charAt(0).toUpperCase()}
-                                    className="w-full h-full object-cover rounded-full"
+                                    alt={user.userName}
+                                    className="h-[35px] w-[35px] rounded-full object-cover"
                                   />
                                 ) : (
-                                  <div className="w-full h-full bg-primaryColor flex justify-center items-center text-white font-bold text-lg rounded-full">
-                                    {user.userName?.charAt(0).toUpperCase()}
+                                  <div
+                                    className="h-[35px] w-[35px] rounded-full flex items-center justify-center text-white text-sm font-medium"
+                                    style={{ backgroundColor: getColor(user.userName) }}
+                                  >
+                                    {getInitials(user.userName)}
                                   </div>
                                 )}
                               </div>
@@ -405,6 +432,9 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                               {/*</div>*/}
                               <div className="w-[12%] font-[400] font-sans">
                                 {formatDate(user.joiningDate)}
+                              </div>
+                              <div className="w-[12%] font-[400] font-sans text-center">
+                                {formatDate(user.renewDate)}
                               </div>
                               <div className="w-[15%] font-[400] font-sans overflow-hidden text-center mr-2">
                                 {/*{user.currentMonthZPoints*/}

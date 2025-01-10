@@ -605,7 +605,9 @@ const UpcomingSessionsMobile = () => {
           </div>
           {!attendanceList ? (
             <div>
-              <Streak count={count} setCount={setCount} />
+              {Ctx.userData.userType !== "admin" && (
+                <Streak count={count} setCount={setCount} />
+              )}
 
               <div
                 className={`grid gap-[1.4rem] md:gap-4 grid-cols-1 sm:grid-cols-2 mx-auto`}

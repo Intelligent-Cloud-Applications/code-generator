@@ -47,7 +47,7 @@ const Streak = () => {
         }}
       >
         <div className="flex flex-col">
-          <h2 className="stkm font-bold">Unleash Your Momentum:</h2>
+          <h2 className="stkm font-bold">Track Your Progress:</h2>
           <p className="mov">
           Keep the energy alive and rise higher with your performance and milstones
           </p>
