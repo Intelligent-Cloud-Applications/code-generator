@@ -1,116 +1,187 @@
 # Dance Studio Repository
-This repository contains the codebase for Dance Studio, a dynamic institution-based deployment system.
 
-## Repository Structure
-```
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+
+> An elegant solution for dynamic institution-based deployments, powered by AWS and React.
+
+---
+
+## 📁 Repository Structure
+
+The repository follows a clear separation of concerns with two main directories:
+
+```bash
 src/
-├── Development/     # All development work goes here
-└── Operation/      # Operational configurations and data
-    ├── data.json         # Institution-specific data
-    └── metatags.json     # Meta tags configuration
+├── Development/     # 💻 Development workspace 
+└── Operation/      # ⚙️ Operational configs
+    ├── data.json         # Institution data
+    └── metatags.json     # Meta configurations
 ```
 
-### Development Directory
-All new feature development, bug fixes, and improvements should be implemented in the Development directory. This separation ensures clean organization between operational configurations and actual development work.
+### 🔨 Development Directory (`src/Development/`)
 
-### Operation Directory
-The Operation directory contains configuration files that control deployment and institution-specific settings:
-- `data.json`: Contains institution-specific data including:
-  - `institutionId`: Unique identifier (e.g., "dance123")
-  - `cloudFrontId`: AWS CloudFront distribution ID
-  - Other institution-specific configurations
-- `metatags.json`: Contains metadata configurations for the application
+This is where all development work including:
+- New features
+- Bug fixes
+- Components
+- UI improvements
+- Business logic
 
-## Release Code Generation Process
-The following diagram illustrates the step-by-step process for generating release code:
+### ⚙️ Operation Directory (`src/Operation/`)
+
+Houses critical configuration files:
+
+#### `data.json`
+```json
+{
+    "institutionId": "happyprancer1234",          # The institutionId needs to be replaced here
+
+    "s3BucketName": "beta.happyprancer.com",      # The bucket name where the frontend of the institution is deployed
+
+    "cloudFrontId": "E263LXOGXF3H0N",             # The cloudfrontId attached with the particular institution
+
+    "domain": "https://beta.happyprancer.com"
+}
+```
+
+#### `metatags.json`
+```json
+{
+  // Meta configurations for SEO and display
+}
+```
+
+---
+
+## 🚀 Deployment Workflow
+
+Our sophisticated deployment pipeline automatically handles everything from build to delivery.
+
+### 🌳 Branch Strategy
 
 ```mermaid
-flowchart TD
-    A[Start: Open dev branch] --> B[Create new branch]
-    B --> C[Name branch with institutionId]
-    C --> D{Is it beta?}
-    D -->|Yes| E[Name: beta_institutionId]
-    D -->|No| F[Name: institutionId]
-    E --> G[Navigate to SRC->operation]
-    F --> G
-
-    subgraph data
-        H[Update data.json] --> I[Modify institutionId]
-        I --> J[Update S3 bucket name]
-        J --> K[Update Cloudfront]
-        K --> L[Update Domain name]
-    end
-
-    subgraph meta
-        M[Update metatags.json] --> N[Change Website title]
-        N --> O[Update Description]
-        O --> P[Update Keywords]
-        P --> Q[Update gtmId]
-    end
-
-    G --> H
-    L --> M
-    Q --> R[Push code]
-    R --> S[End]
-
-    style data fill:none
-    style meta fill:none
+graph TD
+    A[Main Branch] --> B[Production: institutionName]
+    A --> C[Development: beta-institutionName]
 ```
 
-## Deployment Workflow
-The repository uses GitHub Actions for automated deployments to AWS S3 and CloudFront. The workflow is triggered on every push to any branch.
+| Branch Type | Pattern | Example | Environment |
+|------------|---------|---------|-------------|
+| Production | `institutionName` | `dance` | `PROD` |
+| Development | `beta-institutionName` | `beta-dance` | `DEV` |
 
-### Workflow Details
-1. **Branch Detection**:
-   - Production branches: `institutionName` (e.g., "dance")
-   - Development branches: `beta-institutionName` (e.g., "beta-dance")
-2. **Environment Configuration**:
-   - Production branches deploy with `REACT_APP_STAGE=PROD`
-   - Beta branches deploy with `REACT_APP_STAGE=DEV`
-3. **Deployment Process**:
-   - Checks out the code
-   - Sets up Node.js environment
-   - Installs dependencies
-   - Reads configuration from Operation/data.json
-   - Determines deployment settings based on branch name
-   - Updates environment variables
-   - Builds the React application
-   - Deploys to AWS S3
-   - Invalidates CloudFront cache
+### 📦 Deployment Process
 
-### Deployment Destinations
-- **Production Branches**:
-  - S3 Bucket: `institutionName.com`
-  - Example: `dance.com`
-- **Beta Branches**:
-  - S3 Bucket: `beta.institutionName.com`
-  - Example: `beta.dance.com`
+1. **🔍 Branch Detection**
+   ```bash
+   # Production branch
+   dance → dance.com
+   
+   # Development branch
+   beta-dance → beta.dance.com
+   ```
 
-### Automatic Deployment Rules
-The workflow automatically determines whether to deploy based on the branch name:
-- If the branch name matches either `institutionName` or `beta-institutionName`, deployment proceeds
-- For other branch names, the deployment is skipped
+2. **🛠️ Build Configuration**
+   - Production: `REACT_APP_STAGE=PROD`
+   - Development: `REACT_APP_STAGE=DEV`
 
-## Development Guidelines
-1. **New Features**:
-   - All new development work should be done in the Development directory
-   - Create feature branches from the appropriate base branch
-2. **Operational Changes**:
-   - Updates to institution configurations should be made in the Operation directory
-   - Always validate JSON files before committing
-3. **Branch Naming**:
-   - Production: Use the institution name (e.g., "dance")
-   - Development: Prefix with "beta-" (e.g., "beta-dance")
+3. **📤 Deployment Steps**
+   ```mermaid
+   graph LR
+       A[Code Checkout] --> B[Setup Node.js]
+       B --> C[Install Dependencies]
+       C --> D[Read Configs]
+       D --> E[Build React App]
+       E --> F[Deploy to S3]
+       F --> G[Invalidate CloudFront]
+   ```
 
-## Security Note
-- Ensure all sensitive credentials are stored as GitHub Secrets
-- Never commit AWS credentials directly in the workflow file
-- Regularly rotate access keys and update GitHub Secrets accordingly
+---
 
-## Troubleshooting
-If deployment fails:
-1. Check the GitHub Actions logs
-2. Verify the institution ID format in data.json
-3. Ensure AWS credentials are properly configured
-4. Validate the S3 bucket names and permissions
-5. Check CloudFront distribution ID correctness
+## 👩‍💻 Development Guidelines
+
+### Starting New Development
+
+1. Create a new branch from appropriate base
+   ```bash
+   # For new feature in development
+   git checkout -b beta-dance/new-feature
+   
+   # For production fixes
+   git checkout -b dance/hotfix
+   ```
+
+2. Work within the Development directory
+   ```bash
+   cd src/Development/
+   ```
+
+3. Test thoroughly before pushing
+   ```bash
+   yarn test
+   yarn build
+   ```
+
+### Making Operational Changes
+
+1. Navigate to Operation directory
+   ```bash
+   cd src/Operation/
+   ```
+
+2. Validate JSON before committing
+   ```bash
+   yarn validate-json
+   ```
+
+---
+
+## 🔒 Security Best Practices
+
+- ✅ Use GitHub Secrets for credentials
+- ❌ Never commit AWS keys
+- 🔄 Rotate access keys regularly
+- 🛡️ Maintain least-privilege access
+
+---
+
+## ❗ Troubleshooting
+
+If deployment fails, follow these steps:
+
+1. **Check GitHub Actions Logs**
+   ```bash
+   # Look for specific error messages in the workflow run
+   ```
+
+2. **Verify Institution ID**
+   ```json
+   // Operation/data.json
+   {
+     "institutionId": "dance123" // Should match expected format
+   }
+   ```
+
+3. **Validate AWS Configuration**
+   - S3 bucket exists and is accessible
+   - CloudFront distribution ID is correct
+   - IAM permissions are properly set
+
+---
+
+## 🆘 Need Help?
+
+- 📝 Open an issue for bugs
+- 💡 Create a discussion for feature requests
+- 📧 Contact the DevOps team for deployment issues
+
+---
+
+## 📄 License
+
+This project is proprietary and confidential.
+
+---
+
+*Made with ❤️ by the Dance Studio Team*
