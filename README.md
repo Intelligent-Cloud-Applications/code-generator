@@ -126,41 +126,10 @@ As a member of the operations team, you'll be responsible for updating the follo
    ```
    Update configuration: [Brief description]
    - Changed X in data.json
+   - Updated Y in metatags.json
    ```
 3. Ensure "Commit directly to the ops/config-update branch" is selected
 4. Click "Commit changes"
-
-### Step 5: Create a Pull Request
-
-1. Look for the notification about your recent changes
-2. Click "Compare & pull request"
-3. Verify:
-   - Base branch is set to `dev`
-   - Compare branch is your `institutionId` branch
-4. Add a detailed description of your changes
-5. Click "Create pull request"
-
-## 🔍 Best Practices
-
-### Branch Naming
-- Always include the `Operation/` prefix
-- Use descriptive names:
-  - `ops/update-meta-tags`
-  - `ops/modify-data-config`
-
-### JSON Editing
-- Utilize GitHub's built-in editor
-- Pay attention to red underlines indicating JSON errors
-- Review changes in preview mode before committing
-
-### Commit Messages
-Structure your messages clearly:
-```
-Update configuration: [Brief description]
-- Changed X in data.json
-- Updated Y in metatags.json
-
-```
 
 ## ⚠️ Important Notes
 
@@ -181,8 +150,6 @@ Update configuration: [Brief description]
 2. Navigate to Operation folder
 3. Edit JSON files
 4. Commit changes
-5. Create pull request
-6. Await review
 
 Remember: The GitHub interface will help validate your JSON. If you see red squiggly lines, fix those errors before committing!
 
