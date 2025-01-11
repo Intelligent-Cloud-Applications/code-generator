@@ -93,6 +93,8 @@ As a member of the operations team, you'll be responsible for updating the follo
 
 ## 🚀 Making Configuration Changes in GitHub
 
+![operational](https://github.com/user-attachments/assets/d2a705a4-4c1b-4a32-809d-36aca47dded3)
+
 ### Step 1: Create a New Branch
 
 1. Navigate to the repository on GitHub
