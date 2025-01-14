@@ -61,7 +61,7 @@ const UpcomingSessions = () => {
   );
   const isMobileScreen = useMediaQuery("(max-width: 600px)");
   const Navigate = useNavigate();
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(Ctx.upcomingClasses.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -880,16 +880,16 @@ const UpcomingSessions = () => {
                 {!attendanceList && (
                   <li className="w-full px-4 md:px-8 py-2">
                     <div
-                      className={`hidden md:grid gap-2 font-bold ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
-                          ? 'md:grid-cols-6'
-                          : 'md:grid-cols-5'
+                      className={`hidden md:grid gap-4 font-bold ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
+                          ? 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr]'
+                          : 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr]'
                         }`}
                     >
                       <div className="text-center">Date</div>
                       <div className="text-center">Instructor</div>
                       <div className="text-center">Description</div>
                       <div className="text-center">Time</div>
-                      <div className="text-center">
+                      <div className="text-center w-[80px]">
                         {sortedFilteredClasses[0]?.zoomLink ? 'Join' : 'Attendance'}
                       </div>
                       {(Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor') && (
@@ -922,9 +922,9 @@ const UpcomingSessions = () => {
                             className={`w-full ${editingIndex === i ? 'bg-[#fdd00823]' : ''}`}
                           >
                             <div
-                              className={`flex flex-col md:grid gap-2 py-2 items-center ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
-                                  ? 'md:grid-cols-6'
-                                  : 'md:grid-cols-5'
+                              className={`flex flex-col md:grid gap-4 py-2 items-center ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
+                                  ? 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr]'
+                                  : 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr]'
                                 }`}
                             >
                               {/* Mobile Labels + Values */}
@@ -1066,9 +1066,9 @@ const UpcomingSessions = () => {
                                 )}
                               </div>
 
-                              <div className="w-full">
+                              <div className="w-[80px] flex justify-center items-center">
                                 <button
-                                  className="w-full h-10 text-white rounded transition-colors duration-200 text-sm"
+                                  className="px-2 py-1 text-white rounded transition-colors duration-200 text-sm"
                                   onClick={() => {
                                     if (clas.zoomLink) {
                                       if (UserCtx.userData.userType === 'member') {
