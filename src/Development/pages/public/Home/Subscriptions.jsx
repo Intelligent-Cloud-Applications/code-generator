@@ -130,7 +130,7 @@ const Subscription = () => {
   return (
     <div
       id="subscription-section"
-      className={`text-[1.5rem] flex flex-col items-center justify-center gap-[5rem] my-8 `}
+      className={`text-[1.5rem] flex flex-col items-center justify-center gap-[5rem] `}
       style={{
         backgroundImage: bgInView
           ? `url(${InstitutionData.SubscriptionBg})`
@@ -146,7 +146,7 @@ const Subscription = () => {
         <h1
           className="text-[3rem] max850:text-[1.5rem] font-[700] max800:px-3"
           style={{
-            color: "black",
+            color: bgInView ? "white" : "black",
             fontWeight: "bold",
           }}
         >
@@ -155,7 +155,7 @@ const Subscription = () => {
         <h3
           className="text-[1rem] mt-2 max850:text-[.7rem] font-[600]"
           style={{
-            color: "black",
+            color: bgInView ? "white" : "black",
           }}
         >
           See the pricing details below
