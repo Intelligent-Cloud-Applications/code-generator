@@ -31,7 +31,7 @@ export default function Query() {
 
     console.log(name, email, phoneNumber, message);
 
-    if(!name || !email || !phoneNumber || !message){
+    if (!name || !email || !phoneNumber || !message) {
       UtilCtx.setLoader(false);
       return toast.error("All fields are required");
     }
@@ -99,7 +99,7 @@ export default function Query() {
               </span>
               <div className={`text-[0.9rem] sans-sarif text-white`}>
                 {" "}
-                [] Already a Customer or need help ?{" "}
+                Already a Customer or need help ?{" "}
               </div>
               <div className={`flex text-white text-[0.8rem] flex-col`}>
                 <span
@@ -115,84 +115,71 @@ export default function Query() {
                 </a>
               </div>
             </div>
-            <div
-              className={`border-[#9d9d9d78] border-[1px] bg-black my-8 max850:hidden`}
-            ></div>
-            <div
-              className={`sans-sarif flex flex-col items-center gap-10 py-4`}
-            >
-              <h3 className="max500:mr-14">FILL IT UP!</h3>
-              <form onSubmit={onSubmit} className={`flex flex-col gap-8 items-center`}>
-                <ul
-                  className={`w-[25rem] flex flex-col items-center gap-6 max500:w-[70vw]`}
-                >
-                  <li
-                    className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
-                  >
-                    <label for="name" className='font-bold'>Name</label>
-                    <input
-                      id="name"
-                      name="name"
-                      type="text"
-                      pattern="[A-Za-z ]+"
-                      title="Name can only have characters and spaces"
-                      className={`rounded-md py-[0.4rem] px-2 max500:w-[100%] bg-[#d9d9d980]`}
-                      // value={name}
-                      // onChange={(e) => {
-                      //   setName(e.target.value);
-                      // }}
-                      required
-                    />
-                  </li>
-                  <li
-                    className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
-                  >
-                    <label className='font-bold'>Email</label>
+            <div className={`border-[#9d9d9d78] border-[1px] bg-black my-8 max850:hidden`}></div>
+            <div className={`sans-sarif flex flex-col items-center gap-10 py-4`}>
+              <h3 className="max500:mr-14 font-bold">FILL IT UP!</h3>
+              <form onSubmit={onSubmit} className={`flex flex-col gap-8 items-center w-full`}>
+                <div className={`w-[25rem] flex flex-col gap-6 max500:w-[70vw]`}>
+                  {/* Name and Phone Number row */}
+                  <div className={`grid grid-cols-2 gap-4 w-full max500:grid-cols-1`}>
+                    {/* Name Input */}
+                    <div className="flex flex-col gap-2">
+                      <label htmlFor="name" className="font-bold">
+                        Name
+                      </label>
+                      <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        pattern="[A-Za-z ]+"
+                        title="Name can only have characters and spaces"
+                        className={`rounded-md border border-black py-[0.4rem] px-2 bg-[#d9d9d980] w-full`}
+                        required
+                      />
+                    </div>
+                    {/* Phone Number Input */}
+                    <div className="flex flex-col gap-2">
+                      <label htmlFor="phoneNumber" className="font-bold">
+                        Phone Number
+                      </label>
+                      <input
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        pattern="[0-9]{9,10}"
+                        title="Phone number can only be 9 or 10 numbers."
+                        className={`rounded-md border border-black py-[0.4rem] px-2 bg-[#d9d9d980] w-full`}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email Input */}
+                  <div className="flex flex-col gap-2 w-full">
+                    <label htmlFor="email" className="font-bold">
+                      Email
+                    </label>
                     <input
                       id="email"
                       name="email"
                       type="email"
-                      className={`rounded-md py-[0.4rem] px-2 max500:w-[100%] bg-[#d9d9d980]`}
-                      // value={email}
-                      // onChange={(e) => {
-                      //   setEmail(e.target.value);
-                      // }}
+                      className={`rounded-md border border-black py-[0.4rem] px-2 bg-[#d9d9d980] w-full`}
                       required
                     />
-                  </li>
-                  <li
-                    className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
-                  >
-                    <label className='font-bold'>Phone Number</label>
-                    <input
-                      id="phoneNumber"
-                      name="phoneNumber"
-                      className={`rounded-md py-[0.4rem] px-2 max500:w-[100%] bg-[#d9d9d980]`}
-                      // value={phoneNumber}
-                      // onChange={(e) => {
-                      //   setPhoneNumber(e.target.value);
-                      // }}
-                      pattern="[0-9]{9,10}"
-                      title="Phone number can only be 9 or 10 numbers."
-                      required
-                    />
-                  </li>
-                  <li
-                    className={`flex gap-4 items-center justify-between w-[23rem] max500:flex-col max500:gap-1 max500:items-start max500:w-[90%] max500:mr-20`}
-                  >
-                    <label for="message" className='font-bold'>Message</label>
+                  </div>
+
+                  {/* Message Input */}
+                  <div className="flex flex-col gap-2 w-full">
+                    <label htmlFor="message" className="font-bold">
+                      Message
+                    </label>
                     <textarea
                       id="message"
                       name="message"
-                      className={`rounded-md py-[0.4rem] px-2 h-[8rem] max500:w-[100%] bg-[#d9d9d980]`}
-                      // value={message}
-                      // onChange={(e) => {
-                      //   setMessage(e.target.value);
-                      // }}
+                      className={`rounded-md border border-black py-[0.4rem] px-2 h-32 bg-[#d9d9d980] w-full`}
                       required
                     />
-                  </li>
-                </ul>
+                  </div>
+                </div>
                 <Button2
                   data={"Submit"}
                   // fn={onSubmit}
