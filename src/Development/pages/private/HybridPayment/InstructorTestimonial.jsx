@@ -241,19 +241,26 @@ const InstructorTestimonial = () => {
     return (
       <>
         <div className="my-12 w-[287px] md:w-11/12 md:max-w-[980px] mx-auto md:h-[450px] h-[333px] ">
-          <div className="w-[287px] md:w-full -left-1 relative h-full">
-            <div className="relative md:w-full w-[284px]">
-              <div className="border border-gray-200 absolute w-[310px] md:w-full md:h-[27rem] h-[330px] top-0 left-0 bg-neutral-50 rounded-[21.77px] shadow-[0px_85.26px_181.4px_#15151526]" />
-              <RiDoubleQuotesL className="relative text-8xl text-slate-500 bottom-8 -left-4 h-12 w-16" />
+          <div className=" md:w-full w-full relative h-full">
+            <div className="relative md:w-full w-full flex flex-col  ">
+              <div className="border border-gray-200  absolute w-[310px] md:w-full md:h-[27rem] h-[530px]  top-0 left-0 bg-neutral-50 rounded-[21.77px] shadow-[0px_85.26px_181.4px_#15151526]" />
+              <RiDoubleQuotesL className="relative z-10 text-8xl text-slate-500 bottom-8 -left-4 h-12 w-16" />
 
-              <img
-                className="absolute w-[3.188rem] h-[5.78rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-8 right-0 object-cover rounded-md"
-                alt="Unsplash ww"
-                src={imgUrl}
-              />
 
+              <div className="w-full">
+            {
+              imgUrl && (
+                <img
+                  className="absolute h-[15rem] w-[90%] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-24 right-0 object-cover rounded-md"
+                  alt="Profile"
+                  src={imgUrl}
+                />
+              )
+            }
+
+                
               {!imagePresent === true && (
-                <div className="absolute w-[3.188rem] h-[5.78rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-8 right-0 object-cover rounded-md bg-gray-300">
+                <div className="absolute w-[90%] h-[15rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-24 right-0 object-cover rounded-md bg-gray-300">
                   <div className="flex items-center justify-center h-full">
                     <p className="text-[3rem] font-bold text-gray-700">
                       <span className="text-[1.5rem] font-bold text-gray-700">
@@ -268,7 +275,7 @@ const InstructorTestimonial = () => {
                 </div>
               )}
 
-              <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-14 left-4">
+              <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-36 md:-bottom-14 left-4">
                 <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[20px] md:text-[29px] relative w-fit tracking-[0] leading-[normal]">
                   {/* Instructor Name */}
                   <p className="text-3xl font-bold md:font-extrabold text-gray-900 md:text-4xl ">
@@ -289,7 +296,7 @@ const InstructorTestimonial = () => {
                 UserCtx.cognitoId ===
                   instructor?.instructorProfile?.cognitoId && (
                   <div
-                    className={`flex justify-end md:justify-center mb-6 absolute top-16 right-0 md:right-[50%] lg:right-[50%] md:top-20 lg:top-20`}
+                    className={`flex justify-end md:justify-center mb-6 absolute top-[12rem] right-0 md:right-[50%] lg:right-[50%] md:top-20 lg:top-20`}
                   >
                     <button
                       className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center h-10"
@@ -302,12 +309,12 @@ const InstructorTestimonial = () => {
 
               {instructor && (
                 <div className="mb-8">
-                  <div className="min-w-full">
+                  <div className="min-w-full ">
                     {!editing ? (
                       <p
                         className={`mt-5 absolute w-full
                           max-w-[461px] md:max950:max-w-[320px]
-                        top-28 left-4 text-black text-left md:first-letter:text-3xl md:tracking-wide overflow-scroll h-36 md:h-40 lg:h-60 rounded-lg  text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none `}
+                        top-48 md:top-28 left-4 text-black text-left md:first-letter:text-3xl md:tracking-wide overflow-hidden h-60 rounded-lg  text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none `}
                       >
                         <AboutInstructor
                           aboutText={
@@ -317,11 +324,11 @@ const InstructorTestimonial = () => {
                         />
                       </p>
                     ) : (
-                      <div className="relative -top-12 md:top-0">
+                      <div className="relative top-20 md:top-0">
                         <textarea
                           className={`mt-2 absolute w-full 
                             max-w-[461px] max950:max-w-[322px]
-                         top-28 left-4 h-36 md:h-40 bg-gray-100 border border-gray-300 rounded-lg p-4 text-gray-700 text-base md:text-lg  focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none box-border`}
+                         top-28 left-4 h-48 md:h-40 bg-gray-100 border border-gray-300 rounded-lg p-4 text-gray-700 text-base md:text-lg  focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none box-border`}
                           onChange={(e) => setAbout(e.target.value)}
                           value={about}
                           maxLength={300}
@@ -331,7 +338,7 @@ const InstructorTestimonial = () => {
                           isAuth &&
                           UserCtx.cognitoId ===
                             instructor?.instructorProfile?.cognitoId && (
-                            <div className="flex justify-start space-x-4 mt-6 absolute top-[16rem] left-[2rem] md:top-[17rem] md:left-[6rem]">
+                            <div className="flex justify-start space-x-4 mt-6 absolute top-[19rem] left-[2rem] md:top-[17rem] md:left-[6rem]">
                               <button
                                 className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center"
                                 onClick={() => setEditing(false)}
@@ -352,6 +359,8 @@ const InstructorTestimonial = () => {
                   </div>
                 </div>
               )}
+              </div>
+
             </div>
           </div>
         </div>

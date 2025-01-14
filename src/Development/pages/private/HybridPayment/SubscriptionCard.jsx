@@ -125,10 +125,14 @@ const SubscriptionCard = () => {
         </p>
       </div>
       <div className="flex flex-row gap-8 justify-center items-center flex-wrap max850:!flex-col max-w-[90vw] mx-auto">
+        {console.log(products)}
         {products.map(
           (item, i) =>
-            //  This will render the card only if the index is 1
-            i === 1 && (
+            { 
+              // When locationData.countryCode is IN then to show card with index 1 or else with index 0
+              return (
+              locationData?.countryCode === "IN" ? i === 1 : i === 0) && (
+
               <div
                 key={i}
                 className="min-h-[528px] card-color w-[300px] max850:w-[300px] text-white rounded-lg shadow-lg px-2"
@@ -161,24 +165,22 @@ const SubscriptionCard = () => {
                   {/* Description List */}
                   <ul className="my-7 space-y-5 text-center min-h-[12rem]">
                     {item.currency === "INR" ? (
-                      <li className="text-lg font-normal text-white">
-                        <div>₹1000 for Monthly.</div>
-                        <div>Instructors:Certified Zumba & BWORKZ</div>
-                        <div>
-                          Plan: 40+ Monthly Online andin-person Dance Fitness
-                          Classes
-                        </div>
+                      item.provides.map((provide, j) => (
+                      <li key={`${item.productId}-provide-${j}`} className="text-lg font-normal text-white">
+                        <div>{provide}</div>
                       </li>
+                    )
+                  )
                     ) : (
-                      <li className="text-lg font-normal text-white">
-                        <div>$12 for Monthly.</div>
-                        <div>Instructors:Certified Zumba & BWORKZ</div>
-                        <div>
-                          Plan: 40+ Monthly Online andin-person Dance Fitness
-                          Classes
-                        </div>
+                    //  Other Countries
+                    item.provides.map((provide, j) => (
+                      <li key={`${item.productId}-provide-${j}`} className="text-lg font-normal text-white">
+                        <div>{provide}</div>
                       </li>
-                    )}
+                    )
+
+                    ))}
+                    
                   </ul>
                   <div className="border border-gray-500 w-3/4 mx-auto mb-2"></div>
 
@@ -197,8 +199,11 @@ const SubscriptionCard = () => {
                   </button>
                 </div>
               </div>
-            )
-        )}
+              )
+            }
+            )}
+
+        
       </div>
     </>
   );

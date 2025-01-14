@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 
-const EditableTextArea = ({ label, value, onChange,placeholder,minimumHeight }) => {
+const EditableTextArea = ({ label, value, onChange,placeholder,minimumHeight,maxLength }) => {
   const [isEditable, setIsEditable] = useState(false);
   const inputRef = useRef(null);
 
@@ -23,6 +23,8 @@ const EditableTextArea = ({ label, value, onChange,placeholder,minimumHeight }) 
         placeholder={"Enter your address here"}
         readOnly={!isEditable}
         onChange={onChange}
+        // if max length is there use maxLength else it can be any length
+        maxLength={maxLength ? maxLength : 1000}
         onBlur={() => setIsEditable(false)}
       />
       <FaPencilAlt

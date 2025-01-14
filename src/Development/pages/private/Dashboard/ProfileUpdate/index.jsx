@@ -609,6 +609,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                         type={"text"}
                         className=" bg-inputBgColor min-w-full rounded-lg pl-4 py-2 "
                         minimumHeight={"min-h-28"}
+                        maxLength={300}
                         value={about}
                         onChange={(e) => setAbout(e.target.value)}
                       />
