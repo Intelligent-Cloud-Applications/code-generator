@@ -107,8 +107,8 @@ const UpcomingSessions = () => {
 
   const getInstructor = (name) => {
     Ctx.instructorList.push({
-      name: "Cancelled",
-      instructorId: "Cancelled",
+      name: "Canceled",
+      instructorId: "Canceled",
     });
     return Ctx.instructorList.find(
       (i) => i.name?.toString().trim() === name?.toString().trim()
@@ -881,8 +881,8 @@ const UpcomingSessions = () => {
                   <li className="w-full px-4 md:px-8 py-2">
                     <div
                       className={`hidden md:grid gap-4 font-bold ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
-                          ? 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr]'
-                          : 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr]'
+                        ? 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr]'
+                        : 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr]'
                         }`}
                     >
                       <div className="text-center">Date</div>
@@ -923,8 +923,8 @@ const UpcomingSessions = () => {
                           >
                             <div
                               className={`flex flex-col md:grid gap-4 py-2 items-center ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
-                                  ? 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr]'
-                                  : 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr]'
+                                ? 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr]'
+                                : 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr]'
                                 }`}
                             >
                               {/* Mobile Labels + Values */}
@@ -960,44 +960,38 @@ const UpcomingSessions = () => {
                               <div className="hidden md:block w-full">
                                 {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
                                   <select
-                                    className="w-full h-10 px-2 rounded focus:outline-none focus:border-blue-500 text-sm"
-                                    style={{
-                                      backgroundColor: InstitutionData.LightestPrimaryColor,
-                                    }}
-                                    value={getInstructor(clas.instructorNames)?.name}
-                                    onChange={(e) => {
-                                      if (e.target.value === 'Cancelled') {
-                                        onClassUpdated(
-                                          clas.classId,
-                                          'Cancelled',
-                                          clas.classType,
-                                          'Cancelled',
-                                          clas.date
-                                        );
-                                      } else {
-                                        const instructor = getInstructor(e.target.value);
-                                        onClassUpdated(
-                                          clas.classId,
-                                          instructor.name,
-                                          clas.classType,
-                                          instructor.instructorId,
-                                          clas.date
-                                        );
-                                      }
-                                    }}
-                                  >
-                                    {Ctx.instructorList
-                                      .sort((a, b) => a.name.localeCompare(b.name))
-                                      .map(
-                                        (i) =>
-                                          i.name !== 'Cancelled' && (
-                                            <option key={i.name} value={i.name}>
-                                              {i.name}
-                                            </option>
-                                          )
-                                      )}
-                                    <option value="Cancelled">Cancelled</option>
-                                  </select>
+                                  className="w-full h-10 px-2 rounded focus:outline-none focus:border-blue-500 text-sm"
+                                  style={{
+                                    backgroundColor: InstitutionData.LightestPrimaryColor,
+                                  }}
+                                  value={getInstructor(clas.instructorNames)?.name}
+                                  onChange={(e) => {
+                                    onClassUpdated(
+                                      clas.classId,
+                                      getInstructor(e.target.value).name,
+                                      clas.classType,
+                                      getInstructor(e.target.value).instructorId,
+                                      clas.date
+                                    );
+                                  }}
+                                >
+                                  {Ctx.instructorList
+                                    .sort((a, b) => {
+                                      if (a.name < b.name) return -1;
+                                      if (a.name > b.name) return 1;
+                                      return 0;
+                                    })
+                                    .map((i) =>
+                                      i.name !== "Cancelled" && (
+                                        <option
+                                          key={i.name}
+                                          value={i.name}
+                                        >
+                                          {i.name}
+                                        </option>
+                                      )
+                                    )}
+                                </select>
                                 ) : (
                                   <p
                                     className="h-10 flex items-center justify-center rounded border border-gray-300 text-md"

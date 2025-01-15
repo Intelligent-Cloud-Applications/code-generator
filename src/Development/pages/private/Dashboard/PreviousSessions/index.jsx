@@ -614,8 +614,7 @@ const PreviousSessions = () => {
                                 <select
                                   className={`rounded-[0.51rem] pr-[1.5rem] pl-[0rem]`}
                                   style={{
-                                    backgroundColor:
-                                      InstitutionData.LightestPrimaryColor,
+                                    backgroundColor: InstitutionData.LightestPrimaryColor,
                                   }}
                                   value={clas.instructorNames}
                                   onChange={(e) =>
@@ -628,34 +627,21 @@ const PreviousSessions = () => {
                                   }
                                 >
                                   {Ctx.instructorList
-                                    .sort(function (a, b) {
-                                      if (a.name < b.name) {
-                                        return -1;
-                                      }
-                                      if (a.name > b.name) {
-                                        return 1;
-                                      }
+                                    .sort((a, b) => {
+                                      if (a.name < b.name) return -1;
+                                      if (a.name > b.name) return 1;
                                       return 0;
                                     })
-                                    .map(
-                                      (i) =>
-                                        i.name !== "cancelled" && (
-                                          <option
-                                            key={i.name}
-                                            value={i.name}
-                                            onChange={(e) => { }}
-                                          >
-                                            {i.name}
-                                          </option>
-                                        )
+                                    .map((i) =>
+                                      i.name !== "cancelled" && (
+                                        <option
+                                          key={i.name}
+                                          value={i.name}
+                                        >
+                                          {i.name}
+                                        </option>
+                                      )
                                     )}
-                                  <option
-                                    key="cancelled"
-                                    value="cancelled"
-                                    onChange={(e) => { }}
-                                  >
-                                    cancelled
-                                  </option>
                                 </select>
                               ) : (
                                 clas.instructorNames
