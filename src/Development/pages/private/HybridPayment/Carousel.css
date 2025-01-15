@@ -95,6 +95,7 @@
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
+  margin-top: 110px;
   box-shadow: rgba(9, 87, 231, 0.16) 0px 10px 36px 0px, rgba(5, 178, 209, 0.06) 0px 0px 0px 1px;
   transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
@@ -147,4 +148,11 @@
 .free-demo:active {
   transform: translateY(2px);
 
+}
+
+@media screen and (min-width: 768px) {
+  .free-demo {
+    margin-top: 0px;
+  }
+  
 }
