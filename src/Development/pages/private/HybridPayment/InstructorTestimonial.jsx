@@ -244,123 +244,118 @@ const InstructorTestimonial = () => {
           <div className=" md:w-full w-full relative h-full">
             <div className="relative md:w-full w-full flex flex-col  ">
               <div className="border border-gray-200  absolute w-[310px] md:w-full md:h-[27rem] h-[530px]  top-0 left-0 bg-neutral-50 rounded-[21.77px] shadow-[0px_85.26px_181.4px_#15151526]" />
-              <RiDoubleQuotesL className="relative z-10 text-8xl text-slate-500 bottom-8 -left-4 h-12 w-16" />
-
+              <RiDoubleQuotesL className="relative z-10 text-8xl text-slate-500 bottom-8 -left-4 h-12 w-16 hidden md:block" />
 
               <div className="w-full">
-            {
-              imgUrl && (
-                <img
-                  className="absolute h-[15rem] w-[90%] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-24 right-0 object-cover rounded-md"
-                  alt="Profile"
-                  src={imgUrl}
-                />
-              )
-            }
+                {imgUrl && (
+                  <img
+                    className="absolute h-[15rem] w-[90%] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-24 right-0 object-cover rounded-md"
+                    alt="Profile"
+                    src={imgUrl}
+                  />
+                )}
 
-                
-              {!imagePresent === true && (
-                <div className="absolute w-[90%] h-[15rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-24 right-0 object-cover rounded-md bg-gray-300">
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-[3rem] font-bold text-gray-700">
-                      <span className="text-[1.5rem] font-bold text-gray-700">
-                        {getInitials(
-                          instructor?.instructorProfile?.userName ||
-                            instructor?.referralCode ||
-                            instructor?.name
-                        )}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-36 md:-bottom-14 left-4">
-                <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[20px] md:text-[29px] relative w-fit tracking-[0] leading-[normal]">
-                  {/* Instructor Name */}
-                  <p className="text-3xl font-bold md:font-extrabold text-gray-900 md:text-4xl ">
-                    {capitalizeWords(instructor?.name) ||
-                      capitalizeWords(
-                        instructor?.instructorProfile?.userName
-                      ) ||
-                      capitalizeWords(instructor?.referralCode)}
-                  </p>
-
-                  <p className="text-lg font-medium text-gray-500 md:text-xl">
-                    {institution}
-                  </p>
-                </div>
-              </div>
-
-              {isAuth &&
-                UserCtx.cognitoId ===
-                  instructor?.instructorProfile?.cognitoId && (
-                  <div
-                    className={`flex justify-end md:justify-center mb-6 absolute top-[12rem] right-0 md:right-[50%] lg:right-[50%] md:top-20 lg:top-20`}
-                  >
-                    <button
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center h-10"
-                      onClick={() => setEditing(true)}
-                    >
-                      <FaPencilAlt className="inline mr-2" />
-                    </button>
+                {!imagePresent === true && (
+                  <div className="absolute w-[90%] h-[15rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-24 right-0 object-cover rounded-md bg-gray-300">
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-[3rem] font-bold text-gray-700">
+                        <span className="text-[1.5rem] font-bold text-gray-700">
+                          {getInitials(
+                            instructor?.instructorProfile?.userName ||
+                              instructor?.referralCode ||
+                              instructor?.name
+                          )}
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 )}
 
-              {instructor && (
-                <div className="mb-8">
-                  <div className="min-w-full ">
-                    {!editing ? (
-                      <p
-                        className={`mt-5 absolute w-full
-                          max-w-[461px] md:max950:max-w-[320px]
-                        top-48 md:top-28 left-4 text-black text-left md:first-letter:text-3xl md:tracking-wide overflow-hidden h-60 rounded-lg  text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none `}
-                      >
-                        <AboutInstructor
-                          aboutText={
-                            instructor?.instructorProfile?.about?.trim() ||
-                            "No bio available."
-                          }
-                        />
-                      </p>
-                    ) : (
-                      <div className="relative top-20 md:top-0">
-                        <textarea
-                          className={`mt-2 absolute w-full 
-                            max-w-[461px] max950:max-w-[322px]
-                         top-28 left-4 h-48 md:h-40 bg-gray-100 border border-gray-300 rounded-lg p-4 text-gray-700 text-base md:text-lg  focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none box-border`}
-                          onChange={(e) => setAbout(e.target.value)}
-                          value={about}
-                          maxLength={300}
-                          placeholder="Write something about yourself..."
-                        />
-                        {editing &&
-                          isAuth &&
-                          UserCtx.cognitoId ===
-                            instructor?.instructorProfile?.cognitoId && (
-                            <div className="flex justify-start space-x-4 mt-6 absolute top-[19rem] left-[2rem] md:top-[17rem] md:left-[6rem]">
-                              <button
-                                className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center"
-                                onClick={() => setEditing(false)}
-                              >
-                                <FaRegWindowClose className="inline mr-2" />{" "}
-                                Cancel
-                              </button>
-                              <button
-                                className="bg-gradient-to-r bg-lightPrimaryColor hover:bg-primaryColor text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center"
-                                onClick={() => onProfileUpdate(about)}
-                              >
-                                <FaRegSave className="inline mr-2" /> Save
-                              </button>
-                            </div>
-                          )}
-                      </div>
-                    )}
+                <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-52 md:-bottom-14 left-4">
+                  <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[20px] md:text-[29px] relative w-fit tracking-[0] leading-[normal]">
+                    {/* Instructor Name */}
+                    <p className="text-3xl font-bold md:font-extrabold text-gray-900 md:text-4xl ">
+                      {capitalizeWords(instructor?.name) ||
+                        capitalizeWords(
+                          instructor?.instructorProfile?.userName
+                        ) ||
+                        capitalizeWords(instructor?.referralCode)}
+                    </p>
+
+                    <p className="text-lg font-medium text-gray-500 md:text-xl">
+                      {institution}
+                    </p>
                   </div>
                 </div>
-              )}
-              </div>
 
+                {isAuth &&
+                  UserCtx.cognitoId ===
+                    instructor?.instructorProfile?.cognitoId && (
+                    <div
+                      className={`flex justify-end md:justify-center mb-6 absolute top-[12rem] right-0 md:right-[50%] lg:right-[50%] md:top-20 lg:top-20`}
+                    >
+                      <button
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center h-10"
+                        onClick={() => setEditing(true)}
+                      >
+                        <FaPencilAlt className="inline mr-2" />
+                      </button>
+                    </div>
+                  )}
+
+                {instructor && (
+                  <div className="mb-8">
+                    <div className="min-w-full ">
+                      {!editing ? (
+                        <p
+                          className={`mt-5 absolute w-full
+                          max-w-[461px] md:max950:max-w-[320px]
+                        top-48 md:top-28 left-4 text-black text-left md:first-letter:text-3xl md:tracking-wide overflow-hidden h-60 rounded-lg  text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none `}
+                        >
+                          <AboutInstructor
+                            aboutText={
+                              instructor?.instructorProfile?.about?.trim() ||
+                              "No bio available."
+                            }
+                          />
+                        </p>
+                      ) : (
+                        <div className="relative top-32 md:top-0">
+                          <textarea
+                            className={`mt-2 absolute w-full 
+                            max-w-[461px] max950:max-w-[322px]
+                         top-28 left-4 h-48 md:h-40 bg-gray-100 border border-gray-300 rounded-lg p-4 text-gray-700 text-base md:text-lg  focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none box-border`}
+                            onChange={(e) => setAbout(e.target.value)}
+                            value={about}
+                            maxLength={300}
+                            placeholder="Write something about yourself..."
+                          />
+                          {editing &&
+                            isAuth &&
+                            UserCtx.cognitoId ===
+                              instructor?.instructorProfile?.cognitoId && (
+                              <div className="flex justify-start space-x-4 mt-6 absolute top-[19rem] left-[2rem] md:top-[17rem] md:left-[6rem]">
+                                <button
+                                  className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center"
+                                  onClick={() => setEditing(false)}
+                                >
+                                  <FaRegWindowClose className="inline mr-2" />{" "}
+                                  Cancel
+                                </button>
+                                <button
+                                  className="bg-gradient-to-r bg-lightPrimaryColor hover:bg-primaryColor text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center"
+                                  onClick={() => onProfileUpdate(about)}
+                                >
+                                  <FaRegSave className="inline mr-2" /> Save
+                                </button>
+                              </div>
+                            )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
