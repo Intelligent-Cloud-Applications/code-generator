@@ -1,8 +1,10 @@
-import { useRef, useState } from "react";
+import { useRef, useState,useContext } from "react";
 import { GrFormPrevious } from "react-icons/gr";
 import { MdNavigateNext } from "react-icons/md";
+import InstitutionContext from "../../../Context/InstitutionContext";
 import "./SubscriptionCard.css";
 const Testemonial = () => {
+  const InstitutionData = useContext(InstitutionContext).institutionData;
   const dataRef = useRef([
     {
       description: `Online training provides a great alternative to traditional gyms, especially for beginners. Dance makes workouts fun and expressive, and HappyPrancers delivers an outstanding experience with skilled, motivating trainers. Suitable for all levels, it’s been a fantastic journey—thank you, HappyPrancers!`,
@@ -47,53 +49,52 @@ const Testemonial = () => {
         </p>
       </div>
 
-<div className="bg-gradient-to-b from-white to-gray-50 shadow-xl rounded-2xl p-8 h-auto overflow-hidden w-[90%] md:w-3/4 lg:w-1/3 min-w-[90%] md:min-w-[36rem] lg:min-w-[46rem] mx-auto mt-10 border border-gray-200 min-h-[366px] relative">
-  <div className="grid grid-cols-1 gap-6 lg:gap-10 items-start">
-    {/* Text Content */}
-    <div>
-      <div className="mb-6 flex items-center justify-between space-x-4">
-        <p className="text-3xl font-extrabold text-gray-900 md:text-4xl leading-tight">
-          {data[currentIndex].name}
-        </p>
-        {/* Image Content */}
-        <div>
-          <img
-            src={data[currentIndex].image}
-            alt={data[currentIndex].name}
-            className="w-[70px] h-[70px] md:w-[100px] md:h-[100px] object-cover rounded-full shadow-lg"
-          />
+      <div className="bg-gradient-to-b from-white to-gray-50 shadow-xl rounded-2xl p-8 h-auto overflow-hidden w-[90%] md:w-3/4 lg:w-1/3 min-w-[90%] md:min-w-[36rem] lg:min-w-[46rem] mx-auto mt-10 border border-gray-200 min-h-[366px] relative">
+        <div className="grid grid-cols-1 gap-6 lg:gap-10 items-start">
+          {/* Text Content */}
+          <div>
+            <div className="mb-6 flex items-center justify-between space-x-4">
+              <p className="text-3xl font-extrabold text-gray-900 md:text-4xl leading-tight">
+                {data[currentIndex].name}
+              </p>
+              {/* Image Content */}
+              <div>
+                <img
+                  src={data[currentIndex].image}
+                  alt={data[currentIndex].name}
+                  className="w-[70px] h-[70px] md:w-[100px] md:h-[100px] object-cover rounded-full shadow-lg"
+                />
+              </div>
+            </div>
+            <p className="text-gray-700 text-base md:text-lg italic break-words leading-relaxed overflow-scroll h-44 md:h-full box-border">
+              {data[currentIndex].description || "No bio available."}
+            </p>
+          </div>
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex min-w-[300px] justify-between items-center mt-6 absolute bottom-2 md:bottom-6 left-8 right-8">
+          {currentIndex !== 0 && (
+            <button
+              className={`custom-button text-white px-4 py-2 rounded-md shadow-md transition duration-200 flex items-center space-x-2 bg-[${InstitutionData?.PrimaryColor}] hover:bg-[${InstitutionData?.LightPrimaryColor}]`}
+              onClick={handlePrev}
+            >
+              <GrFormPrevious className="text-lg" />
+              <span>Prev</span>
+            </button>
+          )}
+
+          {currentIndex !== data.length - 1 && (
+            <button
+              className={`custom-button text-white px-4 py-2 rounded-md shadow-md transition duration-200 flex items-center space-x-2 ml-auto bg-[${InstitutionData?.PrimaryColor}] hover:bg-[${InstitutionData?.LightPrimaryColor}]`}
+              onClick={handleNext}
+            >
+              <span>Next</span>
+              <MdNavigateNext className="text-lg" />
+            </button>
+          )}
         </div>
       </div>
-      <p className="text-gray-700 text-base md:text-lg italic break-words leading-relaxed overflow-scroll h-44 md:h-full box-border">
-        {data[currentIndex].description || "No bio available."}
-      </p>
-    </div>
-  </div>
-
-  {/* Navigation Buttons */}
-  <div className="flex min-w-[300px] justify-between items-center mt-6 absolute bottom-2 md:bottom-6 left-8 right-8">
-    {currentIndex !== 0 && (
-      <button
-        className="custom-button bg-primaryColor text-white px-4 py-2 rounded-md shadow-md hover:bg-lightPrimaryColor transition duration-200 flex items-center space-x-2"
-        onClick={handlePrev}
-      >
-        <GrFormPrevious className="text-lg" />
-        <span>Prev</span>
-      </button>
-    )}
-
-    {currentIndex !== data.length - 1 && (
-      <button
-        className="custom-button bg-primaryColor text-white px-4 py-2 rounded-md shadow-md hover:bg-lightPrimaryColor transition duration-200 flex items-center space-x-2 ml-auto"
-        onClick={handleNext}
-      >
-        <span>Next</span>
-        <MdNavigateNext className="text-lg" />
-      </button>
-    )}
-  </div>
-</div>
-
     </>
   );
 };
