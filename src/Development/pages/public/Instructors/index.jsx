@@ -213,44 +213,60 @@ const Instructor = () => {
       setLoaderInitialized(false);
       return;
     }
-    console.log(`+${countryCode}${phone}`);
+  
+    console.log(`${countryCode}${phone}`);
     console.log(imageURL);
+  
     const instructorClassTypes = selectedClassTypes[instructorId]?.map((type) => type.value) || [];
+  
     try {
       const data = {
         institution: institutionData.InstitutionId,
         name: name,
         userName: name,
-        phoneNumber: `+${countryCode}${phone}`,
+        phoneNumber: `${countryCode}${phone}`,
         position: position,
         image: imageURL,
         emailId: email,
-        instructorPaymentType: instructorPaymentType
-          ? instructorPaymentType
-          : "",
-        instructorPaymentAmount: instructorPaymentAmount
-          ? instructorPaymentAmount
-          : "",
+        instructorPaymentType: instructorPaymentType ? instructorPaymentType : "",
+        instructorPaymentAmount: instructorPaymentAmount ? instructorPaymentAmount : "",
         classType: instructorClassTypes,
       };
-      const response = await API.post("main", `/admin/create-user`, {
+  
+      const response = await API.post("main", "/admin/create-user", {
         body: data,
       });
-
+  
       const createdCognitoId = response.user.cognitoId;
-
+  
       await API.put("main", "/admin/member-to-instructor", {
         body: { ...data, cognitoId: createdCognitoId },
       });
-
-      console.log(response);
-      localStorage.removeItem(
-        `instructorList_${institutionData.InstitutionId}`
+  
+      await API.put(
+        "main",
+        `/admin/put-instructor/${institutionData.InstitutionId}/${createdCognitoId}`,
+        {
+          body: {
+            name: name,
+            position: position,
+            image: imageURL,
+            phoneNumber: phone ? `${countryCode}${phone}` : phone,
+            instructorPaymentType: instructorPaymentType,
+            instructorPaymentAmount: instructorPaymentAmount,
+            emailId: email,
+            classType: instructorClassTypes,
+          },
+        }
       );
+  
+      console.log(response);
+      localStorage.removeItem(`instructorList_${institutionData.InstitutionId}`);
       setLoaderInitialized(false);
       toast.success("Instructor added successfully.", {
         className: "custom-toast",
       });
+  
       fileInputRef.current.value = "";
       setName("");
       setPosition("");
@@ -259,6 +275,8 @@ const Instructor = () => {
       console.log(e);
     }
   }
+  
+
 
   async function handleUpdateInstructor() {
     try {
