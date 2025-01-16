@@ -1,18 +1,14 @@
-import React, { use, useContext, useState,useEffect } from "react";
+import React, { useContext } from "react";
 import NavBar from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import Context from "../../../Context/Context";
 import { useNavigate } from "react-router-dom";
 import InstitutionContext from "../../../Context/InstitutionContext";
-import TextEditor from "../../../common/DataDisplay/staticPageData";
-import { MdModeEditOutline } from "react-icons/md";
 
 const AboutUs = () => {
   const institutionData = useContext(InstitutionContext)?.institutionData;
   const navigate = useNavigate();
-  const [data, setData] = useState(institutionData.AboutUs);
-  const { isAuth, userData: UserCtx } = useContext(Context);
-  const [editing, setEditing] = useState(false);
+  const { isAuth } = useContext(Context);
 
   const handleButtonClick = () => {
     if (isAuth) {
@@ -22,10 +18,6 @@ const AboutUs = () => {
       // If user is not authenticated, redirect to signup
       navigate("/SignUp");
     }
-  };
-
-  const removeTagsIfAny = (content) => {
-    return content.replace(/<[^>]*>?/gm, "");
   };
 
   return (
@@ -41,42 +33,30 @@ const AboutUs = () => {
               About Us
             </h1>
           </div>
-          {!editing === true ? (
-            data.map((item, index) => (
-              <div key={index} className="w-full ml-5 max850:ml-0">
-                {index === 0 ? (
-                  <h1 className="text-center text-[4rem] font-bebas-neue">
-                    {removeTagsIfAny(item.title)}
-                  </h1>
-                ) : (
-                  <h4 className="text-[1.2rem] max450:text-[1rem] text-left mt-8 font-bold w-full">
-                    {removeTagsIfAny(item.title)}
-                  </h4>
-                )}
-                {item.content && (
-                  <p className="text-justify mt-8 sm:ml-0 ml-5 mr-5">
-                    {removeTagsIfAny(item.content)}
-                  </p>
-                )}
-                {item.additionalContent1 && (
-                  <p className="text-justify mt-2">
-                    {removeTagsIfAny(item.additionalContent1)}
-                  </p>
-                )}
-                {item.additionalContent2 && (
-                  <p className="text-justify mt-2">
-                    {removeTagsIfAny(item.additionalContent2)}
-                  </p>
-                )}
-              </div>
-            ))
-          ) : (
-            <TextEditor
-              data={institutionData.AboutUs}
-              setEditing={setEditing}
-              setData={setData}
-            />
-          )}
+          {institutionData?.AboutUs.map((item, index) => (
+            <div key={index} className="w-full ml-5 max850:ml-0">
+              {index === 0 ? (
+                <h1 className="text-center text-[4rem] font-bebas-neue">
+                  {item.title}
+                </h1>
+              ) : (
+                <h4 className="text-[1.2rem] max450:text-[1rem] text-left mt-8 font-bold w-full">
+                  {item.title}
+                </h4>
+              )}
+              {item.content && (
+                <p className="text-justify mt-8 sm:ml-0 ml-5 mr-5">
+                  {item.content}
+                </p>
+              )}
+              {item.additionalContent1 && (
+                <p className="text-justify mt-2">{item.additionalContent1}</p>
+              )}
+              {item.additionalContent2 && (
+                <p className="text-justify mt-2">{item.additionalContent2}</p>
+              )}
+            </div>
+          ))}
         </div>
         <div className="flex justify-center mt-5">
           <button
@@ -89,14 +69,6 @@ const AboutUs = () => {
             {isAuth ? "Dashboard" : "Sign Up Now"}
           </button>
         </div>
-        {editing !== true && (
-          <div
-            className="fixed bottom-5 right-5 bg-primaryColor p-3 rounded-full cursor-pointer"
-            onClick={() => setEditing(!editing)}
-          >
-            <MdModeEditOutline className="text-white text-xl lg:text-2xl" />
-          </div>
-        )}
         <Footer />
       </div>
     </>
