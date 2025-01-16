@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa'
 import { GiStarsStack } from 'react-icons/gi'
 import { HiCurrencyDollar } from 'react-icons/hi2'
+import {FaQrcode} from "react-icons/fa6";
 
 const LeftBanner = ({ displayAfterClick }) => {
   const [click, setClick] = useState('Upcoming Classes')
@@ -285,6 +286,18 @@ const LeftBanner = ({ displayAfterClick }) => {
               text="Contact us ?"
               onClickFn={() => Navigate('/query')}  
             />
+
+            {isAdmin && (
+              <ListItem
+                icon={<FaQrcode size={18} />}
+                text="QR Codes"
+                onClickFn={() => {
+                  setClick('QR Codes')
+                  displayAfterClick(8)
+                }}
+              />
+            )}
+
           </ul>
         </nav>
       </div>

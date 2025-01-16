@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import Footer from "../../../components/Footer";
 import BirthdayModal from "./ProfileUpdate/BirthdayModal";
+import QRs from "./QRs";
 
 const DashBoard = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -59,6 +60,9 @@ const DashBoard = () => {
 
       case 7:
         return <Revenue />;
+
+      case 8:
+        return <QRs />
 
       default:
         return <div></div>;

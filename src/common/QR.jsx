@@ -1,11 +1,9 @@
 import QRCode from 'qrcode';
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
-const QR = () => {
+const QR = ({ url, size }) => {
   const [QRSrc, setQRSrc] = useState('');
 
-  // const url = new URL(window.location.href);
-  const url = window.location.href.split('/a')[0] + '/put-attendance';
   console.log(url);
   QRCode.toDataURL(url).then((data) => {
     console.log(data);
@@ -13,7 +11,9 @@ const QR = () => {
   });
 
   return (
-    <img src={QRSrc} alt="QR Code" />
+    <a href={QRSrc} download='qrcode.png'>
+      <img src={QRSrc} alt="QR Code" width={size} height={size} />
+    </a>
   )
 }
 

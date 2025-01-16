@@ -27,7 +27,7 @@ import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
 import { HybridPayment } from "../pages/private/HybridPayment";
-import QR from "../pages/private/PutAttendance/QR";
+// import QR from "../pages/private/PutAttendance/QR";
 import HomePayment from "../CommonPayment/HomePayment";
 import PaymentError from "../pages/PaymentError";
 import PhoneAuth from "../pages/Auth/phone";
@@ -75,7 +75,7 @@ const RoutesContainer = () => {
         }
       />
       <Route path="/put-attendance" element={<PutAttendance />} />
-      <Route path="/attendance-qr" element={<QR />} />
+      {/*<Route path="/attendance-qr" element={<QR />} />*/}
       <Route path="/redirect" element={<Redirect />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route
