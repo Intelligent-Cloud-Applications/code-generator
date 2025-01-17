@@ -1,7 +1,6 @@
 import { API } from "aws-amplify";
 import React, { useContext, useEffect, useState } from "react";
 import { FaPencilAlt, FaRegSave, FaRegWindowClose } from "react-icons/fa";
-import { RiDoubleQuotesL } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,12 +18,11 @@ const InstructorTestimonial = () => {
   const [currentInstructor, setCurrentInstructor] = useState({});
   const [editing, setEditing] = useState(false);
   const [about, setAbout] = useState("");
-  const [imagePresent, setImagePresent] = useState(false);
   const [imgUrl, setImgUrl] = useState("");
   const Navigate = useNavigate();
   const Util = Ctx.util;
 
-  console.log("UserCtx: ", UserCtx);
+  // console.log("UserCtx: ", UserCtx);
 
   const location = useLocation();
   // console.log(Util);
@@ -67,7 +65,7 @@ const InstructorTestimonial = () => {
             `instructorList_${institution}`,
             JSON.stringify(response)
           );
-          console.log("Fetched Instructors:", response.data);
+          // console.log("Fetched Instructors:", response.data);
           setInstructors((prev = []) => [
             ...prev,
             ...(Array.isArray(response?.data) ? response.data : []), // Ensure response.data is an array
@@ -79,7 +77,7 @@ const InstructorTestimonial = () => {
           const response = JSON.parse(
             localStorage.getItem(`instructorList_${institution}`)
           );
-          console.log("Cached Instructors:", response.data);
+          // console.log("Cached Instructors:", response.data);
           setInstructors((prev = []) => [
             ...prev,
             ...(Array.isArray(response?.data) ? response.data : []), // Ensure response.data is an array
@@ -112,9 +110,9 @@ const InstructorTestimonial = () => {
           response = {};
         }
 
-        console.log("Instructors", instructors);
+        // console.log("Instructors", instructors);
         // Find additional data and merge with the response
-        console.log("Referral:", referral);
+        // console.log("Referral:", referral);
         const additionalData = instructors?.find(
           (e) =>
             e?.referral_code === referral ||
@@ -124,7 +122,7 @@ const InstructorTestimonial = () => {
               .startsWith(response?.referralCode?.toUpperCase())
         );
 
-        console.log("Additional Data:", additionalData);
+        // console.log("Additional Data:", additionalData);
 
         // Merge data before setting the instructor state
         setInstructor({
@@ -132,8 +130,8 @@ const InstructorTestimonial = () => {
           ...additionalData,
           ...currentInstructor,
         });
-        console.log("Fetched Instructor:", response);
-        console.log("Set Instructor:", instructor);
+        // console.log("Fetched Instructor:", response);
+        // console.log("Set Instructor:", instructor);
       } catch (error) {
         console.error("Error fetching instructor:", error);
       } finally {
@@ -160,12 +158,7 @@ const InstructorTestimonial = () => {
     if (currentInstructor?.image) {
       setImgUrl(currentInstructor?.image);
     }
-    console.log("Current Instructor:", currentInstructor);
-
-    if (!currentInstructor?.image || !instructor?.instructorProfile?.imgUrl) {
-      setImagePresent(false);
-    }
-    setImagePresent(Boolean(imgUrl));
+    // console.log("Current Instructor:", currentInstructor);
   }, [instructors, instructor]);
   const getInitials = (name) => {
     const names = name?.split(" ");
@@ -240,123 +233,95 @@ const InstructorTestimonial = () => {
   if (referral && institution) {
     return (
       <>
-        <div className="my-12 w-[287px] md:w-11/12 md:max-w-[980px] mx-auto md:h-[450px] h-[333px] ">
-          <div className=" md:w-full w-full relative h-full">
-            <div className="relative md:w-full w-full flex flex-col  ">
-              <div className="border border-gray-200  absolute w-[310px] md:w-full md:h-[27rem] h-[530px]  top-0 left-0 bg-neutral-50 rounded-[21.77px] shadow-[0px_85.26px_181.4px_#15151526]" />
-              <RiDoubleQuotesL className="relative z-10 text-8xl text-slate-500 bottom-8 -left-4 h-12 w-16 hidden md:block" />
-
-              <div className="w-full">
-                {imgUrl && (
-                  <img
-                    className="absolute h-[15rem] w-[90%] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-24 right-0 object-cover rounded-md"
-                    alt="Profile"
-                    src={imgUrl}
-                  />
+        <div className="flex flex-col md:flex-row items-center md:items-start w-11/12 md:w-11/12 md:max-w-[980px] mx-auto my-12 p-6 border border-gray-200 rounded-lg bg-neutral-50 shadow-lg gap-6">
+          {/* Image Section */}
+          {imgUrl ? (
+            <img
+              className="w-[90%] md:w-[18rem] h-[18rem] md:h-[29rem] object-cover rounded-md"
+              alt="Profile"
+              src={imgUrl}
+            />
+          ) : (
+            <div className="w-[90%] md:w-[18rem] h-[15rem] md:h-[29rem] bg-gray-300 flex items-center justify-center rounded-md">
+              <p className="text-3xl font-bold text-gray-700">
+                {getInitials(
+                  instructor?.instructorProfile?.userName ||
+                    instructor?.referralCode ||
+                    instructor?.name
                 )}
-
-                {!imagePresent === true && (
-                  <div className="absolute w-[90%] h-[15rem] md:h-[29rem] md:w-[18rem] md:right-12 md:-top-4 -top-24 right-0 object-cover rounded-md bg-gray-300">
-                    <div className="flex items-center justify-center h-full">
-                      <p className="text-[3rem] font-bold text-gray-700">
-                        <span className="text-[1.5rem] font-bold text-gray-700">
-                          {getInitials(
-                            instructor?.instructorProfile?.userName ||
-                              instructor?.referralCode ||
-                              instructor?.name
-                          )}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="inline-flex flex-col items-start justify-end gap-[3.63px] absolute -bottom-52 md:-bottom-14 left-4">
-                  <div className="mt-[-0.91px] [font-family:'Manrope-Medium',Helvetica] font-medium text-black text-[20px] md:text-[29px] relative w-fit tracking-[0] leading-[normal]">
-                    {/* Instructor Name */}
-                    <p className="text-3xl font-bold md:font-extrabold text-gray-900 md:text-4xl ">
-                      {capitalizeWords(instructor?.name) ||
-                        capitalizeWords(
-                          instructor?.instructorProfile?.userName
-                        ) ||
-                        capitalizeWords(instructor?.referralCode)}
-                    </p>
-
-                    <p className="text-lg font-medium text-gray-500 md:text-xl">
-                      {institution}
-                    </p>
-                  </div>
-                </div>
-
-                {isAuth &&
-                  UserCtx.cognitoId ===
-                    instructor?.instructorProfile?.cognitoId && (
-                    <div
-                      className={`flex justify-end md:justify-center mb-6 absolute top-[12rem] right-0 md:right-[50%] lg:right-[50%] md:top-20 lg:top-20`}
-                    >
-                      <button
-                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center h-10"
-                        onClick={() => setEditing(true)}
-                      >
-                        <FaPencilAlt className="inline mr-2" />
-                      </button>
-                    </div>
-                  )}
-
-                {instructor && (
-                  <div className="mb-8">
-                    <div className="min-w-full ">
-                      {!editing ? (
-                        <p
-                          className={`mt-5 absolute w-full
-                          max-w-[461px] md:max950:max-w-[320px]
-                        top-48 md:top-28 left-4 text-black text-left md:first-letter:text-3xl md:tracking-wide overflow-hidden h-60 rounded-lg  text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none `}
-                        >
-                          <AboutInstructor
-                            aboutText={
-                              instructor?.instructorProfile?.about?.trim() ||
-                              "No bio available."
-                            }
-                          />
-                        </p>
-                      ) : (
-                        <div className="relative top-32 md:top-0">
-                          <textarea
-                            className={`mt-2 absolute w-full 
-                            max-w-[461px] max950:max-w-[322px]
-                         top-28 left-4 h-48 md:h-40 bg-gray-100 border border-gray-300 rounded-lg p-4 text-gray-700 text-base md:text-lg  focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none box-border`}
-                            onChange={(e) => setAbout(e.target.value)}
-                            value={about}
-                            maxLength={300}
-                            placeholder="Write something about yourself..."
-                          />
-                          {editing &&
-                            isAuth &&
-                            UserCtx.cognitoId ===
-                              instructor?.instructorProfile?.cognitoId && (
-                              <div className="flex justify-start space-x-4 mt-6 absolute top-[19rem] left-[2rem] md:top-[17rem] md:left-[6rem]">
-                                <button
-                                  className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center"
-                                  onClick={() => setEditing(false)}
-                                >
-                                  <FaRegWindowClose className="inline mr-2" />{" "}
-                                  Cancel
-                                </button>
-                                <button
-                                  className="bg-gradient-to-r bg-lightPrimaryColor hover:bg-primaryColor text-white py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center"
-                                  onClick={() => onProfileUpdate(about)}
-                                >
-                                  <FaRegSave className="inline mr-2" /> Save
-                                </button>
-                              </div>
-                            )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              </p>
             </div>
+          )}
+
+          {/* Info Section */}
+          <div className="flex-1">
+            {/* Instructor Name */}
+            <div className="mb-4">
+              <p className="text-3xl font-bold md:text-4xl text-gray-900">
+                {instructor?.name ||
+                  instructor?.instructorProfile?.userName ||
+                  capitalizeWords(instructor?.referralCode)}
+              </p>
+              <p className="text-lg font-medium text-gray-500">{institution}</p>
+            </div>
+
+            {/* About Section */}
+            <div className="mb-6">
+              {!editing ? (
+                <p
+                  className="text-base sm:text-lg md:text-xl text-gray-700 border  p-4 rounded-lg bg-gray-50 "
+                  style={{
+                    borderColor: InstitutionData.PrimaryColor,
+                  }}
+                >
+                  <AboutInstructor
+                    aboutText={
+                      instructor?.instructorProfile?.about?.trim() ||
+                      "No bio available."
+                    }
+                  />
+                </p>
+              ) : (
+                <textarea
+                  className="w-full h-48 p-4 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                  onChange={(e) => setAbout(e.target.value)}
+                  value={about}
+                  maxLength={500}
+                  placeholder="Write something about yourself..."
+                />
+              )}
+            </div>
+
+            {/* Edit Buttons */}
+            {isAuth &&
+              UserCtx.cognitoId ===
+                instructor?.instructorProfile?.cognitoId && (
+                <div className="flex gap-4">
+                  {editing ? (
+                    <>
+                      <button
+                        className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded-lg shadow-md flex items-center"
+                        onClick={() => setEditing(false)}
+                      >
+                        <FaRegWindowClose className="mr-2" /> Cancel
+                      </button>
+                      <button
+                        className={`bg-gradient-to-r from-${InstitutionData.PrimaryColor} to-${InstitutionData.LightPrimaryColor} hover:from-${InstitutionData.LightPrimaryColor} hover:to-${InstitutionData.PrimaryColor} text-white py-2 px-4 rounded-lg shadow-md flex items-center`}
+                        onClick={() => onProfileUpdate(about)}
+                      >
+                        <FaRegSave className="mr-2" /> Save
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      className={`bg-gradient-to-r from-${InstitutionData.PrimaryColor} to-${InstitutionData.LightPrimaryColor} hover:from-${InstitutionData.LightPrimaryColor} hover:to-${InstitutionData.PrimaryColor} text-white py-2 px-4 rounded-lg shadow-md flex items-center`}
+                      onClick={() => setEditing(true)}
+                    >
+                      <FaPencilAlt className="mr-2" /> Edit
+                    </button>
+                  )}
+                </div>
+              )}
           </div>
         </div>
 

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext } from "react";
+import InstitutionContext from "../../../Context/InstitutionContext";
 import "./Carousel.css";
-// import { PropertyDefault } from "./PropertyDefault";
+
 
 
 
@@ -20,59 +21,32 @@ const images = [
 ];
 
 const Carousel = () => {
+  const InstitutionData = useContext(InstitutionContext).institutionData;
   return (
     <>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        height="435"
-        viewBox="0 0 869 435"
-        fill="none"
-        className="absolute top-4 left-0 w-screen z-0"
-      >
-        <g filter="url(#filter0_f_1_249)">
-          <path
-            d="M683.958 -281.151L411.354 152.711L287.5 223.5L84.5172 250.619L-48.9053 250.619L-110.817 191.586L-711.576 -578.952L68.113 -1138.81L683.958 -281.151Z"
-            fill="url(#paint0_angular_1_249)"
-          />
-        </g>
-        <defs>
-          <filter
-            id="filter0_f_1_249"
-            x="-895.872"
-            y="-1323.11"
-            width="1764.13"
-            height="1758.02"
-            filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
-          >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
-            <feBlend
-              mode="normal"
-              in="SourceGraphic"
-              in2="BackgroundImageFix"
-              result="shape"
-            />
-            <feGaussianBlur
-              stdDeviation="92.1479"
-              result="effect1_foregroundBlur_1_249"
-            />
-          </filter>
-          <radialGradient
-            id="paint0_angular_1_249"
-            cx="0"
-            cy="0"
-            r="1"
-            gradientUnits="userSpaceOnUse"
-            gradientTransform="translate(-62.6805 -337.621) rotate(-177.533) scale(663.694 488.191)"
-          >
-            <stop offset="0.146" stop-color="white" stop-opacity="0" />
-            <stop offset="0.506955" stop-color="#225C59" />
-            <stop offset="1" stop-color="white" stop-opacity="0.53" />
-          </radialGradient>
-        </defs>
-      </svg>
-      <div className="mb-7">
-        <h1 className="hybrid-heading relative z-10 text-3xl font-bold text-center mt-8 text-[3rem] mb-4 text-lightPrimaryColor ">
+      <div className="absolute -top-40  w-screen h-[435px] z-0">
+        <div
+          className="blur-[92px] rounded-full"
+          style={{
+            width: "400px", // Adjust the width to your desired circle size
+            height: "400px", // Match the height to make it a circle
+            background: `radial-gradient(
+        circle at 50% 50%,
+        var(--color-primary) 14.6%,
+        var(--color-light-primary) 50.7%,
+        var(--color-lightest-primary) 100%
+      )`,
+            transform: "translate(-50%, -50%)", // Center the circle
+            position: "absolute",
+            top: "50%", // Vertical center
+          }}
+        ></div>
+      </div>
+
+      <div className="mb-7 z-10">
+        <h1 className="hybrid-heading relative z-10 text-3xl font-bold text-center mt-8 text-[3rem] mb-4 "
+          style={{ color: InstitutionData.PrimaryColor }}
+        >
           Hybrid Class
         </h1>
         <p className="relative z-10 text-[1rem] px-4 mt-2 text-center font-[600]">
@@ -91,7 +65,7 @@ const Carousel = () => {
         </div>
       </div> */}
 
-      <div className="w-screen h-[451px]">
+      <div className="w-screen h-[451px] z-10">
         <div className="relative max-w-screen h-[451px] m-auto">
           {/* <img
             className="absolute z-10 w-screen h-[103px] top-[330px] left-0"
@@ -107,7 +81,6 @@ const Carousel = () => {
             alt="Upper elipse"
             src={upperElipse}
           /> */}
-
 
           {/* Upper half ellipse */}
           <div className="half-ellipse-border absolute z-20"></div>
@@ -128,7 +101,6 @@ const Carousel = () => {
           <div className="half-ellipse-border-down absolute z-20 h-[53px] top-[342px]"></div>
         </div>
       </div>
-
     </>
   );
 };

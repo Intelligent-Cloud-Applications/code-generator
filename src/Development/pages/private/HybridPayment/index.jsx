@@ -178,11 +178,12 @@ export const HybridPayment = () => {
         <div className="my-4"></div>
         <SubscriptionCard />
       </div>
+      <div className="absolute z-10">
       <Footer />
+      </div>
     </>
   );
 };
-
 
 
 
