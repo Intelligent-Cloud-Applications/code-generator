@@ -60,16 +60,18 @@ const SubscriptionCard = () => {
       );
     } else {
       toast.error("You have no accounts yet. Please sign up to continue.");
-      navigate(`/signup?referral=${referral}&institution=${institution}&hybrid=true`);
+      navigate(
+        `/signup?referral=${referral}&institution=${institution}&hybrid=true`
+      );
     }
   };
 
   return (
     <>
-
       <div className="mb-7">
-        <h1 className="hybrid-heading text-3xl font-bold text-center mt-8 text-[3rem] mb-4"
-        style={{color: InstitutionData.PrimaryColor}}
+        <h1
+          className="hybrid-heading text-3xl font-bold text-center mt-8 text-[3rem] mb-4"
+          style={{ color: InstitutionData.PrimaryColor }}
         >
           Subscription
         </h1>
@@ -78,7 +80,7 @@ const SubscriptionCard = () => {
           on this exciting journey!
         </p>
       </div>
-      <div className="flex flex-row gap-8 justify-center items-center flex-wrap max850:!flex-col max-w-[90vw] mx-auto">
+      <div className="flex flex-row gap-8 justify-center items-center flex-wrap max850:!flex-col max-w-[90vw] mx-auto z-10">
         {products.map(
           (item, i) =>
             //  This will render the card only if the index is 1

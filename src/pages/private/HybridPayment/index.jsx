@@ -1,4 +1,4 @@
-import React, { useContext,useState,useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../../components/Footer";
 import NavBar from "../../../components/Header";
@@ -7,18 +7,12 @@ import InstitutionContext from "../../../Context/InstitutionContext";
 import HappyprancerPaypalHybrid from "../../public/Subscription/HappyprancerPaypalHybrid";
 import Testemonial from "./Testemonial";
 import SubscriptionCard from "./SubscriptionCard";
-import {Overview} from "./Overview";
+import { Overview } from "./Overview";
 import Carousel from "./Carousel";
-import"./Carousel.css";
-
-
+import "./Carousel.css";
 import InstructorTestimonial from "./InstructorTestimonial";
 
-
-
-
 export const HybridPayment = () => {
-
   const { institutionData: InstitutionData } = useContext(InstitutionContext);
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const Navigate = useNavigate();
@@ -67,11 +61,10 @@ export const HybridPayment = () => {
   };
 
   const handleFreeTrial = async () => {
-    if(isAuth){
+    if (isAuth) {
       console.log(UserCtx);
-    }else{
+    } else {
       // Get the current url and append the trial query params
-
 
       Navigate("/signup?trial=true&trialPeriod=Monthly");
     }
@@ -168,25 +161,19 @@ export const HybridPayment = () => {
 
       <NavBar />
       <Carousel />
-        
+
       <div className="mb-12 w-screen flex flex-col justify-center items-center p-2">
         <InstructorTestimonial />
       </div>
-        <Testemonial />
+      <Testemonial />
       <div className=" mx-auto p-4 flex flex-col">
         <Overview />
         <div className="my-4"></div>
         <SubscriptionCard />
       </div>
       <div className="absolute z-10">
-      <Footer />
+        <Footer />
       </div>
     </>
   );
 };
-
-
-
-
-
-
