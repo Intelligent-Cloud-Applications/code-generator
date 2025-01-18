@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useContext } from "react";
-import discount from "./discount.svg"
+import discount from "./discount.svg";
 import React from "react";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import "./SubscriptionCard.css";
@@ -14,12 +14,12 @@ export const Overview = ({
   // console.log(InstitutionData)
   return (
     <>
-      <div className="absolute -right-9 z-0 opacity-70 hidden lg:block">
+      <div className="absolute -right-0 z-0 opacity-40 hidden lg:block">
         <div
           className="blur-[96px] rounded-full"
           style={{
             width: "450px",
-            height: "1581px",
+            height: "1281px",
             background: `radial-gradient(
         circle at 70% 50%,
         rgba(255, 255, 255, 0) 15%,
@@ -29,12 +29,12 @@ export const Overview = ({
           }}
         ></div>
       </div>
-      <div className="absolute -left-[32rem] opacity-70 z-0 hidden md:block">
+      <div className="absolute -left-[32rem] opacity-40 z-0 hidden lg:block">
         <div
           className="blur-[96px] rounded-full"
           style={{
             width: "963px",
-            height: "1581px",
+            height: "1281px",
             background: `radial-gradient(
         circle at 20% 50%,
         rgba(255, 255, 255, 0) 15%,
@@ -44,7 +44,7 @@ export const Overview = ({
           }}
         ></div>
       </div>
-      <div className="mb-7">
+      <div className="mb-7 z-10">
         <h1
           className="text-3xl font-bold text-center mt-8 text-[3rem] mb-4 "
           style={{

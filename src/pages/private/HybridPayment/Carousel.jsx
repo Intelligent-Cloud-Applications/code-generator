@@ -2,9 +2,6 @@ import React, { useContext } from "react";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import "./Carousel.css";
 
-
-
-
 const images = [
   "https://plus.unsplash.com/premium_photo-1661777196224-bfda51e61cfd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://images.unsplash.com/photo-1447452001602-7090c7ab2db3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -24,7 +21,7 @@ const Carousel = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   return (
     <>
-      <div className="absolute -top-40  w-screen h-[435px] z-0">
+      <div className="absolute -top-40  w-screen opacity-40 h-[435px] z-0 hidden md:block">
         <div
           className="blur-[92px] rounded-full"
           style={{
@@ -44,7 +41,8 @@ const Carousel = () => {
       </div>
 
       <div className="mb-7 z-10">
-        <h1 className="hybrid-heading relative z-10 text-3xl font-bold text-center mt-8 text-[3rem] mb-4 "
+        <h1
+          className="hybrid-heading relative z-10 text-3xl font-bold text-center mt-8 text-[3rem] mb-4 "
           style={{ color: InstitutionData.LightPrimaryColor }}
         >
           Hybrid Class

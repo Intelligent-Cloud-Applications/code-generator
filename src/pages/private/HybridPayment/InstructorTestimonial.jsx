@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Context from "../../../Context/Context";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import AboutInstructor from "./AboutInstructor";
+import "./InstructorTestimonial.css";
 
 const InstructorTestimonial = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -306,7 +307,7 @@ const InstructorTestimonial = () => {
                         <FaRegWindowClose className="mr-2" /> Cancel
                       </button>
                       <button
-                        className={`bg-gradient-to-r from-${InstitutionData.PrimaryColor} to-${InstitutionData.LightPrimaryColor} hover:from-${InstitutionData.LightPrimaryColor} hover:to-${InstitutionData.PrimaryColor} text-white py-2 px-4 rounded-lg shadow-md flex items-center`}
+                        className={`button-gradient text-white py-2 px-4 rounded-lg shadow-md flex items-center`}
                         onClick={() => onProfileUpdate(about)}
                       >
                         <FaRegSave className="mr-2" /> Save
@@ -314,7 +315,7 @@ const InstructorTestimonial = () => {
                     </>
                   ) : (
                     <button
-                      className={`bg-gradient-to-r from-${InstitutionData.PrimaryColor} to-${InstitutionData.LightPrimaryColor} hover:from-${InstitutionData.LightPrimaryColor} hover:to-${InstitutionData.PrimaryColor} text-white py-2 px-4 rounded-lg shadow-md flex items-center`}
+                      className={`button-gradient text-white py-2 px-4 rounded-lg shadow-md flex items-center`}
                       onClick={() => setEditing(true)}
                     >
                       <FaPencilAlt className="mr-2" /> Edit
