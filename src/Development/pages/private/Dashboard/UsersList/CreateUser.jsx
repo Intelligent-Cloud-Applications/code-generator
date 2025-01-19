@@ -95,7 +95,7 @@ function CreateUser({
       institution: InstitutionData.InstitutionId, // Add institution to the body
       cognitoId, // required for both create and update
       emailId: email,
-      userName:name,
+      userName: name,
       name: name,
       phoneNumber: formattedPhoneNumber,
       status,
@@ -122,7 +122,7 @@ function CreateUser({
           window.localStorage.removeItem(
             `instructorList_${InstitutionData.InstitutionId}`
           );
-      }
+        }
 
         toast.success("User Created Successfully");
       } else {
@@ -171,7 +171,19 @@ function CreateUser({
 
     } catch (error) {
       console.error("Error creating/updating user:", error);
-      toast.error("Error processing request. Please try again later.");
+      const errorMessage = error.response?.data?.message;
+    
+      if (error.response?.data?.message === "Email already exists in the database.") {
+        toast.error("This email is already registered in the system");
+      } else if (error.response?.data?.message?.includes("phone number")) {
+        toast.error("This phone number is already registered");
+      } else if (error.response?.status === 400) {
+        toast.error(errorMessage || "Invalid input. Please check all fields");
+      } else if (error.response?.status === 500) {
+        toast.error("Server error. Please try again later");
+      } else {
+        toast.error(errorMessage || "Error processing request. Please try again");
+      }
     } finally {
       setShowUserAdd(false);
       setIsModalOpen(false);
