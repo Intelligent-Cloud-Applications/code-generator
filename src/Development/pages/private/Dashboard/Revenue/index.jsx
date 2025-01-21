@@ -61,15 +61,16 @@ function PaymentDetails() {
   const totalOnlineAmount = useMemo(() => {
     return filteredPayments
       ?.filter(payment => payment.paymentMode === 'online')
-      .reduce((total, payment) => total + (payment.amount || 0), 0);
+      .reduce((total, payment) => total + (Number(payment.amount) || 0), 0);
   }, [filteredPayments]);
 
   const totalOfflineAmount = useMemo(() => {
     return filteredPayments
       ?.filter(payment => payment.paymentMode === 'offline')
-      .reduce((total, payment) => total + (payment.amount || 0), 0);
+      .reduce((total, payment) => total + (Number(payment.amount) || 0), 0);
   }, [filteredPayments]);
 
+  console.log(totalOfflineAmount)
   const selectedPayments = filteredPayments?.slice((currentPage - 1) * 7, currentPage * 7);
 
   const handleRowClick = (payment) => {
