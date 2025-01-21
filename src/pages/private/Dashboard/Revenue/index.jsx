@@ -61,15 +61,16 @@ function PaymentDetails() {
   const totalOnlineAmount = useMemo(() => {
     return filteredPayments
       ?.filter(payment => payment.paymentMode === 'online')
-      .reduce((total, payment) => total + (payment.amount || 0), 0);
+      .reduce((total, payment) => total + (Number(payment.amount) || 0), 0);
   }, [filteredPayments]);
 
   const totalOfflineAmount = useMemo(() => {
     return filteredPayments
       ?.filter(payment => payment.paymentMode === 'offline')
-      .reduce((total, payment) => total + (payment.amount || 0), 0);
+      .reduce((total, payment) => total + (Number(payment.amount) || 0), 0);
   }, [filteredPayments]);
 
+  console.log(totalOfflineAmount)
   const selectedPayments = filteredPayments?.slice((currentPage - 1) * 7, currentPage * 7);
 
   const handleRowClick = (payment) => {
@@ -143,9 +144,9 @@ function PaymentDetails() {
               <div className='text-[2rem] font-[700]'>
                 {formatAmountWithCurrency(totalOnlineAmount, currency)}
               </div>
-              {/*<div className='text-[0.9rem] font-[500] text-[gray]'>*/}
-              {/*  Last Cashout amount is <span className='text-green-600 text-bold'>₹{cashoutAmount?.amount}</span> on date {cashoutAmount?.paymentDate}*/}
-              {/*</div>*/}
+              <div className='text-[0.9rem] font-[500] text-[gray]'>
+                Last Cashout amount is <span className='text-green-600 text-bold'>₹{cashoutAmount?.amount}</span> on date {cashoutAmount?.paymentDate}
+              </div>
             </div>
           </div>
           <div className="flex flex-col w-1/2 max850:w-full">
@@ -206,7 +207,7 @@ function PaymentDetails() {
                     <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${payment.paymentMode === "offline" ? "bg-purple-100 text-purple-600" : "bg-green-100 text-green-600"}`}>
-                        {payment.paymentMode === "offline" ? "Offline" : "Razorpay"}
+                        {payment.paymentMode === "offline" ? "Offline" : "Online"}
                       </span>
                     </Table.Cell>
                     <Table.Cell className='whitespace-nowrap text-sm text-gray-500 text-center bg-white'>
