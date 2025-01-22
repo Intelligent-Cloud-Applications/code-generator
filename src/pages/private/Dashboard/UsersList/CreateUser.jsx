@@ -179,6 +179,23 @@ function CreateUser({
     }
   };
 
+  const sendInvoice = async () => {
+    try {
+      UtilCtx.setLoader(true);
+      await API.post('awsaiapp', `/admin/send-invoice/${InstitutionData.InstitutionId}`, {
+        body: {
+          cognitoId
+        }
+      });
+      toast.success("Invoice sent successfully");
+    } catch (e) {
+      console.log(e);
+      toast.error(e.message);
+    } finally {
+      UtilCtx.setLoader(false);
+    }
+  }
+
 
   return (
     <div>
@@ -372,10 +389,18 @@ function CreateUser({
           </div>
         )}
 
+        {status === 'InActive' && <button
+          className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center max850:w-[82%]"
+          style={{backgroundColor: InstitutionData.PrimaryColor}}
+          onClick={sendInvoice}
+        >
+          Send Invoice
+        </button>}
+
 
         <button
           className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center max850:w-[82%]"
-          style={{ backgroundColor: InstitutionData.PrimaryColor }}
+          style={{backgroundColor: InstitutionData.PrimaryColor}}
           onClick={onCreateUser}
         >
           {createButton ? "Create" : "Update"}
