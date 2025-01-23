@@ -7,6 +7,8 @@ import InstitutionContext from "../../../Context/InstitutionContext";
 
 const AboutUs = () => {
   const institutionData = useContext(InstitutionContext)?.institutionData;
+  const { productId } = useContext(InstitutionContext).institutionData;
+  console.log("productId: "+ productId);
   const navigate = useNavigate();
   const { isAuth } = useContext(Context);
 
@@ -58,6 +60,8 @@ const AboutUs = () => {
             </div>
           ))}
         </div>
+        {/* Conditional rendering for productId 1000007 */}
+        {productId === "1000007" && (
         <div className="flex justify-center mt-5">
           <button
             className="w-[15rem] text-white px-12 py-2 rounded-[8px] mb-4 h-[3rem] text-[1.2rem] tracking-[0.8px]"
@@ -69,6 +73,7 @@ const AboutUs = () => {
             {isAuth ? "Dashboard" : "Sign Up Now"}
           </button>
         </div>
+        )}
         <Footer />
       </div>
     </>
