@@ -9,6 +9,7 @@ import institutionData from "../../../constants";
 
 const Subscription = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
+  const { productId } = useContext(InstitutionContext).institutionData;
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const [products, setProducts] = useState([]);
   const Navigate = useNavigate();
@@ -202,7 +203,7 @@ const Subscription = () => {
                 </li>
               ))}
             </ul>
-            {paymentHandler(item)}
+            {productId === "1000007" && paymentHandler(item)}
           </Card>
         ))}
       </div>
