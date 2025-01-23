@@ -60,7 +60,7 @@ const AboutUs = () => {
             </div>
           ))}
         </div>
-        {/* Conditional rendering for productId 1000007 */}
+        
         {productId === "1000007" && (
         <div className="flex justify-center mt-5">
           <button
