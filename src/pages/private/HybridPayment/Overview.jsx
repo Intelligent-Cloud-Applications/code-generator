@@ -1,8 +1,7 @@
 import PropTypes from "prop-types";
-import { useContext } from "react";
-import discount from "./discount.svg";
-import React from "react";
+import React, { useContext } from "react";
 import InstitutionContext from "../../../Context/InstitutionContext";
+import discount from "./discount.svg";
 import "./SubscriptionCard.css";
 
 export const Overview = ({
@@ -22,9 +21,9 @@ export const Overview = ({
             height: "1281px",
             background: `radial-gradient(
         circle at 70% 50%,
-        rgba(255, 255, 255, 0) 15%,
-        rgba(34, 92, 89, 1) 50%,
-        rgba(255, 255, 255, 0.53) 100%
+        var(--color-primary) 15%,
+        var(--color-light-primary) 50%,
+        var(--color-lightest-primary) 100%
       )`,
           }}
         ></div>
@@ -37,9 +36,9 @@ export const Overview = ({
             height: "1281px",
             background: `radial-gradient(
         circle at 20% 50%,
-        rgba(255, 255, 255, 0) 15%,
-        rgba(34, 92, 89, 1) 50%,
-        rgba(255, 255, 255, 0.53) 100%
+        var(--color-primary) 15%,
+        var(--color-light-primary) 50%,
+        var(--color-lightest-primary) 100%
       )`,
           }}
         ></div>

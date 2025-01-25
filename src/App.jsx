@@ -18,7 +18,7 @@ function App() {
       try {
         let data = require("./utils/data.json");
         data = await API.get(
-          "prod",
+          "main",
           `/any/get-institution-data/${data && data.InstitutionId}`
         );
         data.InstitutionId = data.institutionid;
