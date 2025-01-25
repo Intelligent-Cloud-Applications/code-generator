@@ -389,22 +389,24 @@ function CreateUser({
           </div>
         )}
 
-        {status === 'InActive' && <button
-          className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center max850:w-[82%]"
-          style={{backgroundColor: InstitutionData.PrimaryColor}}
-          onClick={sendInvoice}
-        >
-          Send Invoice
-        </button>}
+        <div className='flex gap-4 flex-wrap'>
+          {status === 'InActive' && userType === 'member' && !createButton && <button
+            className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center max850:w-[82%]"
+            style={{backgroundColor: InstitutionData.PrimaryColor}}
+            onClick={sendInvoice}
+          >
+            Send Invoice
+          </button>}
 
+          <button
+            className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center max850:w-[82%]"
+            style={{backgroundColor: InstitutionData.PrimaryColor}}
+            onClick={onCreateUser}
+          >
+            {createButton ? "Create" : "Update"}
+          </button>
+        </div>
 
-        <button
-          className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center max850:w-[82%]"
-          style={{backgroundColor: InstitutionData.PrimaryColor}}
-          onClick={onCreateUser}
-        >
-          {createButton ? "Create" : "Update"}
-        </button>
       </div>
     </div>
   );
