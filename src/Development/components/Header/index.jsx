@@ -59,12 +59,12 @@ const Header = () => {
   );
 
   let authBarContent = [];
-  // Logic for different plans based on productId
+  
   if (productId === "1000008") { // Basic Plan
-    authBarContent = []; // Hide AuthBar for all userTypes
+    authBarContent = []; 
   } else if (productId === "1000009") { // Standard Plan
       authBarContent = [
-        { label: 'Login', path: '/login' }, // Show only Login
+        { label: 'Login', path: '/login' }, 
       ];
   } else if (productId === "1000007") { // Advanced Plan
     authBarContent = isAuth
