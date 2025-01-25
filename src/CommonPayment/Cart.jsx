@@ -228,7 +228,7 @@ const Cart = ({ institution }) => {
       const invoiceId = response[0].invoiceId; // Get the invoice ID
 
       const options = {
-        key: "rzp_test_blkHaVbIxIwCZK",
+        key: "rzp_test_1Q7x6lOoAhIVlE",
         amount: totalAmount,
         currency: response[0].subscriptionResult.currency,
         name: institution.toUpperCase(),
