@@ -13,6 +13,7 @@ const Billing = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const [renewDate, setRenewDate] = useState(userData.renewDate);
   const [amount, setAmount] = useState('$0');
+  const [productName, setProductName] = useState('');
   const [orderHistory, setOrderHistory] = useState([]);
 
   useEffect(() => {
@@ -31,17 +32,20 @@ const Billing = () => {
           {}
         );
         console.log("Response:", response)
-        const data = response.payments
+        const sortedData = response.payments
+          .toSorted((a, b) => b.paymentDate - a.paymentDate);
+        const data = sortedData
           .map((object, index) => [
             (new Date(object.paymentDate)).toLocaleDateString(),
             // response.profile.products[index].S,
             products[object.productId].heading,
             object.paymentMode,
             `${object.currency === 'USD' ? '$' : '₹'}${object.amount / 100}`
-          ])
+          ]);
         // .flatMap(item => Array(6).fill(item));
         setOrderHistory(data);
-        setAmount(data.slice(-1)[0][3]);
+        setAmount(data[0][3]);
+        setProductName(data[0][1]);
         setRenewDate(response.payments[0].renewDate)
       } catch (error) {
         console.error('Error fetching payment history:', error);
@@ -62,14 +66,14 @@ const Billing = () => {
              backgroundColor: InstitutionData.LightPrimaryColor,
            }}
         >Member since {(new Date(userData.joiningDate).toDateString())}</p>
-        <p className='text-xl font-bold'>{userData.products}</p>
+        <p className='text-xl font-bold'>{productName}</p>
         <p className='text-lg'>{amount}</p>
         <br />
         <p className='text-xl font-bold'>Next billing date</p>
         <p>{(new Date(renewDate)).toLocaleDateString()}</p>
       </div>
 
-      <h2 className='text-2xl font-bold mt-16'>Billing History</h2>
+      <h2 className='text-2xl font-bold mt-16 mb-8'>Billing History</h2>
       <div>
         <PaginatedTable
           head={['Date', 'Description', 'Payment Method', 'Amount']}
