@@ -5,7 +5,7 @@ import Footer from "../../../components/Footer";
 import Context from "../../../Context/Context";
 import { useNavigate } from "react-router-dom";
 import InstitutionContext from "../../../Context/InstitutionContext";
-import TextEditor from "../../../common/DataDisplay/TextEditor";
+import TextEditor from "../../../common/TextEditor/TextEditor";
 import "./AboutUs.css";
 import { API } from "aws-amplify";
 import {toast} from "react-toastify";
@@ -26,7 +26,7 @@ const AboutUs = () => {
     institutionData?.AboutUs || ""
   );
 
-  console.log(aboutUsContent)
+  // console.log(aboutUsContent)
 
   const setPadding = () => {
     const tags = document.querySelectorAll("span");

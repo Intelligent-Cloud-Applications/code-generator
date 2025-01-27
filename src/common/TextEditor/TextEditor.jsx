@@ -1,0 +1,145 @@
+import React, { useCallback, useContext, useRef, useState } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import Quill from "quill";
+import ImageResize from "quill-image-resize-module-react";
+import InstitutionContext from "../../Context/InstitutionContext";
+import { useImageTracker } from "./ImageTracker";
+import { uploadImage, deleteImage } from "./ImageUploader";
+import EditorToolbar from "./EditorToolbar";
+
+Quill.register("modules/imageResize", ImageResize);
+
+const TextEditor = ({
+  value,
+  onChange,
+  onSave,
+  showSaveButton = true,
+  saveButtonText = "Save Changes",
+  saveButtonClassName = "",
+  saveButtonStyle = {},
+  editorClassName = "",
+  placeholder = "",
+}) => {
+  const inputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const institutionData = useContext(InstitutionContext).institutionData;
+  const folder = `${institutionData?.InstitutionId}/about-us-image`;
+
+  const { uploadedImages, setUploadedImages, currentImages, parseImagesFromContent } = 
+    useImageTracker(folder, value);
+
+  const imageHandler = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+
+    input.onchange = async () => {
+      if (!input.files?.length) return;
+
+      const file = input.files[0];
+      setIsUploading(true);
+      
+      try {
+        const { fileName, fileUrl, key } = await uploadImage(file, folder);
+
+        setUploadedImages((prev) => {
+          const next = new Map(prev);
+          next.set(fileName, { fileName, fileUrl, key });
+          return next;
+        });
+
+        const editor = document.querySelector(".ql-editor");
+        const range = document.getSelection()?.getRangeAt(0);
+        
+        if (editor && range) {
+          const img = document.createElement("img");
+          img.src = fileUrl;
+          img.setAttribute("name", fileName);
+          img.setAttribute("key", key);
+          range.insertNode(img);
+        }
+      } catch (error) {
+        console.error("Error handling image upload:", error);
+      } finally {
+        setIsUploading(false);
+      }
+    };
+  }, [folder, setUploadedImages]);
+
+  const handleContentChange = useCallback(async (content) => {
+    onChange(content);
+    
+    if (isUploading) return;
+
+    const newImages = parseImagesFromContent(content);
+    const currentKeys = new Set(newImages.map(img => img.key));
+    
+    // Find images that were in uploadedImages but not in new content
+    const deletedImages = Array.from(uploadedImages.values())
+      .filter(img => !currentKeys.has(img.key));
+
+    // Delete removed images from S3
+    for (const image of deletedImages) {
+      const success = await deleteImage(image.key);
+      if (success) {
+        setUploadedImages(prev => {
+          const next = new Map(prev);
+          next.delete(image.fileName);
+          return next;
+        });
+      }
+    }
+  }, [uploadedImages, onChange, isUploading, parseImagesFromContent, setUploadedImages]);
+
+  const modules = {
+    toolbar: {
+      container: EditorToolbar().container,
+      handlers: { image: imageHandler }
+    },
+    clipboard: { matchVisual: false },
+    history: {
+      delay: 2000,
+      maxStack: 500,
+      userOnly: false
+    },
+    imageResize: {
+      parchment: Quill.import("parchment"),
+      modules: ["Resize", "DisplaySize", "Toolbar"],
+      displaySize: true,
+      handleStyles: {
+        backgroundColor: "black",
+        border: "none",
+        color: "white"
+      }
+    }
+  };
+
+  return (
+    <div className="text-editor-container">
+      <ReactQuill
+        value={value}
+        ref={inputRef}
+        onChange={handleContentChange}
+        modules={modules}
+        className={`mt-5 ${editorClassName}`}
+        theme="snow"
+        placeholder={placeholder}
+      />
+      {showSaveButton && onSave && (
+        <div className="flex justify-end mt-5">
+          <button
+            onClick={onSave}
+            className={`w-[15rem] text-white px-12 py-2 rounded-[8px] mb-4 h-[3rem] text-[1.2rem] tracking-[0.8px] ${saveButtonClassName} mt-28 md:mt-14`}
+            style={saveButtonStyle}
+          >
+            {saveButtonText}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TextEditor;
