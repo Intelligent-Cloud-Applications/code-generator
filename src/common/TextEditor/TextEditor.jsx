@@ -20,11 +20,10 @@ const TextEditor = ({
   saveButtonStyle = {},
   editorClassName = "",
   placeholder = "",
+  folder= "",
 }) => {
   const inputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
-  const institutionData = useContext(InstitutionContext).institutionData;
-  const folder = `${institutionData?.InstitutionId}/about-us-image`;
 
   const { uploadedImages, setUploadedImages, currentImages, parseImagesFromContent } = 
     useImageTracker(folder, value);
@@ -95,7 +94,7 @@ const TextEditor = ({
 
   const modules = {
     toolbar: {
-      container: EditorToolbar().container,
+      container: EditorToolbar(folder).container,
       handlers: { image: imageHandler }
     },
     clipboard: { matchVisual: false },

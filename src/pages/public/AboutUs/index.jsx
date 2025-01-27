@@ -17,6 +17,7 @@ const AboutUs = () => {
   const { isAuth } = useContext(Context);
   const [editing, setEditing] = useState(false);
   const util = useContext(Context).util;
+  const folder = `${institutionData?.InstitutionId}/about-us-image`;
 
 
   const [aboutUsContent, setAboutUsContent] = useState(
@@ -149,6 +150,7 @@ useEffect(() => {
               value={aboutUsContent}
               onChange={setAboutUsContent}
               onSave={handleSave}
+              folder={folder || ""}
               editorClassName="h-[90dvh] max600:h-[50rem] text-gray-800 leading-relaxed text-[1.2rem] w-full about-us-content"
               saveButtonStyle={{
                 backgroundColor: institutionData?.LightPrimaryColor,
