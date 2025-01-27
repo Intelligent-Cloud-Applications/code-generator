@@ -3,6 +3,8 @@ import { Pagination, Table, Dropdown } from "flowbite-react";
 import { API } from 'aws-amplify';
 import Context from '../../../../Context/Context';
 import InstitutionContext from '../../../../Context/InstitutionContext';
+import RevenueSection from './RevenueCard';
+
 function PaymentDetails() {
   const [currentPage, setCurrentPage] = useState(1);
   const [cashoutAmount, setCashoutAmount] = useState(0);
@@ -20,7 +22,6 @@ function PaymentDetails() {
 
   const [selectedMonth, setSelectedMonth] = useState(months[currentMonth]);
 
-  console.log(userData)
   const years = useMemo(() => {
     return [currentYear, currentYear - 1, currentYear - 2];
   }, [currentYear]);
@@ -58,17 +59,17 @@ function PaymentDetails() {
   }, [revenue, selectedYear, selectedMonth, months]);
 
   // Calculate total amounts based on filtered payments
-  const totalOnlineAmount = useMemo(() => {
-    return filteredPayments
-      ?.filter(payment => payment.paymentMode === 'online')
-      .reduce((total, payment) => total + (payment.amount || 0), 0);
-  }, [filteredPayments]);
+  // const totalOnlineAmount = useMemo(() => {
+  //   return filteredPayments
+  //     ?.filter(payment => payment.paymentMode === 'online')
+  //     .reduce((total, payment) => total + (payment.amount || 0), 0);
+  // }, [filteredPayments]);
 
-  const totalOfflineAmount = useMemo(() => {
-    return filteredPayments
-      ?.filter(payment => payment.paymentMode === 'offline')
-      .reduce((total, payment) => total + (payment.amount || 0), 0);
-  }, [filteredPayments]);
+  // const totalOfflineAmount = useMemo(() => {
+  //   return filteredPayments
+  //     ?.filter(payment => payment.paymentMode === 'offline')
+  //     .reduce((total, payment) => total + (payment.amount || 0), 0);
+  // }, [filteredPayments]);
 
   const selectedPayments = filteredPayments?.slice((currentPage - 1) * 7, currentPage * 7);
 
@@ -128,7 +129,7 @@ function PaymentDetails() {
         </div>
 
         {/* Totals Section */}
-        <div className='flex w-full justify-center flex-wrap min850:px-5 max850:gap-4'>
+        {/* <div className='flex w-full justify-center flex-wrap min850:px-5 max850:gap-4'>
           <div className="flex flex-col w-1/2 max850:w-full">
             <div className='w-full'>
               <div className='w-fit p-1 px-2 text-start text-white'
@@ -164,7 +165,8 @@ function PaymentDetails() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
+        <RevenueSection revenue={filteredPayments} cashoutAmount={cashoutAmount} />
 
         {/* Table Section */}
         <div className='mt-6 bg-white max-w-full mx-auto rounded-b-md'>
