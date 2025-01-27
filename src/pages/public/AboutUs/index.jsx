@@ -9,6 +9,8 @@ import TextEditor from "../../../common/TextEditor/TextEditor";
 import "./AboutUs.css";
 import { API } from "aws-amplify";
 import {toast} from "react-toastify";
+import { FaPencilAlt } from "react-icons/fa";
+import {MdCancel} from "react-icons/md";
 
 const AboutUs = () => {
   const institutionData = useContext(InstitutionContext)?.institutionData;
@@ -139,7 +141,17 @@ useEffect(() => {
                   }}
                   onClick={() => setEditing((prev) => !prev)}
                 >
-                  {editing ? "Cancel" : "Edit"}
+                  {editing ? (
+                    <span className="flex items-center justify-center">
+                      <MdCancel className="mr-2" />
+                      Cancel
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <FaPencilAlt className="mr-2" />
+                      Edit
+                    </span>
+                  )}
                 </button>
               </div>
             )

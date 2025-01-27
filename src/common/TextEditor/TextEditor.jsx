@@ -1,12 +1,13 @@
-import React, { useCallback, useContext, useRef, useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import Quill from "quill";
 import ImageResize from "quill-image-resize-module-react";
+import React, { useCallback, useContext, useRef, useState } from "react";
+import { FaPencilAlt } from "react-icons/fa";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import InstitutionContext from "../../Context/InstitutionContext";
-import { useImageTracker } from "./ImageTracker";
-import { uploadImage, deleteImage } from "./ImageUploader";
 import EditorToolbar from "./EditorToolbar";
+import { useImageTracker } from "./ImageTracker";
+import { deleteImage, uploadImage } from "./ImageUploader";
 
 Quill.register("modules/imageResize", ImageResize);
 
@@ -20,13 +21,18 @@ const TextEditor = ({
   saveButtonStyle = {},
   editorClassName = "",
   placeholder = "",
-  folder= "",
+  folder = "",
+  ...rest
 }) => {
   const inputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const { uploadedImages, setUploadedImages, currentImages, parseImagesFromContent } = 
-    useImageTracker(folder, value);
+  const {
+    uploadedImages,
+    setUploadedImages,
+    currentImages,
+    parseImagesFromContent,
+  } = useImageTracker(folder, value);
 
   const imageHandler = useCallback(() => {
     const input = document.createElement("input");
@@ -39,7 +45,7 @@ const TextEditor = ({
 
       const file = input.files[0];
       setIsUploading(true);
-      
+
       try {
         const { fileName, fileUrl, key } = await uploadImage(file, folder);
 
@@ -51,7 +57,7 @@ const TextEditor = ({
 
         const editor = document.querySelector(".ql-editor");
         const range = document.getSelection()?.getRangeAt(0);
-        
+
         if (editor && range) {
           const img = document.createElement("img");
           img.src = fileUrl;
@@ -67,41 +73,51 @@ const TextEditor = ({
     };
   }, [folder, setUploadedImages]);
 
-  const handleContentChange = useCallback(async (content) => {
-    onChange(content);
-    
-    if (isUploading) return;
+  const handleContentChange = useCallback(
+    async (content) => {
+      onChange(content);
 
-    const newImages = parseImagesFromContent(content);
-    const currentKeys = new Set(newImages.map(img => img.key));
-    
-    // Find images that were in uploadedImages but not in new content
-    const deletedImages = Array.from(uploadedImages.values())
-      .filter(img => !currentKeys.has(img.key));
+      if (isUploading) return;
 
-    // Delete removed images from S3
-    for (const image of deletedImages) {
-      const success = await deleteImage(image.key);
-      if (success) {
-        setUploadedImages(prev => {
-          const next = new Map(prev);
-          next.delete(image.fileName);
-          return next;
-        });
+      const newImages = parseImagesFromContent(content);
+      const currentKeys = new Set(newImages.map((img) => img.key));
+
+      // Find images that were in uploadedImages but not in new content
+      const deletedImages = Array.from(uploadedImages.values()).filter(
+        (img) => !currentKeys.has(img.key)
+      );
+
+      // Delete removed images from S3
+      for (const image of deletedImages) {
+        const success = await deleteImage(image.key);
+        if (success) {
+          setUploadedImages((prev) => {
+            const next = new Map(prev);
+            next.delete(image.fileName);
+            return next;
+          });
+        }
       }
-    }
-  }, [uploadedImages, onChange, isUploading, parseImagesFromContent, setUploadedImages]);
+    },
+    [
+      uploadedImages,
+      onChange,
+      isUploading,
+      parseImagesFromContent,
+      setUploadedImages,
+    ]
+  );
 
   const modules = {
     toolbar: {
       container: EditorToolbar(folder).container,
-      handlers: { image: imageHandler }
+      handlers: { image: imageHandler },
     },
     clipboard: { matchVisual: false },
     history: {
       delay: 2000,
       maxStack: 500,
-      userOnly: false
+      userOnly: false,
     },
     imageResize: {
       parchment: Quill.import("parchment"),
@@ -110,9 +126,9 @@ const TextEditor = ({
       handleStyles: {
         backgroundColor: "black",
         border: "none",
-        color: "white"
-      }
-    }
+        color: "white",
+      },
+    },
   };
 
   return (

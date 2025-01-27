@@ -1,7 +1,5 @@
-// components/TextEditor/EditorToolbar.jsx
-import React from "react";
-
-const EditorToolbar = (folder) => ({
+// EditorToolbar.jsx
+const EditorToolbar = (folders) => ({
   container: [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
     [{ font: [] }],
@@ -10,7 +8,11 @@ const EditorToolbar = (folder) => ({
     [{ color: [] }, { background: [] }],
     [{ align: [] }],
     [{ list: "ordered" }, { list: "bullet" }],
-    ["link", ...(folder !== "" ? ["image"] : [])].filter(Boolean),
+    [
+      "link",
+      ...(folders.images !== "" ? ["image"] : []),
+      ...(folders.videos !== "" ? ["video"] : [])
+    ].filter(Boolean),
     [{ blockquote: true }],
     ["clean"],
   ],

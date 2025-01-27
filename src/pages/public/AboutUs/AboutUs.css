@@ -201,7 +201,7 @@
 
 .edit-button-container {
     position: fixed;
-    top: 100px;
+    top: 140px;
     right: 40px;
     z-index: 1000;
     display: flex;
@@ -249,7 +249,7 @@
 
     .edit-button-container {
         right: 20px;
-        top: 80px;
+        top: 140px;
     }
 }
 
