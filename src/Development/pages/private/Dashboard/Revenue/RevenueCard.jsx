@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 const RevenueCard = ({ 
   currency, 
   totalCollected = 0, 
-  totalPaid = 0, 
+  totalPaid, 
   transactionCount = 0, 
   minAmount = 0, 
   maxAmount = 0,
@@ -101,81 +101,95 @@ const RevenueCard = ({
 };
 
 const RevenueSection = ({ revenue = [], cashoutAmount }) => {
-  // Calculate USD online total
-  const usdOnlineAmount = useMemo(() => {
-    return revenue
-      ?.filter(payment => payment.paymentMode === 'online' && payment.currency === 'USD')
-      .reduce((total, payment) => total + (payment.amount || 0), 0);
-  }, [revenue]);
-
-  // Calculate INR online total
-  const inrOnlineAmount = useMemo(() => {
-    return revenue
-      ?.filter(payment => payment.paymentMode === 'online' && payment.currency === 'INR')
-      .reduce((total, payment) => total + (payment.amount || 0), 0);
-  }, [revenue]);
-
-  // Calculate offline total and count
-  const offlineStats = useMemo(() => {
-    const offlinePayments = revenue?.filter(payment => payment.paymentMode === 'offline') || [];
-    return {
-      total: offlinePayments.reduce((total, payment) => total + (payment.amount || 0), 0),
-      count: offlinePayments.length
-    };
-  }, [revenue]);
-
-  // Get transaction counts and ranges for USD
+  // Calculate USD stats
   const usdStats = useMemo(() => {
     const onlineUsdPayments = revenue?.filter(payment => 
-      payment.paymentMode === 'online' && payment.currency === 'USD'
+      payment.paymentMode !== 'offline' && 
+      payment.currency === 'USD'
     ) || [];
-    
-    const amounts = onlineUsdPayments.map(p => p.amount || 0);
-    return {
-      count: onlineUsdPayments.length,
-      minAmount: amounts.length ? Math.min(...amounts) : 0,
-      maxAmount: amounts.length ? Math.max(...amounts) : 0
-    };
+
+    return onlineUsdPayments.reduce((stats, payment) => {
+      const amount = parseInt(payment.amount) || 0;
+      if (!Number.isFinite(amount)) return stats;
+
+      return {
+        total: stats.total + amount,
+        count: stats.count + 1,
+        amounts: [...stats.amounts, amount]
+      };
+    }, { total: 0, count: 0, amounts: [] });
   }, [revenue]);
 
-  // Get transaction counts and ranges for INR
+  // Calculate INR stats
   const inrStats = useMemo(() => {
     const onlineInrPayments = revenue?.filter(payment => 
-      payment.paymentMode === 'online' && payment.currency === 'INR'
+      payment.paymentMode !== 'offline' && 
+      payment.currency === 'INR'
     ) || [];
-    
-    const amounts = onlineInrPayments.map(p => p.amount || 0);
-    return {
-      count: onlineInrPayments.length,
-      minAmount: amounts.length ? Math.min(...amounts) : 0,
-      maxAmount: amounts.length ? Math.max(...amounts) : 0
-    };
+
+    return onlineInrPayments.reduce((stats, payment) => {
+      const amount = parseInt(payment.amount) || 0;
+      if (!Number.isFinite(amount)) return stats;
+
+      return {
+        total: stats.total + amount,
+        count: stats.count + 1,
+        amounts: [...stats.amounts, amount]
+      };
+    }, { total: 0, count: 0, amounts: [] });
   }, [revenue]);
+
+  // Calculate offline stats
+  const offlineStats = useMemo(() => {
+    const offlinePayments = revenue?.filter(payment => 
+      payment.paymentMode === 'offline'
+    ) || [];
+
+    return offlinePayments.reduce((stats, payment) => {
+      const amount = parseInt(payment.amount) || 0;
+      if (!Number.isFinite(amount)) return stats;
+      
+      return {
+        total: stats.total + amount,
+        count: stats.count + 1
+      };
+    }, { total: 0, count: 0 });
+  }, [revenue]);
+
+  // Calculate total paid amounts from cashout logs
+  const paidAmounts = useMemo(() => {
+    const cashoutLogs = cashoutAmount?.client?.[0]?.cashoutLogs || [];
+    return {
+      USD: cashoutLogs
+        .filter(log => log.currency === 'USD' && log.status === 'Transferred')
+        .reduce((total, log) => total + (parseFloat(log.amount) ), 0),
+      INR: cashoutLogs
+        .filter(log => log.currency === 'INR' && log.status === 'Transferred')
+        .reduce((total, log) => total + (parseFloat(log.amount) ), 0)
+    };
+  }, [cashoutAmount]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-      {/* USD Online Card */}
       <RevenueCard
         currency="USD"
-        totalCollected={usdOnlineAmount}
-        totalPaid={usdOnlineAmount}
+        totalCollected={usdStats.total}
+        totalPaid={paidAmounts.USD}
         transactionCount={usdStats.count}
-        minAmount={usdStats.minAmount}
-        maxAmount={usdStats.maxAmount}
+        minAmount={Math.min(...usdStats.amounts)}
+        maxAmount={Math.max(...usdStats.amounts)}
       />
       
-      {/* INR Online Card */}
       <RevenueCard
         currency="INR"
-        totalCollected={inrOnlineAmount}
-        totalPaid={inrOnlineAmount}
+        totalCollected={inrStats.total}
+        totalPaid={paidAmounts.INR}
         transactionCount={inrStats.count}
-        minAmount={inrStats.minAmount}
-        maxAmount={inrStats.maxAmount}
+        minAmount={Math.min(...inrStats.amounts)}
+        maxAmount={Math.max(...inrStats.amounts)}
         cashoutDate={cashoutAmount?.paymentDate}
       />
       
-      {/* Offline Collections Card */}
       <RevenueCard
         currency="INR"
         totalCollected={offlineStats.total}

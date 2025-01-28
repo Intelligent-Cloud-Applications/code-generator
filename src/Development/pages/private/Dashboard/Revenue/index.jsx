@@ -58,19 +58,6 @@ function PaymentDetails() {
     });
   }, [revenue, selectedYear, selectedMonth, months]);
 
-  // Calculate total amounts based on filtered payments
-  // const totalOnlineAmount = useMemo(() => {
-  //   return filteredPayments
-  //     ?.filter(payment => payment.paymentMode === 'online')
-  //     .reduce((total, payment) => total + (payment.amount || 0), 0);
-  // }, [filteredPayments]);
-
-  // const totalOfflineAmount = useMemo(() => {
-  //   return filteredPayments
-  //     ?.filter(payment => payment.paymentMode === 'offline')
-  //     .reduce((total, payment) => total + (payment.amount || 0), 0);
-  // }, [filteredPayments]);
-
   const selectedPayments = filteredPayments?.slice((currentPage - 1) * 7, currentPage * 7);
 
   const handleRowClick = (payment) => {
@@ -128,44 +115,6 @@ function PaymentDetails() {
           )}
         </div>
 
-        {/* Totals Section */}
-        {/* <div className='flex w-full justify-center flex-wrap min850:px-5 max850:gap-4'>
-          <div className="flex flex-col w-1/2 max850:w-full">
-            <div className='w-full'>
-              <div className='w-fit p-1 px-2 text-start text-white'
-                style={{
-                  backgroundColor: InstitutionData.PrimaryColor
-                }}
-              >
-                Online Collection
-              </div>
-            </div>
-            <div className='p-4 border'>
-              <div className='text-[2rem] font-[700]'>
-                {formatAmountWithCurrency(totalOnlineAmount, currency)}
-              </div>
-              <div className='text-[0.9rem] font-[500] text-[gray]'>
-                Last Cashout amount is <span className='text-green-600 text-bold'>₹{cashoutAmount?.amount}</span> on date {cashoutAmount?.paymentDate}
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col w-1/2 max850:w-full">
-            <div className='w-full flex justify-end max800:justify-start'>
-              <div className='w-fit p-1 px-2 text-start text-white'
-                style={{
-                  backgroundColor: InstitutionData.PrimaryColor
-                }}
-              >
-                Offline Collection
-              </div>
-            </div>
-            <div className='p-4 h-full border'>
-              <div className='text-[2rem] font-[700]'>
-                {formatAmountWithCurrency(totalOfflineAmount, currency)}
-              </div>
-            </div>
-          </div>
-        </div> */}
         <RevenueSection revenue={filteredPayments} cashoutAmount={cashoutAmount} />
 
         {/* Table Section */}
