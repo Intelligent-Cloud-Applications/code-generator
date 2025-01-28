@@ -24,7 +24,7 @@ const Perks = () => {
       className="New flex justify-between max600:h-[60rem] h-[52rem] blurimg w-[auto] relative pt-[3.5rem] pb-20 pr-5 pl-5 max600:flex-col max600:mx-0 max600:items-start max600:m-0 max600:w-[100vw] overflow-hidden"
       style={{
         backgroundImage: `url(${InstitutionData.ServicesBg})`,
-        backgroundSize: 'cover',
+        backgroundSize: "cover",
       }}
     >
       <div
@@ -33,22 +33,22 @@ const Perks = () => {
           borderColor: InstitutionData.PrimaryColor,
         }}
       >
-        {services.slice(0, 2).map((service, index) => (
+        {services?.slice(0, 2)?.map((service, index) => (
           <div
             className="w-[20rem] max800:w-[14rem] max600:w-[100%]"
             key={index}
           >
             <h1
               className="text-[2rem] max800:text-[1.5rem] font-russo max600:text-[1.6rem]"
-              style={{ color: InstitutionData.ServicesBg ? 'white' : 'black' }}
+              style={{ color: InstitutionData?.ServicesBg ? "white" : "black" }}
             >
-              {service.title}
+              {service?.title}
             </h1>
             <ul
               className="max800:text-[0.8rem] list-disc max950:pl-[3rem] max600:pl-0 text-justify"
-              style={{ color: InstitutionData.ServicesBg ? 'white' : 'black' }}
+              style={{ color: InstitutionData?.ServicesBg ? "white" : "black" }}
             >
-              {service.items.map((item, itemIndex) => (
+              {service?.items?.map((item, itemIndex) => (
                 <li key={itemIndex}>{item}</li>
               ))}
             </ul>
@@ -68,15 +68,15 @@ const Perks = () => {
           >
             <h1
               className="text-[2rem] max800:text-[1.5rem] max600:text-[1.6rem] font-russo max950:pl-[3rem] max600:pl-0"
-              style={{ color: InstitutionData.ServicesBg ? 'white' : 'black' }}
+              style={{ color: InstitutionData.ServicesBg ? "white" : "black" }}
             >
               {service.title}
             </h1>
             <ul
               className="max800:text-[0.8rem] list-disc max950:pl-[3rem] max600:pl-0 text-justify"
-              style={{ color: InstitutionData.ServicesBg ? 'white' : 'black' }}
+              style={{ color: InstitutionData.ServicesBg ? "white" : "black" }}
             >
-              {service.items.map((item, itemIndex) => (
+              {service?.items?.map((item, itemIndex) => (
                 <li key={itemIndex}>{item}</li>
               ))}
             </ul>
