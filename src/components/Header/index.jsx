@@ -6,10 +6,9 @@ import NavBar from "./NavBar";
 
 const Header = () => {
   const { isAuth, userData } = useContext(Context);
-  const { imgUrl, userName, status, userType } = userData;
-
+  const { imgUrl, userName, status } = userData;
   const { productId } = useContext(institutionContext).institutionData;
-  // console.log("productId: "+ productId);
+
   const getInitials = (name) => {
     if (!name) return '';
     const initials = name
@@ -68,27 +67,27 @@ const Header = () => {
       ];
   } else if (productId === "1000007") { // Advanced Plan
     authBarContent = isAuth
-      ? [
-        { label: `Welcome, ${userName?.split(' ')[0]}`, path: "/dashboard" },
-        { label: "Dashboard", path: "/dashboard" },
-        { label: profileImage, path: "/dashboard" },
-      ]
-      : [
-        { label: 'Login', path: '/login' },
-        { label: 'Join Now', path: '/signup' },
-      ];
+    ? [
+      { label: `Welcome, ${userName?.split(' ')[0]}`, path: "/dashboard" },
+      { label: "Dashboard", path: "/dashboard" },
+      { label: profileImage, path: "/dashboard" },
+    ]
+    : [
+      { label: 'Login', path: '/login' },
+      { label: 'Join Now', path: '/signup' },
+      { label: process.env.REACT_APP_STAGE !== 'PROD' && "Dev", path: "/auth" },
+    ];
   }
-
   const navBarContent = [
     { label: "ABOUT US", path: "/aboutus" },
     { label: "INSTRUCTOR", path: "/instructor" },
     { label: "GALLERY", path: "/gallery" },
     { label: "SCHEDULE", path: "/schedule" },
   ];
-
+  
   return (
     <header className="z-50">
-      {authBarContent.length > 0 && <AuthBar content={authBarContent} />}
+      <AuthBar content={authBarContent} />
       <NavBar content={navBarContent} />
     </header>
   );
