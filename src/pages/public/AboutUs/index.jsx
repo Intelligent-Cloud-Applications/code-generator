@@ -12,6 +12,8 @@ import {toast} from "react-toastify";
 
 const AboutUs = () => {
   const institutionData = useContext(InstitutionContext)?.institutionData;
+  const { productId } = useContext(InstitutionContext).institutionData;
+  console.log("productId: "+ productId);
   const UserCtx = useContext(Context).userData;
   const navigate = useNavigate();
   const { isAuth } = useContext(Context);
@@ -168,6 +170,7 @@ useEffect(() => {
         </div>
 
         {/* Call-to-Action Button */}
+        {productId === "1000007" && (
         <div className="flex justify-center mt-[20px]">
           <button
             className="w-[15rem] text-white px-12 py-2 rounded-[8px] mb-4 h-[3rem] text-[1.2rem] tracking-[0.8px]"
@@ -179,6 +182,7 @@ useEffect(() => {
             {isAuth ? "Dashboard" : "Sign Up Now"}
           </button>
         </div>
+        )}
         <Footer />
       </div>
     </>
