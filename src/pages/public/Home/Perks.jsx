@@ -1,96 +1,231 @@
-import React, { useContext, useEffect } from 'react';
-import InstitutionContext from '../../../Context/InstitutionContext';
+import React, { useContext, useState, useRef } from "react";
+import InstitutionContext from "../../../Context/InstitutionContext";
+import { GrEdit } from "react-icons/gr";
+import { Button, Label, Modal, TextInput, FileInput } from "flowbite-react";
+import { FaPlus } from "react-icons/fa6";
+import Context from "../../../Context/Context";
 
 const Perks = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
-  const services = InstitutionData.Services;
+  const { PrimaryColor } = InstitutionData;
+  const [services, setServices] = useState(InstitutionData.Services || []);
+  const [openModal, setOpenModal] = useState(false);
+  const [modalMode, setModalMode] = useState("create");
+  const [currentService, setCurrentService] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    serviceImg: null
+  });
+  
+  const UserCtx = useContext(Context);
+  const isAdmin = UserCtx.userData.userType === "admin";
 
-  useEffect(() => {
-    // Preload the background image                  
-    const bgImage = new Image();
-    bgImage.src = InstitutionData.ServicesBg;
-
-    // Preload the portrait image
-    if (InstitutionData.ServicesPortrait) {
-      const portraitImage = new Image();
-      portraitImage.src = InstitutionData.ServicesPortrait;
+  const handleModalOpen = (mode, service = null) => {
+    setModalMode(mode);
+    if (mode === "edit" && service) {
+      setFormData({
+        title: service.title || "",
+        description: service.description || "",
+        serviceImg: service.serviceImg || null
+      });
+      setCurrentService(service);
+    } else {
+      setFormData({
+        title: "",
+        description: "",
+        serviceImg: null
+      });
     }
-  }, [InstitutionData.ServicesBg, InstitutionData.ServicesPortrait]);
+    setOpenModal(true);
+  };
 
-  console.log(services);
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id === "text" ? "title" : id]: value
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        serviceImg: file
+      }));
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("description", formData.description);
+      if (formData.serviceImg) {
+        formDataToSend.append("serviceImg", formData.serviceImg);
+      }
+
+      if (modalMode === "edit" && currentService) {
+        formDataToSend.append("serviceId", currentService.id); // Assuming each service has an id
+      }
+
+      // Using the same API endpoint for both create and update
+      const response = await fetch("/admin/update-service-data", {
+        method: "PUT",
+        body: formDataToSend
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save service");
+      }
+
+      const savedService = await response.json();
+
+      if (modalMode === "create") {
+        setServices(prev => [...prev, savedService]);
+      } else {
+        setServices(prev =>
+          prev.map(service =>
+            service.id === currentService.id ? savedService : service
+          )
+        );
+      }
+
+      setOpenModal(false);
+      setFormData({
+        title: "",
+        description: "",
+        serviceImg: null
+      });
+      setCurrentService(null);
+    } catch (error) {
+      console.error("Error saving service:", error);
+      // Handle error (show error message to user)
+    }
+  };
 
   return (
-    <div
-      className="New flex justify-between max600:h-[60rem] h-[52rem] blurimg w-[auto] relative pt-[3.5rem] pb-20 pr-5 pl-5 max600:flex-col max600:mx-0 max600:items-start max600:m-0 max600:w-[100vw] overflow-hidden"
-      style={{
-        backgroundImage: `url(${InstitutionData.ServicesBg})`,
-        backgroundSize: 'cover',
-      }}
-    >
-      <div
-        className="p-10 flex flex-col max600:items-center justify-between bg-transparent border-y-[0.4rem] rounded-tl-lg rounded-bl-lg border-l-[0.4rem] w-[38vw] h-[45rem] max600:h-auto max600:border-0 max600:w-[100%]"
-        style={{
-          borderColor: InstitutionData.PrimaryColor,
-        }}
+    <>
+      <Modal
+        show={openModal}
+        size="md"
+        popup
+        onClose={() => setOpenModal(false)}
       >
-        {services.slice(0, 2).map((service, index) => (
-          <div
-            className="w-[20rem] max800:w-[14rem] max600:w-[100%]"
-            key={index}
-          >
-            <h1
-              className="text-[2rem] max800:text-[1.5rem] font-russo max600:text-[1.6rem]"
-              style={{ color: InstitutionData.ServicesBg ? 'white' : 'black' }}
-            >
-              {service.title}
-            </h1>
-            <ul
-              className="max800:text-[0.8rem] list-disc max950:pl-[3rem] max600:pl-0 text-justify"
-              style={{ color: InstitutionData.ServicesBg ? 'white' : 'black' }}
-            >
-              {service.items.map((item, itemIndex) => (
-                <li key={itemIndex}>{item}</li>
-              ))}
-            </ul>
+        <Modal.Header />
+        <Modal.Body>
+          <div className="space-y-6">
+            <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+              {modalMode === "create" ? "Create a New Service" : "Update This Service"}
+            </h3>
+
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="file-upload-helper-text" value="Upload file" />
+              </div>
+              <FileInput
+                id="file-upload-helper-text"
+                helperText="SVG, PNG, JPG or GIF."
+                onChange={handleFileChange}
+              />
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="title" value="Title" />
+              </div>
+              <TextInput
+                id="title"
+                type="text"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Enter the title of this service"
+              />
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="description" value="Description" />
+              </div>
+              <TextInput
+                id="description"
+                type="text"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Enter the Description of this service"
+              />
+            </div>
+
+            <div className="w-full">
+              <Button
+                onClick={handleSubmit}
+                style={{ backgroundColor: PrimaryColor }}
+              >
+                {modalMode === "create" ? "Create" : "Update"}
+              </Button>
+            </div>
           </div>
-        ))}
-      </div>
-      <div
-        className="Over p-10 flex flex-col max600:items-center max600:pt-0 items-end bg-transparent border-y-[0.4rem] rounded-tr-lg rounded-br-lg border-r-[0.4rem] w-[38vw] h-[45rem] max600:h-auto max600:border-0 max600:w-[100%] justify-between"
-        style={{
-          borderColor: InstitutionData.PrimaryColor,
-        }}
-      >
-        {services.slice(2).map((service, index) => (
-          <div
-            className="w-[20rem] max800:w-[14rem] max600:w-[100%]"
-            key={index}
+        </Modal.Body>
+      </Modal>
+
+      <div className="w-full h-auto bg-[#E6F5F1] py-16 flex flex-col items-center">
+        <div className="text-center mb-12">
+          <h1
+            className={`text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider`}
+            style={{ color: PrimaryColor }}
           >
-            <h1
-              className="text-[2rem] max800:text-[1.5rem] max600:text-[1.6rem] font-russo max950:pl-[3rem] max600:pl-0"
-              style={{ color: InstitutionData.ServicesBg ? 'white' : 'black' }}
+            Features
+          </h1>
+          <p className="text-gray-700 mt-2 text-lg">Our Features & Services.</p>
+        </div>
+
+        <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+          {services?.map((service, index) => (
+            <div
+              key={index}
+              className="relative bg-white rounded-lg shadow-lg overflow-hidden text-center flex flex-col items-center p-6 h-[470px]"
             >
-              {service.title}
-            </h1>
-            <ul
-              className="max800:text-[0.8rem] list-disc max950:pl-[3rem] max600:pl-0 text-justify"
-              style={{ color: InstitutionData.ServicesBg ? 'white' : 'black' }}
-            >
-              {service.items.map((item, itemIndex) => (
-                <li key={itemIndex}>{item}</li>
-              ))}
-            </ul>
+              {isAdmin && (
+                <button
+                  onClick={() => handleModalOpen("edit", service)}
+                  className={`absolute top-4 right-4 text-xl font-medium py-2 px-6`}
+                  style={{ color: PrimaryColor }}
+                >
+                  <GrEdit />
+                </button>
+              )}
+
+              <img
+                className="w-60 h-60 mb-6"
+                src={service.serviceImg}
+                alt={service.title}
+              />
+              <h2
+                className={`font-semibold text-lg mb-2`}
+                style={{ color: PrimaryColor }}
+              >
+                {service.title}
+              </h2>
+              <p className="text-gray-600 text-sm mb-4">
+                {service.description ||
+                  "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum, reiciendis quaerat! Ipsa maxime numquam iusto obcaecati."}
+              </p>
+            </div>
+          ))}
+          <div className="w-full flex justify-center mt-8 relative">
+            {isAdmin && (
+              <button
+                onClick={() => handleModalOpen("create")}
+                className={`text-white font-semibold px-6 py-3 rounded-lg h-[50px] absolute top-1/2 transform -translate-y-1/2`}
+                style={{ backgroundColor: PrimaryColor }}
+              >
+                <FaPlus />
+              </button>
+            )}
           </div>
-        ))}
+        </div>
       </div>
-      {InstitutionData.ServicesPortrait && (
-        <img
-          src={InstitutionData.ServicesPortrait}
-          className="xs:block hidden absolute left-[55%] -translate-x-[60%] w-[40vw] max1078:-left-[50.9%] borderbox-hidden bottom-[-39px] max1920:bottom-[10%]"
-          alt=""
-        />
-      )}
-    </div>
+    </>
   );
 };
 
