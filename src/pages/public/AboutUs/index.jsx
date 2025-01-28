@@ -5,10 +5,12 @@ import Footer from "../../../components/Footer";
 import Context from "../../../Context/Context";
 import { useNavigate } from "react-router-dom";
 import InstitutionContext from "../../../Context/InstitutionContext";
-import TextEditor from "../../../common/DataDisplay/TextEditor";
+import TextEditor from "../../../common/TextEditor/TextEditor";
 import "./AboutUs.css";
 import { API } from "aws-amplify";
 import {toast} from "react-toastify";
+import { FaPencilAlt } from "react-icons/fa";
+import {MdCancel} from "react-icons/md";
 
 const AboutUs = () => {
   const institutionData = useContext(InstitutionContext)?.institutionData;
@@ -19,6 +21,7 @@ const AboutUs = () => {
   const { isAuth } = useContext(Context);
   const [editing, setEditing] = useState(false);
   const util = useContext(Context).util;
+  const folder = `${institutionData?.InstitutionId}/about-us-image`;
 
 
   const [aboutUsContent, setAboutUsContent] = useState(
@@ -28,7 +31,7 @@ const AboutUs = () => {
     institutionData?.AboutUs || ""
   );
 
-  console.log(aboutUsContent)
+  // console.log(aboutUsContent)
 
   const setPadding = () => {
     const tags = document.querySelectorAll("span");
@@ -140,7 +143,17 @@ useEffect(() => {
                   }}
                   onClick={() => setEditing((prev) => !prev)}
                 >
-                  {editing ? "Cancel" : "Edit"}
+                  {editing ? (
+                    <span className="flex items-center justify-center">
+                      <MdCancel className="mr-2" />
+                      Cancel
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <FaPencilAlt className="mr-2" />
+                      Edit
+                    </span>
+                  )}
                 </button>
               </div>
             )
@@ -151,6 +164,7 @@ useEffect(() => {
               value={aboutUsContent}
               onChange={setAboutUsContent}
               onSave={handleSave}
+              folder={folder || ""}
               editorClassName="h-[90dvh] max600:h-[50rem] text-gray-800 leading-relaxed text-[1.2rem] w-full about-us-content"
               saveButtonStyle={{
                 backgroundColor: institutionData?.LightPrimaryColor,
