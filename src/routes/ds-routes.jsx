@@ -1,5 +1,6 @@
 // Packages
 import { Routes, Route } from "react-router-dom";
+import React, { useContext } from "react";
 
 // Local
 import Home from "../pages/public/Home";
@@ -31,6 +32,7 @@ import { HybridPayment } from "../pages/private/HybridPayment";
 import HomePayment from "../CommonPayment/HomePayment";
 import PaymentError from "../pages/PaymentError";
 import PhoneAuth from "../pages/Auth/phone";
+import InstitutionContext from "../Context/InstitutionContext";
 
 //const Navigate = ({to}) => {
 //  const navigate = useNavigate();
@@ -44,6 +46,7 @@ import PhoneAuth from "../pages/Auth/phone";
 
 // Code
 const RoutesContainer = () => {
+  const { productId } = useContext(InstitutionContext).institutionData;
 
   return (
     <Routes>
@@ -55,9 +58,15 @@ const RoutesContainer = () => {
       <Route path="/privacypolicy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/refund" element={<Refund />} />
+      {productId !== "1000008" && (
+        <>
       <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
+      </>
+      )}
+      {productId === "1000007" && (
       <Route path="/signup" element={<Signup />} />
+      )}
       <Route path="/dashboard" element={<DashBoard />} />
       <Route path="/meeting" element={<Meeting />} />
       <Route path="/query" element={<Query />} />

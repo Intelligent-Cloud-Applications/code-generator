@@ -10,6 +10,7 @@ import RazorpayPayment from "../Subscription/RazorpayPayment";
 
 const Subscription = () => {
   const { institutionData: InstitutionData } = useContext(InstitutionContext);
+  const { productId } = useContext(InstitutionContext).institutionData;
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const [products, setProducts] = useState([]);
   const Navigate = useNavigate();
@@ -202,7 +203,7 @@ useEffect(() => {
             >
               Choose plan
             </button> */}
-            {paymentHandler(item)}
+            {productId === "1000007" && paymentHandler(item)}
           </Card>
         ))}
       </div>
