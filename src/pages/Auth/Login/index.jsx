@@ -15,7 +15,7 @@ const customTheme = {
 
 const AuthPage = () => {
   const { setLoader } = useContext(Context).util;
-  const { InstitutionId } = useContext(InstitutionContext).institutionData;
+  const { InstitutionId, productId } = useContext(InstitutionContext).institutionData;
   const navigate = useNavigate();
 
   const handleLogin = async (event) => {
@@ -62,6 +62,9 @@ const AuthPage = () => {
         onSubmit={handleLogin}
         className='flex flex-col items-center gap-6 w-full'
       >
+        
+        {productId === "1000007" && (
+          <>
         <button
           className="flex items-center bg-white text-black px-4 py-2 border rounded-md"
           type='button'
@@ -75,11 +78,15 @@ const AuthPage = () => {
           Sign in with Google
         </button>
         <HR.Text text='or' theme={customTheme}/>
+        </>
+      )}
         <EmailInput name='email' className='rounded w-full'/>
         <PasswordInput name='password' className='rounded w-full'/>
         <Link to={'/forgot-password'}>Forgot password?</Link>
         <PrimaryButton>Continue</PrimaryButton>
-        <p>Dont have an account? <Link className='underline' to={'/signup'}>Signup</Link></p>
+        {productId === "1000007" && (
+        <p>Dont have an account? <Link to={'/signup'}>Signup</Link></p>
+        )}
       </form>
     </FormWrapper>
   );
