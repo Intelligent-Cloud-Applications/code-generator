@@ -1,12 +1,15 @@
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState } from "react";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import { GrEdit } from "react-icons/gr";
 import { Button, Label, Modal, TextInput, FileInput } from "flowbite-react";
 import { FaPlus } from "react-icons/fa6";
 import Context from "../../../Context/Context";
+import { Storage } from "aws-amplify";
+import { Auth, API } from "aws-amplify";
 
 const Perks = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
+  const { InstitutionId } = InstitutionData; 
   const { PrimaryColor } = InstitutionData;
   const [services, setServices] = useState(InstitutionData.Services || []);
   const [openModal, setOpenModal] = useState(false);
@@ -15,9 +18,9 @@ const Perks = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    serviceImg: null
+    serviceImg: null,
   });
-  
+
   const UserCtx = useContext(Context);
   const isAdmin = UserCtx.userData.userType === "admin";
 
@@ -27,107 +30,148 @@ const Perks = () => {
       setFormData({
         title: service.title || "",
         description: service.description || "",
-        serviceImg: service.serviceImg || null
+        serviceImg: null,
       });
       setCurrentService(service);
     } else {
       setFormData({
         title: "",
         description: "",
-        serviceImg: null
+        serviceImg: null,
       });
+      setCurrentService(null);
     }
     setOpenModal(true);
   };
 
+  const handleModalClose = () => {
+    setOpenModal(false);
+    setFormData({
+      title: "",
+      description: "",
+      serviceImg: null,
+    });
+    setCurrentService(null);
+  };
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [id === "text" ? "title" : id]: value
+      [id]: value,
     }));
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({
+    if (file && file.size <= 5 * 1024 * 1024) {
+      setFormData((prev) => ({
         ...prev,
-        serviceImg: file
+        serviceImg: file,
       }));
+    } else {
+      alert("File size must be less than 5MB.");
+    }
+  };
+
+  const uploadToS3 = async (file) => {
+    try {
+      const response = await Storage.put(`services/${file.name}`, file, {
+        contentType: file.type,
+        ACL: "public-read",
+      });
+      const url = await Storage.get(response.key);
+      return url.split("?")[0]; // Remove query parameters from the URL
+    } catch (error) {
+      console.error("Error uploading to S3:", error);
+      throw error;
     }
   };
 
   const handleSubmit = async () => {
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("title", formData.title);
-      formDataToSend.append("description", formData.description);
+      let serviceImgUrl = currentService?.serviceImg;
+
       if (formData.serviceImg) {
-        formDataToSend.append("serviceImg", formData.serviceImg);
+        serviceImgUrl = await uploadToS3(formData.serviceImg);
       }
 
-      if (modalMode === "edit" && currentService) {
-        formDataToSend.append("serviceId", currentService.id); // Assuming each service has an id
+      if (!serviceImgUrl && modalMode === "create") {
+        alert("Please upload an image.");
+        return;
       }
 
-      // Using the same API endpoint for both create and update
-      const response = await fetch("/admin/update-service-data", {
-        method: "PUT",
-        body: formDataToSend
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save service");
-      }
-
-      const savedService = await response.json();
+      let serviceData = {
+        title: formData.title,
+        description: formData.description,
+        serviceImg: serviceImgUrl,
+      };
 
       if (modalMode === "create") {
-        setServices(prev => [...prev, savedService]);
+        // Assign a unique serial number
+        const newSerialNumber =
+          services.length > 0
+            ? Math.max(...services.map((s) => s.serialNumber || 0)) + 1
+            : 1;
+        serviceData.serialNumber = newSerialNumber;
       } else {
-        setServices(prev =>
-          prev.map(service =>
-            service.id === currentService.id ? savedService : service
-          )
-        );
+        serviceData.serialNumber = currentService.serialNumber;
       }
 
-      setOpenModal(false);
-      setFormData({
-        title: "",
-        description: "",
-        serviceImg: null
-      });
-      setCurrentService(null);
+      console.log("Making API request with data:", serviceData);
+
+      const response = await API.put(
+        "main",
+        `/admin/update-service-data/${InstitutionId}?type=${modalMode === "create" ? "create" : "update"}`,
+        {
+          body: { service: serviceData }
+        }
+      );
+      
+      
+
+      console.log("API response:", response);
+
+      if (response.statusCode === 200) {
+        setServices((prev) => {
+          if (modalMode === "create") {
+            return [...prev, response.service];
+          } else {
+            return prev.map((service) =>
+              service.serialNumber === currentService.serialNumber
+                ? response.service
+                : service
+            );
+          }
+        });
+
+        handleModalClose();
+      } else {
+        throw new Error(response.error || "Failed to save service");
+      }
     } catch (error) {
-      console.error("Error saving service:", error);
-      // Handle error (show error message to user)
+      console.error("Detailed error:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
   return (
     <>
-      <Modal
-        show={openModal}
-        size="md"
-        popup
-        onClose={() => setOpenModal(false)}
-      >
-        <Modal.Header />
+      <Modal show={openModal} onClose={handleModalClose} size="md" popup>
+        <Modal.Header>
+          <div className="text-xl font-medium text-gray-900 dark:text-white">
+            {modalMode === "create" ? "Create a New Service" : "Update Service"}
+          </div>
+        </Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
-            <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-              {modalMode === "create" ? "Create a New Service" : "Update This Service"}
-            </h3>
-
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="file-upload-helper-text" value="Upload file" />
+                <Label htmlFor="file-upload-helper-text" value="Upload Image" />
               </div>
               <FileInput
                 id="file-upload-helper-text"
-                helperText="SVG, PNG, JPG or GIF."
+                helperText="SVG, PNG, JPG or GIF (Max: 5MB)."
                 onChange={handleFileChange}
               />
             </div>
@@ -137,10 +181,10 @@ const Perks = () => {
               </div>
               <TextInput
                 id="title"
-                type="text"
                 value={formData.title}
                 onChange={handleInputChange}
                 placeholder="Enter the title of this service"
+                required
               />
             </div>
             <div>
@@ -149,19 +193,19 @@ const Perks = () => {
               </div>
               <TextInput
                 id="description"
-                type="text"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Enter the Description of this service"
+                placeholder="Enter the description of this service"
+                required
               />
             </div>
-
             <div className="w-full">
               <Button
                 onClick={handleSubmit}
                 style={{ backgroundColor: PrimaryColor }}
+                className="w-full"
               >
-                {modalMode === "create" ? "Create" : "Update"}
+                {modalMode === "create" ? "Create Service" : "Update Service"}
               </Button>
             </div>
           </div>
@@ -171,58 +215,55 @@ const Perks = () => {
       <div className="w-full h-auto bg-[#E6F5F1] py-16 flex flex-col items-center">
         <div className="text-center mb-12">
           <h1
-            className={`text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider`}
+            className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider"
             style={{ color: PrimaryColor }}
           >
             Features
           </h1>
           <p className="text-gray-700 mt-2 text-lg">Our Features & Services.</p>
         </div>
-
         <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
-          {services?.map((service, index) => (
+          {services.map((service, index) => (
             <div
-              key={index}
-              className="relative bg-white rounded-lg shadow-lg overflow-hidden text-center flex flex-col items-center p-6 h-[470px]"
+              key={service.serialNumber || index}
+              className="relative bg-white rounded-lg shadow-lg p-6 h-[470px] flex flex-col items-center"
             >
               {isAdmin && (
                 <button
                   onClick={() => handleModalOpen("edit", service)}
-                  className={`absolute top-4 right-4 text-xl font-medium py-2 px-6`}
+                  className="absolute top-4 right-4 hover:scale-110 transition-transform"
                   style={{ color: PrimaryColor }}
                 >
-                  <GrEdit />
+                  <GrEdit size={20} />
                 </button>
               )}
-
               <img
-                className="w-60 h-60 mb-6"
+                className="w-60 h-60 mb-6 object-cover rounded-lg"
                 src={service.serviceImg}
                 alt={service.title}
               />
               <h2
-                className={`font-semibold text-lg mb-2`}
+                className="font-semibold text-lg mb-2 text-center"
                 style={{ color: PrimaryColor }}
               >
                 {service.title}
               </h2>
-              <p className="text-gray-600 text-sm mb-4">
-                {service.description ||
-                  "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum, reiciendis quaerat! Ipsa maxime numquam iusto obcaecati."}
+              <p className="text-gray-600 text-sm text-center">
+                {service.description}
               </p>
             </div>
           ))}
-          <div className="w-full flex justify-center mt-8 relative">
-            {isAdmin && (
+          {isAdmin && (
+            <div className="flex items-center justify-center bg-white rounded-lg shadow-lg p-6 h-[470px]">
               <button
                 onClick={() => handleModalOpen("create")}
-                className={`text-white font-semibold px-6 py-3 rounded-lg h-[50px] absolute top-1/2 transform -translate-y-1/2`}
+                className="text-white font-semibold p-4 rounded-full hover:scale-110 transition-transform"
                 style={{ backgroundColor: PrimaryColor }}
               >
-                <FaPlus />
+                <FaPlus size={24} />
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </>
