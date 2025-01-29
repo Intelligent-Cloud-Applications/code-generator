@@ -1,96 +1,272 @@
-import React, { useContext, useEffect } from 'react';
-import InstitutionContext from '../../../Context/InstitutionContext';
+import React, { useContext, useState } from "react";
+import InstitutionContext from "../../../Context/InstitutionContext";
+import { GrEdit } from "react-icons/gr";
+import { Button, Label, Modal, TextInput, FileInput } from "flowbite-react";
+import { FaPlus } from "react-icons/fa6";
+import Context from "../../../Context/Context";
+import { Storage } from "aws-amplify";
+import { Auth, API } from "aws-amplify";
 
 const Perks = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
-  const services = InstitutionData.Services;
+  const { InstitutionId } = InstitutionData; 
+  const { PrimaryColor } = InstitutionData;
+  const [services, setServices] = useState(InstitutionData.Services || []);
+  const [openModal, setOpenModal] = useState(false);
+  const [modalMode, setModalMode] = useState("create");
+  const [currentService, setCurrentService] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    serviceImg: null,
+  });
 
-  useEffect(() => {
-    // Preload the background image                  
-    const bgImage = new Image();
-    bgImage.src = InstitutionData.ServicesBg;
+  const UserCtx = useContext(Context);
+  const isAdmin = UserCtx.userData.userType === "admin";
 
-    // Preload the portrait image
-    if (InstitutionData.ServicesPortrait) {
-      const portraitImage = new Image();
-      portraitImage.src = InstitutionData.ServicesPortrait;
+  const handleModalOpen = (mode, service = null) => {
+    setModalMode(mode);
+    if (mode === "edit" && service) {
+      setFormData({
+        title: service.title || "",
+        description: service.description || "",
+        serviceImg: null,
+      });
+      setCurrentService(service);
+    } else {
+      setFormData({
+        title: "",
+        description: "",
+        serviceImg: null,
+      });
+      setCurrentService(null);
     }
-  }, [InstitutionData.ServicesBg, InstitutionData.ServicesPortrait]);
+    setOpenModal(true);
+  };
 
-  console.log(services);
+  const handleModalClose = () => {
+    setOpenModal(false);
+    setFormData({
+      title: "",
+      description: "",
+      serviceImg: null,
+    });
+    setCurrentService(null);
+  };
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size <= 5 * 1024 * 1024) {
+      setFormData((prev) => ({
+        ...prev,
+        serviceImg: file,
+      }));
+    } else {
+      alert("File size must be less than 5MB.");
+    }
+  };
+
+  const uploadToS3 = async (file) => {
+    try {
+      const response = await Storage.put(`services/${file.name}`, file, {
+        contentType: file.type,
+        ACL: "public-read",
+      });
+      const url = await Storage.get(response.key);
+      return url.split("?")[0]; // Remove query parameters from the URL
+    } catch (error) {
+      console.error("Error uploading to S3:", error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      let serviceImgUrl = currentService?.serviceImg;
+
+      if (formData.serviceImg) {
+        serviceImgUrl = await uploadToS3(formData.serviceImg);
+      }
+
+      if (!serviceImgUrl && modalMode === "create") {
+        alert("Please upload an image.");
+        return;
+      }
+
+      let serviceData = {
+        title: formData.title,
+        description: formData.description,
+        serviceImg: serviceImgUrl,
+      };
+
+      if (modalMode === "create") {
+        // Assign a unique serial number
+        const newSerialNumber =
+          services.length > 0
+            ? Math.max(...services.map((s) => s.serialNumber || 0)) + 1
+            : 1;
+        serviceData.serialNumber = newSerialNumber;
+      } else {
+        serviceData.serialNumber = currentService.serialNumber;
+      }
+
+      console.log("Making API request with data:", serviceData);
+
+      const response = await API.put(
+        "main",
+        `/admin/update-service-data?type=${modalMode === "create" ? "create" : "update"}`,
+        {
+          body: { service: serviceData, institutionid: InstitutionId}
+        }
+      );
+      
+      
+
+      console.log("API response:", response);
+
+      if (response.statusCode === 200) {
+        setServices((prev) => {
+          if (modalMode === "create") {
+            return [...prev, response.service];
+          } else {
+            return prev.map((service) =>
+              service.serialNumber === currentService.serialNumber
+                ? response.service
+                : service
+            );
+          }
+        });
+
+        handleModalClose();
+      } else {
+        throw new Error(response.error || "Failed to save service");
+      }
+    } catch (error) {
+      console.error("Detailed error:", error);
+      // alert("An error occurred. Please try again.");
+    }
+  };
 
   return (
-    <div
-      className="New flex justify-between max600:h-[60rem] h-[52rem] blurimg w-[auto] relative pt-[3.5rem] pb-20 pr-5 pl-5 max600:flex-col max600:mx-0 max600:items-start max600:m-0 max600:w-[100vw] overflow-hidden"
-      style={{
-        backgroundImage: `url(${InstitutionData.ServicesBg})`,
-        backgroundSize: "cover",
-      }}
-    >
-      <div
-        className="p-10 flex flex-col max600:items-center justify-between bg-transparent border-y-[0.4rem] rounded-tl-lg rounded-bl-lg border-l-[0.4rem] w-[38vw] h-[45rem] max600:h-auto max600:border-0 max600:w-[100%]"
-        style={{
-          borderColor: InstitutionData.PrimaryColor,
-        }}
-      >
-        {services?.slice(0, 2)?.map((service, index) => (
-          <div
-            className="w-[20rem] max800:w-[14rem] max600:w-[100%]"
-            key={index}
-          >
-            <h1
-              className="text-[2rem] max800:text-[1.5rem] font-russo max600:text-[1.6rem]"
-              style={{ color: InstitutionData?.ServicesBg ? "white" : "black" }}
-            >
-              {service?.title}
-            </h1>
-            <ul
-              className="max800:text-[0.8rem] list-disc max950:pl-[3rem] max600:pl-0 text-justify"
-              style={{ color: InstitutionData?.ServicesBg ? "white" : "black" }}
-            >
-              {service?.items?.map((item, itemIndex) => (
-                <li key={itemIndex}>{item}</li>
-              ))}
-            </ul>
+    <>
+      <Modal show={openModal} onClose={handleModalClose} size="md" popup>
+        <Modal.Header>
+          <div className="text-xl font-medium text-gray-900 dark:text-white">
+            {modalMode === "create" ? "Create a New Service" : "Update Service"}
           </div>
-        ))}
-      </div>
-      <div
-        className="Over p-10 flex flex-col max600:items-center max600:pt-0 items-end bg-transparent border-y-[0.4rem] rounded-tr-lg rounded-br-lg border-r-[0.4rem] w-[38vw] h-[45rem] max600:h-auto max600:border-0 max600:w-[100%] justify-between"
-        style={{
-          borderColor: InstitutionData.PrimaryColor,
-        }}
-      >
-        {services.slice(2).map((service, index) => (
-          <div
-            className="w-[20rem] max800:w-[14rem] max600:w-[100%]"
-            key={index}
-          >
-            <h1
-              className="text-[2rem] max800:text-[1.5rem] max600:text-[1.6rem] font-russo max950:pl-[3rem] max600:pl-0"
-              style={{ color: InstitutionData.ServicesBg ? "white" : "black" }}
-            >
-              {service.title}
-            </h1>
-            <ul
-              className="max800:text-[0.8rem] list-disc max950:pl-[3rem] max600:pl-0 text-justify"
-              style={{ color: InstitutionData.ServicesBg ? "white" : "black" }}
-            >
-              {service?.items?.map((item, itemIndex) => (
-                <li key={itemIndex}>{item}</li>
-              ))}
-            </ul>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="space-y-6">
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="file-upload-helper-text" value="Upload Image" />
+              </div>
+              <FileInput
+                id="file-upload-helper-text"
+                helperText="SVG, PNG, JPG or GIF (Max: 5MB)."
+                onChange={handleFileChange}
+              />
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="title" value="Title" />
+              </div>
+              <TextInput
+                id="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Enter the title of this service"
+                required
+              />
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="description" value="Description" />
+              </div>
+              <TextInput
+                id="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Enter the description of this service"
+                required
+              />
+            </div>
+            <div className="w-full">
+              <Button
+                onClick={handleSubmit}
+                style={{ backgroundColor: PrimaryColor }}
+                className="w-full"
+              >
+                {modalMode === "create" ? "Create Service" : "Update Service"}
+              </Button>
+            </div>
           </div>
-        ))}
+        </Modal.Body>
+      </Modal>
+
+      <div className="w-full h-auto bg-[#E6F5F1] py-16 flex flex-col items-center">
+        <div className="text-center mb-12">
+          <h1
+            className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider"
+            style={{ color: PrimaryColor }}
+          >
+            Features
+          </h1>
+          <p className="text-gray-700 mt-2 text-lg">Our Features & Services.</p>
+        </div>
+        <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+          {services.map((service, index) => (
+            <div
+              key={service.serialNumber || index}
+              className="relative bg-white rounded-lg shadow-lg p-6 h-[470px] flex flex-col items-center"
+            >
+              {isAdmin && (
+                <button
+                  onClick={() => handleModalOpen("edit", service)}
+                  className="absolute top-4 right-4 hover:scale-110 transition-transform"
+                  style={{ color: PrimaryColor }}
+                >
+                  <GrEdit size={20} />
+                </button>
+              )}
+              <img
+                className="w-60 h-60 mb-6 object-cover rounded-lg"
+                src={service.serviceImg}
+                alt={service.title}
+              />
+              <h2
+                className="font-semibold text-lg mb-2 text-center"
+                style={{ color: PrimaryColor }}
+              >
+                {service.title}
+              </h2>
+              <p className="text-gray-600 text-sm text-center">
+                {service.description}
+              </p>
+            </div>
+          ))}
+          {isAdmin && (
+            <div className="flex items-center justify-center bg-white rounded-lg shadow-lg p-6 h-[470px]">
+              <button
+                onClick={() => handleModalOpen("create")}
+                className="text-white font-semibold p-4 rounded-full hover:scale-110 transition-transform"
+                style={{ backgroundColor: PrimaryColor }}
+              >
+                <FaPlus size={24} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-      {InstitutionData.ServicesPortrait && (
-        <img
-          src={InstitutionData.ServicesPortrait}
-          className="xs:block hidden absolute left-[55%] -translate-x-[60%] w-[40vw] max1078:-left-[50.9%] borderbox-hidden bottom-[-39px] max1920:bottom-[10%]"
-          alt=""
-        />
-      )}
-    </div>
+    </>
   );
 };
 
