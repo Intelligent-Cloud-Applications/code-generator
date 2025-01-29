@@ -2,14 +2,12 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Pagination, Table, Dropdown } from "flowbite-react";
 import { API } from "aws-amplify";
 import Context from "../../../../Context/Context";
-import InstitutionContext from "../../../../Context/InstitutionContext";
 import RevenueSection from "./RevenueCard";
 
 function PaymentDetails() {
   const [currentPage, setCurrentPage] = useState(1);
   const [cashoutAmount, setCashoutAmount] = useState(null); // Changed initial state to null
   const { userData, revenue } = useContext(Context);
-  const InstitutionData = useContext(InstitutionContext).institutionData;
   const date = new Date();
   const currentYear = date.getFullYear();
   const currentMonth = date.getMonth() + 1;
