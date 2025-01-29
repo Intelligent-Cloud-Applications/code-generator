@@ -1074,12 +1074,14 @@ const UpcomingSessions = () => {
                                         const passwordMatch = clas.zoomLink.match(passwordRegex);
                                         const password = passwordMatch ? passwordMatch[1] : '';
 
-                                        Navigate(
-                                          `/meeting?instructorId=${clas.instructorId}&meetingNumber=${meetingNumber}&password=${password}`
+                                        window.open(
+                                          `https://live.awsaiapp.com/?institution=${InstitutionData.InstitutionId}&cognitoId=${Ctx.userData.cognitoId}&instructorId=${clas.instructorId}&meetingNumber=${meetingNumber}&password=${password}`,
+                                          "_blank" 
                                         );
                                       } else {
                                         window.open(clas.zoomLink, '_blank', 'noreferrer');
                                       }
+                                     
                                       onJoinClass(InstitutionData.InstitutionId);
                                     } else {
                                       markAttendance(clas.classId);

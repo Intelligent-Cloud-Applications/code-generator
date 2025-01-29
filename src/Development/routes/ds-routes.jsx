@@ -32,7 +32,7 @@ import HomePayment from "../CommonPayment/HomePayment";
 import PaymentError from "../pages/PaymentError";
 import PhoneAuth from "../pages/Auth/phone";
 import InstitutionContext from "../Context/InstitutionContext";
-
+import Cafepayment from "../CommonPayment/Cafe/Cafepayment"
 //const Navigate = ({to}) => {
 //  const navigate = useNavigate();
 //  useEffect(() => {
@@ -84,6 +84,7 @@ const RoutesContainer = () => {
       />
       <Route path="/put-attendance" element={<PutAttendance />} />
       <Route path="/attendance-qr" element={<QR />} />
+      <Route path="/cafepayment/:institution/:orderId" element={<Cafepayment />} />
       <Route path="/redirect" element={<Redirect />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route
