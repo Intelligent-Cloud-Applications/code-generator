@@ -76,7 +76,7 @@ const Header = () => {
       : [
         { label: 'Login', path: '/login' },
         { label: 'Join Now', path: '/signup' },
-        { label: process.env.REACT_APP_STAGE !== 'PROD' && "Dev", path: "/auth" },
+        { label: process.env.REACT_APP_STAGE !== 'PROD', path: "/auth" },
       ];
   }
 
