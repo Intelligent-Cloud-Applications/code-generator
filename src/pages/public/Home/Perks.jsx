@@ -6,10 +6,11 @@ import { FaPlus } from "react-icons/fa6";
 import Context from "../../../Context/Context";
 import { Storage } from "aws-amplify";
 import { Auth, API } from "aws-amplify";
+import { toast } from "react-toastify";
 
 const Perks = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
-  const { InstitutionId } = InstitutionData; 
+  const { InstitutionId } = InstitutionData;
   const { PrimaryColor } = InstitutionData;
   const [services, setServices] = useState(InstitutionData.Services || []);
   const [openModal, setOpenModal] = useState(false);
@@ -91,70 +92,68 @@ const Perks = () => {
   const handleSubmit = async () => {
     try {
       let serviceImgUrl = currentService?.serviceImg;
-
+  
       if (formData.serviceImg) {
         serviceImgUrl = await uploadToS3(formData.serviceImg);
       }
-
+  
       if (!serviceImgUrl && modalMode === "create") {
         alert("Please upload an image.");
         return;
       }
-
+  
       let serviceData = {
         title: formData.title,
         description: formData.description,
         serviceImg: serviceImgUrl,
       };
-
-      if (modalMode === "create") {
-        // Assign a unique serial number
-        const newSerialNumber =
-          services.length > 0
-            ? Math.max(...services.map((s) => s.serialNumber || 0)) + 1
-            : 1;
-        serviceData.serialNumber = newSerialNumber;
-      } else {
-        serviceData.serialNumber = currentService.serialNumber;
+  
+      if (modalMode === "edit") {
+        serviceData.serialNumber = currentService.serialNumber; 
       }
-
-      console.log("Making API request with data:", serviceData);
-
+  
       const response = await API.put(
         "main",
         `/admin/update-service-data?type=${modalMode === "create" ? "create" : "update"}`,
         {
-          body: { service: serviceData, institutionid: InstitutionId}
+          body: { service: serviceData, institutionid: InstitutionId },
         }
       );
-      
-      
-
-      console.log("API response:", response);
-
-      if (response.statusCode === 200) {
+  
+      console.log("Full API Response:", response);
+  
+      if (response && response.service) {
         setServices((prev) => {
           if (modalMode === "create") {
             return [...prev, response.service];
           } else {
             return prev.map((service) =>
-              service.serialNumber === currentService.serialNumber
-                ? response.service
-                : service
+              service.serialNumber === currentService.serialNumber ? response.service : service
             );
           }
         });
-
+  
+        // ✅ Show success alert
+        toast.success(
+          modalMode === "create"
+            ? "Service created successfully!"
+            : "Service updated successfully!",
+          { className: "custom-toast" }
+        );
+  
         handleModalClose();
       } else {
+        console.error("API error response:", response);
         throw new Error(response.error || "Failed to save service");
       }
     } catch (error) {
       console.error("Detailed error:", error);
-      // alert("An error occurred. Please try again.");
+      toast.error(error.message || "An unknown error occurred. Please try again.", {
+        className: "custom-toast",
+      });
     }
   };
-
+  
   return (
     <>
       <Modal show={openModal} onClose={handleModalClose} size="md" popup>
