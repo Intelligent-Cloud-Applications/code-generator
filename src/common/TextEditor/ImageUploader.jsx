@@ -13,7 +13,8 @@ export const uploadImage = async (file, folder) => {
     });
 
 
-    const fileUrl = await Storage.get(key);
+    let fileUrl = await Storage.get(key)
+    fileUrl = fileUrl.split("?")[0];
     toast.success("Image uploaded successfully!");
     return { fileName, fileUrl, key };
   } catch (error) {

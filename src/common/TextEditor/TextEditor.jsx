@@ -62,7 +62,8 @@ const TextEditor = ({
           const img = document.createElement("img");
           img.src = fileUrl;
           img.setAttribute("name", fileName);
-          img.setAttribute("key", key);
+          img.setAttribute("key", fileName);
+          img.setAttribute("alt", fileName);
           range.insertNode(img);
         }
       } catch (error) {
