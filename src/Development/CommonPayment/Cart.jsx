@@ -1,3 +1,4 @@
+//cart.jsx
 import { animated, useSpring } from "@react-spring/web";
 import { API } from "aws-amplify";
 import React, { useContext, useEffect, useRef, useState } from "react";
@@ -229,9 +230,12 @@ const Cart = ({ institution }) => {
       );
       const invoiceId = response[0].invoiceId; // Get the invoice ID
 
-      
+      const RAZORPAY_KEY = process.env.REACT_APP_STAGE == 'DEV' 
+    ? process.env.REACT_APP_RAZORPAY_TEST_KEY_ID 
+    : process.env.REACT_APP_RAZORPAY_KEY_ID;
+
       const options = {
-        key: "rzp_live_KBQhEinczOWwzs",
+        key: RAZORPAY_KEY,
         amount: totalAmount,
         currency: response[0].subscriptionResult.currency,
         name: institution.toUpperCase(),

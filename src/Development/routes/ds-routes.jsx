@@ -32,6 +32,7 @@ import HomePayment from "../CommonPayment/HomePayment";
 import PaymentError from "../pages/PaymentError";
 import PhoneAuth from "../pages/Auth/phone";
 import InstitutionContext from "../Context/InstitutionContext";
+import DevSubscription from "../pages/public/Home/DevSubscription"
 
 //const Navigate = ({to}) => {
 //  const navigate = useNavigate();
@@ -92,6 +93,7 @@ const RoutesContainer = () => {
       />
       <Route path="/allpayment/:institution" element={<HomePayment />} />
       <Route path="*" element={<Error />} />
+      <Route path="/dev-subscription" element={<DevSubscription />} />
     </Routes>
   );
 };

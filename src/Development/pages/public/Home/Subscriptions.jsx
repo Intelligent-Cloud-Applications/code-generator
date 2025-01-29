@@ -25,15 +25,20 @@ const Subscription = () => {
   }, [UserCtx?.location?.countryCode]);
 
   useEffect(() => {
-    // Only update the products when country code changes and avoid including 'products' in the dependency array
     const storedLocation = localStorage.getItem("userLocation");
-
-    if (storedLocation === "IN") {
-      setProducts(productList.filter((item) => item.currency === "INR"));
-    } else {
-      setProducts(productList.filter((item) => item.currency !== "INR"));
-    }
-  }, [UserCtx?.location?.countryCode, productList]);
+    
+    // Filter out product with ID 1000048 and apply location-based filtering
+    const filteredProducts = productList
+      .filter(item => item.productId !== "1000048") // Remove dev subscription
+      .filter(item => {
+        if (storedLocation === "IN") {
+          return item.currency === "INR";
+        }
+        return item.currency !== "INR";
+      });
+    
+    setProducts(filteredProducts);
+}, [UserCtx?.location?.countryCode, productList]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
