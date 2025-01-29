@@ -122,9 +122,9 @@ const Perks = () => {
 
       const response = await API.put(
         "main",
-        `/admin/update-service-data/${InstitutionId}?type=${modalMode === "create" ? "create" : "update"}`,
+        `/admin/update-service-data?type=${modalMode === "create" ? "create" : "update"}`,
         {
-          body: { service: serviceData }
+          body: { service: serviceData, institutionid: InstitutionId}
         }
       );
       
@@ -151,7 +151,7 @@ const Perks = () => {
       }
     } catch (error) {
       console.error("Detailed error:", error);
-      alert("An error occurred. Please try again.");
+      // alert("An error occurred. Please try again.");
     }
   };
 
