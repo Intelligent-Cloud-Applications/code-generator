@@ -100,7 +100,14 @@ const RevenueCard = ({
   );
 };
 
-const RevenueSection = ({ revenue = [], cashoutAmount }) => {
+
+const RevenueSection = ({ revenue = [], cashoutAmount, selectedYear, selectedMonth }) => {
+  // Define months array
+  const months = useMemo(() => [
+    'All time', 'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ], []);
+
   // Calculate USD stats
   const usdStats = useMemo(() => {
     const onlineUsdPayments = revenue?.filter(payment => 
@@ -156,18 +163,39 @@ const RevenueSection = ({ revenue = [], cashoutAmount }) => {
     }, { total: 0, count: 0 });
   }, [revenue]);
 
-  // Calculate total paid amounts from cashout logs
+  // Calculate total paid amounts from cashout logs based on selected year and month
   const paidAmounts = useMemo(() => {
     const cashoutLogs = cashoutAmount?.client?.[0]?.cashoutLogs || [];
-    return {
-      USD: cashoutLogs
-        .filter(log => log.currency === 'USD' && log.status === 'Transferred')
-        .reduce((total, log) => total + (parseFloat(log.amount) ), 0),
-      INR: cashoutLogs
-        .filter(log => log.currency === 'INR' && log.status === 'Transferred')
-        .reduce((total, log) => total + (parseFloat(log.amount) ), 0)
-    };
-  }, [cashoutAmount]);
+    
+    return cashoutLogs.reduce((acc, log) => {
+      const logDate = new Date(log.date);
+      const logYear = logDate.getFullYear();
+      const logMonth = logDate.getMonth(); // 0-based index to match months array
+      
+      // Filter based on selected year and month
+      if (selectedYear !== 'All time') {
+        const yearMatch = logYear === parseInt(selectedYear);
+        const monthMatch = selectedMonth === 'All time' || 
+                         months[logMonth + 1] === selectedMonth; // +1 because months array includes 'All time'
+        
+        if (!yearMatch || !monthMatch) return acc;
+      }
+
+      // Only include "Transferred" status transactions
+      if (log.status !== 'Transferred') return acc;
+
+      // Convert amount to number and multiply by 100 to match the format
+      const amount = parseFloat(log.amount || 0) * 100;
+      
+      if (log.currency === 'USD') {
+        acc.USD += amount;
+      } else if (log.currency === 'INR') {
+        acc.INR += amount;
+      }
+      
+      return acc;
+    }, { USD: 0, INR: 0 });
+  }, [cashoutAmount, selectedYear, selectedMonth, months]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
@@ -199,5 +227,6 @@ const RevenueSection = ({ revenue = [], cashoutAmount }) => {
     </div>
   );
 };
+
 
 export default RevenueSection;
