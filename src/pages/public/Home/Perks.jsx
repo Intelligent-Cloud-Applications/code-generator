@@ -8,6 +8,7 @@ import { Storage } from "aws-amplify";
 import { Auth, API } from "aws-amplify";
 import { toast } from "react-toastify";
 
+
 const Perks = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const { InstitutionId } = InstitutionData;
