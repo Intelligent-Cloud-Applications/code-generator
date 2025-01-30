@@ -1,20 +1,217 @@
 import { Link, useNavigate } from 'react-router-dom'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import './Footer.css'
 import { useContext } from 'react'
 import InstitutionContext from '../../Context/InstitutionContext'
+import Context from "../../Context/Context"
+import { Button, Modal, FileInput, Label, TextInput } from "flowbite-react";
+import { MdEdit } from "react-icons/md";
+import { FaPlus, FaTimes } from "react-icons/fa";
 
 const Footer = (props) => {
   const InstitutionData = useContext(InstitutionContext).institutionData
-  const Navigate = useNavigate()
+  const Navigate = useNavigate();
+  const UserCtx = useContext(Context);
+  const isAdmin = UserCtx.userData.userType === "admin";
+  const [modalShow, setModalShow] = useState(false);
+  const [facebookLink, setFacebookLink] = useState(InstitutionData.Facebook);
+  const [instagramLink, setInstagramLink] = useState(InstitutionData.Instagram);
+  const [addSection, setAddSection] = useState(false);
+  const [newSectionTitle, setNewSectionTitle] = useState("");
+  const [items, setItems] = useState([""]); // Stores item inputs
+
+  // Add new item input
+  const handleAddItem = () => {
+    setItems([...items, ""]);
+  };
+
+  // Remove all inputs
+  const handleCancel = () => {
+    setAddSection(false);
+    setNewSectionTitle("");
+    setItems([""]);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [props.initialContent])
+  }, [props.initialContent]);
+
+  const onCloseModal = () => {
+    setModalShow(false);
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/img"];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Only JPG, IMG, JPEG, and PNG files are allowed.");
+        event.target.value = ""; // Clear input field
+      }
+    }
+  };
+
+  const handleRemoveItem = (index) => {
+    const newItems = items.filter((_, i) => i !== index);
+    setItems(newItems);
+
+    // If no items left, reset the whole section
+    if (newItems.length === 0) {
+      handleCancel();
+    }
+  };
+
+  console.log("the data in footer", InstitutionData);
 
   return (
     <div>
+      <Modal show={modalShow} size="lg" onClose={onCloseModal} popup>
+        <Modal.Header className="py-4 px-4">Update Footer Section</Modal.Header>
+        <Modal.Body>
+          <div className="space-y-6">
+            <div id="fileUpload" className="max-w-md">
+              <div className="mb-2 block">
+                <Label htmlFor="file" value="Upload Logo" />
+              </div>
+              <FileInput
+                id="fileUpload"
+                accept=".jpg, .jpeg, .png, .img"
+                onChange={handleFileChange}
+                helperText="Upload a Logo (img, jpg, jpeg, png)"
+              />
+            </div>
+            <div className="max-w-md">
+              <div className="mb-2 block">
+                <Label htmlFor="text" value="Facebook Link" />
+              </div>
+              <TextInput
+                color={"primary"}
+                id="text"
+                type="text"
+                value={facebookLink}
+                placeholder="Enter Primary Link"
+                onChange={(e) => setFacebookLink(e.target.value)}
+                required
+                rightIcon={MdEdit}
+              />
+            </div>
+            <div className="max-w-md">
+              <div className="mb-2 block">
+                <Label htmlFor="text" value="Instagram Link" />
+              </div>
+              <TextInput
+                color={"primary"}
+                id="text"
+                type="text"
+                value={instagramLink}
+                placeholder="Enter Instagram Link"
+                onChange={(e) => setInstagramLink(e.target.value)}
+                required
+                rightIcon={MdEdit}
+              />
+            </div>
+            {addSection ? (
+              <>
+                {/* Title Input */}
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="sectionTitle" value="Title" />
+                  </div>
+                  <TextInput
+                    color={"primary"}
+                    id="sectionTitle"
+                    type="text"
+                    placeholder="Enter title of new column"
+                    value={newSectionTitle}
+                    onChange={(e) => setNewSectionTitle(e.target.value)}
+                    required
+                  />
+                </div>
+
+                {/* Item Inputs */}
+                {items.map((item, index) => (
+                  <div key={index} className="relative">
+                    {/* Small Circular Remove Button */}
+                    <button
+                      onClick={() => handleRemoveItem(index)}
+                      className="absolute top-1 right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md"
+                    >
+                      <FaTimes size={10} />
+                    </button>
+
+                    <div className="mb-2 block">
+                      <Label htmlFor={`item-${index}`} value={`Item ${index + 1}`} />
+                    </div>
+                    <TextInput
+                      color={"primary"}
+                      id={`item-${index}`}
+                      type="text"
+                      placeholder="Enter item"
+                      value={item}
+                      onChange={(e) => {
+                        const newItems = [...items];
+                        newItems[index] = e.target.value;
+                        setItems(newItems);
+                      }}
+                      required
+                    />
+                  </div>
+                ))}
+                {/* Add Item & Cancel Buttons */}
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    onClick={handleAddItem}
+                    className="bg-gray-300 text-black text-sm flex flex-row items-center justify-center p-0 m-0"
+                  >
+                    <FaPlus className="mr-1" /> Add Item
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    className="bg-red-500 text-white text-sm flex flex-row items-center justify-center p-0 m-0"
+                  >
+                    <FaTimes className="mr-1" /> Remove
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <Button
+                onClick={() => setAddSection(true)}
+                className="bg-black text-white"
+              >
+                Add New Column
+              </Button>
+            )}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            color={"primary"}
+            onClick={() => {
+              setModalShow(false);
+              handleUpdateSection();
+            }}
+            className='w-full'
+          >
+            Update
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <div className={`bg-black`}>
+        {isAdmin && (
+          <Button
+            style={{
+              backgroundColor: InstitutionData.PrimaryColor
+            }}
+            className="absolute left-3 p-0 m-0 mt-3 border-0 hover:border-0"
+            onClick={() => setModalShow(true)}
+            afterClick="boder-0"
+          >
+            <div className="flex gap-2 justify-center items-center">
+              <MdEdit size={16} />
+              Edit
+            </div>
+          </Button>
+        )}
         <div
           className={` footerheight max800:h-[30rem] flex flex-col justify-between sm:flex-row h-[17rem] max600:flex-col max600:justify-center p-12 gap-6 max1358:justify-center w-[100vw] z-[1000]`}
         >
