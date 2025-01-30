@@ -1,19 +1,24 @@
 {
   "files": {
-    "main.css": "/static/css/main.6d267ce9.css",
-    "main.js": "/static/js/main.83e4a8a1.js",
-    "static/js/209.a512c796.chunk.js": "/static/js/209.a512c796.chunk.js",
+    "main.css": "/static/css/main.0060477b.css",
+    "main.js": "/static/js/main.1927078f.js",
+    "static/js/209.8de78b3f.chunk.js": "/static/js/209.8de78b3f.chunk.js",
+    "static/js/52.aeaa1a54.chunk.js": "/static/js/52.aeaa1a54.chunk.js",
+    "static/js/760.8800b6d3.chunk.js": "/static/js/760.8800b6d3.chunk.js",
+    "static/js/239.bca5ad91.chunk.js": "/static/js/239.bca5ad91.chunk.js",
     "static/media/dancebg.jpg": "/static/media/dancebg.d6fd5776f0a5dc9c78e7.jpg",
     "static/media/yoga.png": "/static/media/yoga.93241db67f6c78dc6fbf.png",
     "static/media/whatsapp.png": "/static/media/whatsapp.965d92ce0d9f486938b6.png",
+    "static/media/check.png": "/static/media/check.3681c0e66d788244dcff.png",
+    "static/media/discount.svg": "/static/media/discount.09e1c2313cd75b001282c582d4336f74.svg",
     "index.html": "/index.html",
-    "static/media/Whatsapp.svg": "/static/media/Whatsapp.c0210390dcad8e514c9ee137cb50fb17.svg",
-    "static/media/Telegram.svg": "/static/media/Telegram.e3a73b3e65d1434f19440ba230509abe.svg",
-    "static/media/Facebook.svg": "/static/media/Facebook.1c76244e056fc62b7af18a95d25fab27.svg",
-    "static/media/Twitter.svg": "/static/media/Twitter.b63606e859f217cbe9c59e270c443c0b.svg"
+    "static/media/Whatsapp.svg": "/static/media/Whatsapp.0890b9c1ecbd4863c9ad9cd0920a6c95.svg",
+    "static/media/Telegram.svg": "/static/media/Telegram.381c89a4fcf6e93eb68b42895a1082bd.svg",
+    "static/media/Facebook.svg": "/static/media/Facebook.b043f93046c7c0c80c52535210026915.svg",
+    "static/media/Twitter.svg": "/static/media/Twitter.24075ada578e4e479725fc58c0ea3170.svg"
   },
   "entrypoints": [
-    "static/css/main.6d267ce9.css",
-    "static/js/main.83e4a8a1.js"
+    "static/css/main.0060477b.css",
+    "static/js/main.1927078f.js"
   ]
 }
