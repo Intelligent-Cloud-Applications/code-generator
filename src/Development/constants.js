@@ -32,9 +32,9 @@ const institutionData = {
         }
     },
     seo: {
-        title: metaTags.title,
-        description: metaTags.description,
-        keywords: metaTags.keywords
+        title: metaTags.seo.title,
+        description: metaTags.seo.description,
+        keywords: metaTags.seo.keywords
     }
 };
 

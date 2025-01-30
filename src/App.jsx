@@ -15,31 +15,33 @@ function App() {
   const RefInstitutionCtx = useRef(useContext(InstitutionContext));
   const InstitutionCtx = useContext(InstitutionContext);
 
+  // Get the company name for document title
+  const getCompanyName = () => {
+    const name = InstitutionCtx.institutionData?.companyName || institutionData.institution;
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
   // Initialize GTM
   useEffect(() => {
-    // Remove existing GTM script if any
-    const existingScript = document.querySelector('script[src*="googletagmanager"]');
-    if (existingScript) {
-      existingScript.remove();
-    }
+    if (institutionData.GTM_ID) {
+      const gtmScript = document.createElement('script');
+      gtmScript.innerHTML = `
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','${institutionData.GTM_ID}');
+      `;
+      document.head.appendChild(gtmScript);
 
-    // Create and add new GTM script
-    const script = document.createElement('script');
-    script.innerHTML = `
-      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','${institutionData.GTM_ID}');
-    `;
-    document.head.appendChild(script);
-
-    // Update noscript iframe
-    const noscriptIframe = document.querySelector('noscript iframe');
-    if (noscriptIframe) {
-      noscriptIframe.src = `https://www.googletagmanager.com/ns.html?id=${institutionData.GTM_ID}`;
+      const noscript = document.createElement('noscript');
+      noscript.innerHTML = `
+        <iframe src="https://www.googletagmanager.com/ns.html?id=${institutionData.GTM_ID}"a
+        height="0" width="0" style="display:none;visibility:hidden"></iframe>
+      `;
+      document.body.insertBefore(noscript, document.body.firstChild);
     }
-  }, [institutionData.GTM_ID]);
+  }, []);
 
   // Function to dynamically set the favicon
   const setFavicon = (logoUrl) => {
@@ -79,7 +81,6 @@ function App() {
           data.LightestPrimaryColor
         );
 
-        // Set the favicon dynamically
         setFavicon(data.logoUrl);
 
         RefInstitutionCtx.current.setInstitutionData(data);
@@ -161,17 +162,18 @@ function App() {
   return (
     <HelmetProvider>
       <Helmet>
-        {/* Keeping the original dynamic title logic */}
-        <title>
-          {`Welcome to ${InstitutionCtx.institutionData?.companyName
-              ? InstitutionCtx.institutionData.companyName.charAt(0).toUpperCase() +
-              InstitutionCtx.institutionData.companyName.slice(1)
-              : "Institution"
-            }!`}
-        </title>
-        {/* Adding the new SEO meta tags */}
+        {/* Document title - shows in browser tab */}
+        <title>{`Welcome to ${getCompanyName()}`}</title>
+        
+        {/* Meta tags for SEO */}
+        <meta name="title" content={institutionData.seo.title} />
         <meta name="description" content={institutionData.seo.description} />
-        <meta name="keywords" content={institutionData.seo.keywords} />
+        <meta 
+          name="keywords" 
+          content={Array.isArray(institutionData.seo.keywords) 
+            ? institutionData.seo.keywords.join(', ') 
+            : institutionData.seo.keywords} 
+        />
       </Helmet>
       <LoaderProvider>
         {InstitutionCtx.institutionData && <RoutesContainer />}
