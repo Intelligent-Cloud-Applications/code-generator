@@ -4,10 +4,8 @@ import InstitutionContext from "../../../../Context/InstitutionContext";
 const RevenueCard = ({
   currency,
   totalCollected = 0,
-  totalPaid,
+  totalPaid = 0,
   transactionCount = 0,
-  minAmount = 0,
-  maxAmount = 0,
   isOffline = false,
   cashoutDate,
 }) => {
@@ -23,11 +21,13 @@ const RevenueCard = ({
     )}`;
   };
 
+  const amountPending = totalCollected - totalPaid;
+
   return (
     <div className="bg-white rounded-xl shadow-md p-3 hover:shadow-xl transition-all duration-300">
       <div className="flex items-center gap-2 mb-3">
         <div
-          className=" p-1.5 rounded-full"
+          className="p-1.5 rounded-full"
           style={{ color: InstitutionData.lightPrimaryColor }}
         >
           <svg
@@ -71,13 +71,13 @@ const RevenueCard = ({
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Total Collected</div>
+              <div className="text-sm text-gray-500 mb-1">Total Payment</div>
               <div className="text-lg font-bold text-blue-600">
                 {formatAmount(totalCollected)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Total Paid</div>
+              <div className="text-sm text-gray-500 mb-1">Total Received</div>
               <div className="text-lg font-bold text-green-600">
                 {formatAmount(totalPaid)}
               </div>
@@ -92,10 +92,10 @@ const RevenueCard = ({
               <div className="text-xs text-gray-600">Transactions</div>
             </div>
             <div className="text-center">
-              <div className="font-bold text-blue-600 text-xs">
-                {formatAmount(minAmount)} - {formatAmount(maxAmount)}
+              <div className="font-bold text-red-500 text-xs">
+                {formatAmount(amountPending)}
               </div>
-              <div className="text-xs text-gray-600">Amount Range</div>
+              <div className="text-xs text-gray-600">Amount Pending</div>
             </div>
           </div>
 
@@ -109,6 +109,7 @@ const RevenueCard = ({
     </div>
   );
 };
+
 
 const RevenueSection = ({
   revenue = [],

@@ -1,17 +1,22 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Pagination, Table, Dropdown } from "flowbite-react";
 import { API } from "aws-amplify";
+import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 import Context from "../../../../Context/Context";
 import RevenueSection from "./RevenueCard";
 
 function PaymentDetails() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [cashoutAmount, setCashoutAmount] = useState(null); // Changed initial state to null
+  const [cashoutAmount, setCashoutAmount] = useState(null);
   const { userData, revenue } = useContext(Context);
   const date = new Date();
   const currentYear = date.getFullYear();
   const currentMonth = date.getMonth() + 1;
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: null
+  });
 
   const months = useMemo(
     () => [
@@ -35,18 +40,37 @@ function PaymentDetails() {
   const [selectedMonth, setSelectedMonth] = useState(months[currentMonth]);
 
   const years = useMemo(() => {
+    const currentYear = new Date().getFullYear();
     return [currentYear, currentYear - 1, currentYear - 2];
-  }, [currentYear]);
+  }, []);
+
+  const SortIcon = React.memo(({ isActive, direction }) => (
+    <span className="inline-flex flex-col ml-1 relative h-4 w-3">
+      <IoMdArrowDropup
+        className={`absolute top-0 ${
+          isActive && direction === 'ascending' ? 'text-blue-600' : 'text-gray-400'
+        }`}
+        size={12}
+      />
+      <IoMdArrowDropdown
+        className={`absolute bottom-0 ${
+          isActive && direction === 'descending' ? 'text-blue-600' : 'text-gray-400'
+        }`}
+        size={12}
+      />
+    </span>
+  ));
 
   useEffect(() => {
     const fetchCashoutAmount = async () => {
+      if (!userData?.institution) return;
+
       try {
         const response = await API.get(
           "main",
           `/cashCollected/${userData.institution}`
         );
-        // Store the entire client array from the response
-        if (response && response.client && Array.isArray(response.client)) {
+        if (response?.client?.length > 0) {
           setCashoutAmount({
             client: response.client,
             paymentDate: response.client[0]?.lastUpdated || null,
@@ -59,62 +83,113 @@ function PaymentDetails() {
     };
 
     fetchCashoutAmount();
-  }, [userData.institution]);
+  }, [userData?.institution]);
 
-  // Filter payments based on the selected year and month
-  const filteredPayments = useMemo(() => {
-    if (selectedYear === "All time") {
-      return revenue;
+  const handleSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
+      key = null;
+      direction = null;
     }
+    setSortConfig({ key, direction });
+  };
 
-    return revenue?.filter((payment) => {
-      const date = new Date(payment.paymentDate);
-      const paymentYear = date.getFullYear();
-      const paymentMonth = date.getMonth() + 1;
+  const sortData = useMemo(() => {
+    if (!sortConfig.key || !sortConfig.direction || !revenue) return revenue;
 
-      const isYearMatch = paymentYear === parseInt(selectedYear);
-      const isMonthMatch =
-        selectedMonth === "All time" ||
-        paymentMonth === months.indexOf(selectedMonth);
+    return [...revenue].sort((a, b) => {
+      let aValue, bValue;
 
-      return isYearMatch && isMonthMatch;
+      switch (sortConfig.key) {
+        case 'userName':
+          aValue = a.userDetails?.userName?.toLowerCase() || '';
+          bValue = b.userDetails?.userName?.toLowerCase() || '';
+          break;
+        case 'phoneNumber':
+          aValue = a.userDetails?.phoneNumber || '';
+          bValue = b.userDetails?.phoneNumber || '';
+          break;
+        case 'products':
+          aValue = a.userDetails?.products?.length || 0;
+          bValue = b.userDetails?.products?.length || 0;
+          break;
+        case 'amount':
+          aValue = Number(a.amount) || 0;
+          bValue = Number(b.amount) || 0;
+          break;
+        case 'paymentDate':
+          aValue = new Date(a.paymentDate || 0).getTime();
+          bValue = new Date(b.paymentDate || 0).getTime();
+          break;
+        default:
+          aValue = (a[sortConfig.key]?.toLowerCase?.() || a[sortConfig.key] || '').toString();
+          bValue = (b[sortConfig.key]?.toLowerCase?.() || b[sortConfig.key] || '').toString();
+      }
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'ascending'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+
+      return sortConfig.direction === 'ascending'
+        ? aValue - bValue
+        : bValue - aValue;
     });
-  }, [revenue, selectedYear, selectedMonth, months]);
+  }, [revenue, sortConfig]);
 
-  // Calculate total amounts based on filtered payments
-  const totalOnlineAmount = useMemo(() => {
-    return filteredPayments
-      ?.filter(payment => payment.paymentMode === 'online')
-      .reduce((total, payment) => total + (Number(payment.amount) || 0), 0);
+  const filteredPayments = useMemo(() => {
+    if (!revenue) return [];
+    
+    let filtered = sortData;
+    if (selectedYear !== "All time") {
+      filtered = sortData?.filter((payment) => {
+        const date = new Date(payment.paymentDate);
+        const paymentYear = date.getFullYear();
+        const paymentMonth = date.getMonth() + 1;
+
+        const isYearMatch = paymentYear === parseInt(selectedYear);
+        const isMonthMatch =
+          selectedMonth === "All time" ||
+          paymentMonth === months.indexOf(selectedMonth);
+
+        return isYearMatch && isMonthMatch;
+      });
+    }
+    return filtered;
+  }, [sortData, selectedYear, selectedMonth, months]);
+
+  const { totalOnlineAmount, totalOfflineAmount } = useMemo(() => {
+    return {
+      totalOnlineAmount: filteredPayments
+        ?.filter(payment => payment.paymentMode === 'online')
+        .reduce((total, payment) => total + (Number(payment.amount) || 0), 0) || 0,
+      totalOfflineAmount: filteredPayments
+        ?.filter(payment => payment.paymentMode === 'offline')
+        .reduce((total, payment) => total + (Number(payment.amount) || 0), 0) || 0
+    };
   }, [filteredPayments]);
 
-  const totalOfflineAmount = useMemo(() => {
-    return filteredPayments
-      ?.filter(payment => payment.paymentMode === 'offline')
-      .reduce((total, payment) => total + (Number(payment.amount) || 0), 0);
-  }, [filteredPayments]);
-
-  console.log(totalOfflineAmount)
-  const selectedPayments = filteredPayments?.slice((currentPage - 1) * 7, currentPage * 7);
+  const selectedPayments = useMemo(() => {
+    return filteredPayments?.slice((currentPage - 1) * 7, currentPage * 7) || [];
+  }, [filteredPayments, currentPage]);
 
   const handleRowClick = (payment) => {
-    console.log(payment);
+    console.log('Payment details:', payment);
   };
 
   const formatEpochToReadableDate = (epoch) => {
     if (!epoch) return "N/A";
-    const date = new Date(epoch);
-    return date.toLocaleDateString();
+    return new Date(epoch).toLocaleDateString();
   };
 
-  const formatAmountWithCurrency = (amount, currency) => {
+  const formatAmountWithCurrency = (amount, currency = "INR") => {
     const symbol = currency === "INR" ? "₹" : "$";
-    return `${symbol} ${amount / 100}`;
+    return `${symbol} ${(amount / 100).toFixed(2)}`;
   };
 
-  const currency = revenue?.length > 0 ? revenue[0].currency : "USD";
-
-  // Determine the available months based on the selected year
   const availableMonths = useMemo(() => {
     if (selectedYear === currentYear) {
       return months.slice(0, currentMonth + 1);
@@ -122,22 +197,43 @@ function PaymentDetails() {
     return months;
   }, [selectedYear, currentYear, currentMonth, months]);
 
+  const tableHeaders = [
+    { key: 'userName', label: 'Name', className: 'w-32' },
+    { key: 'phoneNumber', label: 'Phone Number', className: 'w-32' },
+    { key: 'products', label: 'Products', className: 'w-48' },
+    { key: 'subscriptionType', label: 'Subscription Type', className: 'w-36' },
+    { key: 'paymentMode', label: 'Payment Mode', className: 'w-32' },
+    { key: 'paymentDate', label: 'Payment Date', className: 'w-32' },
+    { key: 'amount', label: 'Amount', className: 'w-32' }
+  ];
+
+  const CustomTableHeadCell = React.memo(({ onClick, children, sortKey, className }) => (
+    <Table.HeadCell
+      className={`h-14 px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-50 ${className}`}
+      onClick={onClick}
+    >
+      <div className="flex items-center justify-center gap-1 h-full">
+        <span className="truncate">{children}</span>
+        <SortIcon
+          isActive={sortConfig.key === sortKey}
+          direction={sortConfig.direction}
+        />
+      </div>
+    </Table.HeadCell>
+  ));
+
   return (
     <div className="p-4 Inter max850:p-1">
-      <div className="w-full h-screen">
-        {/* Year and Month Filter Section */}
-        <div className="w-full flex justify-center gap-2 flex-wrap">
-          <div className="border flex items-center justify-center w-[8rem] py-1 rounded-md">
-            <Dropdown label={selectedYear} inline>
-              <div className=" ml-[-1rem] flex flex-col items-left">
+      <div className="w-full">
+        <div className="w-full flex justify-center gap-2 flex-wrap mb-4">
+          <div className="border flex items-center justify-center w-32 py-1 rounded-md">
+            <Dropdown label={selectedYear.toString()} inline>
+              <div className="flex flex-col items-left">
                 <Dropdown.Item onClick={() => setSelectedYear("All time")}>
                   All time
                 </Dropdown.Item>
                 {years?.map((year) => (
-                  <Dropdown.Item
-                    key={year}
-                    onClick={() => setSelectedYear(year)}
-                  >
+                  <Dropdown.Item key={year} onClick={() => setSelectedYear(year)}>
                     {year}
                   </Dropdown.Item>
                 ))}
@@ -145,13 +241,12 @@ function PaymentDetails() {
             </Dropdown>
           </div>
 
-          {/* Month Dropdown */}
           {selectedYear !== "All time" && (
-            <div className="border flex items-center justify-center w-[8rem] rounded-md">
+            <div className="border flex items-center justify-center w-32 rounded-md">
               <Dropdown label={selectedMonth} inline>
-                {availableMonths?.map((month, index) => (
+                {availableMonths?.map((month) => (
                   <Dropdown.Item
-                    key={index}
+                    key={month}
                     onClick={() => setSelectedMonth(month)}
                   >
                     {month}
@@ -167,103 +262,100 @@ function PaymentDetails() {
           cashoutAmount={cashoutAmount}
           selectedYear={selectedYear}
           selectedMonth={selectedMonth}
+          totalOnlineAmount={totalOnlineAmount}
+          totalOfflineAmount={totalOfflineAmount}
         />
 
-        {/* Table Section */}
-        <div className="mt-6 bg-white max-w-full mx-auto rounded-b-md">
-          <div className="overflow-x-auto border rounded-[1rem]">
-            <Table hoverable className="min-w-full">
-              <Table.Head>
-                <Table.HeadCell className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase">
-                  Name
-                </Table.HeadCell>
-                <Table.HeadCell className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">
-                  Phone Number
-                </Table.HeadCell>
-                <Table.HeadCell className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">
-                  Products
-                </Table.HeadCell>
-                <Table.HeadCell className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">
-                  Subscription Type
-                </Table.HeadCell>
-                <Table.HeadCell className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">
-                  Payment Mode
-                </Table.HeadCell>
-                <Table.HeadCell className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">
-                  Payment Date
-                </Table.HeadCell>
-                <Table.HeadCell className="px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase">
-                  Amount
-                </Table.HeadCell>
+        <div className="mt-6 bg-white max-w-full mx-auto rounded-lg shadow">
+          <div className="overflow-x-auto">
+            <Table hoverable className="min-w-full table-fixed">
+              <Table.Head className="bg-white">
+                {tableHeaders.map((column) => (
+                  <CustomTableHeadCell
+                    key={column.key}
+                    onClick={() => handleSort(column.key)}
+                    sortKey={column.key}
+                    className={column.className}
+                  >
+                    {column.label}
+                  </CustomTableHeadCell>
+                ))}
               </Table.Head>
               <Table.Body className="divide-y">
                 {selectedPayments?.map((payment) => (
                   <Table.Row
                     key={payment.paymentId}
-                    className="hover:bg-gray-200 cursor-pointer"
+                    className="hover:bg-gray-50 cursor-pointer"
                     onClick={() => handleRowClick(payment)}
                   >
-                    <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
-                      {payment.userDetails?.userName}
+                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
+                      <div className="truncate px-2">
+                        {payment.userDetails?.userName || 'N/A'}
+                      </div>
                     </Table.Cell>
-                    <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
-                      {payment.userDetails?.phoneNumber}
+                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
+                      <div className="truncate px-2">
+                        {payment.userDetails?.phoneNumber || 'N/A'}
+                      </div>
                     </Table.Cell>
-                    <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
-                      {payment.userDetails?.products?.length > 0
-                        ? payment.userDetails.products?.map(
-                            (product, index) => <p key={index}>{product.S}</p>
+                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-48 overflow-hidden">
+                      <div className="max-h-24 overflow-y-auto px-2">
+                        {payment.userDetails?.products?.length > 0
+                          ? payment.userDetails.products?.map(
+                            (product, index) => (
+                              <div key={index} className="truncate">
+                                {product.S}
+                              </div>
+                            )
                           )
-                        : "N/A"}
+                          : "N/A"}
+                      </div>
                     </Table.Cell>
-                    <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
-                      {payment.subscriptionType}
+                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-36 overflow-hidden">
+                      <div className="truncate px-2">
+                        {payment.subscriptionType || 'N/A'}
+                      </div>
                     </Table.Cell>
-                    <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
+                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32">
                       <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           payment.paymentMode === "offline"
                             ? "bg-purple-100 text-purple-600"
                             : "bg-green-100 text-green-600"
                         }`}
                       >
-                        {payment.paymentMode === "offline"
-                          ? "Offline"
-                          : "Online"}
+                        {payment.paymentMode === "offline" ? "Offline" : "Online"}
                       </span>
                     </Table.Cell>
-                    <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
-                      {formatEpochToReadableDate(payment.paymentDate)}
+                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
+                      <div className="truncate px-2">
+                        {formatEpochToReadableDate(payment.paymentDate)}
+                      </div>
                     </Table.Cell>
-                    <Table.Cell className="whitespace-nowrap text-sm text-gray-500 text-center bg-white">
-                      {formatAmountWithCurrency(
-                        payment.amount,
-                        payment.currency
-                      )}
+                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
+                      <div className="truncate px-2">
+                        {formatAmountWithCurrency(payment.amount, payment.currency)}
+                      </div>
                     </Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
             </Table>
           </div>
-        </div>
 
-        {/* Pagination */}
-        <div className="py-2 flex justify-between items-center px-4">
-          <div className="text-sm text-gray-600">
-            Showing {(currentPage - 1) * 7 + 1}-
-            {Math.min(
-              currentPage * (selectedPayments?.length || 0),
-              filteredPayments?.length || 0
-            )}{" "}
-            of {filteredPayments?.length || 0}
+          <div className="py-4 flex justify-between items-center px-6 border-t">
+            <div className="text-sm text-gray-600">
+              Showing {Math.min((currentPage - 1) * 7 + 1, filteredPayments?.length || 0)}-
+              {Math.min(currentPage * 7, filteredPayments?.length || 0)}{" "}
+              of {filteredPayments?.length || 0}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil((filteredPayments?.length || 0) / 7)}
+              onPageChange={setCurrentPage}
+              className="flex justify-end"
+            />
           </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={Math.ceil((filteredPayments?.length || 0) / 7)}
-            onPageChange={setCurrentPage}
-            className="flex justify-end"
-          />
         </div>
       </div>
     </div>
