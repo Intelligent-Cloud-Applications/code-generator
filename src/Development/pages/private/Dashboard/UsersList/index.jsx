@@ -9,7 +9,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { FaEye } from "react-icons/fa6";
 import { Button2 } from "../../../../common/Inputs";
 import InstitutionContext from "../../../../Context/InstitutionContext";
-import CreateUser from "./CreateUser";
+import CreateUser from "./CreateUpdateUser";
 import { toast } from "react-toastify";
 import { API } from "aws-amplify";
 import InstructorList from "./InstructorList";
