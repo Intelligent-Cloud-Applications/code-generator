@@ -7,6 +7,8 @@ import Context from "../../Context/Context"
 import { Button, Modal, FileInput, Label, TextInput } from "flowbite-react";
 import { MdEdit } from "react-icons/md";
 import { FaPlus, FaTimes } from "react-icons/fa";
+import { API, Storage } from "aws-amplify";
+import { toast } from 'react-toastify';
 
 const Footer = (props) => {
   const InstitutionData = useContext(InstitutionContext).institutionData
@@ -19,7 +21,7 @@ const Footer = (props) => {
   const [addSection, setAddSection] = useState(false);
   const [newSectionTitle, setNewSectionTitle] = useState("");
   const [items, setItems] = useState([""]); // Stores item inputs
-
+  const [selectedFile, setSelectedFile] = useState(null);
   // Add new item input
   const handleAddItem = () => {
     setItems([...items, ""]);
@@ -43,11 +45,28 @@ const Footer = (props) => {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/img"];
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
       if (!allowedTypes.includes(file.type)) {
-        alert("Only JPG, IMG, JPEG, and PNG files are allowed.");
+        alert("Only JPG, JPEG, and PNG files are allowed.");
         event.target.value = ""; // Clear input field
+        setSelectedFile(null); // Clear stored file
+      } else {
+        setSelectedFile(file); // Store the valid file
       }
+    }
+  };
+
+  const uploadToS3 = async (file) => {
+    try {
+      const response = await Storage.put(`Logo/${file.name}`, file, {
+        contentType: file.type,
+        ACL: "public-read",
+      });
+      const url = await Storage.get(response.key);
+      return url.split("?")[0]; // Remove query parameters from the URL
+    } catch (error) {
+      console.error("Error uploading to S3:", error);
+      throw error;
     }
   };
 
@@ -58,6 +77,42 @@ const Footer = (props) => {
     // If no items left, reset the whole section
     if (newItems.length === 0) {
       handleCancel();
+    }
+  };
+
+  const handleUpdateFooter = async () => {
+    try {
+      let newUrl;
+      let AdditionalColumn = {}; // Initialize as empty object
+
+      if (selectedFile) {
+        newUrl = await uploadToS3(selectedFile);
+      } else {
+        newUrl = institutionData.logoUrl;
+      }
+      // Create AdditionalColumn object only if there's a title
+      if (newSectionTitle.trim() !== "") {
+        AdditionalColumn = {
+          title: newSectionTitle, // Title from state
+          items: items, // Items array from state
+        };
+      }
+
+      const response = await API.put("main", "/admin/update-footer-data", {
+        body: {
+          institutionid: InstitutionData.institutionid, // Fixed typo (institutionData)
+          Facebook: facebookLink,
+          Instagram: instagramLink,
+          logoUrl: newUrl,
+          AdditionalColumn: AdditionalColumn, // Send structured object
+        },
+      });
+      console.log(response);
+      toast.success("Footer updated successfully!");
+
+    } catch (error) {
+      console.log(error);
+      toast.error("Error in Updating the Data"); // Show error message
     }
   };
 
@@ -161,9 +216,10 @@ const Footer = (props) => {
                 <div className="flex gap-2 mt-2">
                   <Button
                     onClick={handleAddItem}
-                    className="bg-gray-300 text-black text-sm flex flex-row items-center justify-center p-0 m-0"
+                    className="bg-gray-300 text-black text-sm flex flex-row items-center justify-center p-0 m-0 hover:bg-gray-400 group"
                   >
-                    <FaPlus className="mr-1" /> Add Item
+                    <FaPlus className="mr-1 group-hover:text-white" />
+                    <span className="group-hover:text-white">Add Item</span>
                   </Button>
                   <Button
                     onClick={handleCancel}
@@ -188,7 +244,7 @@ const Footer = (props) => {
             color={"primary"}
             onClick={() => {
               setModalShow(false);
-              handleUpdateSection();
+              handleUpdateFooter();
             }}
             className='w-full'
           >
@@ -236,7 +292,6 @@ const Footer = (props) => {
             >
               <h2 className={`text-[1.2rem] mb-[0]`}>Useful Links</h2>
               <hr className={`w-[100%] text-white mb-[0] `} />
-
               <p
                 className={`cursor-pointer mb-[0]`}
                 onClick={() => {
