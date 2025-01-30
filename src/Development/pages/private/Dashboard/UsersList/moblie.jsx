@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import Context from '../../../../Context/Context';
 import { Pagination } from "flowbite-react";
 import InstitutionContext from '../../../../Context/InstitutionContext';
-import CreateUser from './CreateUser';
+import CreateUser from './CreateUpdateUser';
 import './index.css';
 import './mobile.css';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
