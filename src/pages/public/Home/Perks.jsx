@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import { GrEdit } from "react-icons/gr";
-import { Button, Label, Modal, TextInput, FileInput } from "flowbite-react";
+import { Button, Label, Modal, TextInput, FileInput, Textarea } from "flowbite-react";
 import { FaPlus } from "react-icons/fa6";
 import Context from "../../../Context/Context";
 import { Storage } from "aws-amplify";
@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 const Perks = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const { InstitutionId } = InstitutionData;
-  const { PrimaryColor } = InstitutionData;
+  const { PrimaryColor, LightestPrimaryColor } = InstitutionData;
   const [services, setServices] = useState(InstitutionData.Services || []);
   const [openModal, setOpenModal] = useState(false);
   const [modalMode, setModalMode] = useState("create");
@@ -159,7 +159,7 @@ const Perks = () => {
       <Modal show={openModal} onClose={handleModalClose} size="md" popup>
         <Modal.Header>
           <div className="text-xl font-medium text-gray-900 dark:text-white">
-            {modalMode === "create" ? "Create a New Service" : "Update Service"}
+            {/* {modalMode === "create" ? "Create a New Service" : "Update Service"} */}
           </div>
         </Modal.Header>
         <Modal.Body>
@@ -190,8 +190,9 @@ const Perks = () => {
               <div className="mb-2 block">
                 <Label htmlFor="description" value="Description" />
               </div>
-              <TextInput
+              <Textarea
                 id="description"
+                rows={4}
                 value={formData.description}
                 onChange={handleInputChange}
                 placeholder="Enter the description of this service"
@@ -211,7 +212,8 @@ const Perks = () => {
         </Modal.Body>
       </Modal>
 
-      <div className="w-full h-auto bg-[#E6F5F1] py-16 flex flex-col items-center">
+      <div className={`w-full h-auto py-16 flex flex-col items-center`}
+      style={{backgroundColor: LightestPrimaryColor}}>
         <div className="text-center mb-12">
           <h1
             className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider"
@@ -225,7 +227,7 @@ const Perks = () => {
           {services.map((service, index) => (
             <div
               key={service.serialNumber || index}
-              className="relative bg-white rounded-lg shadow-lg p-6 h-[470px] flex flex-col items-center"
+              className="relative bg-white rounded-lg shadow-lg p-6 h-[470px] flex flex-col items-center overflow-hidden"
             >
               {isAdmin && (
                 <button
