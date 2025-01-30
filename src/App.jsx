@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Auth, API } from "aws-amplify";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 import Context from "./Development/Context/Context";
@@ -14,45 +14,18 @@ function App() {
   const RefCtx = useRef(useContext(Context));
   const RefInstitutionCtx = useRef(useContext(InstitutionContext));
   const InstitutionCtx = useContext(InstitutionContext);
+  
 
-  // Get the company name for document title
+  // State for dynamic meta data
+  const [metaData, setMetaData] = useState({
+    title: institutionData.seo?.title || '',
+    description: institutionData.seo?.description || '',
+    keywords: institutionData.seo?.keywords || '',
+    companyName: institutionData.institution || ''
+  });
+
   const getCompanyName = () => {
-    const name = InstitutionCtx.institutionData?.companyName || institutionData.institution;
-    return name.charAt(0).toUpperCase() + name.slice(1);
-  };
-
-  // Initialize GTM
-  useEffect(() => {
-    if (institutionData.GTM_ID) {
-      const gtmScript = document.createElement('script');
-      gtmScript.innerHTML = `
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','${institutionData.GTM_ID}');
-      `;
-      document.head.appendChild(gtmScript);
-
-      const noscript = document.createElement('noscript');
-      noscript.innerHTML = `
-        <iframe src="https://www.googletagmanager.com/ns.html?id=${institutionData.GTM_ID}"a
-        height="0" width="0" style="display:none;visibility:hidden"></iframe>
-      `;
-      document.body.insertBefore(noscript, document.body.firstChild);
-    }
-  }, []);
-
-  // Function to dynamically set the favicon
-  const setFavicon = (logoUrl) => {
-    if (!logoUrl) return;
-    let link =
-      document.querySelector("link[rel*='icon']") ||
-      document.createElement("link");
-    link.type = "image/x-icon";
-    link.rel = "shortcut icon";
-    link.href = logoUrl;
-    document.getElementsByTagName("head")[0].appendChild(link);
+    return metaData.companyName.charAt(0).toUpperCase() + metaData.companyName.slice(1);
   };
 
   useEffect(() => {
@@ -64,6 +37,15 @@ function App() {
         );
         data.InstitutionId = data.institutionid;
 
+        // Update meta data based on institution data
+        setMetaData({
+          title: data.seo?.title || data.companyName || institutionData.seo?.title,
+          description: data.seo?.description || institutionData.seo?.description,
+          keywords: data.seo?.keywords || institutionData.seo?.keywords,
+          companyName: data.companyName || institutionData.institution
+        });
+
+        // Set CSS variables
         document.documentElement.style.setProperty(
           "--color-primary",
           data.PrimaryColor
@@ -81,8 +63,6 @@ function App() {
           data.LightestPrimaryColor
         );
 
-        setFavicon(data.logoUrl);
-
         RefInstitutionCtx.current.setInstitutionData(data);
         RefCtx.current.onUnauthLoad(data.InstitutionId);
 
@@ -94,7 +74,6 @@ function App() {
 
     const check = async (data) => {
       UtilCtx.current.setLoader(true);
-
       try {
         const cognito = await Auth.currentAuthenticatedUser();
         const attributes = jwtDecode(cognito.signInUserSession.idToken.jwtToken);
@@ -143,38 +122,70 @@ function App() {
         console.error("Error checking user data:", e);
         RefCtx.current.setUserData({});
         UtilCtx.current.setLoader(false);
-      } finally {
-        UtilCtx.current.setLoader(true);
-        if (RefCtx.current.userData["location"] === undefined) {
-          const location = await API.get("main", apiPaths?.getUserLocation);
-          RefCtx.current.setUserData((prev) => ({
-            ...prev,
-            location,
-          }));
-        }
-        UtilCtx.current.setLoader(false);
       }
     };
 
     dataLoadFn();
   }, []);
 
+  // Verify meta tags are set properly
+  useEffect(() => {
+    const verifyMetaTags = () => {
+      const currentTags = {
+        title: document.querySelector('meta[name="title"]')?.content,
+        description: document.querySelector('meta[name="description"]')?.content,
+        keywords: document.querySelector('meta[name="keywords"]')?.content
+      };
+      
+      console.log('Current Meta Tags:', currentTags);
+    };
+
+    // Check after a delay to ensure React-Helmet has updated
+    setTimeout(verifyMetaTags, 1000);
+  }, [metaData]);
+
   return (
     <HelmetProvider>
       <Helmet>
-        {/* Document title - shows in browser tab */}
+        {/* Dynamic document title */}
         <title>{`Welcome to ${getCompanyName()}`}</title>
         
-        {/* Meta tags for SEO */}
-        <meta name="title" content={institutionData.seo.title} />
-        <meta name="description" content={institutionData.seo.description} />
+        {/* Dynamic meta tags */}
+        <meta name="title" content={metaData.title} />
+        <meta name="description" content={metaData.description} />
         <meta 
           name="keywords" 
-          content={Array.isArray(institutionData.seo.keywords) 
-            ? institutionData.seo.keywords.join(', ') 
-            : institutionData.seo.keywords} 
+          content={Array.isArray(metaData.keywords) 
+            ? metaData.keywords.join(', ') 
+            : metaData.keywords} 
         />
+        
+        {/* GTM Script */}
+        {institutionData.GTM_ID && (
+          <script>
+            {`
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','${institutionData.GTM_ID}');
+            `}
+          </script>
+        )}
       </Helmet>
+
+      {/* GTM NoScript */}
+      {institutionData.GTM_ID && (
+        <noscript>
+          <iframe 
+            src={`https://www.googletagmanager.com/ns.html?id=${institutionData.GTM_ID}`}
+            height="0" 
+            width="0" 
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
+      )}
+
       <LoaderProvider>
         {InstitutionCtx.institutionData && <RoutesContainer />}
       </LoaderProvider>
