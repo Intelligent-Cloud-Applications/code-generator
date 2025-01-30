@@ -333,7 +333,7 @@ const Perks = () => {
                 </button>
                 <button
                     onClick={() => handleDeleteModalOpen(service)}
-                    className="absolute top-4 right-10 hover:scale-110 transition-transform text-red-500"
+                    className="absolute top-4 left-4 hover:scale-110 transition-transform text-red-500"
                   >
                     <MdDeleteOutline  size={20} />
                   </button>
