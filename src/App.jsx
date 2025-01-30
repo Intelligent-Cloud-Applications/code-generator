@@ -15,7 +15,6 @@ function App() {
   const RefInstitutionCtx = useRef(useContext(InstitutionContext));
   const InstitutionCtx = useContext(InstitutionContext);
   
-
   // State for dynamic meta data
   const [metaData, setMetaData] = useState({
     title: institutionData.seo?.title || '',
@@ -28,6 +27,18 @@ function App() {
     return metaData.companyName.charAt(0).toUpperCase() + metaData.companyName.slice(1);
   };
 
+  // Function to dynamically set the favicon
+  const setFavicon = (logoUrl) => {
+    if (!logoUrl) return;
+    let link =
+      document.querySelector("link[rel*='icon']") ||
+      document.createElement("link");
+    link.type = "image/x-icon";
+    link.rel = "shortcut icon";
+    link.href = logoUrl;
+    document.getElementsByTagName("head")[0].appendChild(link);
+  };
+
   useEffect(() => {
     const dataLoadFn = async () => {
       try {
@@ -36,6 +47,9 @@ function App() {
           `/any/get-institution-data/${institutionData.InstitutionId}`
         );
         data.InstitutionId = data.institutionid;
+
+        // Set favicon dynamically
+        setFavicon(data.logoUrl);
 
         // Update meta data based on institution data
         setMetaData({
