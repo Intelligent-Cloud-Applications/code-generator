@@ -7,7 +7,6 @@ import "./FAQ.css";
 import Faq from "react-faq-component";
 import { GrEdit } from "react-icons/gr";
 import { MdDeleteOutline } from "react-icons/md";
-import { AiOutlinePlus } from "react-icons/ai"; // Importing Plus Icon
 
 export default function FAQ() {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -18,7 +17,7 @@ export default function FAQ() {
     useContext(InstitutionContext);
   const [editingIndex, setEditingIndex] = useState(null);
   const [faqData, setFaqData] = useState(institutionData?.FAQ || []);
-  const [newFaq, setNewFaq] = useState({ title: "", content: "" }); // State for adding new FAQ
+  const [newFaq, setNewFaq] = useState({ title: "", content: "" }); 
   const { PrimaryColor } = InstitutionData;
 
   const handleEdit = (index) => {
