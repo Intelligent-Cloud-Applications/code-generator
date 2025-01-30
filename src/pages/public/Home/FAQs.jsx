@@ -7,6 +7,7 @@ import "./FAQ.css";
 import Faq from "react-faq-component";
 import { GrEdit } from "react-icons/gr";
 import { MdDeleteOutline } from "react-icons/md";
+import { Modal, Button } from "flowbite-react";
 
 export default function FAQ() {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -17,8 +18,12 @@ export default function FAQ() {
     useContext(InstitutionContext);
   const [editingIndex, setEditingIndex] = useState(null);
   const [faqData, setFaqData] = useState(institutionData?.FAQ || []);
-  const [newFaq, setNewFaq] = useState({ title: "", content: "" }); 
+  const [newFaq, setNewFaq] = useState({ title: "", content: "" });
   const { PrimaryColor } = InstitutionData;
+
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
 
   const handleEdit = (index) => {
     setEditingIndex(index);
@@ -77,24 +82,6 @@ export default function FAQ() {
     }
   };
 
-  const handleDelete = async (index) => {
-    const updatedFaqData = faqData.filter((_, i) => i !== index);
-    try {
-      await API.put("main", "/admin/update-static-data", {
-        body: {
-          institutionid: institutionData.InstitutionId,
-          field: "FAQ",
-          value: updatedFaqData,
-        },
-      });
-      setInstitutionData({ ...institutionData, FAQ: updatedFaqData });
-      setFaqData(updatedFaqData);
-      toast.success("FAQ deleted successfully");
-    } catch (error) {
-      console.error("Error deleting FAQ:", error);
-      toast.error("Failed to delete FAQ");
-    }
-  };
 
   const data = {
     rows: institutionData.FAQ.map((row) => {
@@ -127,6 +114,39 @@ export default function FAQ() {
     animate: true,
     tabFocus: true,
   };
+
+
+  const handleDeleteModalOpen = (index) => {
+    setDeleteIndex(index);
+    setOpenDeleteModal(true);
+  };
+
+  const handleDeleteModalClose = () => {
+    setDeleteIndex(null);
+    setOpenDeleteModal(false);
+  };
+
+  const handleDelete = async () => {
+    if (deleteIndex === null) return;
+    const updatedFaqData = faqData.filter((_, i) => i !== deleteIndex);
+    try {
+      await API.put("main", "/admin/update-static-data", {
+        body: {
+          institutionid: institutionData.InstitutionId,
+          field: "FAQ",
+          value: updatedFaqData,
+        },
+      });
+      setInstitutionData({ ...institutionData, FAQ: updatedFaqData });
+      setFaqData(updatedFaqData);
+      toast.success("FAQ deleted successfully");
+    } catch (error) {
+      console.error("Error deleting FAQ:", error);
+      toast.error("Failed to delete FAQ");
+    }
+    handleDeleteModalClose();
+  };
+
 
   return (
     <div className="home-faq flex flex-col items-center justify-center gap-20 max800:py-[10rem]">
@@ -189,9 +209,8 @@ export default function FAQ() {
                     <GrEdit size={20} />
                   </button>
 
-                  {/* Delete Button - Bottom Right */}
                   <button
-                    onClick={() => handleDelete(index)}
+                    onClick={() => handleDeleteModalOpen(index)}
                     className="absolute bottom-1 right-4 hover:scale-110 transition-transform text-red-500"
                   >
                     <MdDeleteOutline size={20} />
@@ -202,7 +221,7 @@ export default function FAQ() {
           ))}
 
           {/* Add FAQ Section */}
-          <div className="flex flex-col border-t py-4 mt-6">
+          <div className="flex flex-col  py-4 mt-6 border-b">
             <h3 className="text-xl font-semibold mb-4">Add New FAQ</h3>
             <input
               type="text"
@@ -221,26 +240,43 @@ export default function FAQ() {
               }
               className="border p-2 w-full"
             />
-    
-            <div className="flex justify-end gap-4">
-                    <button
-                      onClick={handleAddFaq}
-                      className="mt-2 px-4 py-2 text-white rounded"
-                      style={{ backgroundColor: PrimaryColor }}
-                    >
-                      Save
-                    </button>
-                    {/* <button
-                      onClick={handleCancel}
-                      className="mt-2 px-4 py-2 text-black rounded bg-gray-200"
-                    >
-                      Cancel
-                    </button> */}
-                  </div>
 
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={handleAddFaq}
+                className="mt-2 px-4 py-2 text-white rounded"
+                style={{ backgroundColor: PrimaryColor }}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      <Modal
+        show={openDeleteModal}
+        onClose={handleDeleteModalClose}
+        size="sm"
+        popup
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <h3 className="mb-5 text-lg font-normal text-gray-500">
+              Are you sure you want to delete this FAQ?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleDelete}>
+                Yes, delete
+              </Button>
+              <Button color="gray" onClick={handleDeleteModalClose}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
 
       {!isAdmin && <Faq data={data} styles={styles} config={config} />}
     </div>
