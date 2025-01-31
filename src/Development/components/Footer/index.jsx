@@ -25,6 +25,7 @@ const Footer = (props) => {
     link: ""
   }]); // Stores item inputs
   const [selectedFile, setSelectedFile] = useState(null);
+
   // Add new item input
   const handleAddItem = () => {
     setItems([...items, {
@@ -125,8 +126,6 @@ const Footer = (props) => {
       });
       console.log(response);
       toast.success("Footer updated successfully!");
-      // setItems();
-      // setNewSectionTitle();
     } catch (error) {
       console.log(error);
       toast.error("Error in Updating the Data"); // Show error message
@@ -304,17 +303,6 @@ const Footer = (props) => {
               />
             </a>
           </div>
-          {InstitutionData.AdditionalColumn && (
-            <ul className={`flex flex-col gap-4 sm:flex-row sm:gap-8 max950:gap-4 text-[1.2rem] text-white flex-wrap max1050:justify-center pl-0`}>
-              <li className={`flex flex-col gap-[0.7rem] items-center text-center`}>
-                <h2 className={`text-[1.2rem] mb-[0]`}>{InstitutionData.AdditionalColumn.title}</h2>
-                <hr className={`w-[100%] text-white mb-[0] `} />
-                {InstitutionData.AdditionalColumn.items.map((item, idx) => (
-                  <p className={`text-[1.2rem] mb-[0]`} key={idx}>{item}</p>
-                ))}
-              </li>
-            </ul>
-          )}
           <div className='flex flex-row gap-5'>
             {isAdmin && (
               <div className="flex items-center justify-center rounded-lg shadow-lg">
@@ -326,6 +314,19 @@ const Footer = (props) => {
                   <FaPlus size={24} />
                 </button>
               </div>
+            )}
+            {InstitutionData.AdditionalColumn && (
+              <ul className={`flex flex-col gap-4 sm:flex-row sm:gap-8 max950:gap-4 text-[1.2rem] text-white flex-wrap max1050:justify-center pl-0`}>
+                <li className={`flex flex-col gap-[0.7rem] items-center text-center`}>
+                  <h2 className={`text-[1.2rem] mb-[0]`}>{InstitutionData.AdditionalColumn.title}</h2>
+                  <hr className={`w-[100%] text-white mb-[0] `} />
+                  {InstitutionData.AdditionalColumn.items.map((entry, idx) => (
+                    <p className={`text-[1.2rem] mb-[0]`} key={idx}>
+                      <a href={entry.link} target="_blank" rel="noreferrer">{entry.item}</a>
+                    </p>
+                  ))}
+                </li>
+              </ul>
             )}
             <ul
               className={`flex flex-col gap-4 sm:flex-row sm:gap-8 max950:gap-4 text-[1.2rem] text-white flex-wrap max1050:justify-center pl-0`}
