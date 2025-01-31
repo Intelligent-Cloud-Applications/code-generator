@@ -1,7 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { BsArrowLeftCircle, BsArrowRightCircle } from 'react-icons/bs'
 import './Testimonial.css'
-import InstitutionContext from '../../../Context/InstitutionContext'
+import InstitutionContext from '../../../Context/InstitutionContext';
+import Context from "../../../Context/Context";
+import { MdEdit } from "react-icons/md";
+import { Button, Modal, FileInput, Label, TextInput } from "flowbite-react";
+// import { FaPlus, FaTimes } from "react-icons/fa";
+
 
 const Testimonial = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData
@@ -12,7 +17,15 @@ const Testimonial = () => {
   }))
 
   const [testimonials, setTestimonials] = useState(testiData)
-  const [inView, setInView] = useState(false)
+  const [inView, setInView] = useState(false);
+  const UserCtx = useContext(Context);
+  const isAdmin = UserCtx.userData.userType === "admin";
+  const [modalShow, setModalShow] = useState(false);
+  // const [addTestimonial, setAddTestimonial] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [newTestName, setNewTestName] = useState("");
+  const [newFeedback, setNewFeedback] = useState("");
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -57,6 +70,30 @@ const Testimonial = () => {
       return tempTesti
     })
   }
+
+  const onCloseModal = () => {
+    setModalShow(false);
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Only JPG, JPEG, and PNG files are allowed.");
+        event.target.value = ""; // Clear input field
+        setSelectedFile(null); // Clear stored file
+      } else {
+        setSelectedFile(file); // Store the valid file
+      }
+    }
+  };
+
+  // const handleCancel = () => {
+  //   setAddTestimonial(false);
+  //   setNewTestName("");
+  //   setNewFeedback("");
+  // };
 
   return (
     <div
@@ -111,6 +148,66 @@ const Testimonial = () => {
           </div>
           {testimonials[1] && (
             <>
+              <Modal show={modalShow} size="lg" onClose={onCloseModal} popup>
+                <Modal.Header className="py-4 px-4">Update Testimonials</Modal.Header>
+                <Modal.Body>
+                  <div className="space-y-6">
+                    <div id="fileUpload" className="max-w-md">
+                      <div className="mb-2 block">
+                        <Label htmlFor="file" value="Upload Photo" />
+                      </div>
+                      <FileInput
+                        id="fileUpload"
+                        accept=".jpg, .jpeg, .png, .img"
+                        onChange={handleFileChange}
+                        helperText="Upload a Logo (img, jpg, jpeg, png)"
+                      />
+                    </div>
+                    <div className="max-w-md">
+                      <div className="mb-2 block">
+                        <Label htmlFor="text" value="Name" />
+                      </div>
+                      <TextInput
+                        color={"primary"}
+                        id="text"
+                        type="text"
+                        value={testimonials[1].name}
+                        placeholder="Enter Name"
+                        onChange={(e) => setNewTestName(e.target.value)}
+                        required
+                        rightIcon={MdEdit}
+                      />
+                    </div>
+                    <div className="max-w-md">
+                      <div className="mb-2 block">
+                        <Label htmlFor="text" value="Feedback" />
+                      </div>
+                      <TextInput
+                        color={"primary"}
+                        id="text"
+                        type="text"
+                        value={testimonials[1].description}
+                        placeholder="Enter Feedback"
+                        onChange={(e) => setNewFeedback(e.target.value)}
+                        required
+                        rightIcon={MdEdit}
+                      />
+                    </div>
+                  </div>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button
+                    color={"primary"}
+                    onClick={() => {
+                      setModalShow(false);
+                      handleUpdateFooter();
+                    }}
+                    className='w-full'
+                  >
+                    Update
+                  </Button>
+                </Modal.Footer>
+              </Modal>
               <h1
                 className={`h-[4.5rem] w-[100%] text-3xl font-[500] max800:text-[1.4rem] text-center text-white flex items-center justify-center`}
               >
@@ -126,7 +223,7 @@ const Testimonial = () => {
                   }}
                 >
                   {testimonials[1].description[0] === '"' &&
-                    (testimonials[1].description = testimonials[1].description.slice(0,testimonials[1].description.length-1))}
+                    (testimonials[1].description = testimonials[1].description.slice(0, testimonials[1].description.length - 1))}
                   <span className={`text-[1.4rem]`}>"</span>
                   {testimonials[1].description}
                   <span className={`text-[1.4rem]`}>"</span>
@@ -144,6 +241,23 @@ const Testimonial = () => {
               />
             ))}
           </div>
+          {isAdmin && (
+            <div className='flex justify-center items-center'>
+              <Button
+                style={{
+                  backgroundColor: InstitutionData.PrimaryColor
+                }}
+                className="p-0 m-0 mt-3 border-0 hover:border-0"
+                onClick={() => setModalShow(true)}
+                afterClick="boder-0"
+              >
+                <div className="flex gap-2 justify-center items-center">
+                  <MdEdit size={16} />
+                  Edit
+                </div>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
