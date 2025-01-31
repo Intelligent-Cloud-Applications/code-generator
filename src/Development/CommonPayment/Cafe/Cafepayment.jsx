@@ -54,7 +54,7 @@ const Cafepayment = () => {
     }
 
     const options = {
-      key: 'rzp_test_blkHaVbIxIwCZK',
+      key:  process.env.REACT_APP_STAGE === 'DEV'?REACT_APP_RAZORPAY_TEST_KEY_ID:REACT_APP_RAZORPAY_KEY_ID,
       amount: orderDetails.amount,
       currency: orderDetails.currency,
       name: institutionData?.name?.toUpperCase() || institution.toUpperCase(),
@@ -74,6 +74,13 @@ const Cafepayment = () => {
               },
             }
           );
+          await API.post('cafe', '/any/lambda-calling', {
+            body: {
+              orderId: orderId,
+              institution: institution,
+              userType: 'chef',
+            },
+          });
           alert(verificationResponse.message);
           setTimeout(() => {
             window.close();
