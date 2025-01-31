@@ -43,7 +43,7 @@ function App() {
     const dataLoadFn = async () => {
       try {
         const data = await API.get(
-          "prod",
+          "main",
           `/any/get-institution-data/${institutionData.InstitutionId}`
         );
         data.InstitutionId = data.institutionid;

@@ -89,7 +89,7 @@ export const dsDev = {
             {
                 name: 'awsaiapp',
                 endpoint: "https://gn41h453j1.execute-api.us-east-2.amazonaws.com/dev",
-                region: 'us-east-1',
+                region: 'us-east-2',
             },
             {
                 name: 'cafe',
