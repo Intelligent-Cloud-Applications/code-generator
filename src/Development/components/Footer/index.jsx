@@ -20,11 +20,23 @@ const Footer = (props) => {
   const [instagramLink, setInstagramLink] = useState(InstitutionData.Instagram);
   const [addSection, setAddSection] = useState(false);
   const [newSectionTitle, setNewSectionTitle] = useState("");
-  const [items, setItems] = useState([""]); // Stores item inputs
+  const [items, setItems] = useState([{
+    item: "",
+    link: ""
+  }]); // Stores item inputs
   const [selectedFile, setSelectedFile] = useState(null);
   // Add new item input
   const handleAddItem = () => {
-    setItems([...items, ""]);
+    setItems([...items, {
+      item: "",
+      link: ""
+    }]);
+  };
+
+  const handleChange = (index, field, value) => {
+    const newItems = [...items];
+    newItems[index] = { ...newItems[index], [field]: value };
+    setItems(newItems);
   };
 
   // Remove all inputs
@@ -40,6 +52,10 @@ const Footer = (props) => {
 
   const onCloseModal = () => {
     setModalShow(false);
+  };
+
+  const onCloseModal2 = () => {
+    setAddSection(false);
   };
 
   const handleFileChange = (event) => {
@@ -88,7 +104,7 @@ const Footer = (props) => {
       if (selectedFile) {
         newUrl = await uploadToS3(selectedFile);
       } else {
-        newUrl = institutionData.logoUrl;
+        newUrl = InstitutionData.logoUrl;
       }
       // Create AdditionalColumn object only if there's a title
       if (newSectionTitle.trim() !== "") {
@@ -97,7 +113,7 @@ const Footer = (props) => {
           items: items, // Items array from state
         };
       }
-
+      console.log("the aditional column", AdditionalColumn);
       const response = await API.put("main", "/admin/update-footer-data", {
         body: {
           institutionid: InstitutionData.institutionid, // Fixed typo (institutionData)
@@ -109,7 +125,8 @@ const Footer = (props) => {
       });
       console.log(response);
       toast.success("Footer updated successfully!");
-
+      // setItems();
+      // setNewSectionTitle();
     } catch (error) {
       console.log(error);
       toast.error("Error in Updating the Data"); // Show error message
@@ -165,78 +182,6 @@ const Footer = (props) => {
                 rightIcon={MdEdit}
               />
             </div>
-            {addSection ? (
-              <>
-                {/* Title Input */}
-                <div>
-                  <div className="mb-2 block">
-                    <Label htmlFor="sectionTitle" value="Title" />
-                  </div>
-                  <TextInput
-                    color={"primary"}
-                    id="sectionTitle"
-                    type="text"
-                    placeholder="Enter title of new column"
-                    value={newSectionTitle}
-                    onChange={(e) => setNewSectionTitle(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {/* Item Inputs */}
-                {items.map((item, index) => (
-                  <div key={index} className="relative">
-                    {/* Small Circular Remove Button */}
-                    <button
-                      onClick={() => handleRemoveItem(index)}
-                      className="absolute top-1 right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md"
-                    >
-                      <FaTimes size={10} />
-                    </button>
-
-                    <div className="mb-2 block">
-                      <Label htmlFor={`item-${index}`} value={`Item ${index + 1}`} />
-                    </div>
-                    <TextInput
-                      color={"primary"}
-                      id={`item-${index}`}
-                      type="text"
-                      placeholder="Enter item"
-                      value={item}
-                      onChange={(e) => {
-                        const newItems = [...items];
-                        newItems[index] = e.target.value;
-                        setItems(newItems);
-                      }}
-                      required
-                    />
-                  </div>
-                ))}
-                {/* Add Item & Cancel Buttons */}
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    onClick={handleAddItem}
-                    className="bg-gray-300 text-black text-sm flex flex-row items-center justify-center p-0 m-0 hover:bg-gray-400 group"
-                  >
-                    <FaPlus className="mr-1 group-hover:text-white" />
-                    <span className="group-hover:text-white">Add Item</span>
-                  </Button>
-                  <Button
-                    onClick={handleCancel}
-                    className="bg-red-500 text-white text-sm flex flex-row items-center justify-center p-0 m-0"
-                  >
-                    <FaTimes className="mr-1" /> Remove
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <Button
-                onClick={() => setAddSection(true)}
-                className="bg-black text-white"
-              >
-                Add New Column
-              </Button>
-            )}
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -244,6 +189,82 @@ const Footer = (props) => {
             color={"primary"}
             onClick={() => {
               setModalShow(false);
+              handleUpdateFooter();
+            }}
+            className='w-full'
+          >
+            Update
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={addSection} onClose={onCloseModal2} popup>
+        <Modal.Header className="py-4 px-4">Update Footer Section</Modal.Header>
+        <Modal.Body>
+          <div>
+            <div className="mb-2 block">
+              <Label htmlFor="sectionTitle" value="Title" />
+            </div>
+            <TextInput
+              color={"primary"}
+              id="sectionTitle"
+              type="text"
+              placeholder="Enter title of new column"
+              value={newSectionTitle}
+              onChange={(e) => setNewSectionTitle(e.target.value)}
+              required
+            />
+          </div>
+          {items.map((entry, index) => (
+            <div key={index} className="relative mb-2">
+              <button
+                onClick={() => handleRemoveItem(index)}
+                className="absolute top-1 right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md"
+              >
+                <FaTimes size={10} />
+              </button>
+              <div className="mb-2 block">
+                <Label htmlFor={`item-${index}`} value={`Item ${index + 1}`} />
+              </div>
+              <div className='flex flex-row justify-between gap-3'>
+                <TextInput
+                  color="primary"
+                  id={`item-${index}`}
+                  type="text"
+                  placeholder="Enter item"
+                  value={entry.item} // Corrected
+                  onChange={(e) => handleChange(index, "item", e.target.value)}
+                  required
+                  className="w-[50%]"
+                />
+                {/* Link Input */}
+                <TextInput
+                  color="primary"
+                  id={`link-${index}`} // Unique ID
+                  type="text"
+                  placeholder="Enter Link"
+                  value={entry.link} // Corrected
+                  onChange={(e) => handleChange(index, "link", e.target.value)}
+                  required
+                  className="w-[50%]"
+                />
+              </div>
+            </div>
+          ))}
+          <div className="flex gap-2 mt-3">
+            <Button
+              onClick={handleAddItem}
+              className="bg-gray-300 text-black text-sm flex flex-row items-center justify-center p-0 m-0 hover:bg-gray-400 group"
+            >
+              <FaPlus className="mr-1 group-hover:text-white" />
+              <span className="group-hover:text-white">Add Item</span>
+            </Button>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            color={"primary"}
+            onClick={() => {
+              setAddSection(false);
               handleUpdateFooter();
             }}
             className='w-full'
@@ -283,51 +304,73 @@ const Footer = (props) => {
               />
             </a>
           </div>
-
-          <ul
-            className={`flex flex-col gap-4 sm:flex-row sm:gap-8 max950:gap-4 text-[1.2rem] text-white flex-wrap max1050:justify-center pl-0`}
-          >
-            <li
-              className={`flex flex-col gap-[0.7rem] items-center text-center`}
+          {InstitutionData.AdditionalColumn && (
+            <ul className={`flex flex-col gap-4 sm:flex-row sm:gap-8 max950:gap-4 text-[1.2rem] text-white flex-wrap max1050:justify-center pl-0`}>
+              <li className={`flex flex-col gap-[0.7rem] items-center text-center`}>
+                <h2 className={`text-[1.2rem] mb-[0]`}>{InstitutionData.AdditionalColumn.title}</h2>
+                <hr className={`w-[100%] text-white mb-[0] `} />
+                {InstitutionData.AdditionalColumn.items.map((item, idx) => (
+                  <p className={`text-[1.2rem] mb-[0]`} key={idx}>{item}</p>
+                ))}
+              </li>
+            </ul>
+          )}
+          <div className='flex flex-row gap-5'>
+            {isAdmin && (
+              <div className="flex items-center justify-center rounded-lg shadow-lg">
+                <button
+                  onClick={() => setAddSection(true)}
+                  className="text-white font-semibold p-2 rounded-full hover:scale-110 transition-transform right-10"
+                  style={{ backgroundColor: InstitutionData.LightPrimaryColor }}
+                >
+                  <FaPlus size={24} />
+                </button>
+              </div>
+            )}
+            <ul
+              className={`flex flex-col gap-4 sm:flex-row sm:gap-8 max950:gap-4 text-[1.2rem] text-white flex-wrap max1050:justify-center pl-0`}
             >
-              <h2 className={`text-[1.2rem] mb-[0]`}>Useful Links</h2>
-              <hr className={`w-[100%] text-white mb-[0] `} />
-              <p
-                className={`cursor-pointer mb-[0]`}
-                onClick={() => {
-                  Navigate('/query')
-                }}
+              <li
+                className={`flex flex-col gap-[0.7rem] items-center text-center`}
               >
-                Contact Us
-              </p>
-              <a
-                className={`cursor-pointer text-white text-decoration-none`}
-                href={InstitutionData?.Footer_Link_1}
-                target="_blank"
-                rel="noreferrer"
-              >
-                BWorkz
-              </a>
-              <a
-                className={`cursor-pointer text-decoration-none text-white`}
-                href={InstitutionData?.Footer_Link_2}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Zumba
-              </a>
-              <a
-                className={`cursor-pointer text-decoration-none text-white`}
-                href="https://awsaiapp.com/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                AWSAIAPP
-              </a>
-            </li>
-          </ul>
+                <h2 className={`text-[1.2rem] mb-[0]`}>Useful Links</h2>
+                <hr className={`w-[100%] text-white mb-[0] `} />
+                <p
+                  className={`cursor-pointer mb-[0]`}
+                  onClick={() => {
+                    Navigate('/query')
+                  }}
+                >
+                  Contact Us
+                </p>
+                <a
+                  className={`cursor-pointer text-white text-decoration-none`}
+                  href={InstitutionData?.Footer_Link_1}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  BWorkz
+                </a>
+                <a
+                  className={`cursor-pointer text-decoration-none text-white`}
+                  href={InstitutionData?.Footer_Link_2}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Zumba
+                </a>
+                <a
+                  className={`cursor-pointer text-decoration-none text-white`}
+                  href="https://awsaiapp.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  AWSAIAPP
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
-
         <div
           className={`h-16 flex w-full items-center justify-center px-[2rem] sm:justify-start`}
           style={{
