@@ -13,7 +13,7 @@ const Testimonial = () => {
   const testiData = InstitutionData.Testimonial.map((val) => ({
     name: val.name,
     description: val.description,
-    src: val.img,
+    src: val.src,
   }));
 
   const [testimonials, setTestimonials] = useState(testiData);
