@@ -4,6 +4,7 @@ import {API} from "aws-amplify";
 import { PaginatedTable } from "../../../../common/DataDisplay";
 import Context from "../../../../Context/Context";
 import institutionData from "../../../../constants";
+import InstitutionContext from '../../../../Context/InstitutionContext';
 
 const Billing = () => {
   const {userData, util} = useContext(Context);
