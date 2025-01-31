@@ -88,7 +88,7 @@ const Footer = (props) => {
       if (selectedFile) {
         newUrl = await uploadToS3(selectedFile);
       } else {
-        newUrl = institutionData.logoUrl;
+        newUrl = InstitutionData.logoUrl;
       }
       // Create AdditionalColumn object only if there's a title
       if (newSectionTitle.trim() !== "") {
