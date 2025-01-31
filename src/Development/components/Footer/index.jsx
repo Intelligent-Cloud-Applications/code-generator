@@ -161,7 +161,7 @@ const Footer = (props) => {
                 id="text"
                 type="text"
                 value={facebookLink}
-                placeholder="Enter Primary Link"
+                placeholder="Enter Facebook Link"
                 onChange={(e) => setFacebookLink(e.target.value)}
                 required
                 rightIcon={MdEdit}
