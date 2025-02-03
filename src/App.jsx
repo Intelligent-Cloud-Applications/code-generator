@@ -16,8 +16,9 @@ function App() {
   const InstitutionCtx = useContext(InstitutionContext);
   const InstitutionData = InstitutionCtx.institutionData;
 
-  // State for dynamic meta data
   const [metaData, setMetaData] = useState({
+    title: InstitutionData?.title || institutionData.seo?.title || '',
+    description: InstitutionData?.description || institutionData.seo?.description || '',
     title: InstitutionData?.title || institutionData.seo?.title || '',
     description: InstitutionData?.description || institutionData.seo?.description || '',
     keywords: institutionData.seo?.keywords || '',
@@ -29,9 +30,11 @@ function App() {
     return metaData.companyName
       ? metaData.companyName.charAt(0).toUpperCase() + metaData.companyName.slice(1)
       : '';
+    return metaData.companyName
+      ? metaData.companyName.charAt(0).toUpperCase() + metaData.companyName.slice(1)
+      : '';
   };
 
-  // Function to dynamically set the favicon
   const setFavicon = (logoUrl) => {
     if (!logoUrl) return;
     let link =
@@ -46,100 +49,84 @@ function App() {
   useEffect(() => {
     const dataLoadFn = async () => {
       try {
-        const data = await API.get(
-          "main",
-          `/any/get-institution-data/${institutionData.InstitutionId}`
-        );
+        const data = await API.get("main", `/any/get-institution-data/${institutionData.InstitutionId}`);
         data.InstitutionId = data.institutionid;
-
-        // Set favicon dynamically
         setFavicon(data.logoUrl);
-
-        // Set institution data in context
         RefInstitutionCtx.current.setInstitutionData(data);
         RefCtx.current.onUnauthLoad(data.InstitutionId);
 
-        // Ensure metadata updates dynamically
-        setMetaData((prev) => {
-          const newTitle = `Welcome to ${data.title || getCompanyName()}`;
-          const newDescription = data.description || institutionData.seo?.description || '';
-
-          if (prev.title !== newTitle || prev.description !== newDescription) {
-            return {
-              title: newTitle,
-              description: newDescription,
-              keywords: data.seo?.keywords || institutionData.seo?.keywords || '',
-              companyName: data.companyName || institutionData.institution || ''
-            };
-          }
-          return prev; // No changes, avoid re-render
+        setMetaData({
+          title: `Welcome to ${data.title || getCompanyName()}`,
+          description: data.description || institutionData.seo?.description || '',
+          keywords: data.seo?.keywords || institutionData.seo?.keywords || '',
+          companyName: data.companyName || institutionData.institution || ''
         });
 
-        // Set CSS variables for theming
         document.documentElement.style.setProperty("--color-primary", data.PrimaryColor);
         document.documentElement.style.setProperty("--color-secondary", data.SecondaryColor);
         document.documentElement.style.setProperty("--color-light-primary", data.LightPrimaryColor);
         document.documentElement.style.setProperty("--color-lightest-primary", data.LightestPrimaryColor);
 
+        await checkAuth(data);
       } catch (e) {
         console.error("Error loading institution data:", e);
+      }
+    };
+
+    const checkAuth = async (data) => {
+      UtilCtx.current.setLoader(true);
+      try {
+        const cognito = await Auth.currentAuthenticatedUser();
+        const attributes = jwtDecode(cognito.signInUserSession.idToken.jwtToken);
+
+        const response = await API.post("main", `/any/user-exists/${data.InstitutionId}`, {
+          body: { userPoolId: cognito.pool.userPoolId, username: attributes.email }
+        });
+
+        if (!response.inInstitution) {
+          await API.post("main", `/user/profile/${data.InstitutionId}`, {
+            body: { userName: attributes.name, emailId: attributes.email }
+          });
+        }
+
+        const userdata = await API.get("main", `/user/profile/${data.InstitutionId}`);
+        const showBirthdayModal = await API.post("main", `/user/birthday-message/${data.InstitutionId}`);
+        const location = await API.get("main", apiPaths?.getUserLocation);
+
+        RefCtx.current.setUserData((prev) => ({ ...prev, ...userdata, location, showBirthdayModal }));
+        RefCtx.current.setIsAuth(true);
+        UtilCtx.current.setLoader(false);
+        RefCtx.current.onAuthLoad(true, data.InstitutionId);
+      } catch (e) {
+        console.error(e);
+        RefCtx.current.setUserData({});
+        UtilCtx.current.setLoader(false);
+      } finally {
+        UtilCtx.current.setLoader(false);
       }
     };
 
     dataLoadFn();
   }, []);
 
-  // ✅ Update metadata when InstitutionData changes
-  useEffect(() => {
-    if (InstitutionData) {
-      setMetaData((prev) => {
-        const newTitle = `Welcome to ${InstitutionData?.title || getCompanyName()}`;
-        const newDescription = InstitutionData?.description || institutionData.seo?.description || '';
-
-        if (prev.title !== newTitle || prev.description !== newDescription) {
-          return {
-            title: newTitle,
-            description: newDescription,
-            keywords: InstitutionData?.seo?.keywords || institutionData.seo?.keywords || '',
-            companyName: InstitutionData?.institution || institutionData.institution || ''
-          };
-        }
-        return prev;
-      });
-    }
-  }, [InstitutionData]); 
-
   return (
     <HelmetProvider>
       <Helmet>
-        {/* Dynamic document title */}
         <title>{`Welcome to ${metaData.companyName}`}</title>
-
-        {/* Dynamic meta tags */}
         <meta name="title" content={metaData.title} />
         <meta name="description" content={metaData.description} />
-        <meta 
-          name="keywords" 
-          content={Array.isArray(metaData.keywords) 
-            ? metaData.keywords.join(', ') 
-            : metaData.keywords} 
-        />
-
-        {/* GTM Script */}
+        <meta name="keywords" content={Array.isArray(metaData.keywords) ? metaData.keywords.join(', ') : metaData.keywords} />
         {institutionData.GTM_ID && (
-          <script>
-            {`
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','${institutionData.GTM_ID}');
-            `}
-          </script>
+          <script>{`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${institutionData.GTM_ID}');
+          `}</script>
         )}
       </Helmet>
 
-      {/* GTM NoScript */}
       {institutionData.GTM_ID && (
         <noscript>
           <iframe 
