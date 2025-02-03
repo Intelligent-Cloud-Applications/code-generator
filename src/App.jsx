@@ -14,17 +14,21 @@ function App() {
   const RefCtx = useRef(useContext(Context));
   const RefInstitutionCtx = useRef(useContext(InstitutionContext));
   const InstitutionCtx = useContext(InstitutionContext);
-  
+  const InstitutionData = InstitutionCtx.institutionData;
+
   // State for dynamic meta data
   const [metaData, setMetaData] = useState({
-    title: institutionData.seo?.title || '',
-    description: institutionData.seo?.description || '',
+    title: InstitutionData?.title || institutionData.seo?.title || '',
+    description: InstitutionData?.description || institutionData.seo?.description || '',
     keywords: institutionData.seo?.keywords || '',
     companyName: institutionData.institution || ''
   });
 
+  // Capitalize the company name
   const getCompanyName = () => {
-    return metaData.companyName.charAt(0).toUpperCase() + metaData.companyName.slice(1);
+    return metaData.companyName
+      ? metaData.companyName.charAt(0).toUpperCase() + metaData.companyName.slice(1)
+      : '';
   };
 
   // Function to dynamically set the favicon
@@ -51,119 +55,66 @@ function App() {
         // Set favicon dynamically
         setFavicon(data.logoUrl);
 
-        // Update meta data based on institution data
-        setMetaData({
-          title: data.seo?.title || data.companyName || institutionData.seo?.title,
-          description: data.seo?.description || institutionData.seo?.description,
-          keywords: data.seo?.keywords || institutionData.seo?.keywords,
-          companyName: data.companyName || institutionData.institution
-        });
-
-        // Set CSS variables
-        document.documentElement.style.setProperty(
-          "--color-primary",
-          data.PrimaryColor
-        );
-        document.documentElement.style.setProperty(
-          "--color-secondary",
-          data.SecondaryColor
-        );
-        document.documentElement.style.setProperty(
-          "--color-light-primary",
-          data.LightPrimaryColor
-        );
-        document.documentElement.style.setProperty(
-          "--color-lightest-primary",
-          data.LightestPrimaryColor
-        );
-
+        // Set institution data in context
         RefInstitutionCtx.current.setInstitutionData(data);
         RefCtx.current.onUnauthLoad(data.InstitutionId);
 
-        await check(data);
+        // Ensure metadata updates dynamically
+        setMetaData((prev) => {
+          const newTitle = `Welcome to ${data.title || getCompanyName()}`;
+          const newDescription = data.description || institutionData.seo?.description || '';
+
+          if (prev.title !== newTitle || prev.description !== newDescription) {
+            return {
+              title: newTitle,
+              description: newDescription,
+              keywords: data.seo?.keywords || institutionData.seo?.keywords || '',
+              companyName: data.companyName || institutionData.institution || ''
+            };
+          }
+          return prev; // No changes, avoid re-render
+        });
+
+        // Set CSS variables for theming
+        document.documentElement.style.setProperty("--color-primary", data.PrimaryColor);
+        document.documentElement.style.setProperty("--color-secondary", data.SecondaryColor);
+        document.documentElement.style.setProperty("--color-light-primary", data.LightPrimaryColor);
+        document.documentElement.style.setProperty("--color-lightest-primary", data.LightestPrimaryColor);
+
       } catch (e) {
         console.error("Error loading institution data:", e);
-      }
-    };
-
-    const check = async (data) => {
-      UtilCtx.current.setLoader(true);
-      try {
-        const cognito = await Auth.currentAuthenticatedUser();
-        const attributes = jwtDecode(cognito.signInUserSession.idToken.jwtToken);
-
-        const response = await API.post(
-          "main",
-          `/any/user-exists/${data.InstitutionId}`,
-          {
-            body: {
-              userPoolId: cognito.pool.userPoolId,
-              username: attributes.email,
-            },
-          }
-        );
-
-        if (!response.inInstitution) {
-          await API.post("main", `/user/profile/${data.InstitutionId}`, {
-            body: {
-              userName: attributes.name,
-              emailId: attributes.email,
-            },
-          });
-        }
-
-        const userdata = await API.get(
-          "main",
-          `/user/profile/${data && data.InstitutionId}`
-        );
-        const showBirthdayModal = await API.post(
-          "main",
-          `/user/birthday-message/${data && data.InstitutionId}`
-        );
-
-        const location = await API.get("main", apiPaths?.getUserLocation);
-
-        RefCtx.current.setUserData((prev) => ({
-          ...prev,
-          ...userdata,
-          location,
-          showBirthdayModal,
-        }));
-        RefCtx.current.setIsAuth(true);
-        UtilCtx.current.setLoader(false);
-        RefCtx.current.onAuthLoad(true, data.InstitutionId);
-      } catch (e) {
-        console.error("Error checking user data:", e);
-        RefCtx.current.setUserData({});
-        UtilCtx.current.setLoader(false);
       }
     };
 
     dataLoadFn();
   }, []);
 
-  // Verify meta tags are set properly
+  // ✅ Update metadata when InstitutionData changes
   useEffect(() => {
-    const verifyMetaTags = () => {
-      const currentTags = {
-        title: document.querySelector('meta[name="title"]')?.content,
-        description: document.querySelector('meta[name="description"]')?.content,
-        keywords: document.querySelector('meta[name="keywords"]')?.content
-      };
-      
-      console.log('Current Meta Tags:', currentTags);
-    };
+    if (InstitutionData) {
+      setMetaData((prev) => {
+        const newTitle = `Welcome to ${InstitutionData?.title || getCompanyName()}`;
+        const newDescription = InstitutionData?.description || institutionData.seo?.description || '';
 
-    // Check after a delay to ensure React-Helmet has updated
-    setTimeout(verifyMetaTags, 1000);
-  }, [metaData]);
+        if (prev.title !== newTitle || prev.description !== newDescription) {
+          return {
+            title: newTitle,
+            description: newDescription,
+            keywords: InstitutionData?.seo?.keywords || institutionData.seo?.keywords || '',
+            companyName: InstitutionData?.institution || institutionData.institution || ''
+          };
+        }
+        return prev;
+      });
+    }
+  }, [InstitutionData]); 
 
   return (
     <HelmetProvider>
       <Helmet>
         {/* Dynamic document title */}
-        <title>{`Welcome to ${getCompanyName()}`}</title>
-        
+        <title>{`Welcome to ${metaData.companyName}`}</title>
+
         {/* Dynamic meta tags */}
         <meta name="title" content={metaData.title} />
         <meta name="description" content={metaData.description} />
@@ -173,7 +124,7 @@ function App() {
             ? metaData.keywords.join(', ') 
             : metaData.keywords} 
         />
-        
+
         {/* GTM Script */}
         {institutionData.GTM_ID && (
           <script>
