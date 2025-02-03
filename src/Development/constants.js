@@ -23,11 +23,11 @@ const institutionData = {
     GTM_ID: metaTags.gtmId,
     deployment: {
         [`beta-${institutionId}`]: {
-            s3Bucket: `beta.${institutionName}.com`,
+            s3Bucket: data.s3BucketName,
             cloudfrontId: data.cloudFrontId
         },
         [institutionId]: {
-            s3Bucket: `${institutionName}.com`,
+            s3Bucket:data.s3BucketName,
             cloudfrontId: data.cloudFrontId
         }
     },

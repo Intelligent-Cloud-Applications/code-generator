@@ -51,11 +51,11 @@ jobs:
             
             const deployment = {
                 [\`beta-\${institutionId}\`]: {
-                    s3Bucket: \`beta.\${institutionName}.com\`,
+                    s3Bucket: data.s3BucketName,
                     cloudfrontId: data.cloudFrontId
                 },
-                [institutionName]: {
-                    s3Bucket: \`\${institutionName}.com\`,
+                [institutionId]: {
+                    s3Bucket: data.s3BucketName,
                     cloudfrontId: data.cloudFrontId
                 }
             };
@@ -88,58 +88,58 @@ jobs:
           cp temp-package.json package.json
           CONFIG_JSON=$(node configReader.mjs)
           cp original-package.json package.json
-          echo "s3_bucket=$(echo $CONFIG_JSON | jq -r .s3Bucket)" >> $GITHUB_ENV
-          echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudFrontId)" >> $GITHUB_ENV
-          echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_ENV
-          echo "react_app_stage=$(echo $CONFIG_JSON | jq -r .reactAppStage)" >> $GITHUB_ENV
+          echo "s3_bucket=$(echo $CONFIG_JSON | jq -r .s3Bucket)" >> $GITHUB_OUTPUT
+          echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
+          echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
+          echo "react_app_stage=$(echo $CONFIG_JSON | jq -r .reactAppStage)" >> $GITHUB_OUTPUT
 
       - name: Log Deployment Details
-        if: env.should_deploy == 'true'
+        if: steps.config.outputs.should_deploy == 'true'
         run: |
-          echo "Deploying to S3 Bucket: $s3_bucket"
-          echo "CloudFront Distribution ID: $cloudfront_id"
+          echo "Deploying to S3 Bucket: ${{ steps.config.outputs.s3_bucket }}"
+          echo "CloudFront Distribution ID: ${{ steps.config.outputs.cloudfront_id }}"
           echo "Branch name: ${GITHUB_REF#refs/heads/}"
-          echo "React App Stage: $react_app_stage"
+          echo "React App Stage: ${{ steps.config.outputs.react_app_stage }}"
 
       - name: Update .env file
-        if: env.should_deploy == 'true'
+        if: steps.config.outputs.should_deploy == 'true'
         run: |
           if [ -f .env ]; then
             if grep -q "^REACT_APP_STAGE=" .env; then
-              sed -i "s/^REACT_APP_STAGE=.*/REACT_APP_STAGE=$react_app_stage/" .env
+              sed -i "s/^REACT_APP_STAGE=.*/REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}/" .env
             else
-              echo "REACT_APP_STAGE=$react_app_stage" >> .env
+              echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" >> .env
             fi
           else
-            echo "REACT_APP_STAGE=$react_app_stage" > .env
+            echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" > .env
           fi
-          echo "Updated .env file with REACT_APP_STAGE=$react_app_stage while preserving other variables"
+          echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }} while preserving other variables"
 
       - name: Build the React app
-        if: env.should_deploy == 'true'
+        if: steps.config.outputs.should_deploy == 'true'
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
           echo "Building React app with REACT_APP_STAGE from .env"
           yarn react-scripts build || yarn build:prod || yarn build:production || yarn build
 
       - name: Set up AWS CLI
-        if: env.should_deploy == 'true'
+        if: steps.config.outputs.should_deploy == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: AKIA5NNTYGDW2XCPH5GL
+          aws-secret-access-key: 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
           aws-region: us-east-1
 
       - name: Deploy to S3
-        if: env.should_deploy == 'true'
+        if: steps.config.outputs.should_deploy == 'true'
         run: |
-          echo "Starting S3 sync to bucket: $s3_bucket"
-          aws s3 sync ./build s3://$s3_bucket --delete
+          echo "Starting S3 sync to bucket: ${{ steps.config.outputs.s3_bucket }}"
+          aws s3 sync ./build s3://${{ steps.config.outputs.s3_bucket }} --delete
           echo "S3 sync completed"
 
       - name: Cloudfront Invalidation
-        if: env.should_deploy == 'true'
+        if: steps.config.outputs.should_deploy == 'true'
         run: |
-          echo "Creating CloudFront invalidation for distribution: $cloudfront_id"
-          aws cloudfront create-invalidation --distribution-id $cloudfront_id --paths "/*"
+          echo "Creating CloudFront invalidation for distribution: ${{ steps.config.outputs.cloudfront_id }}"
+          aws cloudfront create-invalidation --distribution-id ${{ steps.config.outputs.cloudfront_id }} --paths "/*"
           echo "CloudFront invalidation created"
