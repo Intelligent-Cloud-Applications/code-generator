@@ -89,12 +89,6 @@ jobs:
           echo "Branch name: ${GITHUB_REF#refs/heads/}"
           echo "React App Stage: ${{ steps.config.outputs.react_app_stage }}"
 
-      - name: Update .env file
-        if: steps.config.outputs.should_deploy == 'true'
-        run: |
-          echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" > .env
-          echo "Created .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}"
-
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
         run: |

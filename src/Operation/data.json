@@ -1,9 +1,9 @@
 {
-    "institutionId": "happyprancer",
+    "institutionId": "add the institutionId here",
 
-    "s3BucketName": "beta.happyprancer.com",
+    "s3BucketName": "name of the s3 bucket where the frontend is deployed",
 
-    "cloudFrontId": "E263LXOGXF3H0N",
+    "cloudFrontId": "Write the cloudFrontId of the insttioution",
 
-    "domain": "https://beta.happyprancer.com"
+    "domain": "add the domain name. example - https://beta.happyprancer.com"
 }
