@@ -18,100 +18,72 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: yarn install
-
-      - name: Debug Directory Structure
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "Directory contents:"
-          ls -la
-          echo "src directory contents:"
-          ls -la src/
-          echo "src/Operation contents:"
-          ls -la src/Operation/
+        run: yarn
 
       - name: Create temp config reader
         run: |
           echo '{"type": "module"}' > temp-package.json
-          cat << 'EOF' > configReader.mjs
-          import fs from 'fs';
-
+          echo "import fs from 'fs';
+          
           try {
-            console.log('Current working directory:', process.cwd());
-            console.log('Listing directory contents:', fs.readdirSync('./'));
-            console.log('Listing src directory:', fs.readdirSync('./src'));
-            
             const data = JSON.parse(fs.readFileSync('./src/Operation/data.json', 'utf8'));
-            console.log('data.json contents:', data);
             
-            const { institutionId } = data;
-            console.log('Institution ID:', institutionId);
+            const { institutionId, s3BucketName, cloudFrontId } = data;
             
             const branch = process.env.GITHUB_REF.split('/').pop();
-            console.log('Current branch:', branch);
-            
             const stage = branch.startsWith('beta-') ? 'DEV' : 'PROD';
-            console.log('Determined stage:', stage);
             
             const deployment = {
-              [`beta-${institutionId}`]: {
-                s3Bucket: data.s3BucketName,
-                cloudfrontId: data.cloudFrontId
+              [\`beta-\${institutionId}\`]: {
+                s3Bucket: s3BucketName,
+                cloudfrontId: cloudFrontId,
+                stage: 'DEV'
               },
               [institutionId]: {
-                s3Bucket: data.s3BucketName,
-                cloudfrontId: data.cloudFrontId
+                s3Bucket: s3BucketName,
+                cloudfrontId: cloudFrontId,
+                stage: 'PROD'
               }
             };
-            console.log('Deployment configuration:', deployment);
             
             const config = deployment[branch];
-            console.log('Selected config for branch:', config);
+            const output = config ? {
+              s3Bucket: config.s3Bucket,
+              cloudfrontId: config.cloudfrontId,
+              shouldDeploy: true,
+              reactAppStage: config.stage
+            } : {
+              s3Bucket: '',
+              cloudfrontId: '',
+              shouldDeploy: false,
+              reactAppStage: ''
+            };
+
+            // Write output to a file instead of console.log
+            fs.writeFileSync('config.json', JSON.stringify(output));
             
-            if (config) {
-              console.log(JSON.stringify({
-                s3Bucket: config.s3Bucket,
-                cloudfrontId: config.cloudfrontId,
-                shouldDeploy: true,
-                reactAppStage: stage
-              }));
-            } else {
-              console.log('No matching deployment configuration found for branch:', branch);
-              console.log(JSON.stringify({
-                s3Bucket: '',
-                cloudfrontId: '',
-                shouldDeploy: false,
-                reactAppStage: ''
-              }));
-            }
           } catch (error) {
-            console.error('Error reading files:', error);
+            console.error('Error in configuration:', error.message);
             process.exit(1);
-          }
-          EOF
+          }" > configReader.mjs
 
       - name: Get deployment configuration
         id: config
         run: |
           cp package.json original-package.json
           cp temp-package.json package.json
-          CONFIG_JSON=$(node configReader.mjs)
+          node configReader.mjs
           cp original-package.json package.json
-          echo "s3_bucket=$(echo $CONFIG_JSON | jq -r .s3Bucket)" >> $GITHUB_OUTPUT
-          echo "cloudfront_id=$(echo $CONFIG_JSON | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
-          echo "should_deploy=$(echo $CONFIG_JSON | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
-          echo "react_app_stage=$(echo $CONFIG_JSON | jq -r .reactAppStage)" >> $GITHUB_OUTPUT
-          
-          echo "Configuration output:"
-          echo "S3 Bucket: $(echo $CONFIG_JSON | jq -r .s3Bucket)"
-          echo "CloudFront ID: $(echo $CONFIG_JSON | jq -r .cloudfrontId)"
-          echo "Should Deploy: $(echo $CONFIG_JSON | jq -r .shouldDeploy)"
-          echo "React App Stage: $(echo $CONFIG_JSON | jq -r .reactAppStage)"
+          echo "s3_bucket=$(cat config.json | jq -r .s3Bucket)" >> $GITHUB_OUTPUT
+          echo "cloudfront_id=$(cat config.json | jq -r .cloudfrontId)" >> $GITHUB_OUTPUT
+          echo "should_deploy=$(cat config.json | jq -r .shouldDeploy)" >> $GITHUB_OUTPUT
+          echo "react_app_stage=$(cat config.json | jq -r .reactAppStage)" >> $GITHUB_OUTPUT
 
       - name: Log Deployment Details
         if: steps.config.outputs.should_deploy == 'true'
         run: |
+          echo "Configuration being used:"
+          cat config.json
           echo "Deploying to S3 Bucket: ${{ steps.config.outputs.s3_bucket }}"
           echo "CloudFront Distribution ID: ${{ steps.config.outputs.cloudfront_id }}"
           echo "Branch name: ${GITHUB_REF#refs/heads/}"
@@ -120,24 +92,14 @@ jobs:
       - name: Update .env file
         if: steps.config.outputs.should_deploy == 'true'
         run: |
-          if [ -f .env ]; then
-            if grep -q "^REACT_APP_STAGE=" .env; then
-              sed -i "s/^REACT_APP_STAGE=.*/REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}/" .env
-            else
-              echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" >> .env
-            fi
-          else
-            echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" > .env
-          fi
-          cat .env
-          echo "Updated .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}"
+          echo "REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}" > .env
+          echo "Created .env file with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}"
 
       - name: Build the React app
         if: steps.config.outputs.should_deploy == 'true'
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
-          echo "Building React app with REACT_APP_STAGE=${{ steps.config.outputs.react_app_stage }}"
-          yarn react-scripts build || yarn build:prod || yarn build:production || yarn build
+          yarn build
 
       - name: Set up AWS CLI
         if: steps.config.outputs.should_deploy == 'true'
