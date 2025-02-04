@@ -2,7 +2,7 @@
 import { animated, useSpring } from "@react-spring/web";
 import { API } from "aws-amplify";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { BarLoader } from "react-spinners";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,12 +35,15 @@ const Cart = ({ institution }) => {
     transform: isModalOpen ? "translateY(0)" : "translateY(-20px)",
     config: { tension: 200, friction: 20 },
   });
-  const [searchParams] = useSearchParams();
+
+  const urlParams = new URLSearchParams(window.location.search);
   const color = {
-    primary: searchParams.get('primary') || '#000',
-    secondary: searchParams.get('secondary') || '#000'
+    primary: "#"+(urlParams.get('primary')),
+    secondary: "#"+(urlParams.get('secondary'))
   };
-  const ChildInstitutionId = searchParams.get('institutionId');
+  
+  const ChildInstitutionId = urlParams.get('institutionId') || '';
+
   const navigate = useNavigate();
   const handlePaymentFailure = (message, navigate) => {
     navigate("/payment-error", { state: { message } });

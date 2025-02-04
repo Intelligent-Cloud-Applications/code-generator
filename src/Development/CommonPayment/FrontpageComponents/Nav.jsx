@@ -1,18 +1,16 @@
 import React, { useContext } from 'react';
 import Context from '../../Context/Context';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Nav({ institution, setActiveComponent, activeComponent, userType, setIsPopupOpen }) {
   const { isAuth } = useContext(Context);
   const navigate = useNavigate();
   const { itemCount } = useContext(Context);
-  const [searchParams] = useSearchParams();
-
+  const urlParams = new URLSearchParams(window.location.search);
   const color = {
-    primary: searchParams.get('primary') || '#000',
-    secondary: searchParams.get('secondary') || '#000'
+    primary: "#"+(urlParams.get('primary')),
+    secondary: "#"+(urlParams.get('secondary'))
   };
-
   const handleBackClick = () => {
     if (!window.opener) {
       if (isAuth) navigate("/dashboard");
