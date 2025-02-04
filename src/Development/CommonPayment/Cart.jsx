@@ -1,4 +1,3 @@
-//cart.jsx
 import { animated, useSpring } from "@react-spring/web";
 import { API } from "aws-amplify";
 import React, { useContext, useEffect, useRef, useState } from "react";
@@ -6,6 +5,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { BarLoader } from "react-spinners";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import colors from "../color.json";
 import Context from "../Context/Context";
 import CartTable from "./Cart/CartTable";
 import displayError from "./Errors";
@@ -13,8 +13,7 @@ import ReceiptCard from "./FrontpageComponents/ReceiptCard";
 
 const Cart = ({ institution }) => {
   const { cognitoId, forInstitution } = useParams();
-  const { getCartItems, cartState, setCartState, getPaymentHistory, userData } =
-    useContext(Context);
+  const { getCartItems, cartState, setCartState, getPaymentHistory, userData } =useContext(Context);
   const [isInitialFetch, setIsInitialFetch] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading1, setIsLoading1] = useState(false);
@@ -30,16 +29,18 @@ const Cart = ({ institution }) => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [prevInstructorAmount, setPrevInstructorAmount] = useState(0);
   const prevAmouunt = useRef();
+  const [searchParams] = useSearchParams();
+
+  // Fetching the institutionId from the query parameters
+  const ChildInstitutionId = searchParams.get('institutionId');
+
+  const color = colors[institution];
   const animation = useSpring({
     opacity: isModalOpen ? 1 : 0,
     transform: isModalOpen ? "translateY(0)" : "translateY(-20px)",
     config: { tension: 200, friction: 20 },
   });
-  const [searchParams] = useSearchParams();
-  const color = {
-    primary: searchParams.get('primary') || '#000',
-    secondary: searchParams.get('secondary') || '#000'
-  };
+
   const navigate = useNavigate();
   const handlePaymentFailure = (message, navigate) => {
     navigate("/payment-error", { state: { message } });
@@ -230,12 +231,13 @@ const Cart = ({ institution }) => {
       );
       const invoiceId = response[0].invoiceId; // Get the invoice ID
 
-      const RAZORPAY_KEY = process.env.REACT_APP_STAGE == 'DEV' 
-    ? process.env.REACT_APP_RAZORPAY_TEST_KEY_ID 
-    : process.env.REACT_APP_RAZORPAY_KEY_ID;
+      const key =
+        process.env.REACT_APP_STAGE === 'DEV'
+          ? process.env.REACT_APP_RAZORPAY_TEST_KEY_ID
+          : process.env.REACT_APP_RAZORPAY_KEY_ID
 
       const options = {
-        key: RAZORPAY_KEY,
+        key: key,
         amount: totalAmount,
         currency: response[0].subscriptionResult.currency,
         name: institution.toUpperCase(),
@@ -262,6 +264,7 @@ const Cart = ({ institution }) => {
                   {
                     body: {
                       institutionId,
+                      childInstitution:ChildInstitutionId,
                       cognitoId,
                       subscriptionIds,
                       products: productItems.map((item) => item.heading),
