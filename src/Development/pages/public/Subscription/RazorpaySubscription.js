@@ -135,7 +135,7 @@ const RazorpaySubscription = ({ productId }) => {
         style={{ backgroundColor: InstitutionData.PrimaryColor }}
         onClick={() => {
           window.open(
-            `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor)}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor)}`,
+            `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor.replace('#', ''))}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor.replace('#', ''))}`,
             '_blank',
             'noopener,noreferrer'
           )
