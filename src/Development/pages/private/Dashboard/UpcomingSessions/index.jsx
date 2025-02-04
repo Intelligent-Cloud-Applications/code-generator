@@ -1065,22 +1065,22 @@ const UpcomingSessions = () => {
                                   className="px-2 py-1 text-white rounded transition-colors duration-200 text-sm"
                                   onClick={() => {
                                     if (clas.zoomLink) {
-                                      if (UserCtx.userData.userType === 'member') {
-                                        const meetingNumberRegex = /(?:https?:\/\/)?(?:www\.)?zoom\.us\/j\/(\d+)/;
-                                        const meetingNumberMatch = clas.zoomLink.match(meetingNumberRegex);
-                                        const meetingNumber = meetingNumberMatch ? meetingNumberMatch[1] : '';
+                                      // if (UserCtx.userData.userType === 'member') {
+                                      //   const meetingNumberRegex = /(?:https?:\/\/)?(?:www\.)?zoom\.us\/j\/(\d+)/;
+                                      //   const meetingNumberMatch = clas.zoomLink.match(meetingNumberRegex);
+                                      //   const meetingNumber = meetingNumberMatch ? meetingNumberMatch[1] : '';
 
-                                        const passwordRegex = /[?&]pwd=([^&]+)/;
-                                        const passwordMatch = clas.zoomLink.match(passwordRegex);
-                                        const password = passwordMatch ? passwordMatch[1] : '';
+                                      //   const passwordRegex = /[?&]pwd=([^&]+)/;
+                                      //   const passwordMatch = clas.zoomLink.match(passwordRegex);
+                                      //   const password = passwordMatch ? passwordMatch[1] : '';
 
-                                        window.open(
-                                          `https://live.awsaiapp.com/?institution=${InstitutionData.InstitutionId}&cognitoId=${Ctx.userData.cognitoId}&instructorId=${clas.instructorId}&meetingNumber=${meetingNumber}&password=${password}`,
-                                          "_blank" 
-                                        );
-                                      } else {
+                                      //   window.open(
+                                      //     `https://live.awsaiapp.com/?institution=${InstitutionData.InstitutionId}&cognitoId=${Ctx.userData.cognitoId}&instructorId=${clas.instructorId}&meetingNumber=${meetingNumber}&password=${password}`,
+                                      //     "_blank" 
+                                      //   );
+                                      // } else {
                                         window.open(clas.zoomLink, '_blank', 'noreferrer');
-                                      }
+                                      // }
                                      
                                       onJoinClass(InstitutionData.InstitutionId);
                                     } else {
