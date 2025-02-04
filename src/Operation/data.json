@@ -1,9 +1,9 @@
 {
-    "institutionId": "happyprancer",
+    "institutionId": "lissome",
 
-    "s3BucketName": "beta.happyprancer.com",
+    "s3BucketName": "betalissome.happyprancer.com",
 
-    "cloudFrontId": "E263LXOGXF3H0N",
+    "cloudFrontId": "E1PS4R0P3P3JEA",
 
-    "domain": "https://beta.happyprancer.com"
+    "domain": "https://betalissome.happyprancer.com"
 }
