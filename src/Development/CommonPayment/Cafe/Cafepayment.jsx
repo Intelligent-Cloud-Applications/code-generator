@@ -52,9 +52,10 @@ const Cafepayment = () => {
       setError('Payment details are missing. Please try again.');
       return;
     }
-
+    setLoading(true);
     const options = {
-      key:  process.env.REACT_APP_STAGE === 'DEV'?REACT_APP_RAZORPAY_TEST_KEY_ID:REACT_APP_RAZORPAY_KEY_ID,
+      key:  process.env.REACT_APP_STAGE === 'DEV'?process.env.REACT_APP_RAZORPAY_TEST_KEY_ID 
+      : process.env.REACT_APP_RAZORPAY_KEY_ID,
       amount: orderDetails.amount,
       currency: orderDetails.currency,
       name: institutionData?.name?.toUpperCase() || institution.toUpperCase(),
@@ -81,13 +82,30 @@ const Cafepayment = () => {
               userType: 'chef',
             },
           });
+          await API.post('cafe', '/any/lambda-calling', {
+            body: {
+              orderId: orderId,
+              institution: institution,
+              userType: 'admin',
+            },
+          });
           alert(verificationResponse.message);
-          setTimeout(() => {
-            window.close();
-          }, 1500);
+           const isProd = process.env.REACT_APP_STAG === 'PROD'; 
+      const baseDomain = institutionData.domainLink 
+        ? institutionData.domainLink.endsWith('/') 
+          ? `${institutionData.domainLink}product`
+          : `${institutionData.domainLink}/product`
+        : isProd 
+          ? `${institutionData.institution}.awsaiapp.com/product`
+          : `beta${institutionData.institution}.awsaiapp.com/product`;
+          const url = `${baseDomain}?tableName=${order.tableName}`;
+         
+          window.location.href = url; 
+          setLoading(false);
         } catch (err) {
           console.error('Payment verification failed:', err);
           setError('Payment verification failed. Please contact support.');
+          setLoading(false);
         }
       },
       prefill: {
@@ -96,6 +114,21 @@ const Cafepayment = () => {
       },
       theme: {
         color: institutionData?.PrimaryColor || '#4CAF50',
+      },
+      modal: {
+        ondismiss: () => {
+          console.log('Payment popup closed.');
+         const isProd = process.env.REACT_APP_STAG === 'PROD'; 
+      const baseDomain = institutionData.domainLink 
+        ? institutionData.domainLink.endsWith('/') 
+          ? `${institutionData.domainLink}product`
+          : `${institutionData.domainLink}/product`
+        : isProd 
+          ? `${institutionData.institution}.awsaiapp.com/product`
+          : `beta${institutionData.institution}.awsaiapp.com/product`;
+          const url = `${baseDomain}?tableName=${order.tableName}`;
+          window.location.href = url;
+        },
       },
     };
 
@@ -106,9 +139,9 @@ const Cafepayment = () => {
  
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-100 to-blue-200">
+      <div className="flex justify-center items-center h-screen bg-gradient-to-r ">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600 mb-2"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 mb-2"></div>
           <p className="text-sm text-blue-800">Loading Payment Details...</p>
         </div>
       </div>
