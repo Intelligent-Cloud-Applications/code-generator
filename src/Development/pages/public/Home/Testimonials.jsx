@@ -30,7 +30,7 @@ const Testimonial = () => {
   const [newFeedback, setNewFeedback] = useState("");
   const [updateTestName, setUpdateTestName] = useState("");
   const [updateFeedback, setUpdateFeedback] = useState("");
-  const { PrimaryColor, LightestPrimaryColor } = InstitutionData;
+  const { PrimaryColor } = InstitutionData;
   const [loading, setLoading] = useState(false); // Loader state
 
   useEffect(() => {
