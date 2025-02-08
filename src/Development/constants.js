@@ -15,19 +15,19 @@ const result = splitInstitutionId();
 const institutionName = result.institution;
 
 const institutionData = {
-    BETA_DOMAIN: `https://beta.${institutionName}.com`,
-    PROD_DOMAIN: `https://${institutionName}.com`,
-    InstitutionId: institutionName,
+    BETA_DOMAIN: data.domain,
+    PROD_DOMAIN: data.domain,
+    InstitutionId: data.institutionId,
     institution: institutionName,
     institutionType: 'ds',
     GTM_ID: metaTags.gtmId,
     deployment: {
-        [`beta-${institutionName}`]: {
-            s3Bucket: `beta.${institutionName}.com`,
+        [`beta-${institutionId}`]: {
+            s3Bucket: data.s3BucketName,
             cloudfrontId: data.cloudFrontId
         },
-        [institutionName]: {
-            s3Bucket: `${institutionName}.com`,
+        [institutionId]: {
+            s3Bucket:data.s3BucketName,
             cloudfrontId: data.cloudFrontId
         }
     },

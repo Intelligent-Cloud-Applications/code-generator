@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import React from "react";
 import invoice from "../utils/check.png";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const ReceiptCard = ({
   subscriptionIds = [],
@@ -13,11 +13,13 @@ const ReceiptCard = ({
   email,
   renewalDate,
 }) => {
-  const [searchParams] = useSearchParams();
+  const urlParams = new URLSearchParams(window.location.search);
   const color = {
-    primary: searchParams.get('primary') || '#000',
-    secondary: searchParams.get('secondary') || '#000'
+    primary: "#"+(urlParams.get('primary')),
+    secondary: "#"+(urlParams.get('secondary'))
   };
+  
+  const ChildInstitutionId = urlParams.get('institutionId') || '';
   const plans = planDetails.split(", ");
   const navigate = useNavigate();
   const handleBackClick = () => {

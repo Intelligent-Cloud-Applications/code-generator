@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.css": "/static/css/main.23c8875e.css",
-    "main.js": "/static/js/main.92127b0c.js",
-    "static/js/209.e616c4c3.chunk.js": "/static/js/209.e616c4c3.chunk.js",
+    "main.css": "/static/css/main.3f85cff5.css",
+    "main.js": "/static/js/main.8cbbe337.js",
+    "static/js/209.2262f8e6.chunk.js": "/static/js/209.2262f8e6.chunk.js",
     "static/js/52.aeaa1a54.chunk.js": "/static/js/52.aeaa1a54.chunk.js",
     "static/js/760.62786992.chunk.js": "/static/js/760.62786992.chunk.js",
-    "static/js/239.98f7f0b0.chunk.js": "/static/js/239.98f7f0b0.chunk.js",
+    "static/js/239.31d6574b.chunk.js": "/static/js/239.31d6574b.chunk.js",
     "static/media/dancebg.jpg": "/static/media/dancebg.d6fd5776f0a5dc9c78e7.jpg",
     "static/media/yoga.png": "/static/media/yoga.93241db67f6c78dc6fbf.png",
     "static/media/whatsapp.png": "/static/media/whatsapp.965d92ce0d9f486938b6.png",
@@ -18,7 +18,7 @@
     "static/media/Twitter.svg": "/static/media/Twitter.24075ada578e4e479725fc58c0ea3170.svg"
   },
   "entrypoints": [
-    "static/css/main.23c8875e.css",
-    "static/js/main.92127b0c.js"
+    "static/css/main.3f85cff5.css",
+    "static/js/main.8cbbe337.js"
   ]
 }

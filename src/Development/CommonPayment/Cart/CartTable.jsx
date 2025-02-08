@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { API } from 'aws-amplify';
 import Context from '../../Context/Context';
 
@@ -10,11 +10,14 @@ const CartTable = ({ product, removeItem }) => {
   const [deletingIndex, setDeletingIndex] = useState(null);
   const { getCartItems } = useContext(Context);
   const { institution, cognitoId } = useParams();
-  const [searchParams] = useSearchParams();
+
+  const urlParams = new URLSearchParams(window.location.search);
   const color = {
-    primary: searchParams.get('primary') || '#000',
-    secondary: searchParams.get('secondary') || '#000'
+    primary: "#"+(urlParams.get('primary')),
+    secondary: "#"+(urlParams.get('secondary'))
   };
+  
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);

@@ -323,7 +323,7 @@ const Testimonial = () => {
                 </Modal.Body>
                 <Modal.Footer className='flex flex-col gap-3'>
                   <Button
-                    color='failure'
+                  color='failure'
                     onClick={handleDeleteTestimonial}
                     className="w-full"
                   >

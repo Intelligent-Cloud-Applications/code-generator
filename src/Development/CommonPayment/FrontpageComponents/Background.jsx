@@ -1,13 +1,12 @@
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 function Background({ institution }) {
-  const [searchParams] = useSearchParams();
+  const urlParams = new URLSearchParams(window.location.search);
   const color = {
-    primary: searchParams.get('primary') || '#000',
-    secondary: searchParams.get('secondary') || '#000'
+    primary: "#"+(urlParams.get('primary')),
+    secondary: "#"+(urlParams.get('secondary'))
   };
-  return (
+    return (
     <div className='relative flex flex-col w-full h-screen overflow-hidden'>
       <div className='absolute inset-0 z-10 flex justify-center items-center'>
         <svg width="50%" height="50%" viewBox="0 0 652 603" fill="none" xmlns="http://www.w3.org/2000/svg">

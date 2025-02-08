@@ -12,11 +12,12 @@ function Card({ product, setActiveComponent, userType, setIsEditPopupOpen, handl
   const util = useContext(Context).util;
   const [isAnimating, setIsAnimating] = useState(false);
   const [searchParams] = useSearchParams();
+  const urlParams = new URLSearchParams(window.location.search);
   const color = {
-    primary: searchParams.get('primary') || '#000',
-    secondary: searchParams.get('secondary') || '#000'
+    primary: "#"+(urlParams.get('primary')),
+    secondary: "#"+(urlParams.get('secondary'))
   };
-
+  
   const isDevMode = searchParams.get('dev') === 'true';
   const isDevProduct = product.productId === '1000048';
 

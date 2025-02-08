@@ -268,7 +268,7 @@ const LeftBanner = ({ displayAfterClick }) => {
                       ? institutionData.PROD_DOMAIN
                       : institutionData.BETA_DOMAIN
 
-                const url = `${baseUrl}/allpayment/${institutionData.InstitutionId}/${UserCtx.userData.cognitoId}/${UserCtx.userData.emailId}`
+                const url = `${baseUrl}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor.replace('#', ''))}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor.replace('#', ''))}`
                 window.open(url, '_blank', 'noopener,noreferrer')
               }}
             />

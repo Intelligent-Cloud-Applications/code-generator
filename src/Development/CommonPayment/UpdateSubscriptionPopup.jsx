@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from 'react';
 import InstitutionContext from '../Context/InstitutionContext';
 import Select from 'react-select';
 import Popup from 'reactjs-popup';
-import { useSearchParams } from 'react-router-dom';
 
 const UpdateSubscriptionPopup = ({
   isEditPopupOpen,
@@ -18,11 +17,13 @@ const UpdateSubscriptionPopup = ({
   handleMoveUp,
   handleMoveDown, handleDeleteSubscription
 }) => {
-  const [searchParams] = useSearchParams();
+  const urlParams = new URLSearchParams(window.location.search);
   const color = {
-    primary: searchParams.get('primary') || '#000',
-    secondary: searchParams.get('secondary') || '#000'
+    primary: "#"+(urlParams.get('primary')),
+    secondary: "#"+(urlParams.get('secondary'))
   };
+  
+  const ChildInstitutionId = urlParams.get('institutionId') || '';
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedClassTypes, setSelectedClassTypes] = useState([]);
   const InstitutionData = useContext(InstitutionContext).institutionData;

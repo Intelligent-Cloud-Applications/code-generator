@@ -69,7 +69,7 @@ const domain =
         }}
         onClick={() => {
             window.open(
-              `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor)}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor)}&dev=true`,
+              `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor.replace('#', ''))}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor.replace('#', ''))}&dev=true`,
               "_blank",
               "noopener,noreferrer"
             );
