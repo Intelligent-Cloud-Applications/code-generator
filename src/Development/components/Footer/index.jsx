@@ -185,7 +185,7 @@ const Footer = (props) => {
         </Modal.Body>
         <Modal.Footer>
           <Button
-            color={"primary"}
+            style={{ backgroundColor: PrimaryColor }}
             onClick={() => {
               setModalShow(false);
               handleUpdateFooter();
@@ -261,7 +261,7 @@ const Footer = (props) => {
         </Modal.Body>
         <Modal.Footer>
           <Button
-            color={"primary"}
+            style={{ backgroundColor: PrimaryColor }}
             onClick={() => {
               setAddSection(false);
               handleUpdateFooter();
