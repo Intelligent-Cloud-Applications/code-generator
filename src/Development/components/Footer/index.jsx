@@ -20,6 +20,7 @@ const Footer = (props) => {
   const [instagramLink, setInstagramLink] = useState(InstitutionData.Instagram);
   const [addSection, setAddSection] = useState(false);
   const [newSectionTitle, setNewSectionTitle] = useState("");
+  const { PrimaryColor} = InstitutionData;
   const [items, setItems] = useState([{
     item: "",
     link: ""
