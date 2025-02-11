@@ -53,9 +53,17 @@ const UpcomingSessions = () => {
       instructorTypeFilter === "" ||
       clas.instructorNames === instructorTypeFilter
   );
-  const sortedFilteredClasses = filteredClasses.sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const sortedFilteredClasses = filteredClasses
+    .filter((clas) => {
+      const classTime = new Date(parseInt(clas.date)).getTime();
+      const currentTime = new Date().getTime();
+      const oneHourInMillis = 60 * 60 * 1000; // 1 hour in milliseconds
+
+      // Check if the class time is within the next hour
+      return classTime + oneHourInMillis > currentTime;
+    })
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
   const classTypes = Array.from(
     new Set(filteredClasses.map((clas) => clas.classType))
   );
@@ -106,10 +114,6 @@ const UpcomingSessions = () => {
   }, [Ctx.userData.userType, InstitutionData.InstitutionId]);
 
   const getInstructor = (name) => {
-    Ctx.instructorList.push({
-      name: "Canceled",
-      instructorId: "Canceled",
-    });
     return Ctx.instructorList.find(
       (i) => i.name?.toString().trim() === name?.toString().trim()
     );
@@ -960,38 +964,38 @@ const UpcomingSessions = () => {
                               <div className="hidden md:block w-full">
                                 {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
                                   <select
-                                  className="w-full h-10 px-2 rounded focus:outline-none focus:border-blue-500 text-sm"
-                                  style={{
-                                    backgroundColor: InstitutionData.LightestPrimaryColor,
-                                  }}
-                                  value={getInstructor(clas.instructorNames)?.name}
-                                  onChange={(e) => {
-                                    onClassUpdated(
-                                      clas.classId,
-                                      getInstructor(e.target.value).name,
-                                      clas.classType,
-                                      getInstructor(e.target.value).instructorId,
-                                      clas.date
-                                    );
-                                  }}
-                                >
-                                  {Ctx.instructorList
-                                    .sort((a, b) => {
-                                      if (a.name < b.name) return -1;
-                                      if (a.name > b.name) return 1;
-                                      return 0;
-                                    })
-                                    .map((i) =>
-                                      i.name !== "Cancelled" && (
-                                        <option
-                                          key={i.name}
-                                          value={i.name}
-                                        >
-                                          {i.name}
-                                        </option>
-                                      )
-                                    )}
-                                </select>
+                                    className="w-full h-10 px-2 rounded focus:outline-none focus:border-blue-500 text-sm"
+                                    style={{
+                                      backgroundColor: InstitutionData.LightestPrimaryColor,
+                                    }}
+                                    value={getInstructor(clas.instructorNames)?.name}
+                                    onChange={(e) => {
+                                      onClassUpdated(
+                                        clas.classId,
+                                        getInstructor(e.target.value).name,
+                                        clas.classType,
+                                        getInstructor(e.target.value).instructorId,
+                                        clas.date
+                                      );
+                                    }}
+                                  >
+                                    {Ctx.instructorList
+                                      .sort((a, b) => {
+                                        if (a.name < b.name) return -1;
+                                        if (a.name > b.name) return 1;
+                                        return 0;
+                                      })
+                                      .map((i) =>
+                                        i.name !== "Cancelled" && (
+                                          <option
+                                            key={i.name}
+                                            value={i.name}
+                                          >
+                                            {i.name}
+                                          </option>
+                                        )
+                                      )}
+                                  </select>
                                 ) : (
                                   <p
                                     className="h-10 flex items-center justify-center rounded border border-gray-300 text-md"
@@ -1079,9 +1083,9 @@ const UpcomingSessions = () => {
                                       //     "_blank" 
                                       //   );
                                       // } else {
-                                        window.open(clas.zoomLink, '_blank', 'noreferrer');
+                                      window.open(clas.zoomLink, '_blank', 'noreferrer');
                                       // }
-                                     
+
                                       onJoinClass(InstitutionData.InstitutionId);
                                     } else {
                                       markAttendance(clas.classId);
