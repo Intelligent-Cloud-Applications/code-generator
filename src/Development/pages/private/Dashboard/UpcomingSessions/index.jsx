@@ -106,10 +106,6 @@ const UpcomingSessions = () => {
   }, [Ctx.userData.userType, InstitutionData.InstitutionId]);
 
   const getInstructor = (name) => {
-    Ctx.instructorList.push({
-      name: "Canceled",
-      instructorId: "Canceled",
-    });
     return Ctx.instructorList.find(
       (i) => i.name?.toString().trim() === name?.toString().trim()
     );
