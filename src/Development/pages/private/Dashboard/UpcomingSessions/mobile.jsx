@@ -216,9 +216,14 @@ const UpcomingSessionsMobile = () => {
   };
 
   // Sort the upcoming classes based on the date in descending order
-  const sortedUpcomingClasses = Ctx.upcomingClasses.sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const sortedUpcomingClasses = Ctx.upcomingClasses
+  .filter(classItem => {
+    const currentTime = new Date().getTime();
+    const oneHourInMs = 60 * 60 * 1000; // 1 hour in milliseconds
+    const classTime = parseInt(classItem.date);
+    return classTime + oneHourInMs > currentTime;
+  })
+  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const [showForm, setShowForm] = useState(false);
   // eslint-disable-next-line
   const [formPosition, setFormPosition] = useState({ x: 0, y: 0 });
