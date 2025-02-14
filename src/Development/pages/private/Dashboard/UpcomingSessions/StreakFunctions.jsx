@@ -9,7 +9,7 @@ const getCurrentDate = () => {
 // Function to fetch the streak count
 const fetchStreakCount = async (institutionid) => {
   try {
-    const response = await API.get('user', `/user/streak-get/${institutionid}`);
+    const response = await API.get('main', `/user/streak-get/${institutionid}`);
 
     if (response && response.streak !== undefined && response.level !== undefined) {
       return { 
@@ -33,7 +33,7 @@ const updateStreak = async (institutionid, lastCallDate) => {
 
   if (!lastCallDate || lastCallDate < currentDate) {
     console.log('Updating streak as last call date is earlier than the current date.');
-    const response = await API.put('user', `/user/streak-update/${institutionid}`);
+    const response = await API.put('main', `/user/streak-update/${institutionid}`);
     console.log('Streak updated:', response);
   } else {
     console.log('No update needed as the last call date matches the current date.');
