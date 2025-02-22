@@ -1,6 +1,6 @@
 // Packages
-import { Routes, Route } from "react-router-dom";
-import React, { useContext } from "react";
+import {Routes, Route, useLocation} from "react-router-dom";
+import React, {useContext, useEffect} from "react";
 // Local
 import Home from "../pages/public/Home";
 import About from "../pages/public/AboutUs";
@@ -35,6 +35,7 @@ import InstitutionContext from "../Context/InstitutionContext";
 import DevSubscription from "../pages/public/Home/DevSubscription"
 
 import Cafepayment from "../CommonPayment/Cafe/Cafepayment"
+import PhoneUpdate from "../pages/private/PhoneUpdate";
 //const Navigate = ({to}) => {
 //  const navigate = useNavigate();
 //  useEffect(() => {
@@ -48,6 +49,11 @@ import Cafepayment from "../CommonPayment/Cafe/Cafepayment"
 // Code
 const RoutesContainer = () => {
   const { productId } = useContext(InstitutionContext).institutionData;
+  const location = useLocation();
+
+    useEffect(() => {
+        window.google.accounts.id.cancel();
+    }, [location]);
 
   return (
     <Routes>
@@ -96,6 +102,7 @@ const RoutesContainer = () => {
       <Route path="/allpayment/:institution" element={<HomePayment />} />
       <Route path="*" element={<Error />} />
       <Route path="/dev-subscription" element={<DevSubscription />} />
+        <Route path="/phone-update" element={<PhoneUpdate />} />
     </Routes>
   );
 };

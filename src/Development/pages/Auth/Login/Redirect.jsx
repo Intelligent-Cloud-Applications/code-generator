@@ -55,7 +55,10 @@ const Redirect = () => {
         util.setLoader(false);
         const path = window.sessionStorage.getItem('login_redirect');
         window.sessionStorage.removeItem('login_redirect');
-        navigate(path || '/dashboard');
+        if (userdata.phoneNumber)
+          navigate(path || '/dashboard');
+        else
+          navigate('/phone-update');
       } catch (e) {
         toast.error('Please signup first');
         util.setLoader(false);
