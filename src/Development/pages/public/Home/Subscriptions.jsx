@@ -111,8 +111,11 @@ const Subscription = () => {
   const handleSubscribeClick = (cognitoId, emailId) => {
     const primaryColor = encodeURIComponent(InstitutionData.PrimaryColor.replace('#', ''));
     const secondaryColor = encodeURIComponent(InstitutionData.SecondaryColor.replace('#', ''));
-    const url = `${domain}/allpayment/${institutionData.InstitutionId}/${cognitoId}/${emailId}?primary=${primaryColor}&secondary=${secondaryColor}`;
-    
+    // const url = `${domain}/allpayment/${institutionData.InstitutionId}/${cognitoId}/${emailId}?primary=${primaryColor}&secondary=${secondaryColor}`;
+    const url = process.env.REACT_APP_STAGE === 'PROD' ?
+      `https://payment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${UserCtx.cognitoId}/${domain.split('://')[1]}` :
+      `https://betapayment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${UserCtx.cognitoId}/${domain.split('://')[1]}`;
+
     window.open(url, "_blank", "noopener,noreferrer");
   };
 

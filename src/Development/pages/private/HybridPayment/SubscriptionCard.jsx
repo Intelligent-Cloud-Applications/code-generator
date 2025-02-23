@@ -53,10 +53,13 @@ const SubscriptionCard = () => {
     }
   }, [locationData, productList]);
   // console.log(UserCtx);
-  const handleChoosePlan = () => {
+  const handleChoosePlan = (productId) => {
     if (isAuth) {
       navigate(
-        `/allpayment/${web?.InstitutionId}/${UserCtx?.cognitoId}/${UserCtx?.emailId}`
+        // `/allpayment/${web?.InstitutionId}/${UserCtx?.cognitoId}/${UserCtx?.emailId}`
+        process.env.REACT_APP_STAGE === 'PROD' ?
+          `https://payment.happyprancer.com/${InstitutionData.InstitutionId}/${productId}/${UserCtx.cognitoId}/${domain.split('://')[1]}` :
+          `https://betapayment.happyprancer.com/${InstitutionData.InstitutionId}/${productId}/${UserCtx.cognitoId}/${domain.split('://')[1]}`
       );
     } else {
       toast.error("You have no accounts yet. Please sign up to continue.");
@@ -137,7 +140,7 @@ const SubscriptionCard = () => {
                   <div className="border border-gray-500 w-3/4 mx-auto mb-2"></div>
 
                   <button
-                    onClick={handleChoosePlan}
+                    onClick={() => handleChoosePlan(item.productId)}
                     className={`choose-plan w-full justify-center rounded-lg transition-colors duration-500 hover:bg-white  bg-slate-900 text-slate-100 px-5 py-2.5 text-center text-sm font-medium mb-2`}
                   >
                     Choose plan
