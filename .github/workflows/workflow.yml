@@ -34,10 +34,10 @@ jobs:
           aws-region: us-east-1 # Replace with your desired AWS region
 
       - name: Deploy to S3
-        run: aws s3 sync ./build s3://betatemplateds.awsaiapp.com --delete
+        run: aws s3 sync ./build s3://templateds.awsaiapp.com --delete
 
       - name: Cloudfront Invalidation
-        run: aws cloudfront create-invalidation --distribution-id E36I0B4BJRQ8X --paths "/*"
+        run: aws cloudfront create-invalidation --distribution-id E263LXOGXF3H0N --paths "/*"
 
   deploy-prod:
     runs-on: ubuntu-latest
