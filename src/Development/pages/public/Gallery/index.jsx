@@ -1,25 +1,26 @@
-import React, { useState, useEffect, useContext, useRef } from 'react'
-import { API, Storage } from 'aws-amplify'
-import Context from '../../../Context/Context'
-import InstitutionContext from '../../../Context/InstitutionContext'
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import { Image, Trash2Icon, Upload, X } from 'lucide-react'
-import { toast } from 'react-toastify'
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { API, Storage } from "aws-amplify";
+import Context from "../../../Context/Context";
+import InstitutionContext from "../../../Context/InstitutionContext";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import { Image, Trash2Icon, Upload, X } from "lucide-react";
+import { toast } from "react-toastify";
 
-import Spinner from '../../../utils/spinner'
-import { FadeLoader } from 'react-spinners'
-import NavBar from '../../../components/Header'
-import Footer from '../../../components/Footer'
+import Spinner from "../../../utils/spinner";
+import { FadeLoader } from "react-spinners";
+import NavBar from "../../../components/Header";
+import Footer from "../../../components/Footer";
 
-import 'react-lazy-load-image-component/src/effects/blur.css'
-import './Gallery.css'
-import 'react-loading-skeleton/dist/skeleton.css'
-import {MdEdit} from "react-icons/md";
-import {Modal} from "flowbite-react";
-import {BaseTextInput, PrimaryButton} from "../../../common/Inputs";
+import "react-lazy-load-image-component/src/effects/blur.css";
+import "./Gallery.css";
+import "react-loading-skeleton/dist/skeleton.css";
+import { MdEdit } from "react-icons/md";
+import { Modal } from "flowbite-react";
+import { BaseTextInput, PrimaryButton } from "../../../common/Inputs";
+import fileUpload from "../../../common/utils/upload-file";
 
 const Gallery = () => {
-  const [uploading, setUploading] = useState(false)
+  const [uploading, setUploading] = useState(false);
   const {
     getImagesFromAPI,
     tempImgSrc,
@@ -29,181 +30,180 @@ const Gallery = () => {
     title,
     setTitle,
     description,
-    setDescription
-  } = useContext(Context)
+    setDescription,
+  } = useContext(Context);
 
-  const [img, setImg] = useState()
-  const [model, setModel] = useState(false)
-  const [showInput, setShowInput] = useState(false)
-  const userData = useContext(Context)
-  const user = userData.userData
-  const { setLoader } = userData.util
-  const [selectedFile, setSelectedFile] = useState('')
-  const [isAdmin, setIsAdmin] = useState(false)
-  const bucketName = 'team-dev-testing'
-  const region = 'us-east-2'
-  const institution = user.institution
-  const { institutionData: InstitutionData } = useContext(InstitutionContext)
-  const fileInputRef = useRef(null)
-  const [loading, setLoading] = useState(true)
-  const [isDeleteing, setIsDeleteing] = useState(false)
-  const [isDataUploading, setIsDataUploading] = useState(false)
-  const [selectValve, setSelectValve] = useState('All')
+  const [img, setImg] = useState();
+  const [model, setModel] = useState(false);
+  const [showInput, setShowInput] = useState(false);
+  const userData = useContext(Context);
+  const user = userData.userData;
+  const { setLoader } = userData.util;
+  const [selectedFile, setSelectedFile] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const bucketName = "team-dev-testing";
+  const region = "us-east-2";
+  const institution = user.institution;
+  const { institutionData: InstitutionData } = useContext(InstitutionContext);
+  const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [isDeleteing, setIsDeleteing] = useState(false);
+  const [isDataUploading, setIsDataUploading] = useState(false);
+  const [selectValve, setSelectValve] = useState("All");
   const [openEditModal, setOpenEditModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true)
-      await getImagesFromAPI()
-      setLoading(false)
-    }
+      setLoading(true);
+      await getImagesFromAPI();
+      setLoading(false);
+    };
 
-    console.log('Fetching images...')
-    console.log('User data:', user)
-    if (user && user.userType === 'admin') {
-      setIsAdmin(true)
+    console.log("Fetching images...");
+    console.log("User data:", user);
+    if (user && user.userType === "admin") {
+      setIsAdmin(true);
     } else {
-      setIsAdmin(false)
+      setIsAdmin(false);
     }
-    console.log('isAdmin after setting:', isAdmin)
-    fetchData()
+    console.log("isAdmin after setting:", isAdmin);
+    fetchData();
     // eslint-disable-next-line
-  }, [user])
+  }, [user]);
 
   const handleFileChange = async (event) => {
-    const file = event.target.files[0]
-    console.log('File selected:', file)
+    const file = event.target.files[0];
+    console.log("File selected:", file);
 
-    if (file.size > 30 * 1024 * 1024) {
-      toast.error('Please upload an image/video of less than 30MB size.', {
-        className: 'custom-toast'
-      })
-      return
+    if (file.size > 25 * 1024 * 1024) {
+      toast.error("Please upload an image/video of less than 25MB size.", {
+        className: "custom-toast",
+      });
+      return;
     }
 
-    const folderPath = `${user.institution}`
-    const existingImageNames = imageUrls.map((url) => url.split('/').pop())
+    const folderPath = `${user.institution}`;
+    const existingImageNames = imageUrls.map((url) => url.split("/").pop());
 
     if (existingImageNames.includes(file.name)) {
-      toast.error('Selected image/video already exists.', {
-        className: 'custom-toast'
-      })
-      return (fileInputRef.current.value = '')
+      toast.error("Selected image/video already exists.", {
+        className: "custom-toast",
+      });
+      return (fileInputRef.current.value = "");
     }
-    setShowInput(true)
+
+    setShowInput(true);
     if (imageUrls.length >= 25) {
       toast.error(
-        'Maximum limit reached. You can upload up to 25 images/videos.',
+        "Maximum limit reached. You can upload up to 25 images/videos.",
         {
-          className: 'custom-toast'
+          className: "custom-toast",
         }
-      )
-      return
+      );
+      return;
     }
 
-    setUploading(true)
+    setUploading(true);
     try {
-      console.log('Uploading media:', file.name, file.type)
-      await Storage.put(`${folderPath}/${file.name}`, file, {
-        progressCallback(progress) {
-          console.log(`Uploaded: ${progress.loaded}/${progress.total}`)
-        },
-        contentType: file.type,
+      console.log("Uploading media:", file.name, file.type);
+
+      const imageUrl = await fileUpload({
         bucket: bucketName,
         region: region,
-        ACL: 'public-read'
-      })
-      console.log('Image uploaded successfully.')
+        folder: folderPath,
+        file: file,
+      });
 
-      const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/public/${folderPath}/${file.name}`
-      setSelectedFile(imageUrl)
-      console.log(title)
-      console.log(description)
-      console.log('API call successful.')
-      await getImagesFromAPI()
+      console.log("Image uploaded successfully.", imageUrl);
+
+      setSelectedFile(imageUrl);
+      console.log(title);
+      console.log(description);
+      console.log("API call successful.");
+      await getImagesFromAPI();
       if (fileInputRef.current) {
-        fileInputRef.current.value = ''
+        fileInputRef.current.value = "";
       }
     } catch (error) {
-      console.error('Error uploading image: ', error)
-      toast.error('Failed to upload image')
+      console.error("Error uploading image: ", error);
+      toast.error("Failed to upload image");
     } finally {
-      setUploading(false) // Ensure this is called to stop the spinner
+      setUploading(false); // Ensure this is called to stop the spinner
     }
-  }
+  };
 
   const uploadImageDataToAPI = async () => {
-    setIsDataUploading(true)
-    const filename = selectedFile.split('/').pop()
+    setIsDataUploading(true);
+    const filename = selectedFile.split("/").pop();
     try {
       const data = {
         institution: institution,
         title: title,
         description: description,
         imageUrl: filename,
-        imgLink: selectedFile
-      }
+        imgLink: selectedFile,
+      };
 
-      await API.post('main', `/admin/upload-image/${institution}`, {
-        body: data
-      })
-      setTitle('')
-      setDescription('')
-      setSelectedFile('') // Reset the selected file
-      setIsDataUploading(false)
-      setShowInput(false)
+      await API.post("main", `/admin/upload-image/${institution}`, {
+        body: data,
+      });
+      setTitle("");
+      setDescription("");
+      setSelectedFile(""); // Reset the selected file
+      setIsDataUploading(false);
+      setShowInput(false);
     } catch (error) {
-      console.error('Error uploading image data to API: ', error)
+      console.error("Error uploading image data to API: ", error);
     } finally {
-      getImagesFromAPI()
-      setTempImgSrc('')
+      getImagesFromAPI();
+      setTempImgSrc("");
     }
-  }
+  };
 
   const getImg = (imageUrl) => {
-    setTempImgSrc(imageUrl)
-    setModel(true)
-    setImg(imageUrl)
-    getImagesFromAPI(imageUrl)
-  }
+    setTempImgSrc(imageUrl);
+    setModel(true);
+    setImg(imageUrl);
+    getImagesFromAPI(imageUrl);
+  };
 
   const handleDelete = async (tempImgSrc) => {
-    console.log('Deleting image:', tempImgSrc)
+    console.log("Deleting image:", tempImgSrc);
     try {
       const key = img.split(
         `https://${bucketName}.s3.${region}.amazonaws.com/public/`
-      )[1]
+      )[1];
 
       await Storage.remove(key, {
         bucket: bucketName,
-        region: region
-      })
-      setImageUrls((prevUrls) => prevUrls.filter((url) => url !== tempImgSrc))
-      setSelectedFile('')
+        region: region,
+      });
+      setImageUrls((prevUrls) => prevUrls.filter((url) => url !== tempImgSrc));
+      setSelectedFile("");
       // Fetch updated image list after deletion
-      getImagesFromAPI()
+      getImagesFromAPI();
     } catch (error) {
-      console.error('Error deleting image: ', error)
+      console.error("Error deleting image: ", error);
     }
-    setModel(false)
-  }
+    setModel(false);
+  };
 
   const dataDelete = async (tempImgSrc) => {
-    console.log(tempImgSrc)
-    setIsDeleteing(true)
+    console.log(tempImgSrc);
+    setIsDeleteing(true);
     try {
-      await API.del('main', `/admin/delete-image/${institution}`, {
+      await API.del("main", `/admin/delete-image/${institution}`, {
         body: {
-          imageUrl: tempImgSrc
-        }
-      })
+          imageUrl: tempImgSrc,
+        },
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-    handleDelete(tempImgSrc)
-    setIsDeleteing(false)
-    setModel(false)
-  }
+    handleDelete(tempImgSrc);
+    setIsDeleteing(false);
+    setModel(false);
+  };
 
   const dataEdit = async (event) => {
     event.preventDefault();
@@ -211,55 +211,57 @@ const Gallery = () => {
     const title = event.target.title.value;
     const description = event.target.description.value;
 
-    setLoader(true)
+    setLoader(true);
     try {
       await API.put("main", `/admin/edit-image/${institution}`, {
         body: {
-          imageUrl, title, description
-        }
+          imageUrl,
+          title,
+          description,
+        },
       });
       setOpenEditModal(false);
-      toast.success("Message edited successfully.")
+      toast.success("Message edited successfully.");
     } catch (e) {
       console.log(e);
       toast.error(e.message);
     } finally {
       setLoader(false);
     }
-  }
+  };
 
   const handleCancelUpload = () => {
-    setShowInput(false)
-    setSelectedFile('')
-    setTitle('')
-    setDescription('')
+    setShowInput(false);
+    setSelectedFile("");
+    setTitle("");
+    setDescription("");
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
-  let mediaUrls = imageUrls
-  if (selectValve === 'images') {
+  let mediaUrls = imageUrls;
+  if (selectValve === "images") {
     mediaUrls = imageUrls.filter(
       (url) =>
-        url.split('/').pop().split('.')[1] !== 'mp4' &&
-        url.split('/').pop().split('.')[1] !== 'avi'
-    )
-  } else if (selectValve === 'videos') {
+        url.split("/").pop().split(".")[1] !== "mp4" &&
+        url.split("/").pop().split(".")[1] !== "avi"
+    );
+  } else if (selectValve === "videos") {
     mediaUrls = imageUrls.filter(
       (url) =>
-        url.split('/').pop().split('.')[1] === 'mp4' ||
-        url.split('/').pop().split('.')[1] === 'avi'
-    )
+        url.split("/").pop().split(".")[1] === "mp4" ||
+        url.split("/").pop().split(".")[1] === "avi"
+    );
   } else {
-    mediaUrls = imageUrls
+    mediaUrls = imageUrls;
   }
 
   return (
     <>
       <div className="min-h-screen">
         {!model && <NavBar />}
-        <div className={model ? 'model open' : 'model'}>
+        <div className={model ? "model open" : "model"}>
           {isDeleteing ? (
             <div className="w-[22.5vw] h-[30vh] z-10 flex flex-col justify-center items-center rounded-lg max800:w-[70vw] max800:h-[20vh]">
               <FadeLoader
@@ -271,8 +273,8 @@ const Gallery = () => {
             </div>
           ) : (
             <>
-              {tempImgSrc?.split('/').pop().split('.')[1] === 'mp4' ||
-              tempImgSrc?.split('/').pop().split('.')[1] === 'avi' ? (
+              {tempImgSrc?.split("/").pop().split(".")[1] === "mp4" ||
+              tempImgSrc?.split("/").pop().split(".")[1] === "avi" ? (
                 <div className="max-h-[90vh] relative">
                   <video
                     className="w-auto max-w-full h-auto max-h-[90vh] block box-border my-0 mx-auto rounded"
@@ -317,22 +319,50 @@ const Gallery = () => {
                   />
                 )}
                 {isAdmin && (
-                  <MdEdit size={24} onClick={() => {
-                    setModel(false)
-                    setOpenEditModal(true)
-                  }} />
+                  <MdEdit
+                    size={24}
+                    onClick={() => {
+                      setModel(false);
+                      setOpenEditModal(true);
+                    }}
+                  />
                 )}
                 {isAdmin && (
-                  <Modal className="z-50" show={openEditModal} onClose={() => setOpenEditModal(false)}>
+                  <Modal
+                    className="z-50"
+                    show={openEditModal}
+                    onClose={() => setOpenEditModal(false)}
+                  >
                     <Modal.Header />
                     <Modal.Body>
                       <form onSubmit={dataEdit} className="flex flex-col gap-2">
-                        <input name="imageUrl" value={tempImgSrc} hidden required />
-                        <BaseTextInput name="title" placeholder="Title" defaultValue={title} required />
-                        <textarea name="description" placeholder="Description" defaultValue={description} required />
+                        <input
+                          name="imageUrl"
+                          value={tempImgSrc}
+                          hidden
+                          required
+                        />
+                        <BaseTextInput
+                          name="title"
+                          placeholder="Title"
+                          defaultValue={title}
+                          required
+                        />
+                        <textarea
+                          name="description"
+                          placeholder="Description"
+                          defaultValue={description}
+                          required
+                        />
                         <div className="grid grid-cols-2 gap-2">
                           <PrimaryButton>Save Changes</PrimaryButton>
-                          <button type="button" className="bg-red-500 text-white rounded-lg" onClick={() => setOpenEditModal(false)}>Cancel</button>
+                          <button
+                            type="button"
+                            className="bg-red-500 text-white rounded-lg"
+                            onClick={() => setOpenEditModal(false)}
+                          >
+                            Cancel
+                          </button>
                         </div>
                       </form>
                     </Modal.Body>
@@ -342,10 +372,10 @@ const Gallery = () => {
                   height={24}
                   width={24}
                   onClick={() => {
-                    setModel(false)
-                    setTitle('')
-                    setDescription('')
-                    setTempImgSrc('')
+                    setModel(false);
+                    setTitle("");
+                    setDescription("");
+                    setTempImgSrc("");
                   }}
                 />
               </div>
@@ -353,7 +383,7 @@ const Gallery = () => {
           )}
         </div>
 
-        <div className={showInput ? 'showInput open' : 'showInput'}>
+        <div className={showInput ? "showInput open" : "showInput"}>
           {isDataUploading ? (
             <div className="w-[22.5vw] h-[30vh] z-10 flex flex-col justify-center items-center rounded-lg max800:w-[70vw] max800:h-[20vh]">
               <FadeLoader
@@ -368,8 +398,8 @@ const Gallery = () => {
               <div className="h-auto w-[40vw] bg-white px-5 py-4 rounded-md flex flex-col justify-center items-center gap-4 max800:w-[90vw]">
                 <div className="h-[30vh] max800:h-[20vh]">
                   {selectedFile ? (
-                    selectedFile?.split('/').pop().split('.')[1] === 'mp4' ||
-                    selectedFile?.split('/').pop().split('.')[1] === 'avi' ? (
+                    selectedFile?.split("/").pop().split(".")[1] === "mp4" ||
+                    selectedFile?.split("/").pop().split(".")[1] === "avi" ? (
                       <video
                         className="w-[22.5vw] h-[30vh] rounded"
                         src={selectedFile}
@@ -380,7 +410,7 @@ const Gallery = () => {
                       <img
                         className="w-[22.5vw] h-[30vh] rounded object-cover"
                         style={{
-                          border: `2px solid ${InstitutionData.PrimaryColor}`
+                          border: `2px solid ${InstitutionData.PrimaryColor}`,
                         }}
                         src={selectedFile}
                         alt="fitness"
@@ -390,8 +420,8 @@ const Gallery = () => {
                     <div
                       className="w-[22.5vw] h-[30vh] z-10 flex flex-col justify-center items-center bg-[#ffffff6e] rounded-lg max800:w-[70vw] max800:h-[20vh]"
                       style={{
-                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-                        backdropFilter: 'blur(5px)'
+                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                        backdropFilter: "blur(5px)",
                       }}
                     >
                       <Spinner />
@@ -400,8 +430,8 @@ const Gallery = () => {
                     <label
                       className="upload border-2 border-dotted border-stone-500 rounded-lg cursor-pointer flex text-black text-[1.2rem] font-semibold flex-col justify-center items-center w-[22.5vw] h-[30vh] mb-1 mt-1  max800:w-[70vw] max800:h-[20vh]"
                       style={{
-                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-                        backdropFilter: 'blur(5px)'
+                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                        backdropFilter: "blur(5px)",
                       }}
                     >
                       <Upload height={20} width={20} />
@@ -455,8 +485,8 @@ const Gallery = () => {
                   <button
                     className="px-12 py-2 text-white bg-red-400 rounded flex flex-row gap-2 items-center justify-center"
                     onClick={() => {
-                      handleCancelUpload()
-                      setUploading(false)
+                      handleCancelUpload();
+                      setUploading(false);
                     }}
                   >
                     Cancel
@@ -464,11 +494,11 @@ const Gallery = () => {
                   <button
                     className="px-12 py-2 text-white rounded flex flex-row gap-2 items-center justify-center"
                     style={{
-                      backgroundColor: `${InstitutionData.PrimaryColor}`
+                      backgroundColor: `${InstitutionData.PrimaryColor}`,
                     }}
                     onClick={() => {
-                      setShowInput(false)
-                      uploadImageDataToAPI(selectedFile)
+                      setShowInput(false);
+                      uploadImageDataToAPI(selectedFile);
                     }}
                   >
                     Upload
@@ -478,6 +508,7 @@ const Gallery = () => {
             </>
           )}
         </div>
+        
         <div>
           <div className="py-[2rem] flex justify-center mb-0 text-[3rem] max600:text-[2rem]">
             <h2
@@ -503,7 +534,7 @@ const Gallery = () => {
                   className="px-12 py-2 text-white rounded flex flex-row gap-2 items-center justify-center"
                   style={{ backgroundColor: `${InstitutionData.PrimaryColor}` }}
                   onClick={() => {
-                    setShowInput(true)
+                    setShowInput(true);
                   }}
                 >
                   <Upload height={20} width={20} />
@@ -537,14 +568,14 @@ const Gallery = () => {
                   </SkeletonTheme>
                 ) : (
                   <div className="media">
-                    {imageUrl.split('/').pop().split('.')[1] === 'mp4' ||
-                    imageUrl.split('/').pop().split('.')[1] === 'avi' ? (
+                    {imageUrl.split("/").pop().split(".")[1] === "mp4" ||
+                    imageUrl.split("/").pop().split(".")[1] === "avi" ? (
                       <video
                         key={index}
                         src={imageUrl}
                         alt="Gallery"
                         style={{
-                          width: '100%'
+                          width: "100%",
                         }}
                         onClick={() => getImg(imageUrl)}
                         autoPlay
@@ -557,7 +588,7 @@ const Gallery = () => {
                         src={imageUrl}
                         alt="Gallery"
                         style={{
-                          width: '100%'
+                          width: "100%",
                         }}
                         onClick={() => getImg(imageUrl)}
                       />
@@ -571,7 +602,7 @@ const Gallery = () => {
       </div>
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default Gallery
+export default Gallery;
