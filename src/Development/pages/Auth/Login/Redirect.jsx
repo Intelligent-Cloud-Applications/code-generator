@@ -1,15 +1,17 @@
-import {useContext, useEffect} from "react";
-import {API, Auth} from "aws-amplify";
-import {toast} from "react-toastify";
+import { useContext, useEffect } from "react";
+import { API, Auth } from "aws-amplify";
+import { toast } from "react-toastify";
 import Context from "../../../Context/Context";
 import InstitutionContext from "../../../Context/InstitutionContext";
-import {useNavigate} from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const Redirect = () => {
   const { util, setUserData, setIsAuth, onAuthLoad } = useContext(Context);
   const { InstitutionId } = useContext(InstitutionContext).institutionData;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const productId = searchParams.get("productId");
 
   useEffect(() => {
     const redirect = async () => {
@@ -31,7 +33,7 @@ const Redirect = () => {
 
         if (!response.inInstitution) {
           await API.post(
-            'main',
+            "main",
             `/user/profile/${InstitutionId}`,
             {
               body: {
@@ -42,32 +44,34 @@ const Redirect = () => {
           );
         }
 
-        const userdata = await API.get(
-          'main',
-          `/user/profile/${InstitutionId}`,
-          {}
-        );
+        const userdata = await API.get("main", `/user/profile/${InstitutionId}`, {});
         setUserData(userdata);
         setIsAuth(true);
 
-        toast.info('Logged in');
+        toast.info("Logged in");
         onAuthLoad(true, InstitutionId);
         util.setLoader(false);
-        const path = window.sessionStorage.getItem('login_redirect');
-        window.sessionStorage.removeItem('login_redirect');
-        if (userdata.phoneNumber)
-          navigate(path || '/dashboard');
-        else
-          navigate('/phone-update');
+
+        // Redirect based on productId presence
+        if (productId) {
+          window.location.href = `https://betapayment.happyprancer.com/${InstitutionId}/${productId}/${userdata.cognitoId}`;
+        } else {
+          const path = window.sessionStorage.getItem("login_redirect");
+          window.sessionStorage.removeItem("login_redirect");
+          if (userdata.phoneNumber) navigate(path || "/dashboard");
+          else navigate("/phone-update");
+        }
       } catch (e) {
-        toast.error('Please signup first');
+        toast.error("Please signup first");
         util.setLoader(false);
-        navigate('/signup');
+        navigate("/signup");
       }
-    }
+    };
 
     redirect();
   }, []);
-}
+
+  return null;
+};
 
 export default Redirect;

@@ -6,19 +6,21 @@ import SignupForm from "./SignupForm";
 import OtpForm from "./OtpForm";
 import countries from "../../../common/Inputs/countries.json";
 import InstitutionContext from "../../../Context/InstitutionContext";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import Context from "../../../Context/Context";
 import { FormWrapper } from "../../../common/Layouts";
 
 const Signup = () => {
   const { setLoader } = useContext(Context).util;
   const { InstitutionId } = useContext(InstitutionContext).institutionData;
-  const [formState, setFormState] = useState('signup');
+  const [formState, setFormState] = useState("signup");
   const [userData, setUserData] = useState({});
   const [password, setPassword] = useState("");
+  const [searchParams] = useSearchParams();
+  const productId = searchParams.get("productId");
   const navigate = useNavigate();
   const location = useLocation();
-
+  console.log(productId);
   // Variables to store trial status and period from URL
   const [trialStatus, setTrialStatus] = useState(null);
   const [trialPeriod, setTrialPeriod] = useState(null);
@@ -26,30 +28,32 @@ const Signup = () => {
   // Extract trial params from URL
   console.log(location.pathname);
   const params = new URLSearchParams(location.search);
-  const trial = params.get('trial');
-  const period = params.get('trialPeriod');
-  const hybridPath = params.get('hybrid');
+  const trial = params.get("trial");
+  const period = params.get("trialPeriod");
+  const hybridPath = params.get("hybrid");
   useEffect(() => {
-    console.log(trial)
+    console.log(trial);
     if (trial === "true" && period) {
       setTrialStatus("Trial");
       // trial = true;
-      setTrialPeriod(period);  // e.g., 'Monthly', 'Quarterly', etc.
+      setTrialPeriod(period); // e.g., 'Monthly', 'Quarterly', etc.
     }
   }, [location.search]);
 
   const handleSignup = async (event) => {
     event.preventDefault();
 
-    if (event.target.password.value !== event.target.password_confirmation.value) {
-      toast.error('Passwords do not match');
+    if (
+      event.target.password.value !== event.target.password_confirmation.value
+    ) {
+      toast.error("Passwords do not match");
       return;
     }
 
-    let userCountry = '';
+    let userCountry = "";
     for (let country of countries) {
       if (country.value === event.target.country.value) {
-        userCountry = country.name.split(' (')[0];
+        userCountry = country.name.split(" (")[0];
         break;
       }
     }
@@ -68,17 +72,17 @@ const Signup = () => {
         phoneNumber: `+${event.target.country.value}${event.target.phone.value}`,
         country: userCountry,
         referred_code: event.target.referral.value,
-        status: trialStatus || "InActive",  // Set status to Trial if URL param exists
-        trialPeriod: trialPeriod || null,  // Add trialPeriod from URL
-        trial: trial
+        status: trialStatus || "InActive", // Set status to Trial if URL param exists
+        trialPeriod: trialPeriod || null, // Add trialPeriod from URL
+        trial: trial,
       };
 
       setUserData(userPayload);
       setPassword(event.target.password.value);
-      setFormState('confirm');
+      setFormState("confirm");
     } catch (e) {
       console.log(e);
-      toast.error('Error signing up');
+      toast.error("Error signing up");
     } finally {
       setLoader(false);
     }
@@ -93,25 +97,21 @@ const Signup = () => {
       await Auth.signIn(userData.emailId, password);
 
       // Send user data to API
-      await API.post(
-        'main',
-        `/user/profile/${InstitutionId}`,
-        {  
-          queryStringParameters: {
+      await API.post("main", `/user/profile/${InstitutionId}`, {
+        queryStringParameters: {
           trial: trial,
           trialPeriod: trialPeriod,
           hybrid: hybridPath,
         },
-          body: {
-            ...userData,
-            trial: trial,
-            trialPeriod: trialPeriod
-          },
-        }
-      );
+        body: {
+          ...userData,
+          trial: trial,
+          trialPeriod: trialPeriod,
+        },
+      });
 
       setLoader(false);
-      navigate('/redirect');
+      navigate(`/redirect?productId=${productId}`);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -129,16 +129,16 @@ const Signup = () => {
     let endDate;
     switch (period) {
       case "Monthly":
-        endDate = currentDate + (30 * 24 * 60 * 60 * 1000); // 30 days
+        endDate = currentDate + 30 * 24 * 60 * 60 * 1000; // 30 days
         break;
       case "Quarterly":
-        endDate = currentDate + (90 * 24 * 60 * 60 * 1000); // 90 days
+        endDate = currentDate + 90 * 24 * 60 * 60 * 1000; // 90 days
         break;
       case "Half-yearly":
-        endDate = currentDate + (180 * 24 * 60 * 60 * 1000); // 180 days
+        endDate = currentDate + 180 * 24 * 60 * 60 * 1000; // 180 days
         break;
       case "Yearly":
-        endDate = currentDate + (365 * 24 * 60 * 60 * 1000); // 365 days
+        endDate = currentDate + 365 * 24 * 60 * 60 * 1000; // 365 days
         break;
       default:
         endDate = null;
@@ -147,9 +147,12 @@ const Signup = () => {
   };
 
   return (
-    <FormWrapper heading='Signup'>
-      {formState === 'signup' ? <SignupForm handler={handleSignup} /> :
-        <OtpForm handler={confirmSignup} resendHandler={resendHandler} />}
+    <FormWrapper heading="Signup">
+      {formState === "signup" ? (
+        <SignupForm handler={handleSignup} />
+      ) : (
+        <OtpForm handler={confirmSignup} resendHandler={resendHandler} />
+      )}
     </FormWrapper>
   );
 };
