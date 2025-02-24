@@ -119,8 +119,8 @@ const Subscription = () => {
     // const url = `${domain}/allpayment/${institutionData.InstitutionId}/${cognitoId}/${emailId}?primary=${primaryColor}&secondary=${secondaryColor}`;
     const url =
       process.env.REACT_APP_STAGE === "PROD"
-        ? `https://payment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${UserCtx.cognitoId}`
-        : `https://betapayment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${UserCtx.cognitoId}}`;
+        ? `https://payment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`
+        : `https://betapayment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`;
 
         window.location.href = url
   };
