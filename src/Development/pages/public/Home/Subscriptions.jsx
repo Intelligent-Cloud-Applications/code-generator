@@ -21,7 +21,7 @@ const getLocationFromIP = async () => {
 
 const Subscription = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
-  const { productId } = useContext(InstitutionContext).institutionData;
+  const institutionProductId = useContext(InstitutionContext).institutionData?.productId;
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const [products, setProducts] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
@@ -109,7 +109,7 @@ const Subscription = () => {
       ? institutionData.BETA_DOMAIN
       : institutionData.PROD_DOMAIN;
 
-  const handleSubscribeClick = (cognitoId, emailId) => {
+  const handleSubscribeClick = (cognitoId, productId) => {
     const primaryColor = encodeURIComponent(
       InstitutionData.PrimaryColor.replace("#", "")
     );
@@ -130,7 +130,7 @@ const Subscription = () => {
       <button
         type="button"
         className="mt-4 first-letter:inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
-        onClick={() => handleSubscribeClick(UserCtx.cognitoId, UserCtx.emailId)}
+        onClick={() => handleSubscribeClick(UserCtx.cognitoId,item.productId)}
         style={{ backgroundColor: InstitutionData.PrimaryColor }}
       >
         Subscribe
@@ -226,7 +226,7 @@ const Subscription = () => {
         <ul className="my-7 space-y-5 min-h-[12rem]">
           {renderProductFeatures(item.provides, index)}
         </ul>
-        {productId === "1000007" && paymentHandler(item)}
+        {institutionProductId === "1000007" && paymentHandler(item)}
       </Card>
     );
   };
