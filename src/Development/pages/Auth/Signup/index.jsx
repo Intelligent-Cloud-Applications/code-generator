@@ -42,6 +42,7 @@ const Signup = () => {
 
   const handleSignup = async (event) => {
     event.preventDefault();
+    const email = event.target.email.value.toLowerCase();
 
     if (
       event.target.password.value !== event.target.password_confirmation.value
@@ -61,14 +62,14 @@ const Signup = () => {
     setLoader(true);
     try {
       await Auth.signUp({
-        username: event.target.email.value,
+        username: email,
         password: event.target.password.value,
       });
 
       // Prepare user data including trial status and period
       const userPayload = {
         userName: event.target.name.value,
-        emailId: event.target.email.value,
+        emailId: email,
         phoneNumber: `+${event.target.country.value}${event.target.phone.value}`,
         country: userCountry,
         referred_code: event.target.referral.value,
@@ -82,7 +83,12 @@ const Signup = () => {
       setFormState("confirm");
     } catch (e) {
       console.log(e);
-      toast.error("Error signing up");
+      if (e.name === 'UsernameExistsException')
+        toast.error("User already exists.");
+      else if (e.name === 'InvalidPasswordException')
+        toast.error(e.message);
+      else
+        toast.error("Error signing up");
     } finally {
       setLoader(false);
     }

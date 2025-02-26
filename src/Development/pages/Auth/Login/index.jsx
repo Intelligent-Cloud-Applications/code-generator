@@ -20,6 +20,7 @@ const AuthPage = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    const email = event.target.email.value.toLowerCase();
 
     setLoader(true);
     try {
@@ -31,13 +32,13 @@ const AuthPage = () => {
             userPoolId: process.env.REACT_APP_STAGE === 'PROD' ?
               process.env.REACT_APP_PROD_USER_POOL_ID :
               process.env.REACT_APP_DEV_USER_POOL_ID,
-            username: event.target.email.value,
+            username: email,
           }
         }
       );
 
       if (exists.inCognito && exists.inDynamoDb && exists.inInstitution) {
-        await Auth.signIn(event.target.email.value, event.target.password.value);
+        await Auth.signIn(email, event.target.password.value);
         setLoader(false);
         navigate('/redirect');
       } else {

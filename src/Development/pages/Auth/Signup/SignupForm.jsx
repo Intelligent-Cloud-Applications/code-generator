@@ -31,7 +31,7 @@ const SignupForm = ({ handler }) => {
         w-full`
       }
     >
-      <BaseTextInput name='name' className='rounded w-full' placeholder='Name'/>
+      <BaseTextInput name='name' className='rounded w-full' placeholder='Name' pattern='[A-Za-z\ ]'/>
       <EmailInput name='email' className='rounded w-full'/>
       <CountrySelect name='country' className='rounded w-full'/>
       <PhoneInput name='phone' className='rounded w-full'/>
