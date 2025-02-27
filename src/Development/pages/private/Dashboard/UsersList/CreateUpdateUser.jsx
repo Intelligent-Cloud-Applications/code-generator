@@ -208,6 +208,13 @@ function CreateUser({
 
         <div className="w-[80%] flex flex-col gap-4 mt-6">
           <div className="flex gap-1 max850:flex-col max850:space-y-4">
+          <InputComponent
+              width={100}
+              label="Upload Image"
+              type="file"
+              onChange={(e) => setName(e.target.files[0])}
+              className="p-0"
+            />
             <InputComponent
               width={100}
               label="Full Name"
