@@ -117,7 +117,11 @@ const Signup = () => {
       });
 
       setLoader(false);
-      navigate(`/redirect?productId=${productId}`);
+      if(productId){
+        navigate(`/redirect?productId=${productId}`);
+      }else{
+        navigate(`/redirect`);
+      }
     } catch (e) {
       toast.error(e.message);
     } finally {
