@@ -9,7 +9,6 @@ import InputComponent from "../../../../common/InputComponent";
 import { API } from "aws-amplify";
 import fileUpload from "../../../../common/utils/upload-file.js";
 
-
 function CreateUser({
   phoneNumber,
   name,
@@ -97,14 +96,14 @@ function CreateUser({
       ? `${countryCode}${phoneNumber}`
       : phoneNumber;
 
-      let imgUrl = imageUrl
+    let imgUrl = imageUrl
       ? await fileUpload({
           bucket: "institution-utils",
           region: "us-east-1",
           folder: `profile/${email}`,
           file: imageUrl,
         })
-        : null;
+      : null;
     const data = {
       institution: InstitutionData.InstitutionId, // Add institution to the body
       cognitoId, // required for both create and update
@@ -226,7 +225,6 @@ function CreateUser({
     }
   };
 
-
   return (
     <div>
       <div className=" w-[35rem] bg-white px-1 py-4 rounded-md flex flex-col justify-center items-center gap-4 max800:w-[90vw] relative">
@@ -246,18 +244,26 @@ function CreateUser({
             width={100}
             label="Upload Image"
             type="file"
-            onChange={(e) => setImageUrl(e.target.files[0])}
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const maxSize = 5 * 1024 * 1024; // 5 MB in bytes
+                if (file.size > maxSize) {
+                  alert(
+                    "File size exceeds the 5 MB limit. Please upload a smaller file."
+                  );
+                } else {
+                  setImageUrl(file);
+                }
+              } else {
+                alert("No file selected.");
+              }
+            }}
             className="p-0"
           />
-          <div className="flex gap-1 max850:flex-col max850:space-y-4">
-            <InputComponent
-              width={100}
-              label="Upload Image"
-              type="file"
-              onChange={(e) => setName(e.target.files[0])}
-              className="p-0"
-            />
 
+          <div className="flex gap-1 max850:flex-col max850:space-y-4">
             <InputComponent
               width={100}
               label="Full Name"
