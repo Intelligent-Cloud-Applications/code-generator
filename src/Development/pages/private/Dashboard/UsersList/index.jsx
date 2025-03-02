@@ -483,6 +483,9 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                   setPhoneNumber(user.phoneNumber);
                                   setStatus(user.status);
                                   setBalance(user.balance);
+                                  setSelectedProductAmount(user.amount || 0);
+                                  setProductType(user.productType || "Select Product Type");
+                                
                                 }}
                               >
                                 <FaEye size={20} />
