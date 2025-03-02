@@ -226,6 +226,7 @@ function CreateUser({
     }
   };
 
+
   return (
     <div>
       <div className=" w-[35rem] bg-white px-1 py-4 rounded-md flex flex-col justify-center items-center gap-4 max800:w-[90vw] relative">
@@ -249,6 +250,14 @@ function CreateUser({
             className="p-0"
           />
           <div className="flex gap-1 max850:flex-col max850:space-y-4">
+            <InputComponent
+              width={100}
+              label="Upload Image"
+              type="file"
+              onChange={(e) => setName(e.target.files[0])}
+              className="p-0"
+            />
+
             <InputComponent
               width={100}
               label="Full Name"
