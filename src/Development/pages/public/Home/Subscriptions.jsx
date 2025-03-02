@@ -110,52 +110,90 @@ const Subscription = () => {
       : institutionData.PROD_DOMAIN;
 
   const handleSubscribeClick = (cognitoId, productId) => {
-    const primaryColor = encodeURIComponent(
-      InstitutionData.PrimaryColor.replace("#", "")
-    );
-    const secondaryColor = encodeURIComponent(
-      InstitutionData.SecondaryColor.replace("#", "")
-    );
-    // const url = `${domain}/allpayment/${institutionData.InstitutionId}/${cognitoId}/${emailId}?primary=${primaryColor}&secondary=${secondaryColor}`;
+    // Only proceed if user isn't already subscribed to any plan
+    if (hasAnySubscription()) return;
+    
     const url =
       process.env.REACT_APP_STAGE === "PROD"
         ? `https://payment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`
         : `https://betapayment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`;
 
-        window.location.href = url
+    window.location.href = url;
+  };
+
+  // Check if user has any subscription
+  const hasAnySubscription = () => {
+    return UserCtx?.status === "Active";
+  };
+
+  // Check if user is subscribed to specific product
+  const isSubscribedTo = (productId) => {
+    return UserCtx?.status === "Active" && UserCtx?.productId === productId;
   };
 
   const renderSubscribeButton = (item) => {
+    const userHasSubscription = hasAnySubscription();
+    const primaryColor = InstitutionData.PrimaryColor || "#4F46E5";
+    
     return (
       <button
         type="button"
-        className="mt-4 first-letter:inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
-        onClick={() => handleSubscribeClick(UserCtx.cognitoId,item.productId)}
-        style={{ backgroundColor: InstitutionData.PrimaryColor }}
+        className={`mt-4 relative inline-flex w-full justify-center rounded-lg ${
+          userHasSubscription ? "opacity-60 cursor-not-allowed" : ""
+        } bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900`}
+        onClick={() => !userHasSubscription && handleSubscribeClick(UserCtx.cognitoId, item.productId)}
+        style={{ backgroundColor: primaryColor }}
+        disabled={userHasSubscription}
       >
+        {userHasSubscription && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm bg-black/20">
+            <div className="relative flex items-center justify-center p-1.5 rounded-full" style={{ backgroundColor: `${primaryColor}40` }}>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5 text-white drop-shadow-md" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" 
+                />
+              </svg>
+            </div>
+          </div>
+        )}
         Subscribe
       </button>
     );
   };
 
   const renderSubscribedButton = () => {
+    const lightPrimaryColor = InstitutionData.LightPrimaryColor || "#6366F1";
+    
     return (
       <button
         type="button"
-        className="mt-4 inline-flex w-full justify-center rounded-lg bg-white border-lightPrimaryColor border-2 px-5 py-2.5 text-center text-sm font-medium text-lightPrimaryColor hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
+        className="mt-4 inline-flex w-full justify-center rounded-lg bg-white border-lightPrimaryColor border-2 px-5 py-2.5 text-center text-sm font-medium text-lightPrimaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900 cursor-default"
+        style={{ borderColor: lightPrimaryColor, color: lightPrimaryColor }}
+        disabled
       >
-        Subscribed
+        Already Subscribed
       </button>
     );
   };
 
   const renderSignupButton = (productId) => {
+    const lightPrimaryColor = InstitutionData.LightPrimaryColor || "#6366F1";
+    
     return (
       <button
         type="button"
         onClick={() => Navigate(`/signup?productId=${productId}`)}
         className="mt-4 inline-flex w-full justify-center rounded-lg bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900"
-        style={{ backgroundColor: InstitutionData.LightPrimaryColor }}
+        style={{ backgroundColor: lightPrimaryColor }}
       >
         Sign up
       </button>
@@ -165,18 +203,19 @@ const Subscription = () => {
   const paymentHandler = (item) => {
     if (!isAuth) return renderSignupButton(item.productId);
 
-    if (
-      UserCtx?.status === "Active" &&
-      UserCtx?.productIds?.some((id) => id === item.productId)
-    ) {
+    if (isSubscribedTo(item.productId)) {
       return renderSubscribedButton();
     }
 
     if (item.currency === "USD") {
-      if (item.subscriptionType === "Monthly")
-        return <HappyprancerPaypalMonthly />;
-      if (item.subscriptionType === "Hybrid")
-        return <HappyprancerPaypalHybrid />;
+      if (hasAnySubscription()) {
+        return renderSubscribeButton(item);
+      } else {
+        if (item.subscriptionType === "Monthly")
+          return <HappyprancerPaypalMonthly />;
+        if (item.subscriptionType === "Hybrid")
+          return <HappyprancerPaypalHybrid />;
+      }
     }
 
     return renderSubscribeButton(item);
@@ -184,6 +223,7 @@ const Subscription = () => {
 
   const renderProductFeatures = (provides, itemIndex) => {
     if (!provides || !Array.isArray(provides)) return null;
+    const primaryColor = InstitutionData.PrimaryColor || "#4F46E5";
 
     return provides.map((provide, j) => (
       <li key={`${itemIndex}-provide-${j}`} className="flex space-x-3">
@@ -192,6 +232,7 @@ const Subscription = () => {
           fill="primaryColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
+          style={{ fill: primaryColor }}
         >
           <path
             fillRule="evenodd"
@@ -207,8 +248,24 @@ const Subscription = () => {
   };
 
   const renderProductCard = (item, index) => {
+    const isSubscribed = isSubscribedTo(item.productId);
+    const primaryColor = InstitutionData.PrimaryColor || "#4F46E5";
+    
     return (
-      <Card key={index} className="w-[400px] min-h-[450px] max850:w-[300px]">
+      <Card 
+        key={index} 
+        className={`w-[400px] min-h-[450px] max850:w-[300px] overflow-visible relative`}
+      >
+        {isSubscribed && (
+          <div className="absolute top-0 right-0 mt-2 mr-2">
+            <span 
+              className="text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm"
+              style={{ backgroundColor: primaryColor }}
+            >
+              Current Plan
+            </span>
+          </div>
+        )}
         <h5 className="text-2xl min-h-20 font-medium flex items-center text-gray-500 dark:text-gray-400">
           {item.heading}
         </h5>
