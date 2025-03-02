@@ -7,15 +7,19 @@ import Context from "../../../../Context/Context";
 import { toast } from "react-toastify";
 import InputComponent from "../../../../common/InputComponent";
 import { API } from "aws-amplify";
+import fileUpload from "../../../../common/utils/upload-file.js";
+
 
 function CreateUser({
   phoneNumber,
   name,
+  imageUrl,
   email,
   status,
   cognitoId,
   setStatus,
   balance,
+  setImageUrl,
   setShowUserAdd,
   setPhoneNumber,
   createButton,
@@ -89,30 +93,48 @@ function CreateUser({
   const onCreateUser = async (e) => {
     e.preventDefault();
     UtilCtx.setLoader(true);
-    const formattedPhoneNumber = createButton ? `${countryCode}${phoneNumber}` : phoneNumber;
+    const formattedPhoneNumber = createButton
+      ? `${countryCode}${phoneNumber}`
+      : phoneNumber;
 
+      let imgUrl = imageUrl
+      ? await fileUpload({
+          bucket: "institution-utils",
+          region: "us-east-1",
+          folder: `profile/${email}`,
+          file: imageUrl,
+        })
+        : null;
     const data = {
       institution: InstitutionData.InstitutionId, // Add institution to the body
       cognitoId, // required for both create and update
       emailId: email,
       userName: name,
       name: name,
+      imgUrl: imgUrl,
       phoneNumber: formattedPhoneNumber,
       status,
       productType,
       amount: selectedProductAmount,
       userType,
-      instructorPaymentType: userType === "instructor" ? instructorPaymentType : "",
-      instructorPaymentAmount: userType === "instructor" ? instructorPaymentAmount : "",
+      instructorPaymentType:
+        userType === "instructor" ? instructorPaymentType : "",
+      instructorPaymentAmount:
+        userType === "instructor" ? instructorPaymentAmount : "",
       trialPeriod: status === "Trial" ? trialPeriod : "",
-      classType: userType === "instructor" ? selectedClassTypes.map((type) => type.value) : [], // Add classType for instructor
-      product: selectedProduct.heading
+      classType:
+        userType === "instructor"
+          ? selectedClassTypes.map((type) => type.value)
+          : [], // Add classType for instructor
+      product: selectedProduct.heading,
     };
 
     try {
       if (createButton) {
         // Creating a new user
-        const response = await API.post("main", `/admin/create-user`, { body: data });
+        const response = await API.post("main", `/admin/create-user`, {
+          body: data,
+        });
         const createdCognitoId = response.user.cognitoId;
 
         if (userType === "instructor") {
@@ -127,31 +149,39 @@ function CreateUser({
         toast.success("User Created Successfully");
       } else {
         // Updating an existing user
-        await API.put("main", `/admin/update-user/${InstitutionData.InstitutionId}`, { body: data });
+        await API.put(
+          "main",
+          `/admin/update-user/${InstitutionData.InstitutionId}`,
+          { body: data }
+        );
         if (userType === "instructor") {
           await API.put("main", "/admin/member-to-instructor", { body: data });
           window.localStorage.removeItem(
             `instructorList_${InstitutionData.InstitutionId}`
           );
         }
-        if (status === 'Active') {
+        if (status === "Active") {
           const pdate = new Date(paymentDate).getTime();
-          await API.post('main', `/admin/user-payment-update/${InstitutionData.InstitutionId}`, {
-            body: {
-              cognitoId,
-              status,
-              institution: InstitutionData.InstitutionId,
-              productType,
-              amount: selectedProductAmount,
-              // paymentStatus: pstatus,
-              paymentDate: pdate,
-              emailId: email,
-              currency: selectedProduct.currency,
-              productId: selectedProduct.productId,
-              planId: selectedProduct.planId,
-              subscriptionType: selectedProduct.subscriptionType,
+          await API.post(
+            "main",
+            `/admin/user-payment-update/${InstitutionData.InstitutionId}`,
+            {
+              body: {
+                cognitoId,
+                status,
+                institution: InstitutionData.InstitutionId,
+                productType,
+                amount: selectedProductAmount,
+                // paymentStatus: pstatus,
+                paymentDate: pdate,
+                emailId: email,
+                currency: selectedProduct.currency,
+                productId: selectedProduct.productId,
+                planId: selectedProduct.planId,
+                subscriptionType: selectedProduct.subscriptionType,
+              },
             }
-          });
+          );
         }
 
         toast.success("User Updated Successfully");
@@ -166,14 +196,17 @@ function CreateUser({
       setStatus("InActive");
       setPhoneNumber("");
       setBalance("");
+      setImageUrl(null);
       setProductType("");
       setSelectedProductAmount("");
-
     } catch (error) {
       console.error("Error creating/updating user:", error);
       const errorMessage = error.response?.data?.message;
-    
-      if (error.response?.data?.message === "Email already exists in the database.") {
+
+      if (
+        error.response?.data?.message ===
+        "Email already exists in the database."
+      ) {
         toast.error("This email is already registered in the system");
       } else if (error.response?.data?.message?.includes("phone number")) {
         toast.error("This phone number is already registered");
@@ -182,7 +215,9 @@ function CreateUser({
       } else if (error.response?.status === 500) {
         toast.error("Server error. Please try again later");
       } else {
-        toast.error(errorMessage || "Error processing request. Please try again");
+        toast.error(
+          errorMessage || "Error processing request. Please try again"
+        );
       }
     } finally {
       setShowUserAdd(false);
@@ -190,7 +225,6 @@ function CreateUser({
       UtilCtx.setLoader(false);
     }
   };
-
 
   return (
     <div>
@@ -206,15 +240,15 @@ function CreateUser({
           <X size={25} />
         </span>
 
-        <div className="w-[80%] flex flex-col gap-4 mt-6">
-          <div className="flex gap-1 max850:flex-col max850:space-y-4">
+        <div className="w-[80%] p-0 flex flex-col gap-4 mt-6">
           <InputComponent
-              width={100}
-              label="Upload Image"
-              type="file"
-              onChange={(e) => setName(e.target.files[0])}
-              className="p-0"
-            />
+            width={100}
+            label="Upload Image"
+            type="file"
+            onChange={(e) => setImageUrl(e.target.files[0])}
+            className="p-0"
+          />
+          <div className="flex gap-1 max850:flex-col max850:space-y-4">
             <InputComponent
               width={100}
               label="Full Name"
@@ -234,9 +268,9 @@ function CreateUser({
               name="countryCode"
               className={`border-[1px] px-[1.5rem] py-2 rounded-2 w-1/2 border-gray-300`}
               onChange={(e) => {
-                setCountryCode(e.target.value.toString())
+                setCountryCode(e.target.value.toString());
               }}
-              style={{ maxHeight: '100px' }}
+              style={{ maxHeight: "100px" }}
             >
               {<Country />}
             </select>
@@ -248,9 +282,9 @@ function CreateUser({
             />
           </div>
           <div className="w-full flex flex-row-reverse justify-center items-center gap-2">
-            {userType === 'member' && (
-              <div className='flex w-[80%] flex-col'>
-                <label className='font-[500] ml-1'>User Status</label>
+            {userType === "member" && (
+              <div className="flex w-[80%] flex-col">
+                <label className="font-[500] ml-1">User Status</label>
                 <select
                   required
                   className={` border-[1px] px-[1.5rem] py-[0.7rem] rounded-2 focus:ring-transparent`}
@@ -263,8 +297,12 @@ function CreateUser({
                 </select>
               </div>
             )}
-            <div className={`flex flex-col ${userType !== 'member' ? 'w-full' : 'w-[80%]'}`}>
-              <label className='font-[500] ml-1'>User Type</label>
+            <div
+              className={`flex flex-col ${
+                userType !== "member" ? "w-full" : "w-[80%]"
+              }`}
+            >
+              <label className="font-[500] ml-1">User Type</label>
               <select
                 className={`w-full border-[1px] px-[1.5rem] py-[0.7rem] rounded`}
                 value={userType}
@@ -332,7 +370,12 @@ function CreateUser({
             <div className="flex gap-2 justify-center items-center">
               <div className="flex w-full flex-col">
                 <label className="font-[500] ml-1">Payment Date</label>
-                <input value={paymentDate} onChange={(event) => setPaymentDate(event.target.value)} type="date" className="py-[0.7rem] rounded" />
+                <input
+                  value={paymentDate}
+                  onChange={(event) => setPaymentDate(event.target.value)}
+                  type="date"
+                  className="py-[0.7rem] rounded"
+                />
               </div>
               <div className="flex flex-col w-full">
                 <label className="font-[500] ml-1">Payment Status</label>
@@ -355,7 +398,9 @@ function CreateUser({
           <div className="flex flex-col gap-4 w-[80%]">
             <div className="flex flex-row w-full gap-2 max560:flex-col max560:gap-8">
               <div className="flex flex-col justify-center w-full">
-                <label className="font-[500] ml-1">Instructor Payment Type</label>
+                <label className="font-[500] ml-1">
+                  Instructor Payment Type
+                </label>
                 <select
                   className="border-[1px] px-[1.5rem] py-[0.7rem] rounded"
                   value={instructorPaymentType}
@@ -390,7 +435,6 @@ function CreateUser({
             </div>
           </div>
         )}
-
 
         <button
           className="px-12 py-2 rounded-md text-white font-medium flex flex-row gap-2 justify-center items-center max850:w-[82%]"
