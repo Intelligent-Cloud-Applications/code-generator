@@ -123,12 +123,22 @@ const Subscription = () => {
 
   // Check if user has any subscription
   const hasAnySubscription = () => {
-    return UserCtx?.status === "Active";
-  };
+        return (
+            UserCtx?.productId &&
+            UserCtx?.paymentId &&
+            UserCtx?.renewDate &&
+            Date.now() < UserCtx.renewDate
+        );
+    };
 
   // Check if user is subscribed to specific product
   const isSubscribedTo = (productId) => {
-    return UserCtx?.status === "Active" && UserCtx?.productId === productId;
+    return (
+        UserCtx?.productId === productId &&
+        UserCtx?.paymentId &&
+        UserCtx?.renewDate &&
+        Date.now() < UserCtx.renewDate
+    );
   };
 
   const renderSubscribeButton = (item) => {
