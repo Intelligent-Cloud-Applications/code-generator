@@ -112,7 +112,7 @@ const Subscription = () => {
   const handleSubscribeClick = (cognitoId, productId) => {
     // Only proceed if user isn't already subscribed to any plan
     if (hasAnySubscription()) return;
-    
+
     const url =
       process.env.REACT_APP_STAGE === "PROD"
         ? `https://payment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`
@@ -123,18 +123,27 @@ const Subscription = () => {
 
   // Check if user has any subscription
   const hasAnySubscription = () => {
-    return UserCtx?.status === "Active";
+    return (
+      UserCtx?.productId &&
+      UserCtx?.paymentId &&
+      UserCtx?.renewDate &&
+      Date.now() < UserCtx.renewDate
+    );
   };
 
   // Check if user is subscribed to specific product
   const isSubscribedTo = (productId) => {
-    return UserCtx?.status === "Active" && UserCtx?.productId === productId;
+    return (
+      UserCtx?.productId === productId &&
+      UserCtx?.paymentId &&
+      UserCtx?.renewDate &&
+      Date.now() < UserCtx.renewDate
+    );
   };
 
   const renderSubscribeButton = (item) => {
     const userHasSubscription = hasAnySubscription();
     const primaryColor = InstitutionData.PrimaryColor || "#4F46E5";
-    
     return (
       <button
         type="button"
@@ -148,18 +157,18 @@ const Subscription = () => {
         {userHasSubscription && (
           <div className="absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm bg-black/20">
             <div className="relative flex items-center justify-center p-1.5 rounded-full" style={{ backgroundColor: `${primaryColor}40` }}>
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 text-white drop-shadow-md" 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-white drop-shadow-md"
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={2}
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                 />
               </svg>
             </div>
@@ -171,14 +180,13 @@ const Subscription = () => {
   };
 
   const renderSubscribedButton = () => {
-    const lightPrimaryColor = InstitutionData.LightPrimaryColor || "#6366F1";
-    
+    const primaryColor = InstitutionData.PrimaryColor;
+
     return (
       <button
         type="button"
-        className="mt-4 inline-flex w-full justify-center rounded-lg bg-white border-lightPrimaryColor border-2 px-5 py-2.5 text-center text-sm font-medium text-lightPrimaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900 cursor-default"
-        style={{ borderColor: lightPrimaryColor, color: lightPrimaryColor }}
-        disabled
+        className={`mt-4 relative inline-flex w-full justify-center rounded-lg cursor-not-allowed px-5 py-2.5 text-center text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900`}
+        style={{ backgroundColor: primaryColor }}
       >
         Already Subscribed
       </button>
@@ -187,7 +195,7 @@ const Subscription = () => {
 
   const renderSignupButton = (productId) => {
     const lightPrimaryColor = InstitutionData.LightPrimaryColor || "#6366F1";
-    
+
     return (
       <button
         type="button"
@@ -250,15 +258,15 @@ const Subscription = () => {
   const renderProductCard = (item, index) => {
     const isSubscribed = isSubscribedTo(item.productId);
     const primaryColor = InstitutionData.PrimaryColor || "#4F46E5";
-    
+
     return (
-      <Card 
-        key={index} 
+      <Card
+        key={index}
         className={`w-[400px] min-h-[450px] max850:w-[300px] overflow-visible relative`}
       >
         {isSubscribed && (
           <div className="absolute top-0 right-0 mt-2 mr-2">
-            <span 
+            <span
               className="text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm"
               style={{ backgroundColor: primaryColor }}
             >
@@ -332,5 +340,4 @@ const Subscription = () => {
     </div>
   );
 };
-
 export default Subscription;
