@@ -25,7 +25,6 @@ const Subscription = () => {
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const [products, setProducts] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
-  const [userLocation, setUserLocation] = useState(null);
   const Navigate = useNavigate();
   const [bgInView, setBgInView] = useState(false);
 
@@ -80,7 +79,6 @@ const Subscription = () => {
 
     setProducts(filteredProducts);
   }, [userLocation, productList]);
-  }, [userLocation, productList]);
 
   // Handle background intersection observer
   // Handle background intersection observer
@@ -94,7 +92,6 @@ const Subscription = () => {
           }
         });
       },
-      { threshold: 0.01 }
       { threshold: 0.01 }
     );
 
@@ -307,7 +304,6 @@ const Subscription = () => {
   return (
     <div
       id="subscription-section"
-      className="text-[1.5rem] flex flex-col items-center justify-center gap-[5rem]"
       className="text-[1.5rem] flex flex-col items-center justify-center gap-[5rem]"
       style={{
         backgroundImage:
