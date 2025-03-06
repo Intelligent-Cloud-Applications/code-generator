@@ -25,9 +25,11 @@ const Subscription = () => {
   const { isAuth, productList, userData: UserCtx } = useContext(Context);
   const [products, setProducts] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
   const Navigate = useNavigate();
   const [bgInView, setBgInView] = useState(false);
 
+  // Initialize and handle user location
   // Initialize and handle user location
   useEffect(() => {
     const initializeLocation = async () => {
@@ -61,7 +63,10 @@ const Subscription = () => {
   }, [UserCtx?.location?.countryCode]);
 
   // Filter products based on location
+  // Filter products based on location
   useEffect(() => {
+    if (!userLocation || !productList?.length) return;
+
     if (!userLocation || !productList?.length) return;
 
     const filteredProducts = productList
@@ -75,7 +80,9 @@ const Subscription = () => {
 
     setProducts(filteredProducts);
   }, [userLocation, productList]);
+  }, [userLocation, productList]);
 
+  // Handle background intersection observer
   // Handle background intersection observer
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -87,6 +94,7 @@ const Subscription = () => {
           }
         });
       },
+      { threshold: 0.01 }
       { threshold: 0.01 }
     );
 
@@ -300,6 +308,7 @@ const Subscription = () => {
     <div
       id="subscription-section"
       className="text-[1.5rem] flex flex-col items-center justify-center gap-[5rem]"
+      className="text-[1.5rem] flex flex-col items-center justify-center gap-[5rem]"
       style={{
         backgroundImage:
           bgInView && InstitutionData.SubscriptionBg
@@ -335,6 +344,7 @@ const Subscription = () => {
       </div>
 
       <div className="flex flex-row gap-8 justify-center flex-wrap max850:!flex-col max-w-[90vw]">
+        {products.map((item, index) => renderProductCard(item, index))}
         {products.map((item, index) => renderProductCard(item, index))}
       </div>
     </div>
