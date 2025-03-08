@@ -222,7 +222,7 @@ const customTheme = {
     "body": {
       "base": "group/body",
       "cell": {
-        "base": "bg-lighestPrimaryColor bg-opacity-30 px-6 py-4 group-first/body:group-first/row:first:rounded-tl-lg group-first/body:group-first/row:last:rounded-tr-lg group-last/body:group-last/row:first:rounded-bl-lg group-last/body:group-last/row:last:rounded-br-lg "
+        "base": "bg-lighestPrimaryColor text-white bg-opacity-30 px-6 py-4 group-first/body:group-first/row:first:rounded-tl-lg group-first/body:group-first/row:last:rounded-tr-lg group-last/body:group-last/row:first:rounded-bl-lg group-last/body:group-last/row:last:rounded-br-lg "
       }
     },
     "head": {
