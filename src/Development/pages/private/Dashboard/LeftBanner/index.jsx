@@ -1,9 +1,12 @@
 import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { BsPeopleFill, BsBoxArrowRight } from 'react-icons/bs';
+import { Auth } from 'aws-amplify';
 import Context from '../../../../Context/Context'
 import InstitutionContext from '../../../../Context/InstitutionContext'
 import institutionData from '../../../../constants'
 import {
+  FaSignOutAlt,
   FaUser,
   FaCalendarAlt,
   FaHistory,
@@ -19,6 +22,8 @@ import { HiCurrencyDollar } from 'react-icons/hi2'
 const LeftBanner = ({ displayAfterClick }) => {
   const [click, setClick] = useState('Upcoming Classes')
   const [mobileClick, setMobileClick] = useState('Upcoming')
+  const { setLoading, loading } = useContext(Context);
+
   const Navigate = useNavigate()
   const UserCtx = useContext(Context)
   const InstitutionData = useContext(InstitutionContext).institutionData
@@ -88,6 +93,18 @@ const LeftBanner = ({ displayAfterClick }) => {
       </button>
     )
   }
+
+  const handleLogout = async() => {
+    try {
+      setLoading(true);
+      await Auth.signOut();
+      setLoading(false);
+      window.location.href = "/";
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -162,6 +179,12 @@ const LeftBanner = ({ displayAfterClick }) => {
             icon={<FaEnvelope size={20} />}
             text={'Contact'}
             onClickFn={() => Navigate('/query')}
+          />
+          
+          <ListItemMobile
+            icon={<FaSignOutAlt size={20} />}
+            text={'Logout'}
+            onClickFn={handleLogout}
           />
         </div>
       </div>
@@ -287,8 +310,27 @@ const LeftBanner = ({ displayAfterClick }) => {
               text="Contact us ?"
               onClickFn={() => Navigate('/query')}  
             />
+            <button 
+          className=" bottom-2 mt-12 flex gap-1  items-center text-[1.1rem]  w-[75%] p-2 font-bold text-white rounded-md cursor-pointer  transition max1050:w-[25%]" 
+          
+          onClick={handleLogout}
+          disabled={loading}
+        >
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <p className="ml-2 max1050:text-[9.5px] max1050:font-[400] mb-0">Logging out...</p>
+            </div>
+          ) : (
+            <>
+              <BsBoxArrowRight size={'1.9rem'} className="mr-2 text-white" />
+              <p className="text-sm max1050:font-[400] mb-0">Logout</p>
+            </>
+          )}
+        </button>
           </ul>
         </nav>
+       
       </div>
     </>
   )
