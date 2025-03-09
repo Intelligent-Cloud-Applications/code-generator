@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import Context from "../../../../Context/Context";
 import { useNavigate } from "react-router-dom";
 import { API } from "aws-amplify";
-import { Pagination } from "flowbite-react";
+import { Table, Pagination } from "flowbite-react";
 import "./index.css";
 import { useMediaQuery } from "../../../../utils/helpers";
 import UpcomingSessionsMobile from "./mobile";
@@ -99,7 +99,7 @@ const UpcomingSessions = () => {
           const instructor = response.find(
             (inst) => inst.instructorId === Ctx.userData.cognitoId
           );
-          console.log(instructor)
+          console.log(instructor);
           // Set classType if found, or an empty array if not
           setInstructorClassTypes(instructor?.classType || []);
         } catch (error) {
@@ -124,7 +124,7 @@ const UpcomingSessions = () => {
     editedInstructorNames,
     editedClassType,
     instructorId,
-    date,
+    date
   ) => {
     UtilCtx.setLoader(true);
 
@@ -143,12 +143,12 @@ const UpcomingSessions = () => {
       const updatedClasses = Ctx.upcomingClasses.map((c) =>
         c.classId === classId
           ? {
-            ...c,
-            instructorNames: editedInstructorNames,
-            instructorId: instructorId,
-            classType: editedClassType,
-            date: date,
-          }
+              ...c,
+              instructorNames: editedInstructorNames,
+              instructorId: instructorId,
+              classType: editedClassType,
+              date: date,
+            }
           : c
       );
 
@@ -289,36 +289,17 @@ const UpcomingSessions = () => {
   const [currentPageAttendance, setCurrentPageAttendance] = useState(1);
   const usersPerPage = 10;
 
-  const markAttendance = async (ChoosenClassId) => {
-    try {
-      const data = {
-        classId: ChoosenClassId,
-        emailId: UserCtx.userData.emailId,
-      };
 
-      const response = await API.post(
-        "main",
-        `/user/put-attendance/${UserCtx.userData.institution}`,
-        {
-          body: data,
-        }
-      );
-
-      console.log(response);
-      toast.success("Attendance Marked Successfully");
-    } catch (error) {
-      console.error(error);
-      toast, error("An error occurred while marking attendance");
-    }
-  };
 
   useEffect(() => {
     const activeUsers = userList.filter((user) => user.status === "Active");
-    setActiveUsers(activeUsers.toSorted((a, b) => {
-      const x = userAttendance[a.cognitoId] || 0;
-      const y = userAttendance[b.cognitoId] || 0;
-      return y - x;
-    }));
+    setActiveUsers(
+      activeUsers.toSorted((a, b) => {
+        const x = userAttendance[a.cognitoId] || 0;
+        const y = userAttendance[b.cognitoId] || 0;
+        return y - x;
+      })
+    );
     const attendedIds = attendedUsers.map((user) => user.cognitoId);
     const updatedStatus = {};
     activeUsers.forEach((user) => {
@@ -529,22 +510,47 @@ const UpcomingSessions = () => {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
-    return `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day
-      }`;
+    return `${year}-${month < 10 ? "0" + month : month}-${
+      day < 10 ? "0" + day : day
+    }`;
   };
 
   const getTime = (epochTime) => {
     const date = new Date(epochTime);
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    return `${hours < 10 ? "0" + hours : hours}:${minutes < 10 ? "0" + minutes : minutes
-      }`;
+    return `${hours < 10 ? "0" + hours : hours}:${
+      minutes < 10 ? "0" + minutes : minutes
+    }`;
   };
 
   useEffect(() => {
     fetchAttendance();
     // eslint-disable-next-line
   }, [UserCtx]);
+
+  const markAttendance = async (ChoosenClassId) => {
+    try {
+      const data = {
+        classId: ChoosenClassId,
+        emailId: UserCtx.userData.emailId,
+      };
+
+      const response = await API.post(
+        "main",
+        `/user/put-attendance/${UserCtx.userData.institution}`,
+        {
+          body: data,
+        }
+      );
+
+      console.log(response);
+      toast.success("Attendance Marked Successfully");
+    } catch (error) {
+      console.error(error);
+      toast, error("An error occurred while marking attendance");
+    }
+  };
 
   return (
     <>
@@ -656,9 +662,10 @@ const UpcomingSessions = () => {
           <div className="w-full flex justify-center">
             <Button
               style={{
-                backgroundColor: InstitutionData.PrimaryColor
+                backgroundColor: InstitutionData.PrimaryColor,
               }}
-              onClick={onScheduleCreate}>
+              onClick={onScheduleCreate}
+            >
               Create
             </Button>
           </div>
@@ -686,15 +693,15 @@ const UpcomingSessions = () => {
                     </h2>
                   )}
 
-                  {Ctx.userData.status === "Active" || Ctx.userData.status === "Trial" ? (
+                  {Ctx.userData.status === "Active" ||
+                  Ctx.userData.status === "Trial" ? (
                     <p className={`text-[1.4rem] font-bold max500:text-[1rem]`}>
-                      {Ctx.userData.status === "Trial" ? (
-                        `Your trial period ends in ${Math.ceil(
-                          (new Date(Ctx.userData.trialEndDate) - new Date()) / (1000 * 60 * 60 * 24)
-                        )} days`
-                      ) : (
-                        "Be Regular and Work Hard to Achieve Goals"
-                      )}
+                      {Ctx.userData.status === "Trial"
+                        ? `Your trial period ends in ${Math.ceil(
+                            (new Date(Ctx.userData.trialEndDate) - new Date()) /
+                              (1000 * 60 * 60 * 24)
+                          )} days`
+                        : "Be Regular and Work Hard to Achieve Goals"}
                     </p>
                   ) : (
                     <div>
@@ -726,22 +733,24 @@ const UpcomingSessions = () => {
               </h3>
 
               <div
-                className={`flex ${Ctx.userData.userType === "admin" ||
+                className={`flex ${
+                  Ctx.userData.userType === "admin" ||
                   Ctx.userData.userType === "instructor"
-                  ? "justify-between"
-                  : "justify-end"
-                  } relative`}
+                    ? "justify-between"
+                    : "justify-end"
+                } relative`}
               >
                 {(Ctx.userData.userType === "admin" ||
                   Ctx.userData.userType === "instructor") && (
-                    <Button
-                      style={{
-                        backgroundColor: InstitutionData.PrimaryColor,
-                      }}
-                      onClick={() => setModal(true)}>
-                      Create Class
-                    </Button>
-                  )}
+                  <Button
+                    style={{
+                      backgroundColor: InstitutionData.PrimaryColor,
+                    }}
+                    onClick={() => setModal(true)}
+                  >
+                    Create Class
+                  </Button>
+                )}
                 <Button
                   style={{
                     backgroundColor: InstitutionData.PrimaryColor,
@@ -871,175 +880,177 @@ const UpcomingSessions = () => {
                 </div>
               )}
               <ul
-                className={`h-[28rem] relative pb-[3rem] flex flex-col overflow-auto pt-6 ${(Ctx.userData.userType === "admin" ||
-                  Ctx.userData.userType === "instructor") &&
+                className={`h-[28rem] relative pb-[3rem] flex flex-col overflow-auto pt-6 ${
+                  (Ctx.userData.userType === "admin" ||
+                    Ctx.userData.userType === "instructor") &&
                   (attendanceList
                     ? "h-[32rem] relative pb-[3rem]"
                     : "h-[28rem] relative pb-[3rem]")
-                  } flex flex-col overflow-auto pt-6`}
+                } flex flex-col overflow-auto pt-6`}
                 style={{
                   backgroundColor: InstitutionData.LightestPrimaryColor,
                 }}
               >
-                {!attendanceList && (
-                  <li className="w-full px-4 md:px-8 py-2">
-                    <div
-                      className={`hidden md:grid gap-4 font-bold ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
-                        ? 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr]'
-                        : 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr]'
-                        }`}
-                    >
-                      <div className="text-center">Date</div>
-                      <div className="text-center">Instructor</div>
-                      <div className="text-center">Description</div>
-                      <div className="text-center">Time</div>
-                      <div className="text-center w-[80px]">
-                        {sortedFilteredClasses[0]?.zoomLink ? 'Join' : 'Attendance'}
-                      </div>
-                      {(Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor') && (
-                        <div className="w-16"></div>
-                      )}
-                    </div>
-                  </li>
-                )}
-
-                {/* Attendance List */}
                 {!attendanceList ? (
-                  <div className="overflow-auto flex flex-col gap-2 py-2 px-4 md:px-8">
-                    <div className="w-full divide-y">
-                      {sortedFilteredClasses
-                        .slice(startIndex, endIndex)
-                        .filter((clas) => {
-                          if (instructorTypeFilter === '') return true;
-                          return clas.instructorNames === instructorTypeFilter;
-                        })
-                        .filter((clas) => {
-                          if (Ctx.userData.userType === 'instructor') {
-                            return instructorClassTypes.includes(clas.classType);
-                          }
-                          if (classTypeFilter === '') return true;
-                          return clas.classType === classTypeFilter;
-                        })
-                        .map((clas, i) => (
-                          <li
-                            key={clas.classId}
-                            className={`w-full ${editingIndex === i ? 'bg-[#fdd00823]' : ''}`}
-                          >
-                            <div
-                              className={`flex flex-col md:grid gap-4 py-2 items-center ${Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor'
-                                ? 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr]'
-                                : 'md:grid-cols-[2fr_2fr_2fr_2fr_1fr]'
-                                }`}
+                  <div className="overflow-x-auto">
+                    <Table hoverable striped>
+                      <Table.Head
+                        style={{
+                          backgroundColor: InstitutionData.LightestPrimaryColor,
+                        }}
+                        className=""
+                      >
+                        <Table.HeadCell
+                          style={{
+                            backgroundColor:
+                              InstitutionData.LightestPrimaryColor,
+                          }}
+                          className="text-center"
+                        >
+                          Date
+                        </Table.HeadCell>
+                        <Table.HeadCell
+                          style={{
+                            backgroundColor:
+                              InstitutionData.LightestPrimaryColor,
+                          }}
+                          className="text-center"
+                        >
+                          Instructor
+                        </Table.HeadCell>
+                        <Table.HeadCell
+                          style={{
+                            backgroundColor:
+                              InstitutionData.LightestPrimaryColor,
+                          }}
+                          className="text-center"
+                        >
+                          Description
+                        </Table.HeadCell>
+                        <Table.HeadCell
+                          style={{
+                            backgroundColor:
+                              InstitutionData.LightestPrimaryColor,
+                          }}
+                          className="text-center"
+                        >
+                          Time
+                        </Table.HeadCell>
+                        <Table.HeadCell
+                          style={{
+                            backgroundColor:
+                              InstitutionData.LightestPrimaryColor,
+                          }}
+                          className="text-center w-[80px]"
+                        >
+                          {sortedFilteredClasses[0]?.zoomLink
+                            ? "Join"
+                            : "Attendance"}
+                        </Table.HeadCell>
+                        {(Ctx.userData.userType === "admin" ||
+                          Ctx.userData.userType === "instructor") && (
+                          <Table.HeadCell
+                            style={{
+                              backgroundColor:
+                                InstitutionData.LightestPrimaryColor,
+                            }}
+                            className="w-16"
+                          ></Table.HeadCell>
+                        )}
+                      </Table.Head>
+                      <Table.Body className="divide-y">
+                        {sortedFilteredClasses
+                          .slice(startIndex, endIndex)
+                          .filter(
+                            (clas) =>
+                              instructorTypeFilter === "" ||
+                              clas.instructorNames === instructorTypeFilter
+                          )
+                          .filter((clas) => {
+                            if (Ctx.userData.userType === "instructor") {
+                              return instructorClassTypes.includes(
+                                clas.classType
+                              );
+                            }
+                            return (
+                              classTypeFilter === "" ||
+                              clas.classType === classTypeFilter
+                            );
+                          })
+                          .map((clas, i) => (
+                            <Table.Row
+                              key={clas.classId}
+                              className={editingIndex === i ? "bg" : ""}
                             >
-                              {/* Mobile Labels + Values */}
-                              <div className="md:hidden space-y-2">
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold">Date:</span>
-                                  <span>{formatDate(parseInt(clas.date))}</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold">Time:</span>
-                                  <span>
-                                    {new Date(parseInt(clas.date)).toLocaleString('en-us', {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                    })}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold">Instructor:</span>
-                                  <span>{getInstructor(clas.instructorNames)?.name}</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold">Description:</span>
-                                  <span>{clas.classType}</span>
-                                </div>
-                              </div>
-
-                              {/* Desktop View */}
-                              <div className="hidden md:block text-center">
+                              <Table.Cell
+                                style={{
+                                  backgroundColor:
+                                    InstitutionData.LightestPrimaryColor,
+                                }}
+                                className="text-center"
+                              >
                                 {formatDate(parseInt(clas.date))}
-                              </div>
-
-                              <div className="hidden md:block w-full">
-                                {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
+                              </Table.Cell>
+                              <Table.Cell
+                                style={{
+                                  backgroundColor:
+                                    InstitutionData.LightestPrimaryColor,
+                                }}
+                                className="text-center"
+                              >
+                                {Ctx.userData.userType === "admin" ||
+                                Ctx.userData.userType === "instructor" ? (
                                   <select
                                     className="w-full h-10 px-2 rounded focus:outline-none focus:border-blue-500 text-sm"
-                                    style={{
-                                      backgroundColor: InstitutionData.LightestPrimaryColor,
-                                    }}
-                                    value={getInstructor(clas.instructorNames)?.name}
+                                    value={
+                                      getInstructor(clas.instructorNames)?.name
+                                    }
                                     onChange={(e) => {
                                       onClassUpdated(
                                         clas.classId,
                                         getInstructor(e.target.value).name,
                                         clas.classType,
-                                        getInstructor(e.target.value).instructorId,
+                                        getInstructor(e.target.value)
+                                          .instructorId,
                                         clas.date
                                       );
                                     }}
                                   >
                                     {Ctx.instructorList
-                                      .sort((a, b) => {
-                                        if (a.name < b.name) return -1;
-                                        if (a.name > b.name) return 1;
-                                        return 0;
-                                      })
-                                      .map((i) =>
-                                        i.name !== "Cancelled" && (
-                                          <option
-                                            key={i.name}
-                                            value={i.name}
-                                          >
-                                            {i.name}
-                                          </option>
-                                        )
-                                      )}
+                                      .sort((a, b) =>
+                                        a.name.localeCompare(b.name)
+                                      )
+                                      .filter((i) => i.name !== "Cancelled")
+                                      .map((i) => (
+                                        <option key={i.name} value={i.name}>
+                                          {i.name}
+                                        </option>
+                                      ))}
                                   </select>
                                 ) : (
-                                  <p
-                                    className="h-10 flex items-center justify-center rounded border border-gray-300 text-md"
-                                  >
+                                  <p className="h-10 flex items-center justify-center rounded border border-gray-300 text-md">
                                     {getInstructor(clas.instructorNames)?.name}
                                   </p>
                                 )}
-                              </div>
-
-                              <div className="hidden md:block w-full">
-                                {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
-                                  <select
-                                    className="w-full h-10 px-2 rounded focus:outline-none focus:border-blue-500 text-sm"
-                                    style={{
-                                      backgroundColor: InstitutionData.LightestPrimaryColor,
-                                    }}
-                                    value={clas.classType}
-                                    onChange={(e) => {
-                                      onClassUpdated(
-                                        clas.classId,
-                                        getInstructor(clas.instructorNames)?.name,
-                                        e.target.value,
-                                        clas.instructorId,
-                                        clas.date
-                                      );
-                                    }}
-                                  >
-                                    {classTypeNameArray.map((name) => (
-                                      <option key={name} value={name}>
-                                        {name}
-                                      </option>
-                                    ))}
-                                  </select>
-                                ) : (
-                                  <p
-                                    className="h-10 flex items-center justify-center rounded border border-gray-300 bg-lightest-primary text-md"
-                                  >
-                                    {clas.classType}
-                                  </p>
-                                )}
-                              </div>
-
-                              <div className="hidden md:block w-full">
-                                {Ctx.userData.userType === 'admin' || Ctx.userData.userType === 'instructor' ? (
+                              </Table.Cell>
+                              <Table.Cell
+                                style={{
+                                  backgroundColor:
+                                    InstitutionData.LightestPrimaryColor,
+                                }}
+                                className="text-center"
+                              >
+                                {clas.classType}
+                              </Table.Cell>
+                              <Table.Cell
+                                style={{
+                                  backgroundColor:
+                                    InstitutionData.LightestPrimaryColor,
+                                }}
+                                className="text-center"
+                              >
+                                {Ctx.userData.userType === "admin" ||
+                                Ctx.userData.userType === "instructor" ? (
                                   <input
                                     value={getTime(clas.date)}
                                     type="time"
@@ -1047,82 +1058,95 @@ const UpcomingSessions = () => {
                                     onChange={(e) => {
                                       onClassUpdated(
                                         clas.classId,
-                                        getInstructor(clas.instructorNames)?.name,
+                                        getInstructor(clas.instructorNames)
+                                          ?.name,
                                         clas.classType,
                                         clas.instructorId,
-                                        new Date(getDate(clas.date) + 'T' + e.target.value).getTime()
+                                        new Date(
+                                          `${getDate(clas.date)}T${
+                                            e.target.value
+                                          }`
+                                        ).getTime()
                                       );
                                     }}
                                   />
                                 ) : (
                                   <p className="h-10 flex items-center justify-center text-md">
-                                    {new Date(parseInt(clas.date)).toLocaleString('en-us', {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
+                                    {new Date(
+                                      parseInt(clas.date)
+                                    ).toLocaleString("en-US", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
                                     })}
                                   </p>
                                 )}
-                              </div>
-
-                              <div className="w-[80px] flex justify-center items-center">
+                              </Table.Cell>
+                              <Table.Cell
+                                style={{
+                                  backgroundColor:
+                                    InstitutionData.LightestPrimaryColor,
+                                }}
+                                className="text-center"
+                              >
                                 <button
-                                  className="px-2 py-1 text-white rounded transition-colors duration-200 text-sm"
+                                  className="px-2 md:w- lg:w-40 py-2 text-white rounded transition-colors duration-200 text-sm"
+                                  style={{
+                                    backgroundColor:
+                                      InstitutionData.PrimaryColor,
+                                  }}
                                   onClick={() => {
                                     if (clas.zoomLink) {
-                                      // if (UserCtx.userData.userType === 'member') {
-                                      //   const meetingNumberRegex = /(?:https?:\/\/)?(?:www\.)?zoom\.us\/j\/(\d+)/;
-                                      //   const meetingNumberMatch = clas.zoomLink.match(meetingNumberRegex);
-                                      //   const meetingNumber = meetingNumberMatch ? meetingNumberMatch[1] : '';
-
-                                      //   const passwordRegex = /[?&]pwd=([^&]+)/;
-                                      //   const passwordMatch = clas.zoomLink.match(passwordRegex);
-                                      //   const password = passwordMatch ? passwordMatch[1] : '';
-
-                                      //   window.open(
-                                      //     `https://live.awsaiapp.com/?institution=${InstitutionData.InstitutionId}&cognitoId=${Ctx.userData.cognitoId}&instructorId=${clas.instructorId}&meetingNumber=${meetingNumber}&password=${password}`,
-                                      //     "_blank" 
-                                      //   );
-                                      // } else {
-                                      window.open(clas.zoomLink, '_blank', 'noreferrer');
-                                      // }
-
-                                      onJoinClass(InstitutionData.InstitutionId);
+                                      window.open(
+                                        clas.zoomLink,
+                                        "_blank",
+                                        "noreferrer"
+                                      );
+                                      onJoinClass(
+                                        InstitutionData.InstitutionId
+                                      );
                                     } else {
                                       markAttendance(clas.classId);
                                     }
                                   }}
-                                  style={{
-                                    backgroundColor: InstitutionData.PrimaryColor,
-                                  }}
                                 >
-                                  {clas.zoomLink ? 'Join' : attendanceStatus[clas.classId] || 'Mark Attendance'}
+                                  {clas.zoomLink
+                                    ? "Join"
+                                    : attendanceStatus[clas.classId] ||
+                                      "Mark Attendance"}
                                 </button>
-                              </div>
-
-                              {(Ctx.userData.userType === 'admin' ||
-                                Ctx.userData.userType === 'instructor') && (
-                                  <div className="flex justify-center">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth={1.5}
-                                      stroke="currentColor"
-                                      className="w-6 h-6 cursor-pointer"
-                                      onClick={() => showMembersAttended(clas.classId)}
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"
-                                      />
-                                    </svg>
-                                  </div>
-                                )}
-                            </div>
-                          </li>
-                        ))}
-                    </div>
+                              </Table.Cell>
+                              {(Ctx.userData.userType === "admin" ||
+                                Ctx.userData.userType === "instructor") && (
+                                <Table.Cell
+                                  style={{
+                                    backgroundColor:
+                                      InstitutionData.LightestPrimaryColor,
+                                  }}
+                                  className="text-center"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6 cursor-pointer"
+                                    onClick={() =>
+                                      showMembersAttended(clas.classId)
+                                    }
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"
+                                    />
+                                  </svg>
+                                </Table.Cell>
+                              )}
+                            </Table.Row>
+                          ))}
+                      </Table.Body>
+                    </Table>
                   </div>
                 ) : (
                   <>
@@ -1150,13 +1174,13 @@ const UpcomingSessions = () => {
                                 onChange={(event) =>
                                   event.target.checked
                                     ? handleCheckboxClick(
-                                      user.cognitoId,
-                                      user.emailId
-                                    )
+                                        user.cognitoId,
+                                        user.emailId
+                                      )
                                     : handleCheckboxUnclick(
-                                      user.cognitoId,
-                                      user.emailId
-                                    )
+                                        user.cognitoId,
+                                        user.emailId
+                                      )
                                 }
                               />
                             </label>
