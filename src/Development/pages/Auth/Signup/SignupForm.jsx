@@ -40,13 +40,13 @@ const SignupForm = ({ handler }) => {
       <PhoneInput name='phone' className='rounded w-full'/>
       <PasswordInput name='password' className='rounded w-full'/>
       <PasswordInput name='password_confirmation' className='rounded w-full' placeholder='Confirm Password'/>
-      {
+{/*       {
         referral_code ? (
           <BaseTextInputWithValue name='referral' className='rounded w-full' value={referral_code} required={false}/>
         ):
       <BaseTextInput name='referral' className='rounded w-full' placeholder='Referral Code (optional)'
         required={false}/>
-      }
+      } */}
       <PrimaryButton className="hover:opacity-[90%]">Continue</PrimaryButton>
     </form>
   )
