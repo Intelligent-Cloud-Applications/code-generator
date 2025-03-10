@@ -21,6 +21,8 @@ const SignupForm = ({ handler }) => {
     }
   }, [location.search]);
 
+  const [name, setName] = useState("");
+
 
   
   return (
@@ -31,7 +33,8 @@ const SignupForm = ({ handler }) => {
         w-full`
       }
     >
-      <BaseTextInput name='name' className='rounded w-full' placeholder='Name'/>
+      <BaseTextInput name='name' className='rounded w-full' placeholder='Name' pattern='[A-Za-z\ ]' value={name}
+                     onChange={(e) => {if (/^[^0-9]*$/.test(e.target.value)) setName(e.target.value)}}/>
       <EmailInput name='email' className='rounded w-full'/>
       <CountrySelect name='country' className='rounded w-full'/>
       <PhoneInput name='phone' className='rounded w-full'/>
@@ -44,7 +47,7 @@ const SignupForm = ({ handler }) => {
       <BaseTextInput name='referral' className='rounded w-full' placeholder='Referral Code (optional)'
         required={false}/>
       }
-      <PrimaryButton>Continue</PrimaryButton>
+      <PrimaryButton className="hover:opacity-[90%]">Continue</PrimaryButton>
     </form>
   )
 }

@@ -8,6 +8,7 @@ import InstitutionContext from "./Development/Context/InstitutionContext";
 import apiPaths from "./Development/utils/api-paths";
 import { jwtDecode } from "jwt-decode";
 import institutionData from "./Development/constants";
+import {useNavigate} from "react-router-dom";
 
 function App() {
   const UtilCtx = useRef(useContext(Context).util);
@@ -15,6 +16,7 @@ function App() {
   const RefInstitutionCtx = useRef(useContext(InstitutionContext));
   const InstitutionCtx = useContext(InstitutionContext);
   const InstitutionData = InstitutionCtx.institutionData;
+  const navigate = useNavigate();
 
   const [metaData, setMetaData] = useState({
     title: InstitutionData?.title || institutionData.seo?.title || '',
@@ -97,6 +99,9 @@ function App() {
         RefCtx.current.setIsAuth(true);
         UtilCtx.current.setLoader(false);
         RefCtx.current.onAuthLoad(true, data.InstitutionId);
+
+        if (!userdata.phoneNumber)
+          navigate('/phone-update');
       } catch (e) {
         console.error(e);
         RefCtx.current.setUserData({});

@@ -20,6 +20,7 @@ const Footer = (props) => {
   const [instagramLink, setInstagramLink] = useState(InstitutionData.Instagram);
   const [addSection, setAddSection] = useState(false);
   const [newSectionTitle, setNewSectionTitle] = useState("");
+  const { PrimaryColor} = InstitutionData;
   const [items, setItems] = useState([{
     item: "",
     link: ""
@@ -185,7 +186,7 @@ const Footer = (props) => {
         </Modal.Body>
         <Modal.Footer>
           <Button
-            color={"primary"}
+            style={{ backgroundColor: PrimaryColor }}
             onClick={() => {
               setModalShow(false);
               handleUpdateFooter();
@@ -261,7 +262,7 @@ const Footer = (props) => {
         </Modal.Body>
         <Modal.Footer>
           <Button
-            color={"primary"}
+            style={{ backgroundColor: PrimaryColor }}
             onClick={() => {
               setAddSection(false);
               handleUpdateFooter();

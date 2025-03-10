@@ -201,10 +201,4 @@ If deployment fails, follow these steps:
 
 ---
 
-## 📄 License
-
-This project is proprietary and confidential.
-
----
-
 *Made with ❤️ by the Dance Studio Team*

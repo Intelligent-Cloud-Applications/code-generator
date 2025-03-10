@@ -31,6 +31,7 @@ export const CountrySelect = (props) => {
 };
 
 export const PhoneInput = (props) => {
+  const [value, setValue] = useState("");
   return (
     <TextInput
       type="tel"
@@ -39,6 +40,11 @@ export const PhoneInput = (props) => {
       required
       pattern="[0-9]{9,10}"
       title="Phone Numbers are 9 or 10 digits"
+      value={value}
+      onChange={(event) => {
+        if (/^\d{0,10}$/.test(event.target.value))
+          setValue(event.target.value);
+      }}
       {...props}
     />
   );
@@ -56,17 +62,42 @@ export const EmailInput = (props) => {
   );
 };
 
+
 export const PasswordInput = (props) => {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const validatePassword = (value) => {
+    if (value.length < 8) return "Must be at least 8 characters.";
+    if (!/\d/.test(value)) return "Must contain a number.";
+    if (!/[A-Z]/.test(value)) return "Must contain an uppercase letter.";
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) return "Must contain a special character.";
+    return "";
+  };
+
+  const handleChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setError(validatePassword(newPassword));
+  };
+
   return (
-    <TextInput
-      type="password"
-      placeholder="Password"
-      icon={LuLock}
-      required
-      {...props}
-    />
-  )
-}
+    <div className="flex flex-col gap-1 items-center w-full">
+      <TextInput
+        type="password"
+        placeholder="Password"
+        icon={LuLock}
+        value={password}
+        onChange={handleChange}
+        required
+        className={`border ${error ? "border-red-500" : "border-gray-300"} focus:border-red-500`}
+        {...props}
+      />
+      {error && <p className="text-red-600 text-sm">{error}</p>}
+    </div>
+  );
+};
+
 
 export const OtpInput = (props) => {
   return (

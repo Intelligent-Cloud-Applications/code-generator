@@ -135,7 +135,10 @@ const RazorpaySubscription = ({ productId }) => {
         style={{ backgroundColor: InstitutionData.PrimaryColor }}
         onClick={() => {
           window.open(
-            `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor.replace('#', ''))}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor.replace('#', ''))}`,
+            // `${domain}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor.replace('#', ''))}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor.replace('#', ''))}`,
+            process.env.REACT_APP_STAGE === 'PROD' ?
+              `https://payment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${UserCtx.cognitoId}/${domain.split('://')[1]}` :
+              `https://betapayment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${UserCtx.cognitoId}/${domain.split('://')[1]}`,
             '_blank',
             'noopener,noreferrer'
           )

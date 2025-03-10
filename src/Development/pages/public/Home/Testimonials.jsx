@@ -30,6 +30,7 @@ const Testimonial = () => {
   const [newFeedback, setNewFeedback] = useState("");
   const [updateTestName, setUpdateTestName] = useState("");
   const [updateFeedback, setUpdateFeedback] = useState("");
+  const { PrimaryColor } = InstitutionData;
   const [loading, setLoading] = useState(false); // Loader state
 
   useEffect(() => {
@@ -329,7 +330,7 @@ const Testimonial = () => {
                     Delete
                   </Button>
                   <Button
-                    color={"primary"}
+                    style={{ backgroundColor: PrimaryColor }}
                     onClick={handleUpdateTestimonial}
                     className="w-full"
                   >
@@ -386,7 +387,7 @@ const Testimonial = () => {
                 </Modal.Body>
                 <Modal.Footer className='flex flex-col gap-3'>
                   <Button
-                    color={"primary"}
+                    style={{ backgroundColor: PrimaryColor }}
                     onClick={handleAddTestimonial}
                     className="w-full"
                   >

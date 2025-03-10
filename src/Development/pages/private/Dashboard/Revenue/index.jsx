@@ -200,10 +200,11 @@ function PaymentDetails() {
   const tableHeaders = [
     { key: 'userName', label: 'Name', className: 'w-32' },
     { key: 'phoneNumber', label: 'Phone Number', className: 'w-32' },
-    { key: 'products', label: 'Products', className: 'w-48' },
+    // { key: 'products', label: 'Products', className: 'w-48' },
     { key: 'subscriptionType', label: 'Subscription Type', className: 'w-36' },
     { key: 'paymentMode', label: 'Payment Mode', className: 'w-32' },
     { key: 'paymentDate', label: 'Payment Date', className: 'w-32' },
+    { key: 'renewDate', label: 'Renew Date', className: 'w-32' },
     { key: 'amount', label: 'Amount', className: 'w-32' }
   ];
 
@@ -298,19 +299,19 @@ function PaymentDetails() {
                         {payment.userDetails?.phoneNumber || 'N/A'}
                       </div>
                     </Table.Cell>
-                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-48 overflow-hidden">
-                      <div className="max-h-24 overflow-y-auto px-2">
-                        {payment.userDetails?.products?.length > 0
-                          ? payment.userDetails.products?.map(
-                            (product, index) => (
-                              <div key={index} className="truncate">
-                                {product.S}
-                              </div>
-                            )
-                          )
-                          : "N/A"}
-                      </div>
-                    </Table.Cell>
+                    {/*<Table.Cell className="h-12 text-sm text-gray-500 text-center w-48 overflow-hidden">*/}
+                    {/*  <div className="max-h-24 overflow-y-auto px-2">*/}
+                    {/*    {payment.userDetails?.products?.length > 0*/}
+                    {/*      ? payment.userDetails.products?.map(*/}
+                    {/*        (product, index) => (*/}
+                    {/*          <div key={index} className="truncate">*/}
+                    {/*            {product.S}*/}
+                    {/*          </div>*/}
+                    {/*        )*/}
+                    {/*      )*/}
+                    {/*      : "N/A"}*/}
+                    {/*  </div>*/}
+                    {/*</Table.Cell>*/}
                     <Table.Cell className="h-12 text-sm text-gray-500 text-center w-36 overflow-hidden">
                       <div className="truncate px-2">
                         {payment.subscriptionType || 'N/A'}
@@ -330,6 +331,11 @@ function PaymentDetails() {
                     <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
                       <div className="truncate px-2">
                         {formatEpochToReadableDate(payment.paymentDate)}
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
+                      <div className="truncate px-2">
+                        {formatEpochToReadableDate(payment.renewDate)}
                       </div>
                     </Table.Cell>
                     <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
