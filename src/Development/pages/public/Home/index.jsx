@@ -11,24 +11,24 @@ import config from "../../../config";
 import {jwtDecode} from "jwt-decode";
 
 function Home() {
-  async function initializeGoogleOneTap() {
-    try {
-      await Auth.currentAuthenticatedUser();
-      window.google.accounts.id.cancel();
-    } catch (error) {
-      console.log(error);
+  // async function initializeGoogleOneTap() {
+  //   try {
+  //     await Auth.currentAuthenticatedUser();
+  //     window.google.accounts.id.cancel();
+  //   } catch (error) {
+  //     console.log(error);
 
-      window.google.accounts.id.initialize({
-        client_id: "132743944863-n6trjig5u2104014e3d7u41vtq3odeib.apps.googleusercontent.com",
-        callback: handleCredentialResponse,
-        prompt_parent_id: "google-one-tap-container", // Optional
-        cancel_on_tap_outside: false,
-      });
+  //     window.google.accounts.id.initialize({
+  //       client_id: "132743944863-n6trjig5u2104014e3d7u41vtq3odeib.apps.googleusercontent.com",
+  //       callback: handleCredentialResponse,
+  //       prompt_parent_id: "google-one-tap-container", // Optional
+  //       cancel_on_tap_outside: false,
+  //     });
 
-      window.google.accounts.id.prompt(); // Shows the One Tap UI
-    }
+  //     window.google.accounts.id.prompt(); // Shows the One Tap UI
+  //   }
 
-  }
+  // }
 
   async function handleCredentialResponse(response) {
     console.log("Google Token:", response.credential);
@@ -56,9 +56,9 @@ function Home() {
     }
   }
 
-  useEffect(() => {
-    initializeGoogleOneTap();
-  }, []);
+  // useEffect(() => {
+  //   initializeGoogleOneTap();
+  // }, []);
 
   return (
     <div className={` overflow-hidden`}>
