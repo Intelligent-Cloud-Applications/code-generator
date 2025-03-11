@@ -21,6 +21,26 @@ const formatDate = (epochDate) => {
   return `${day}/${month}/${year}`;
 };
 
+const formatTime = (epochDate) => {
+  if (!epochDate) return 'N/A';
+  try {
+    const date = new Date(epochDate);
+    if (isNaN(date.getTime())) return 'N/A';
+    
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const formattedHours = String(hours).padStart(2, "0");
+    
+    return `${formattedHours}:${minutes} ${ampm}`;
+  } catch (error) {
+    return 'N/A';
+  }
+};
+
 const PreviousSessions = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const [classId, setClassId] = useState("");
@@ -624,6 +644,9 @@ const PreviousSessions = () => {
                       Date
                     </Table.HeadCell>
                     <Table.HeadCell className="font-semibold">
+                      Time
+                    </Table.HeadCell>
+                    <Table.HeadCell className="font-semibold">
                       Recording Link
                     </Table.HeadCell>
                     <Table.HeadCell className="font-semibold">
@@ -641,6 +664,9 @@ const PreviousSessions = () => {
                         </Table.Cell>
                         <Table.Cell className="text-gray-700 font-semibold">
                           {formatDate(clas.date)}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-700 font-semibold">
+                          {formatTime(clas.date)}
                         </Table.Cell>
                         <Table.Cell className="text-gray-700 font-semibold">
                           <div className="flex items-center gap-4">

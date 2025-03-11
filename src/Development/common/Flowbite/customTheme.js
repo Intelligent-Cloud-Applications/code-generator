@@ -228,7 +228,7 @@ const customTheme = {
     "head": {
       "base": "group/head text-xs",
       "cell": {
-        "base": "bg-primaryColor bg-opacity-90 font-semibold text-[1rem] text-white px-6 py-3 group-first/head:first:rounded-tl-lg group-first/head:last:rounded-tr-lg"
+        "base": "bg-lightPrimaryColor bg-opacity-90 font-semibold text-[1rem] text-white px-6 py-3 group-first/head:first:rounded-tl-lg group-first/head:last:rounded-tr-lg"
       }
     },
     "row": {
