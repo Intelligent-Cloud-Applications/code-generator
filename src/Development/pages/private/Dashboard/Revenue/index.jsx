@@ -208,7 +208,7 @@ function PaymentDetails() {
 
   const CustomTableHeadCell = React.memo(({ onClick, children, sortKey, className }) => (
     <Table.HeadCell
-      className={`h-14 px-6 py-2 text-center text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-50 ${className}`}
+      className={`h-14 px-6 py-2 text-center text-xs font-medium text-white uppercase cursor-pointer ${className}`}
       onClick={onClick}
     >
       <div className="flex items-center justify-center gap-1 h-full">
