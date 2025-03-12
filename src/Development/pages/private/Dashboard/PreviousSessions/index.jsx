@@ -189,7 +189,7 @@ const PreviousSessions = () => {
   };
 
   //attendance
-  const { userList = [], userAttendance = {} } = useContext(Context) || {};
+  const { userList = [], userAttendance = {}, getUserAttendance } = useContext(Context) || {};
   const [attendedUsers, setAttendedUsers] = useState([]);
   const [attendanceStatus, setAttendanceStatus] = useState({});
   const [activeUsers, setActiveUsers] = useState([]);
@@ -464,7 +464,7 @@ const PreviousSessions = () => {
   const handleAttendanceClick = async (classId) => {
     setSelectedClassForAttendance(classId);
     setShowAttendanceModal(true);
-    
+    UtilCtx.setLoader(true);
     try {
       const response = await API.get(
         "main",
@@ -482,47 +482,85 @@ const PreviousSessions = () => {
     } catch (error) {
       console.error(error);
       toast.error("Failed to fetch attendance data");
+    } finally {
+      UtilCtx.setLoader(false);
     }
   };
 
-  const handleToggleAttendance = (cognitoId) => {
-    setSelectedUsers(prev => ({
-      ...prev,
-      [cognitoId]: !prev[cognitoId]
-    }));
-  };
-
-  const handleSaveAttendance = async () => {
+  const handleToggleAttendance = async (cognitoId, emailId, classId) => {
     UtilCtx.setLoader(true);
     try {
-      // Get all selected users
-      const selectedUserIds = Object.entries(selectedUsers)
-        .filter(([_, isSelected]) => isSelected)
-        .map(([cognitoId]) => cognitoId);
-
-      // Make API call to update attendance
-      await API.post(
+      const response = await API.post(
         "main",
         `/admin/put-attendance/${UserCtx.userData.institution}`,
         {
           body: {
             classId: selectedClassForAttendance,
-            attendedUsers: selectedUserIds,
+            cognitoId: cognitoId,
+            emailId: emailId,
           },
         }
       );
-
       toast.success("Attendance updated successfully");
-      setShowAttendanceModal(false);
-      setSelectedClassForAttendance(null);
-      setSelectedUsers({});
+      const res = await API.get(
+        "main",
+        `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}`
+      );
+      const attendedUsers = res.Items || [];
+      const initialSelectedUsers = {};
+      
+      // Initialize with currently attended users
+      attendedUsers.forEach(user => {
+        initialSelectedUsers[user.cognitoId] = true;
+      });
+      
+      setSelectedUsers(initialSelectedUsers);
     } catch (error) {
       console.error(error);
       toast.error("Failed to update attendance");
     } finally {
       UtilCtx.setLoader(false);
+
     }
   };
+
+  const handleCloseAttendanceModal = () => {
+    setShowAttendanceModal(false);
+    setSelectedUsers({});
+    setSelectedClassForAttendance(null);
+  };
+
+  // const handleSaveAttendance = async () => {
+  //   UtilCtx.setLoader(true);
+  //   try {
+  //     // Get all selected users
+  //     const selectedUserIds = Object.entries(selectedUsers)
+  //       .filter(([_, isSelected]) => isSelected)
+  //       .map(([cognitoId]) => cognitoId);
+
+  //     // Make API call to update attendance
+  //     await API.post(
+  //       "main",
+  //       `/admin/put-attendance/${UserCtx.userData.institution}`,
+  //       {
+  //         body: {
+  //           classId: selectedClassForAttendance,
+  //           attendedUsers: selectedUserIds,
+  //         },
+  //       }
+  //     );
+
+  //     toast.success("Attendance updated successfully");
+  //     setShowAttendanceModal(false);
+  //     setSelectedClassForAttendance(null);
+  //     setSelectedUsers({});
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Failed to update attendance");
+  //   } finally {
+  //     UtilCtx.setLoader(false);
+  //   }
+  // };
 
   const filteredUsers = (userList || [])
     .filter(user => user?.status === "Active")
@@ -817,7 +855,7 @@ const PreviousSessions = () => {
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Mark Attendance</h3>
               <button
-                onClick={() => setShowAttendanceModal(false)}
+                onClick={handleCloseAttendanceModal}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -851,7 +889,7 @@ const PreviousSessions = () => {
                       type="checkbox"
                       className="sr-only peer"
                       checked={selectedUsers[user.cognitoId] || false}
-                      onChange={() => handleToggleAttendance(user.cognitoId)}
+                      onChange={() => handleToggleAttendance(user.cognitoId, user.emailId, selectedClassForAttendance)}
                     />
                     <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer 
                       ${selectedUsers[user.cognitoId] ? 'bg-green-600' : 'bg-gray-200'} 
@@ -867,21 +905,9 @@ const PreviousSessions = () => {
             <div className="flex justify-end gap-3 pt-4 border-t">
               <Button
                 color="gray"
-                onClick={() => {
-                  setShowAttendanceModal(false);
-                  setSelectedClassForAttendance(null);
-                  setSelectedUsers({});
-                }}
+                onClick={handleCloseAttendanceModal}  
               >
                 Cancel
-              </Button>
-              <Button
-                onClick={handleSaveAttendance}
-                style={{
-                  backgroundColor: InstitutionData.LightPrimaryColor,
-                }}
-              >
-                Save Attendance
               </Button>
             </div>
           </div>
