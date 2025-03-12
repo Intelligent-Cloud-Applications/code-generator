@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import { API } from "aws-amplify";
 import InstructorList from "./InstructorList";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { Table } from "flowbite-react";
 
 const UsersList = ({ userCheck, setUserCheck }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -40,7 +41,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Members List");
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const isMobileScreen = useMediaQuery("(max-width: 600px)");
 
   // Filter functions
@@ -123,7 +124,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     return `${day}/${month}/${year}`;
   };
 
-
   // Sort functionality
   const requestSort = (key) => {
     let direction = "ascending";
@@ -143,21 +143,29 @@ const UsersList = ({ userCheck, setUserCheck }) => {
 
   //for profile pic
   const getInitials = (name) => {
-    if (!name) return '';
+    if (!name) return "";
     const initials = name
-      .split(' ')
+      .split(" ")
       .map((word) => word.charAt(0).toUpperCase())
-      .join('');
+      .join("");
     return initials;
   };
 
   const getColor = (name) => {
-    if (!name) return '#888888';
+    if (!name) return "#888888";
     const colors = [
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF'
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
     ];
     const index = name.length % colors.length;
     return colors[index];
@@ -208,7 +216,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     filter2,
     setShowDeleteModal,
     showDeleteModal,
-    confirmDelete
+    confirmDelete,
   };
 
   return (
@@ -304,16 +312,10 @@ const UsersList = ({ userCheck, setUserCheck }) => {
           </div>
           <div
             className={`w-[85%]  max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%]`}
-            style={{
-              backgroundColor: InstitutionData.LightestPrimaryColor,
-            }}
           >
-            {/* Step 4: Create and integrate the search bar */}
             <div
               className={`flex w-[94.5%] mt-4 rounded-md overflow-hidden gap-2`}
-              style={{
-                backgroundColor: InstitutionData.LightestPrimaryColor,
-              }}
+
             >
               <input
                 className={`flex-1 p-2 outline-none rounded-md`}
@@ -335,135 +337,74 @@ const UsersList = ({ userCheck, setUserCheck }) => {
               />
             </div>
             {selectedOption === "Members List" ? (
-              <div className="overflow-x-auto w-full">
-                <ul className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-col max536:bg-primaryColor rounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] max536:bg-gradient-to-b max536:from-[#dad7c6] max536:to-[#fdd00891]">
-                  {/* List header */}
-                  <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
-                    <div className="d-flex justify-content-between w-[98%] max1050:w-[100%] mb-3 font-bold">
-                      {/* List header content */}
-                      <div className="w-[12%]"></div>
-                      <div className="w-[24%]">Name</div>
-                      {/*<div*/}
-                      {/*  className="w-[13%] email-hover"*/}
-                      {/*  onClick={() => requestSort("email")}*/}
-                      {/*  style={{ cursor: "pointer" }}*/}
-                      {/*>*/}
-                      {/*  Email*/}
-                      {/*</div>*/}
-                      {/*<div className="w-[11%] font-sans ml-[0.5rem]">Phone</div>*/}
-                      <div className="w-[21%] font-sans">Joining Date</div>
-                      <div className="w-[20%] font-sans">Renew Date</div>
-                      <div className="w-[23%] font-sans">Classes Attended</div>
-                      <div className="w-[10%] font-sans">
-                        Balance
-                      </div>
-                      <div></div>
-                      {/* Icons */}
-                      <div className="w-10 font-sans h-10">
-                        <img
-                          src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/userName.png`}
-                          alt=""
-                          className="min536:hidden w-full h-full"
-                        />
-                      </div>
-                      <img
-                        src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/userName.png`}
-                        alt=""
-                        className="min536:hidden w-10 h-10"
-                      />
-                      <img
-                        src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/details.png`}
-                        alt=""
-                        className="min536:hidden w-10 h-10"
-                      />
-                      <img
-                        src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/attendance.png`}
-                        alt=""
-                        className="min536:hidden w-10 h-10"
-                      />
-                      <img
-                        src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/due.png`}
-                        alt=""
-                        className="min536:hidden w-10 h-10"
-                      />
-                    </div>
-                  </li>
+              <div className=" pt-6">
+                {/* <ul className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-colrounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] ">
 
-                  {/* Render list of members */}
-                  <div className="overflow-auto max536:w-[96%] w-full">
-                    {filteredUserList.map((user, i) => {
+                  <div className="overflow-auto w-full"> */}
+                <Table striped>
+                  <Table.Head className="font-semibold text-center">
+                    <Table.HeadCell></Table.HeadCell>
+                    <Table.HeadCell>Name</Table.HeadCell>
+                    <Table.HeadCell>Joining Date</Table.HeadCell>
+                    <Table.HeadCell>Renew Date</Table.HeadCell>
+                    <Table.HeadCell>Classes Attended</Table.HeadCell>
+                    <Table.HeadCell>Balance</Table.HeadCell>
+                    <Table.HeadCell></Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body className="divide-y">
+                    {filteredUserList.map((user) => {
                       if (!user.isArchived) {
                         return (
-                          <li
-                            key={user.cognitoId}
-                            className="w-full flex flex-col gap-[4px] items-center justify-center p-2 max536:bg-primaryColor max536:pt-6 max536:rounded-2xl Sansita max536:text-[0.8rem]"
-                          >
-                            <div className="flex justify-between w-[100%] items-center">
-                              {/* Profile picture - shifted left and made circular */}
-                              <div className="w-[4%] h-8 flex justify-start items-center mr-3">
-                                {user.imgUrl ? (
-                                  <img
-                                    src={user.imgUrl}
-                                    alt={user.userName}
-                                    className="h-[35px] w-[35px] rounded-full object-cover"
-                                  />
-                                ) : (
-                                  <div
-                                    className="h-[35px] w-[35px] rounded-full flex items-center justify-center text-white text-sm font-medium"
-                                    style={{ backgroundColor: getColor(user.userName) }}
-                                  >
-                                    {getInitials(user.userName)}
-                                  </div>
-                                )}
-                              </div>
-                              <div className="w-[18%] font-[400] mr-2 font-sans truncate">
-                                {user.userName}
-                              </div>
-                              {/*<div*/}
-                              {/*  className="w-[16%] font-[400] font-sans email-hover"*/}
-                              {/*  onClick={() => requestSort("email")}*/}
-                              {/*  style={{ cursor: "pointer" }}*/}
-                              {/*  title={user.emailId}*/}
-                              {/*>*/}
-                              {/*  {user.emailId?.split("@")[0]}@*/}
-                              {/*</div>*/}
-                              {/*<div className="w-[18%] font-[400] font-sans ml-[3.2rem]">*/}
-                              {/*  {user.phoneNumber}*/}
-                              {/*</div>*/}
-                              <div className="w-[12%] font-[400] font-sans">
-                                {formatDate(user.joiningDate)}
-                              </div>
-                              <div className="w-[12%] font-[400] font-sans text-center">
-                                {formatDate(user.renewDate)}
-                              </div>
-                              <div className="w-[15%] font-[400] font-sans overflow-hidden text-center mr-2">
-                                {/*{user.currentMonthZPoints*/}
-                                {/*  ? user.currentMonthZPoints*/}
-                                {/*  : 0}*/}
-                                {/*/*/}
-                                {/*{user.lastMonthZPoints*/}
-                                {/*  ? user.lastMonthZPoints*/}
-                                {/*  : 0}*/}
-                                {userAttendance[user.cognitoId] || 0}
-                              </div>
-                              <div
-                                className="w-[7%] h-7 rounded px-2 text-center"
-                                style={{
-                                  color:
-                                    parseFloat(user.balance) < 0
-                                      ? "red"
-                                      : "black",
-                                }}
-                              >
-                                {user.balance}
-                              </div>
+                          <Table.Row key={user.cognitoId}>
+                            <Table.Cell>
+                              {user.imgUrl ? (
+                                <img
+                                  src={user.imgUrl}
+                                  alt={user.userName}
+                                  className="h-10 w-10 rounded-full object-cover text-gray-700 font-semibold"
+                                />
+                              ) : (
+                                <div
+                                  className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                                  style={{
+                                    backgroundColor: getColor(
+                                      user.userName
+                                    ),
+                                  }}
+                                >
+                                  {getInitials(user.userName)}
+                                </div>
+                              )}
+                            </Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center"
+                            >{user.userName}</Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center">
+                              {formatDate(user.joiningDate)}
+                            </Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center"
+                            >
+                              {formatDate(user.renewDate)}
+                            </Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center"
+                            >
+                              {userAttendance[user.cognitoId] || 0}
+                            </Table.Cell>
+                            <Table.Cell
+                              className={
+                                parseFloat(user.balance) < 0
+                                  ? "text-red-500 "
+                                  : "text-gray-700 font-semibold text-center"
+                              }
+                            >
+                              {user.balance}
+                            </Table.Cell>
+                            <Table.Cell className="flex gap-3 text-gray-700 font-semibold text-center">
                               <button
-                                className="pl-[0.4rem]"
                                 onClick={() => {
-                                  console.log(
-                                    "User data before opening modal:",
-                                    user
-                                  );
                                   setIsUserAdd(false);
                                   setIsModalOpen(true);
                                   setCognitoId(user.cognitoId);
@@ -472,15 +413,11 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                   setPhoneNumber(user.phoneNumber);
                                   setStatus(user.status);
                                   setBalance(user.balance);
-                                  setSelectedProductAmount(user.amount || 0);
-                                  setProductType(user.productType || "Select Product Type");
-                                
                                 }}
                               >
                                 <FaEye size={20} />
                               </button>
                               <button
-                                className="absolute -right-6 mt-1"
                                 onClick={() =>
                                   handleDeleteUser(
                                     user.institution,
@@ -496,36 +433,31 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                 >
                                   <path
                                     fillRule="evenodd"
-                                    d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+                                    d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Z"
                                     clipRule="evenodd"
                                   />
                                 </svg>
                               </button>
-                            </div>
-                          </li>
+                            </Table.Cell>
+                          </Table.Row>
                         );
                       }
-                      return null; // Ensure a return in the else case
+                      return null;
                     })}
-                    <ConfirmDeleteModal
-                      show={showDeleteModal}
-                      onHide={() => setShowDeleteModal(false)}
-                      onConfirm={confirmDelete}
-                    />
-                    <div
-                      className={`absolute bottom-0 flex justify-center items-center w-full`}
-                    >
-                      <Pagination
-                        totalPages={Math.ceil(
-                          searchedUserList.length / itemsPerPage
-                        )}
-                        currentPage={currentPage}
-                        onPageChange={(value) => setCurrentPage(value)}
-                        style={{ margin: "0 auto" }}
-                      />
-                    </div>
-                  </div>
-                </ul>
+                  </Table.Body>
+                </Table>
+                {/* Pagination */}
+                <div className="flex justify-center items-center w-full mt-4">
+                  <Pagination
+                    totalPages={Math.ceil(
+                      searchedUserList.length / itemsPerPage
+                    )}
+                    currentPage={currentPage}
+                    onPageChange={(value) => setCurrentPage(value)}
+                  />
+                </div>
+                {/* </div>
+                </ul> */}
               </div>
             ) : (
               <InstructorList />

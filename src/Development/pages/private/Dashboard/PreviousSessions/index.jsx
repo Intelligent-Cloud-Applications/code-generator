@@ -8,6 +8,9 @@ import { Button2 } from "../../../../common/Inputs";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import { toast } from "react-toastify";
 
+
+import { Table } from "flowbite-react";
+
 // import { useNavigate } from "react-router-dom";
 
 const formatDate = (epochDate) => {
@@ -22,6 +25,8 @@ const PreviousSessions = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const [classId, setClassId] = useState("");
   const [recordingLink, setRecordingLink] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const UserCtx = useContext(Context);
   const Ctx = useContext(Context);
   const UtilCtx = useContext(Context).util;
@@ -30,120 +35,141 @@ const PreviousSessions = () => {
   // const instructorNamesOptions = Ctx.instructorList.map((i) => i.name)
   const [classTypeFilter, setClassTypeFilter] = useState("");
   const [instructorTypeFilter, setinstructorTypeFilter] = useState("");
-  const filteredClasses = Ctx.previousClasses.filter(
-    (clas) =>
-      instructorTypeFilter === "" ||
-      clas.instructorNames === instructorTypeFilter
-  );
-
-  const classTypes = Array.from(
-    new Set(filteredClasses.map((clas) => clas.classType))
-  );
-
-  const getInstructor = (name) => {
-    return Ctx.instructorList.find(
-      (i) => i.name?.toString().trim() === name?.toString().trim()
-    );
-  };
-
-  const isMobileScreen = useMediaQuery("(max-width: 600px)");
-  const itemsPerPage = 8;
-  const [currentPage, setCurrentPage] = useState(1);
-  let totalPages = Math.ceil(Ctx.previousClasses.length / itemsPerPage);
-  let startIndex = (currentPage - 1) * itemsPerPage;
-  let endIndex = startIndex + itemsPerPage;
   const [showFilters, setShowFilters] = useState(false);
 
-  const onInstructorNameChange = async (
-    newInstructorName,
-    instructorId,
-    classType,
-    classId
-  ) => {
-    UtilCtx.setLoader(true);
+  // First sort the classes by date
+  const sortedPreviousClasses = Ctx.previousClasses.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
-    try {
-      await API.put(
-        "main",
-        `/admin/edit-schedule-name/${InstitutionData.InstitutionId}`,
-        {
-          body: {
-            classId: classId,
-            instructorNames: newInstructorName,
-            instructorId: instructorId,
-            classType: classType,
-          },
-        }
-      );
+  // Then apply filters
+  const filteredClasses = sortedPreviousClasses
+    .filter((clas) => {
+      if (instructorTypeFilter === "") {
+        return true;
+      }
+      return clas.instructorNames === instructorTypeFilter;
+    })
+    .filter((clas) => {
+      if (classTypeFilter === "") {
+        return true;
+      }
+      return clas.classType === classTypeFilter;
+    });
 
-      const updatedClasses = Ctx.previousClasses.map((clas) => {
-        if (clas.classId === classId) {
-          return {
-            ...clas,
-            instructorNames: newInstructorName,
-            instructorId: instructorId,
-          };
-        }
-        return clas;
-      });
+  const classTypes = Array.from(
+    new Set(sortedPreviousClasses.map((clas) => clas.classType))
+  );
 
-      Ctx.setPreviousClasses(updatedClasses);
+  // Pagination logic
+  const itemsPerPage = 6;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filteredClasses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  
+  // Get current page classes
+  const currentClasses = filteredClasses.slice(startIndex, endIndex);
 
-      UtilCtx.setLoader(false);
-    } catch (e) {
-      alert(e.message);
-      UtilCtx.setLoader(false);
-    }
+  const onPageChange = (page) => {
+    setCurrentPage(page);
   };
+
+  // const onInstructorNameChange = async (
+  //   newInstructorName,
+  //   instructorId,
+  //   classType,
+  //   classId
+  // ) => {
+  //   UtilCtx.setLoader(true);
+
+  //   try {
+  //     await API.put(
+  //       "main",
+  //       `/admin/edit-schedule-name/${InstitutionData.InstitutionId}`,
+  //       {
+  //         body: {
+  //           classId: classId,
+  //           instructorNames: newInstructorName,
+  //           instructorId: instructorId,
+  //           classType: classType,
+  //         },
+  //       }
+  //     );
+
+  //     const updatedClasses = Ctx.previousClasses.map((clas) => {
+  //       if (clas.classId === classId) {
+  //         return {
+  //           ...clas,
+  //           instructorNames: newInstructorName,
+  //           instructorId: instructorId,
+  //         };
+  //       }
+  //       return clas;
+  //     });
+
+  //     Ctx.setPreviousClasses(updatedClasses);
+
+  //     UtilCtx.setLoader(false);
+  //   } catch (e) {
+  //     alert(e.message);
+  //     UtilCtx.setLoader(false);
+  //   }
+  // };
 
   const onRecordingUpdate = async (e) => {
     e.preventDefault();
     UtilCtx.setLoader(true);
 
     try {
-      if (classId.length === 0 && recordingLink.length === 0) {
-        alert("Invalid Details");
+      if (!selectedClassId || !recordingLink) {
+        toast.error("Invalid Details");
         UtilCtx.setLoader(false);
-      } else {
-        await API.put(
-          "main",
-          `/admin/edit-schedule-recording/${InstitutionData.InstitutionId}`,
-          {
-            body: {
-              classId: classId,
-              recordingLink: recordingLink,
-            },
-          }
-        );
-        toast.success("Recording Link Updated Successfully");
-
-        setClassId("");
-
-        const updatedClasses = Ctx.previousClasses.map((clas) => {
-          if (clas.classId === classId) {
-            return {
-              ...clas,
-              recordingLink: recordingLink,
-            };
-          }
-          return clas;
-        });
-
-        Ctx.setPreviousClasses(updatedClasses);
-
-        UtilCtx.setLoader(false);
+        return;
       }
+
+      await API.put(
+        "main",
+        `/admin/edit-schedule-recording/${InstitutionData.InstitutionId}`,
+        {
+          body: {
+            classId: selectedClassId,
+            recordingLink: recordingLink,
+          },
+        }
+      );
+      
+      toast.success("Recording Link Updated Successfully");
+
+      const updatedClasses = Ctx.previousClasses.map((clas) => {
+        if (clas.classId === selectedClassId) {
+          return {
+            ...clas,
+            recordingLink: recordingLink,
+          };
+        }
+        return clas;
+      });
+
+      Ctx.setPreviousClasses(updatedClasses);
+      setSelectedClassId(null);
+      setRecordingLink("");
+      setShowUpdateModal(false);
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message);
+    } finally {
       UtilCtx.setLoader(false);
     }
   };
-  const sortedPreviousClasses = Ctx.previousClasses.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+
+  const handleUpdateClick = (classId, currentLink) => {
+    setSelectedClassId(classId);
+    setRecordingLink(currentLink || "");
+    setShowUpdateModal(true);
+  };
 
   //attendance
-  const { userList, userAttendance } = useContext(Context);
+  const { userList = [], userAttendance = {} } = useContext(Context) || {};
   const [attendedUsers, setAttendedUsers] = useState([]);
   const [attendanceStatus, setAttendanceStatus] = useState({});
   const [activeUsers, setActiveUsers] = useState([]);
@@ -152,18 +178,20 @@ const PreviousSessions = () => {
   const [currentPageAttendance, setCurrentPageAttendance] = useState(1);
   const usersPerPage = 10;
   useEffect(() => {
-    const activeUsers = userList.filter((user) => user.status === "Active");
+    const activeUsers = (userList || []).filter((user) => user?.status === "Active");
     setActiveUsers(activeUsers.toSorted((a, b) => {
-      const x = userAttendance[a.cognitoId] || 0;
-      const y = userAttendance[b.cognitoId] || 0;
+      const x = userAttendance[a?.cognitoId] || 0;
+      const y = userAttendance[b?.cognitoId] || 0;
       return y - x;
     }));
-    const attendedIds = attendedUsers.map((user) => user.cognitoId);
+    const attendedIds = attendedUsers.map((user) => user?.cognitoId);
     const updatedStatus = {};
     activeUsers.forEach((user) => {
-      updatedStatus[user.cognitoId] = attendedIds.includes(user.cognitoId)
-        ? "Attended"
-        : "Not Attended";
+      if (user?.cognitoId) {
+        updatedStatus[user.cognitoId] = attendedIds.includes(user.cognitoId)
+          ? "Attended"
+          : "Not Attended";
+      }
     });
     setAttendanceStatus(updatedStatus);
     console.log(activeUsers);
@@ -173,256 +201,331 @@ const PreviousSessions = () => {
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = activeUsers.slice(indexOfFirstUser, indexOfLastUser);
 
-  const handlePageChange = (value) => {
-    setCurrentPageAttendance(value);
-  };
+  // const handlePageChange = (value) => {
+  //   setCurrentPageAttendance(value);
+  // };
 
-  const showMembersAttended = async (classId) => {
-    console.log(classId);
-    try {
-      const response = await API.get(
-        "main",
-        `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}`
-      );
-      setAttendedUsers(response.Items);
-      setAttendanceList(true);
-      setClassId2(classId);
-      console.log(response);
-      // Update attendance status based on fetched attendance records
-      const updatedStatus = {};
-      activeUsers.forEach((user) => {
-        updatedStatus[user.cognitoId] = response.Items.some(
-          (attendedUser) => attendedUser.cognitoId === user.cognitoId
-        )
-          ? "Attended"
-          : "Not Attended";
-      });
-      setAttendanceStatus(updatedStatus);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const showMembersAttended = async (classId) => {
+  //   console.log(classId);
+  //   try {
+  //     const response = await API.get(
+  //       "main",
+  //       `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}`
+  //     );
+  //     setAttendedUsers(response.Items);
+  //     setAttendanceList(true);
+  //     setClassId2(classId);
+  //     console.log(response);
+  //     // Update attendance status based on fetched attendance records
+  //     const updatedStatus = {};
+  //     activeUsers.forEach((user) => {
+  //       updatedStatus[user.cognitoId] = response.Items.some(
+  //         (attendedUser) => attendedUser.cognitoId === user.cognitoId
+  //       )
+  //         ? "Attended"
+  //         : "Not Attended";
+  //     });
+  //     setAttendanceStatus(updatedStatus);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [showButton, setShowButton] = useState(false);
 
   // Function to filter users based on search term
-  const filterUsers = () => {
-    if (!searchTerm) {
-      return activeUsers;
-    } else {
-      return activeUsers.filter((user) =>
-        user.userName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-  };
-  const filteredUsers = filterUsers();
+  // const filterUsers = () => {
+  //   if (!searchTerm) {
+  //     return activeUsers;
+  //   } else {
+  //     return activeUsers.filter((user) =>
+  //       user.userName.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //   }
+  // };
+  // const filteredUsers = filterUsers();
 
   // Sort the filteredUsers array based on attendance status
-  filteredUsers.sort((a, b) => {
-    if (
-      attendanceStatus[a.cognitoId] === "Attended" &&
-      attendanceStatus[b.cognitoId] !== "Attended"
-    ) {
-      return -1; // attended users first
-    } else if (
-      attendanceStatus[a.cognitoId] !== "Attended" &&
-      attendanceStatus[b.cognitoId] === "Attended"
-    ) {
-      return 1; // non-attended users last
-    } else {
-      return 0; // maintain the current order
-    }
-  });
+  // filteredUsers.sort((a, b) => {
+  //   if (
+  //     attendanceStatus[a.cognitoId] === "Attended" &&
+  //     attendanceStatus[b.cognitoId] !== "Attended"
+  //   ) {
+  //     return -1; // attended users first
+  //   } else if (
+  //     attendanceStatus[a.cognitoId] !== "Attended" &&
+  //     attendanceStatus[b.cognitoId] === "Attended"
+  //   ) {
+  //     return 1; // non-attended users last
+  //   } else {
+  //     return 0; // maintain the current order
+  //   }
+  // });
 
   const [cognitoIds, setCognitoIds] = useState("");
   const [emailIds, setEmailIds] = useState("");
   const blurClass = "blur";
-  const handleCheckboxClick = async (clickedCognitoId, clickedEmailId) => {
-    // Add the clicked ids to the arrays
-    setShowButton(true);
-    setCognitoIds(clickedCognitoId);
-    setEmailIds(clickedEmailId);
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  // const handleCheckboxClick = async (clickedCognitoId, clickedEmailId) => {
+  //   // Add the clicked ids to the arrays
+  //   setShowButton(true);
+  //   setCognitoIds(clickedCognitoId);
+  //   setEmailIds(clickedEmailId);
+  //   const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
-    // Loop through checkboxes
-    checkboxes.forEach((checkbox) => {
-      // Check if checkbox is checked
-      if (checkbox.checked) {
-        // Remove blur class from checked checkbox's parent container
-        checkbox.closest(".grid").classList.remove(blurClass);
-      } else {
-        // Apply blur class to unchecked checkbox's parent container
-        checkbox.closest(".grid").classList.add(blurClass);
-        checkbox.disabled = true;
-      }
-    });
-  };
+  //   // Loop through checkboxes
+  //   checkboxes.forEach((checkbox) => {
+  //     // Check if checkbox is checked
+  //     if (checkbox.checked) {
+  //       // Remove blur class from checked checkbox's parent container
+  //       checkbox.closest(".grid").classList.remove(blurClass);
+  //     } else {
+  //       // Apply blur class to unchecked checkbox's parent container
+  //       checkbox.closest(".grid").classList.add(blurClass);
+  //       checkbox.disabled = true;
+  //     }
+  //   });
+  // };
 
-  const handleCheckboxUnclick = async (
-    unclickedCognitoId,
-    unclickedEmailId
-  ) => {
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    setShowButton(false); // Hide the button if there are no more ids
-    setCognitoIds("");
-    setEmailIds("");
-    checkboxes.forEach((checkbox) => {
-      checkbox.closest(".grid").classList.remove(blurClass);
-      checkbox.disabled = false;
-    });
-  };
+  // const handleCheckboxUnclick = async (
+  //   unclickedCognitoId,
+  //   unclickedEmailId
+  // ) => {
+  //   const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  //   setShowButton(false); // Hide the button if there are no more ids
+  //   setCognitoIds("");
+  //   setEmailIds("");
+  //   checkboxes.forEach((checkbox) => {
+  //     checkbox.closest(".grid").classList.remove(blurClass);
+  //     checkbox.disabled = false;
+  //   });
+  // };
 
-  useEffect(() => {
-    handleCheckboxUnclick("", "");
-  }, [currentPageAttendance]);
+  // useEffect(() => {
+  //   handleCheckboxUnclick("", "");
+  // }, [currentPageAttendance]);
 
-  const adminPutAttendance = async () => {
+  // const adminPutAttendance = async () => {
+  //   try {
+  //     const body = {
+  //       cognitoId: cognitoIds,
+  //       emailId: emailIds,
+  //       classId: classId2,
+  //     };
+
+  //     // Make API request to mark attendance
+  //     await API.post(
+  //       "main",
+  //       `/admin/put-attendance/${UserCtx.userData.institution}`,
+  //       { body: body }
+  //     );
+
+  //     // Update attended status for the user
+  //     const updatedAttendanceStatus = { ...attendanceStatus };
+  //     updatedAttendanceStatus[cognitoIds] = "Attended";
+  //     setAttendanceStatus(updatedAttendanceStatus);
+
+  //     // Deselect checkbox and reset cognitoIds and emailIds
+  //     handleCheckboxUnclick();
+
+  //     alert("Attendance marked successfully");
+  //   } catch (error) {
+  //     console.log(error);
+  //     alert("An error occurred while putting Attendance");
+  //   } finally {
+  //     showMembersAttended(classId2);
+  //   }
+  // };
+
+  // const markAttendance = async (ChoosenClassId) => {
+  //   try {
+  //     const data = {
+  //       classId: ChoosenClassId,
+  //       emailId: UserCtx.userData.emailId,
+  //     };
+
+  //     const response = await API.post(
+  //       "main",
+  //       `/user/put-attendance/${UserCtx.userData.institution}`,
+  //       {
+  //         body: data,
+  //       }
+  //     );
+
+  //     console.log(response);
+  //     alert("Attendance Marked Successfully");
+  //     fetchAttendance();
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert("An error occurred while marking attendance");
+  //   }
+  // };
+
+  // const fetchAttendance = async () => {
+  //   const sortedClasses = [...sortedPreviousClasses];
+
+  //   // Prepare initial attendance status
+  //   const initialStatus = {};
+  //   sortedClasses.forEach(({ classId }) => {
+  //     initialStatus[classId] = "Loading..."; // Show loading initially
+  //   });
+  //   setAttendanceStatus(initialStatus);
+
+  //   const updateAttendanceStatus = (classId, status) => {
+  //     setAttendanceStatus((prevAttendanceStatus) => ({
+  //       ...prevAttendanceStatus,
+  //       [classId]: status,
+  //     }));
+  //   };
+
+  //   // Fetch attendance for classes scheduled today
+  //   for (const { classId } of sortedClasses) {
+  //     try {
+  //       const response = await API.get(
+  //         "main",
+  //         `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}&userId=${UserCtx.userData.cognitoId}`
+  //       );
+  //       if (response.Items.length > 0) {
+  //         const { cognitoId } = response.Items[0];
+
+  //         if (cognitoId === UserCtx.userData.cognitoId) {
+  //           updateAttendanceStatus(classId, "Attended");
+  //         } else {
+  //           updateAttendanceStatus(classId, "Mark Attendance");
+  //         }
+  //       } else {
+  //         updateAttendanceStatus(classId, "Mark Attendance"); // Default to 'Mark Attendance'
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //       updateAttendanceStatus(classId, "Mark Attendance"); // Handle error case
+  //     }
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchAttendance();
+  //   // eslint-disable-next-line
+  // }, [UserCtx]);
+  
+  // let classes = sortedPreviousClasses
+  //   .filter((clas) => {
+  //     if (instructorTypeFilter === "") {
+  //       return true;
+  //     } else {
+  //       return clas.instructorNames === instructorTypeFilter;
+  //     }
+  //   })
+  //   .filter((clas) => {
+  //     if (classTypeFilter === "") {
+  //       return true;
+  //     } else {
+  //       return clas.classType === classTypeFilter;
+  //     }
+  //   });
+
+  // totalPages = Math.ceil(classes.length / itemsPerPage);
+
+  // if (classes.length < itemsPerPage) {
+  //   startIndex = 0;
+  //   endIndex = classes.length;
+  // } else {
+  //   startIndex = (currentPage - 1) * itemsPerPage;
+  //   endIndex = startIndex + itemsPerPage;
+  // }
+
+  const isMobileScreen = useMediaQuery("(max-width: 600px)");
+
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [selectedClassForAttendance, setSelectedClassForAttendance] = useState(null);
+  const [attendanceSearchTerm, setAttendanceSearchTerm] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState({});
+
+  const handleAttendanceClick = async (classId) => {
+    setSelectedClassForAttendance(classId);
+    setShowAttendanceModal(true);
+    
     try {
-      const body = {
-        cognitoId: cognitoIds,
-        emailId: emailIds,
-        classId: classId2,
-      };
+      const response = await API.get(
+        "main",
+        `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}`
+      );
+      const attendedUsers = response.Items || [];
+      const initialSelectedUsers = {};
+      
+      // Initialize with currently attended users
+      attendedUsers.forEach(user => {
+        initialSelectedUsers[user.cognitoId] = true;
+      });
+      
+      setSelectedUsers(initialSelectedUsers);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch attendance data");
+    }
+  };
 
-      // Make API request to mark attendance
+  const handleToggleAttendance = (cognitoId) => {
+    setSelectedUsers(prev => ({
+      ...prev,
+      [cognitoId]: !prev[cognitoId]
+    }));
+  };
+
+  const handleSaveAttendance = async () => {
+    UtilCtx.setLoader(true);
+    try {
+      // Get all selected users
+      const selectedUserIds = Object.entries(selectedUsers)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([cognitoId]) => cognitoId);
+
+      // Make API call to update attendance
       await API.post(
         "main",
         `/admin/put-attendance/${UserCtx.userData.institution}`,
-        { body: body }
-      );
-
-      // Update attended status for the user
-      const updatedAttendanceStatus = { ...attendanceStatus };
-      updatedAttendanceStatus[cognitoIds] = "Attended";
-      setAttendanceStatus(updatedAttendanceStatus);
-
-      // Deselect checkbox and reset cognitoIds and emailIds
-      handleCheckboxUnclick();
-
-      alert("Attendance marked successfully");
-    } catch (error) {
-      console.log(error);
-      alert("An error occurred while putting Attendance");
-    } finally {
-      showMembersAttended(classId2);
-    }
-  };
-
-  const markAttendance = async (ChoosenClassId) => {
-    try {
-      const data = {
-        classId: ChoosenClassId,
-        emailId: UserCtx.userData.emailId,
-      };
-
-      const response = await API.post(
-        "main",
-        `/user/put-attendance/${UserCtx.userData.institution}`,
         {
-          body: data,
+          body: {
+            classId: selectedClassForAttendance,
+            attendedUsers: selectedUserIds,
+          },
         }
       );
 
-      console.log(response);
-      alert("Attendance Marked Successfully");
-      fetchAttendance();
+      toast.success("Attendance updated successfully");
+      setShowAttendanceModal(false);
+      setSelectedClassForAttendance(null);
+      setSelectedUsers({});
     } catch (error) {
       console.error(error);
-      alert("An error occurred while marking attendance");
+      toast.error("Failed to update attendance");
+    } finally {
+      UtilCtx.setLoader(false);
     }
   };
 
-  const fetchAttendance = async () => {
-    const sortedClasses = [...sortedPreviousClasses];
-
-    // Prepare initial attendance status
-    const initialStatus = {};
-    sortedClasses.forEach(({ classId }) => {
-      initialStatus[classId] = "Loading..."; // Show loading initially
+  const filteredUsers = (userList || [])
+    .filter(user => user?.status === "Active")
+    .filter(user => {
+      if (!attendanceSearchTerm) return true;
+      return (
+        user?.userName?.toLowerCase().includes(attendanceSearchTerm.toLowerCase()) ||
+        user?.emailId?.toLowerCase().includes(attendanceSearchTerm.toLowerCase())
+      );
     });
-    setAttendanceStatus(initialStatus);
-
-    const updateAttendanceStatus = (classId, status) => {
-      setAttendanceStatus((prevAttendanceStatus) => ({
-        ...prevAttendanceStatus,
-        [classId]: status,
-      }));
-    };
-
-    // Fetch attendance for classes scheduled today
-    for (const { classId } of sortedClasses) {
-      try {
-        const response = await API.get(
-          "main",
-          `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}&userId=${UserCtx.userData.cognitoId}`
-        );
-        if (response.Items.length > 0) {
-          const { cognitoId } = response.Items[0];
-
-          if (cognitoId === UserCtx.userData.cognitoId) {
-            updateAttendanceStatus(classId, "Attended");
-          } else {
-            updateAttendanceStatus(classId, "Mark Attendance");
-          }
-        } else {
-          updateAttendanceStatus(classId, "Mark Attendance"); // Default to 'Mark Attendance'
-        }
-      } catch (error) {
-        console.error(error);
-        updateAttendanceStatus(classId, "Mark Attendance"); // Handle error case
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchAttendance();
-    // eslint-disable-next-line
-  }, [UserCtx]);
-  let classes = sortedPreviousClasses
-    .filter((clas) => {
-      if (instructorTypeFilter === "") {
-        return true;
-      } else {
-        return clas.instructorNames === instructorTypeFilter;
-      }
-    })
-    .filter((clas) => {
-      if (classTypeFilter === "") {
-        return true;
-      } else {
-        return clas.classType === classTypeFilter;
-      }
-    });
-  totalPages = Math.ceil(classes.length / itemsPerPage);
-
-  if (classes.length < itemsPerPage) {
-    startIndex = 0;
-    endIndex = classes.length;
-  } else {
-    startIndex = (currentPage - 1) * itemsPerPage;
-    endIndex = startIndex + itemsPerPage;
-  }
 
   return (
     <>
       {!isMobileScreen && (
         <>
           <div className={`w-[100%] flex flex-col items-center pt-6 gap-3`}>
+
+            {/* Header Section */}
             <h2 className={`text-[1.6rem] sans-sarif font-[700]`}>
               Previous Sessions
             </h2>
-            {/* <div className={`w-[80%] flex justify-start`}>
-              <button
-                className={`filter-button w-[8rem] tracking-[1.3px] text-[1.1rem] m-[1rem] mr-0 ml-12 rounded-[0.2rem] text-white`}
-                onClick={() => setShowFilters(!showFilters)}
-                style={{
-                  backgroundColor: InstitutionData.PrimaryColor
-                }}
-              >
-                Filter
-              </button>
-            </div> */}
+
+            {/* Filter Section */}
             <div className="w-[75%] flex justify-end">
               <Button
                 style={{
@@ -492,6 +595,7 @@ const PreviousSessions = () => {
               </div>
             </div>
 
+            {/* Recording Link Update Section */}
             {(Ctx.userData.userType === "admin" ||
               Ctx.userData.userType === "instructor") &&
               classId && (
@@ -509,329 +613,132 @@ const PreviousSessions = () => {
                 </form>
               )}
 
-            <ul
-              className={`relative pb-[3rem] w-[75%] min-h-[62vh] flex flex-col rounded-3 items-center justify-start pt-6`}
-              style={{
-                backgroundColor: InstitutionData.LightestPrimaryColor,
-              }}
-            >
-              {!attendanceList ? (
-                <li
-                  className={`w-[96%] flex flex-col items-center justify-center p-2`}
-                >
-                  <div
-                    className={`flex w-[85%] justify-between  mb-3 font-bold`}
-                  >
-                    <p className={`w-[25%] overflow-hidden`}>Instructor</p>
-                    <p
-                      className={`w-[20%] text-left overflow-hidden ml-[-4rem]`}
-                    >
-                      Class
-                    </p>
-                    <p className={`overflow-hidden w-[3.7rem] ml-[-1rem] `}>
+              <div className="w-[75%]">
+                <Table hoverable striped> 
+                  <Table.Head>
+                    
+                    <Table.HeadCell className="font-semibold">
+                      Instructor
+                    </Table.HeadCell>
+                    <Table.HeadCell className="font-semibold">
                       Date
-                    </p>
-                    <p
-                      className={
-                        UserCtx.userData.userType === "member"
-                          ? "w-[7.3rem] mr-0"
-                          : `w-[7.3rem] mr-[3.5rem]`
-                      }
-                    >
+                    </Table.HeadCell>
+                    <Table.HeadCell className="font-semibold">
                       Recording Link
-                    </p>
-                  </div>
-                </li>
-              ) : (
-                <div
-                  className="flex w-full ml-[-2rem] mb-3 mt-[-1rem] justify-between border-b-2 items-center h-[4rem]"
-                  style={{
-                    borderColor: InstitutionData.PrimaryColor,
-                    backgroundColor: InstitutionData.LightestPrimaryColor,
-                  }}
-                >
-                  <div
-                    className="text-[2.5rem] px-4 cursor-pointer"
-                    onClick={() => setAttendanceList(false)}
-                  >
-                    ←
-                  </div>
-                  <div className="flex ">
-                    <input
-                      type="text"
-                      placeholder="Search by user name"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ height: "2rem" }} // Apply height style here
-                      className="focus:outline-none  px-4 py-2 w-[25rem] "
-                    />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="gray"
-                      className="w-6 h-6 relative right-8 top-1"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                      />
-                    </svg>
-                  </div>
-                  <button
-                    className={
-                      showButton
-                        ? "bg-[#1b7571] text-white p-1 px-2 mr-3 rounded-[3px]"
-                        : "bg-transparent text-transparent"
-                    }
-                    onClick={adminPutAttendance}
-                  >
-                    Mark Attendance
-                  </button>
-                </div>
-              )}
-              <div
-                className={`overflow-auto flex flex-col gap-2 w-[100%] items-center`}
-              >
-                {!attendanceList ? (
-                  <div
-                    className={`overflow-auto flex flex-col gap-2 w-[100%] items-center`}
-                  >
-                    {classes.slice(startIndex, endIndex).map((clas, i) => {
-                      return (
-                        <li
-                          key={clas.classId}
-                          className={`w-[96%] flex flex-col items-center justify-center p-2`}
-                        >
-                          <div
-                            className={`flex w-[85%] justify-between items-center relative`}
-                          >
-                            <div className={`w-[25%] overflow-hidden relative`}>
-                              {Ctx.userData.userType === "admin" ||
-                                Ctx.userData.userType === "instructor" ? (
-                                <select
-                                  className={`rounded-[0.51rem] pr-[1.5rem] pl-[0rem]`}
+                    </Table.HeadCell>
+                    <Table.HeadCell className="font-semibold">
+                      Attendance
+                    </Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body className="divide-y">
+                    {currentClasses.map((clas) => (
+                      <Table.Row 
+                        key={clas.classId} 
+                        className="bg-white hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        <Table.Cell className="text-gray-700 font-semibold">
+                          {clas.instructorNames}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-700 font-semibold">
+                          {formatDate(clas.date)}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-700 font-semibold">
+                          <div className="flex items-center gap-4">
+                            {clas.recordingLink ? (
+                              <>
+                                <Button
+                                  href={clas.recordingLink} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  size="xs"
                                   style={{
-                                    backgroundColor: InstitutionData.LightestPrimaryColor,
+                                    backgroundColor: InstitutionData.LightPrimaryColor,
                                   }}
-                                  value={clas.instructorNames}
-                                  onChange={(e) =>
-                                    onInstructorNameChange(
-                                      e.target.value,
-                                      getInstructor(e.target.value).name,
-                                      clas.classType,
-                                      clas.classId
-                                    )
-                                  }
+                                  className="flex items-center gap-2"
                                 >
-                                  {Ctx.instructorList
-                                    .sort((a, b) => {
-                                      if (a.name < b.name) return -1;
-                                      if (a.name > b.name) return 1;
-                                      return 0;
-                                    })
-                                    .map((i) =>
-                                      i.name !== "cancelled" && (
-                                        <option
-                                          key={i.name}
-                                          value={i.name}
-                                        >
-                                          {i.name}
-                                        </option>
-                                      )
-                                    )}
-                                </select>
-                              ) : (
-                                clas.instructorNames
-                              )}
-                            </div>
-                            <p
-                              className={`w-[25%] text-left overflow-hidden m-0`}
-                            >
-                              {clas.classType}
-                            </p>
-                            <p className={`overflow-hidden w-[5.7rem] m-0`}>
-                              {formatDate(parseInt(clas.date))}
-                            </p>
-                            <div
-                              className={
-                                !(UserCtx.userData.userType === "member")
-                                  ? "flex gap-5"
-                                  : ""
-                              }
-                            >
-                              <div
-                                className={`w-[9rem] rounded-[4px] max-h-[1.8rem] self-center flex justify-center items-center`}
-                                style={{
-                                  backgroundColor: InstitutionData.PrimaryColor,
-                                }}
-                              >
-                                {clas.recordingLink ? (
-                                  <a
-                                    href={clas.recordingLink}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className={`no-underline px-2 text-center w-[9rem] sans-sarif text-white`}
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  </svg>
+                                  View Recording
+                                </Button>
+                                {(Ctx.userData.userType === "admin" || Ctx.userData.userType === "instructor") && (
+                                  <button
+                                    onClick={() => handleUpdateClick(clas.classId, clas.recordingLink)}
+                                    className="text-gray-600 hover:text-gray-800"
                                   >
-                                    Watch
-                                  </a>
-                                ) : (
-                                  <div className="w-[9rem] rounded-[4px] px-2 max-h-[1.8rem] self-center flex justify-center items-start">
-                                    {Ctx.userData.userType === "admin" ||
-                                      Ctx.userData.userType === "instructor" ? (
-                                      <div>
-                                        {classId === clas.classId ? (
-                                          <button
-                                            className={`px-2 py-1 sans-sarif text-[0.9rem] text-white`}
-                                            onClick={() => {
-                                              setClassId("");
-                                              setRecordingLink("");
-                                            }}
-                                          >
-                                            Cancel
-                                          </button>
-                                        ) : (
-                                          <button
-                                            className={`w-[3rem] px-2 py-1 sans-sarif text-white`}
-                                            onClick={() => {
-                                              setClassId(clas.classId);
-                                              setRecordingLink(
-                                                clas.recordingLink
-                                              );
-                                            }}
-                                          >
-                                            Add
-                                          </button>
-                                        )}
-                                      </div>
-                                    ) : !clas.zoomLink ? (
-                                      <button
-                                        className="w-[9rem] max-h-[1.8rem] text-white no-underline rounded-1"
-                                        style={{
-                                          backgroundColor:
-                                            InstitutionData.PrimaryColor,
-                                        }}
-                                        onClick={() =>
-                                          markAttendance(clas.classId)
-                                        }
-                                      >
-                                        {attendanceStatus[clas.classId]}
-                                      </button>
-                                    ) : (
-                                      <button
-                                        className="w-[9rem] max-h-[1.8rem] text-white no-underline rounded-1"
-                                        style={{
-                                          backgroundColor:
-                                            InstitutionData.PrimaryColor,
-                                        }}
-                                        onClick={() =>
-                                          markAttendance(clas.classId)
-                                        }
-                                      >
-                                        No Link
-                                      </button>
-                                    )}
-                                  </div>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                  </button>
                                 )}
-                              </div>
-                              <div
-                                className={
-                                  "w-fit" +
-                                  (UserCtx.userData.userType === "member"
-                                    ? " hidden"
-                                    : " ")
-                                }
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={1.5}
-                                  stroke="currentColor"
-                                  className="w-6 h-6 cursor-pointer"
-                                  onClick={() =>
-                                    showMembersAttended(clas.classId)
-                                  }
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
+                              </>
+                            ) : (
+                              <>
+                                
+                                {(Ctx.userData.userType === "admin" || Ctx.userData.userType === "instructor") && (
+                                  <Button
+                                    onClick={() => handleUpdateClick(clas.classId, "")}
+                                    size="xs"
+                                    style={{
+                                      backgroundColor: "transparent",
+                                      border: "1px solid #000",
+                                    }}
+                                    className="flex items-center gap-2 text-black"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                    Add Recording
+                                  </Button>
+                                )}
+                              </>
+                            )}
                           </div>
-                        </li>
-                      );
-                    })}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-700 font-semibold">
+                          <div className="flex items-center gap-4">
+                            {(Ctx.userData.userType === "admin" || Ctx.userData.userType === "instructor") && (
+                              <Button
+                                onClick={() => handleAttendanceClick(clas.classId)}
+                                size="xs"
+                                style={{
+                                  backgroundColor: "transparent",
+                                  border: "1px solid #000",
+                                }}
+                                className="flex items-center gap-3 text-black"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                Mark Attendance
+                              </Button>
+                            )}
+                          </div>
+                        </Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table>
+
+                <div className="flex items-center justify-between mt-4 px-2">
+                  <div className="text-sm text-gray-700">
+                    Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
+                    <span className="font-medium">
+                      {Math.min(endIndex, filteredClasses.length)}
+                    </span>{" "}
+                    of <span className="font-medium">{filteredClasses.length}</span> results
                   </div>
-                ) : (
-                  <>
-                    <div className="w-full grid grid-cols-6 text-black text-[1.1rem] font-[600]">
-                      <p>User Name</p>
-                      <p className="col-span-2">Email ID</p>
-                      <p>Phone Number</p>
-                      <p>Attendance Status</p>
-                      <div></div>
-                    </div>
-                    <div className="w-full max-h-[30rem]">
-                      {currentUsers.map((user) => (
-                        <div
-                          key={user.cognitoId}
-                          className="grid grid-cols-6 text-black font-[400]"
-                        >
-                          <p>{user.userName}</p>
-                          <p className="col-span-2">{user.emailId}</p>
-                          <p>{user.phoneNumber}</p>
-                          <p>{attendanceStatus[user.cognitoId]}</p>
-                          {attendanceStatus[user.cognitoId] !== "Attended" && (
-                            <label className="custom-checkbox">
-                              <input
-                                type="checkbox"
-                                onChange={(event) =>
-                                  event.target.checked
-                                    ? handleCheckboxClick(
-                                      user.cognitoId,
-                                      user.emailId
-                                    )
-                                    : handleCheckboxUnclick(
-                                      user.cognitoId,
-                                      user.emailId
-                                    )
-                                }
-                              />
-                            </label>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 flex justify-center mb-3">
-                      <Pagination
-                        totalPages={Math.ceil(
-                          activeUsers.length / usersPerPage
-                        )}
-                        currentPage={currentPageAttendance}
-                        onPageChange={handlePageChange}
-                      />
-                    </div>
-                  </>
-                )}
-                {!attendanceList && (
-                  <div
-                    className={`absolute bottom-0 left-0 right-0 flex justify-center mb-4`}
-                  >
-                    <Pagination
-                      totalPages={totalPages}
-                      currentPage={currentPage}
-                      onPageChange={(value) => setCurrentPage(value)}
-                    />
-                  </div>
-                )}
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                    showIcons={true}
+                  />
+                </div>
               </div>
-            </ul>
+
+            
+            
           </div>
           {/* ) */}
         </>
@@ -839,6 +746,121 @@ const PreviousSessions = () => {
 
       {/* Conditionally render the PreviousSessionsMobile component */}
       {isMobileScreen && <PreviousSessionsMobile />}
+
+      {/* Update Recording Modal */}
+      {showUpdateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[500px] max-w-[90%]">
+            <h3 className="text-lg font-semibold mb-4">Update Recording Link</h3>
+            <form onSubmit={onRecordingUpdate} className="space-y-4">
+              <div>
+                <input
+                  type="url"
+                  placeholder="Enter recording link"
+                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  value={recordingLink}
+                  onChange={(e) => setRecordingLink(e.target.value)}
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button 
+                  color="gray" 
+                  onClick={() => {
+                    setShowUpdateModal(false);
+                    setSelectedClassId(null);
+                    setRecordingLink("");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" style={{
+                  backgroundColor: InstitutionData.LightPrimaryColor,
+                }}>
+                  Update
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Attendance Modal */}
+      {showAttendanceModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[600px] max-w-[95%] max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Mark Attendance</h3>
+              <button
+                onClick={() => setShowAttendanceModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search users..."
+                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                value={attendanceSearchTerm}
+                onChange={(e) => setAttendanceSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-4 mb-6 max-h-[50vh] overflow-y-auto">
+              {filteredUsers.map((user) => (
+                <div
+                  key={user.cognitoId}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                >
+                  <div>
+                    <p className="font-medium">{user.userName}</p>
+                    <p className="text-sm text-gray-600">{user.emailId}</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={selectedUsers[user.cognitoId] || false}
+                      onChange={() => handleToggleAttendance(user.cognitoId)}
+                    />
+                    <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer 
+                      ${selectedUsers[user.cognitoId] ? 'bg-green-600' : 'bg-gray-200'} 
+                      peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
+                      after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 
+                      after:transition-all`}>
+                    </div>
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button
+                color="gray"
+                onClick={() => {
+                  setShowAttendanceModal(false);
+                  setSelectedClassForAttendance(null);
+                  setSelectedUsers({});
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveAttendance}
+                style={{
+                  backgroundColor: InstitutionData.LightPrimaryColor,
+                }}
+              >
+                Save Attendance
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
