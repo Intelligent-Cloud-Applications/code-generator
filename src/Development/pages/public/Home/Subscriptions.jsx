@@ -219,10 +219,16 @@ const Subscription = () => {
       if (hasAnySubscription()) {
         return renderSubscribeButton(item);
       } else {
-        if (item.subscriptionType === "Monthly")
-          return <HappyprancerPaypalMonthly />;
-        if (item.subscriptionType === "Hybrid")
-          return <HappyprancerPaypalHybrid />;
+        // Only use PayPal components if the user doesn't have a subscription
+        // and the item doesn't have a planId (which would indicate it's managed in the database)
+        if (!item.planId) {
+          if (item.subscriptionType === "Monthly")
+            return <HappyprancerPaypalMonthly />;
+          if (item.subscriptionType === "Hybrid")
+            return <HappyprancerPaypalHybrid />;
+        }
+        // For products with planId or other USD products, show the regular subscribe button
+        return renderSubscribeButton(item);
       }
     }
 
