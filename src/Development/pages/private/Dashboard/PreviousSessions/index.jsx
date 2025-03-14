@@ -1,5 +1,5 @@
 import { API } from "aws-amplify";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Context from "../../../../Context/Context";
 import { Button, Table } from "flowbite-react";
 import PreviousSessionsMobile from "./mobile";
@@ -15,11 +15,10 @@ import formatTime from "../../../../common/utils/format-time";
 
 const PreviousSessions = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
-  const [classId, setClassId] = useState("");
   const [recordingLink, setRecordingLink] = useState("");
+  const [classId, setClassId] = useState("");
   const [selectedClassId, setSelectedClassId] = useState(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const UserCtx = useContext(Context);
   const Ctx = useContext(Context);
   const UtilCtx = useContext(Context).util;
   const [classTypeFilter, setClassTypeFilter] = useState("");
@@ -111,70 +110,20 @@ const PreviousSessions = () => {
     setShowUpdateModal(true);
   };
 
-  //attendance
-  const { userList = [], userAttendance = {} } = useContext(Context) || {};
-  const [attendedUsers, setAttendedUsers] = useState([]);
-  const [attendanceStatus, setAttendanceStatus] = useState({});
-  const [activeUsers, setActiveUsers] = useState([]);
-
-  useEffect(() => {
-    const activeUsers = (userList || []).filter(
-      (user) => user?.status === "Active"
-    );
-    setActiveUsers(
-      activeUsers.toSorted((a, b) => {
-        const x = userAttendance[a?.cognitoId] || 0;
-        const y = userAttendance[b?.cognitoId] || 0;
-        return y - x;
-      })
-    );
-    const attendedIds = attendedUsers.map((user) => user?.cognitoId);
-    const updatedStatus = {};
-    activeUsers.forEach((user) => {
-      if (user?.cognitoId) {
-        updatedStatus[user.cognitoId] = attendedIds.includes(user.cognitoId)
-          ? "Attended"
-          : "Not Attended";
-      }
-    });
-    setAttendanceStatus(updatedStatus);
-    console.log(activeUsers);
-    // eslint-disable-next-line
-  }, [UserCtx]);
-
   const isMobileScreen = useMediaQuery("(max-width: 600px)");
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
   const [selectedClassForAttendance, setSelectedClassForAttendance] =
     useState(null);
-  const [attendanceSearchTerm, setAttendanceSearchTerm] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState({});
 
   const handleAttendanceClick = (classId) => {
     setSelectedClassForAttendance(classId);
     setShowAttendanceModal(true);
   };
 
-  // Removing duplicate handleCloseAttendanceModal function
-
   const handleCloseAttendanceModal = () => {
     setShowAttendanceModal(false);
-    setSelectedUsers({});
     setSelectedClassForAttendance(null);
   };
-
-  const filteredUsers = (userList || [])
-    .filter((user) => user?.status === "Active")
-    .filter((user) => {
-      if (!attendanceSearchTerm) return true;
-      return (
-        user?.userName
-          ?.toLowerCase()
-          .includes(attendanceSearchTerm.toLowerCase()) ||
-        user?.emailId
-          ?.toLowerCase()
-          .includes(attendanceSearchTerm.toLowerCase())
-      );
-    });
 
   return (
     <>
@@ -509,7 +458,6 @@ const PreviousSessions = () => {
         </div>
       )}
 
-      {/* TODO: Common component */}
       {/* Attendance Modal */}
       <AttendanceModal
         isOpen={showAttendanceModal}
