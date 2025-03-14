@@ -5,6 +5,8 @@ import { useMediaQuery } from "../../../../utils/helpers";
 import DashboardRatingMobile from "./mobile";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import Context from "../../../../Context/Context";
+import { Table } from "flowbite-react";
+import Skeleton from "react-loading-skeleton";
 
 export default function DashboardRating() {
   const [ratings, setRatings] = useState([]);
@@ -16,6 +18,7 @@ export default function DashboardRating() {
 
   const [ratingTypeFilter, setRatingTypeFilter] = useState("");
   const [instructorTypeFilter, setinstructorTypeFilter] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -43,6 +46,8 @@ export default function DashboardRating() {
         }
       } catch (error) {
         console.error("Error fetching ratings:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -149,57 +154,81 @@ export default function DashboardRating() {
 
   if (UserCtx.userData.userType === "instructor") {
     const instructorAverageRatings = calculateAverageRatings();
+
     return (
       <div className="instructor-dashboard-container w-full">
         <h2 className="pl-5 font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold text-center mt-4 w-[80%] mx-auto">
           Reviews
         </h2>
-        <div className="h-[100vh] ml-[6rem] max1050:ml-[0] max1050:mt-0">
+        <div className="h-[100vh] ml-[6rem] max1050:ml-0 max1050:mt-0">
           <div
-            className={`w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-10`}
-            style={{
-              backgroundColor: InstitutionData.LightestPrimaryColor,
-            }}
+            className={`w-[85%] min-h-[35rem] max536:bg-transparent max536:w-full rounded-3xl p-2 flex flex-col items-center
+      max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-10`}
+            // style={{ backgroundColor: InstitutionData.LightestPrimaryColor }}
           >
             <div className="overflow-x-auto w-full">
-              <ul
-                className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-col rounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] max536:bg-gradient-to-b max536:from-[#dad7c6] max536:to-[#fdd00891]"
-              // style={{
-              //   backgroundColor: InstitutionData.PrimaryColor,
-              // }}
-              >
-                <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
-                  <div className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-5 font-bold">
-                    <div className="col-span-6 text-center text-black">
-                      Date
-                    </div>
-                    <div className="col-span-6 text-center text-black">
-                      Average Rating
-                    </div>
-                  </div>
-                  {Object.keys(instructorAverageRatings).map((date) => (
-                    <div
-                      key={date}
-                      className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-4"
-                    >
-                      <div className="col-span-6 text-center text-black">
-                        {date}
-                      </div>
-                      <div className="col-span-6 text-center">
-                        {renderStarRating(instructorAverageRatings[date])}
-                      </div>
-                    </div>
-                  ))}
-                </li>
-                <div className="absolute bottom-3 flex justify-center items-center w-full">
-                  <Pagination
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={(value) => setCurrentPage(value)}
-                    style={{ margin: "0 auto" }}
-                  />
+              <Table hoverable>
+                <Table.Head
+                  style={{ backgroundColor: InstitutionData.PrimaryColor }}
+                >
+                  <Table.HeadCell className="text-center ">Date</Table.HeadCell>
+                  <Table.HeadCell className="text-center ">
+                    Average Rating
+                  </Table.HeadCell>
+                </Table.Head>
+                <Table.Body className="divide-y">
+                  {isLoading
+                    ? Array.from({ length: 5 }).map((_, index) => (
+                        <Table.Row
+                          key={index}
+                          className="animate-pulse bg-gray-200"
+                        >
+                          <Table.Cell className="h-6 w-full bg-gray-300 rounded">
+                            <Skeleton height={20} />
+                          </Table.Cell>
+                          <Table.Cell className="h-6 w-full bg-gray-300 rounded">
+                            <Skeleton height={20} />
+                          </Table.Cell>
+                        </Table.Row>
+                      ))
+                    : Object.keys(instructorAverageRatings).map(
+                        (date) =>
+                          instructorAverageRatings[date] && (
+                            <Table.Row
+                              key={date}
+                              className="text-center bg-white hover:bg-gray-100"
+                            >
+                              <Table.Cell className="text-black">
+                                {date}
+                              </Table.Cell>
+                              <Table.Cell>
+                                {renderStarRating(
+                                  instructorAverageRatings[date]
+                                )}
+                              </Table.Cell>
+                            </Table.Row>
+                          )
+                      )}
+                </Table.Body>
+              </Table>
+
+              <div className="absolute bottom-0 w-full flex items-center justify-between">
+                <div className="text-sm text-gray-700">
+                  Showing <span className="font-medium">{startIndex + 1}</span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {Math.min(endIndex, allRatings.length)}
+                  </span>{" "}
+                  of <span className="font-medium">{allRatings.length}</span>{" "}
+                  results
                 </div>
-              </ul>
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={(value) => setCurrentPage(value)}
+                  style={{ margin: "0" }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -209,90 +238,121 @@ export default function DashboardRating() {
 
   if (UserCtx.userData.userType === "member") {
     return (
-      <div className="w-full member-dashboard-conatainer">
-        <h2 className="font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold text-center mt-4 w-[80%] mx-auto">
+      <div className="w-full member-dashboard-container">
+        <h2 className="pl-5 font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold text-center mt-4 w-[80%] mx-auto">
           Reviews
         </h2>
-        <div className="h-[100vh] ml-[6rem] max1050:ml-[0] max1050:mt-0">
-          <div
-            className={`w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-10`}
-            style={{
-              backgroundColor: InstitutionData.LightestPrimaryColor,
-            }}
-          >
-            <div className="overflow-x-auto w-full">
-              <ul
-                className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-col rounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] max536:bg-gradient-to-b max536:from-[#dad7c6] max536:to-[#fdd00891]"
-              // style={{
-              //   backgroundColor: InstitutionData.PrimaryColor,
-              // }}
-              >
-                <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
-                  <div className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-5 font-bold">
-                    <div className="col-span-3 text-center text-black">
+        <div className="min-h-screen ml-[6rem] max1050:ml-[0] max1050:mt-0">
+          <div className="w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-4">
+            <div className="w-full h-full relative">
+              <div className="w-full pb-16">
+                <Table striped>
+                  <Table.Head
+                    className="rounded-3xl"
+                    style={{ backgroundColor: InstitutionData.PrimaryColor }}
+                  >
+                    <Table.HeadCell className="text-center w-[30%]">
                       Instructor
-                    </div>
-                    <div className="col-span-3 text-center text-black">
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
                       Date
-                    </div>
-                    <div className="col-span-3 text-center text-black">
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
                       Time
-                    </div>
-                    <div className="col-span-3 text-center text-black">
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
                       Rating
-                    </div>
-                  </div>
-                  {ratings
-                    .sort((a, b) => {
-                      a.timestamp - b.timestamp ? -1 : 1;
-                    })
-                    .slice(startIndex, endIndex)
-                    .map((rating) => (
-                      <div
-                        key={rating.ratingId}
-                        className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-4 "
-                      >
-                        <div className="col-span-3 text-center text-black">
-                          {rating.instructorName}
-                        </div>
-                        <div className="col-span-3 text-center text-black">
-                          {new Date(
-                            parseInt(rating.timestamp)
-                          ).toLocaleDateString()}
-                        </div>
-                        <div className="col-span-3 text-center text-black">
-                          {new Date(
-                            parseInt(rating.timestamp)
-                          ).toLocaleTimeString()}
-                        </div>
-                        <div className="col-span-3 text-center">
-                          {/* Integrate the StarRating component here with Tailwind classes */}
-                          <div className="flex items-center justify-center">
-                            {Array.from({ length: 5 }, (_, index) => (
-                              <span
-                                key={index}
-                                className={`text-2xl mx-1 ${index < rating.rating
-                                  ? "text-yellow-500"
-                                  : "text-gray-300"
-                                  }`}
-                              >
-                                ★
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </li>
-                <div className="absolute bottom-3 flex justify-center items-center w-full">
-                  <Pagination
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={(value) => setCurrentPage(value)}
-                    style={{ margin: "0 auto" }}
-                  />
+                    </Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body>
+                    {isLoading
+                      ? Array.from({ length: 6 }).map((_, index) => (
+                          <Table.Row
+                            key={index}
+                            className="animate-pulse bg-gray-200"
+                          >
+                            <Table.Cell className="text-center">
+                              <Skeleton height={20} width={100} />
+                            </Table.Cell>
+                            <Table.Cell className="text-center">
+                              <Skeleton height={20} width={80} />
+                            </Table.Cell>
+                            <Table.Cell className="text-center">
+                              <Skeleton height={20} width={60} />
+                            </Table.Cell>
+                            <Table.Cell className="text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                  <Skeleton
+                                    key={i}
+                                    height={20}
+                                    width={20}
+                                    circle
+                                  />
+                                ))}
+                              </div>
+                            </Table.Cell>
+                          </Table.Row>
+                        ))
+                      : ratings
+                          .sort((a, b) => b.timestamp - a.timestamp)
+                          .slice(startIndex, endIndex)
+                          .map((rating) => (
+                            <Table.Row key={rating.ratingId}>
+                              <Table.Cell className="text-gray-700 font-semibold text-center">
+                                {rating.instructorName}
+                              </Table.Cell>
+                              <Table.Cell className="text-gray-700 font-semibold text-center">
+                                {new Date(
+                                  parseInt(rating.timestamp)
+                                ).toLocaleDateString()}
+                              </Table.Cell>
+                              <Table.Cell className="text-gray-700 font-semibold text-center">
+                                {new Date(
+                                  parseInt(rating.timestamp)
+                                ).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </Table.Cell>
+                              <Table.Cell className="text-gray-700 font-semibold text-center">
+                                <div className="flex items-center justify-center">
+                                  {Array.from({ length: 5 }, (_, index) => (
+                                    <span
+                                      key={index}
+                                      className={`text-sm mx-1 ${
+                                        index < rating.rating
+                                          ? "text-yellow-500"
+                                          : "text-gray-300"
+                                      }`}
+                                    >
+                                      ★
+                                    </span>
+                                  ))}
+                                </div>
+                              </Table.Cell>
+                            </Table.Row>
+                          ))}
+                  </Table.Body>
+                </Table>
+              </div>
+              <div className="absolute bottom-0 w-full flex items-center justify-between">
+                <div className="text-sm text-gray-700">
+                  Showing <span className="font-medium">{startIndex + 1}</span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {Math.min(endIndex, allRatings.length)}
+                  </span>{" "}
+                  of <span className="font-medium">{allRatings.length}</span>{" "}
+                  results
                 </div>
-              </ul>
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={(value) => setCurrentPage(value)}
+                  style={{ margin: "0" }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -372,83 +432,135 @@ export default function DashboardRating() {
             </div>
           </div>
         </div>
-  
+
         <div
           className={`w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-4`}
-          style={{
-            backgroundColor: InstitutionData.LightestPrimaryColor,
-          }}
         >
           <div className="w-full h-full relative">
-            <div className="overflow-x-auto w-full h-full pb-16">
-              <ul className="w-[95%] max-w-[1700px] mx-auto flex flex-col rounded-3xl items-center justify-start pt-6 max536:gap-3">
-                <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
-                  <div className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-5 font-bold">
-                    <div className="col-span-2 text-center text-black">
-                      User Name
-                    </div>
-                    <div className="col-span-2 text-center text-black">
-                      Instructor
-                    </div>
-                    <div className="col-span-2 text-center text-black">Date</div>
-                    <div className="col-span-2 text-center text-black">Time</div>
-                    <div className="col-span-2 text-center text-black">Rating</div>
-                    <div className="col-span-2 text-center text-black">Review</div>
-                  </div>
-                  {allRatings
-                    .sort((a, b) => {
-                      a.timestamp - b.timestamp ? -1 : 1;
-                    })
-                    .slice(startIndex, endIndex)
-                    .map((rating) => (
-                      <div
-                        key={rating.ratingId}
-                        className="grid grid-cols-12 justify-content-between w-[98%] max1050:w-[100%] mb-4"
-                      >
-                        <div className="col-span-2 text-center text-black">
-                          {rating.userName.split(" ")[0]}
-                        </div>
-                        <div className="col-span-2 text-center text-black">
-                          {rating.instructorName}
-                        </div>
-                        <div className="col-span-2 text-center text-black">
-                          {new Date(parseInt(rating.timestamp)).toLocaleDateString()}
-                        </div>
-                        <div className="col-span-2 text-center text-black">
-                          {new Date(parseInt(rating.timestamp)).toLocaleTimeString()}
-                        </div>
-                        <div className="col-span-2 text-center">
-                          <div className="flex items-center justify-center">
-                            {Array.from({ length: 5 }, (_, index) => (
-                              <span
-                                key={index}
-                                className={`text-2xl mx-1 ${
-                                  index < rating.rating
-                                    ? "text-yellow-500"
-                                    : "text-gray-300"
-                                }`}
-                              >
-                                ★
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="col-span-2 text-center text-black">
-                          {rating.review}
-                        </div>
-                      </div>
-                    ))}
-                </li>
-              </ul>
+            <div className="w-full pb-16">
+              <Table striped>
+                <Table.Head
+                  className="rounded-3xl"
+                  style={{
+                    backgroundColor: InstitutionData.PrimaryColor,
+                  }}
+                >
+                  <Table.HeadCell className="text-center">
+                    User Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="text-center">
+                    Instructor
+                  </Table.HeadCell>
+                  <Table.HeadCell className="text-center">Date</Table.HeadCell>
+                  <Table.HeadCell className="text-center">Time</Table.HeadCell>
+                  <Table.HeadCell className="text-center">
+                    Rating
+                  </Table.HeadCell>
+                  <Table.HeadCell className="text-center">
+                    Review
+                  </Table.HeadCell>
+                </Table.Head>
+                <Table.Body>
+                  {isLoading
+                    ? Array.from({ length: 6 }).map((_, index) => (
+                        <Table.Row
+                          key={index}
+                          className="animate-pulse bg-gray-200"
+                        >
+                          <Table.Cell className="text-center">
+                            <Skeleton height={20} width={80} />
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            <Skeleton height={20} width={100} />
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            <Skeleton height={20} width={80} />
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            <Skeleton height={20} width={60} />
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            <div className="flex items-center justify-center gap-1">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Skeleton
+                                  key={i}
+                                  height={20}
+                                  width={20}
+                                  circle
+                                />
+                              ))}
+                            </div>
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            <Skeleton height={20} width={150} />
+                          </Table.Cell>
+                        </Table.Row>
+                      ))
+                    : allRatings
+                        .sort((a, b) => (a.timestamp - b.timestamp ? -1 : 1))
+                        .slice(startIndex, endIndex)
+                        .map((rating) => (
+                          <Table.Row key={rating.ratingId}>
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
+                              {rating.userName.split(" ")[0]}
+                            </Table.Cell>
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
+                              {rating.instructorName}
+                            </Table.Cell>
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
+                              {new Date(
+                                parseInt(rating.timestamp)
+                              ).toLocaleDateString()}
+                            </Table.Cell>
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
+                              {new Date(
+                                parseInt(rating.timestamp)
+                              ).toLocaleTimeString("en-US", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </Table.Cell>
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
+                              <div className="flex items-center justify-center">
+                                {Array.from({ length: 5 }, (_, index) => (
+                                  <span
+                                    key={index}
+                                    className={`text-sm mx-1 ${
+                                      index < rating.rating
+                                        ? "text-yellow-500"
+                                        : "text-gray-300"
+                                    }`}
+                                  >
+                                    ★
+                                  </span>
+                                ))}
+                              </div>
+                            </Table.Cell>
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
+                              {rating.review}
+                            </Table.Cell>
+                          </Table.Row>
+                        ))}
+                </Table.Body>
+              </Table>
             </div>
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center">
-              <Pagination
-                totalPages={totalPages}
-                currentPage={currentPage}
-                onPageChange={(value) => setCurrentPage(value)}
-                style={{ margin: "0 auto" }}
-              />
-            </div>
+            <div className="absolute bottom-0 w-full flex items-center justify-between ">
+                <div className="text-sm text-gray-700">
+                  Showing <span className="font-medium">{startIndex + 1}</span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {Math.min(endIndex, allRatings.length)}
+                  </span>{" "}
+                  of <span className="font-medium">{allRatings.length}</span>{" "}
+                  results
+                </div>
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={(value) => setCurrentPage(value)}
+                  style={{ margin: "0" }}
+                />
+              </div>
           </div>
         </div>
       </div>

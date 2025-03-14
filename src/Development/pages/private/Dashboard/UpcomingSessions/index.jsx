@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import Context from "../../../../Context/Context";
 import { useNavigate } from "react-router-dom";
 import { API } from "aws-amplify";
+import { FaEdit } from "react-icons/fa";
 import { Table, Pagination } from "flowbite-react";
 import "./index.css";
 import { useMediaQuery } from "../../../../utils/helpers";
@@ -79,6 +80,11 @@ const UpcomingSessions = () => {
   const classTypeNameArray = InstitutionData.ClassTypes;
   const [count, setCount] = useState(0);
   const [modal, setModal] = useState(false);
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [selectedClassForAttendance, setSelectedClassForAttendance] =
+    useState(null);
+  const [attendanceSearchTerm, setAttendanceSearchTerm] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState({});
 
   // if (Ctx.userData.status === "InActive" && Ctx.userData.userType === "member") {
   //   Navigate("/subscription");
@@ -246,6 +252,69 @@ const UpcomingSessions = () => {
     setTime("00:00:00");
   }
 
+  const handleAttendanceClick = async (classId) => {
+    setSelectedClassForAttendance(classId);
+    setShowAttendanceModal(true);
+
+    try {
+      const response = await API.get(
+        "main",
+        `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}`
+      );
+      const attendedUsers = response.Items || [];
+      const initialSelectedUsers = {};
+
+      // Initialize with currently attended users
+      attendedUsers.forEach((user) => {
+        initialSelectedUsers[user.cognitoId] = true;
+      });
+
+      setSelectedUsers(initialSelectedUsers);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch attendance data");
+    }
+  };
+
+  const handleToggleAttendance = (cognitoId) => {
+    setSelectedUsers((prev) => ({
+      ...prev,
+      [cognitoId]: !prev[cognitoId],
+    }));
+  };
+
+  const handleSaveAttendance = async () => {
+    UtilCtx.setLoader(true);
+    try {
+      // Get all selected users
+      const selectedUserIds = Object.entries(selectedUsers)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([cognitoId]) => cognitoId);
+
+      // Make API call to update attendance
+      await API.post(
+        "main",
+        `/admin/put-attendance/${UserCtx.userData.institution}`,
+        {
+          body: {
+            classId: selectedClassForAttendance,
+            attendedUsers: selectedUserIds,
+          },
+        }
+      );
+
+      toast.success("Attendance updated successfully");
+      setShowAttendanceModal(false);
+      setSelectedClassForAttendance(null);
+      setSelectedUsers({});
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update attendance");
+    } finally {
+      UtilCtx.setLoader(false);
+    }
+  };
+
   const [showForm, setShowForm] = useState(false);
   // eslint-disable-next-line
   const [formPosition, setFormPosition] = useState({ x: 0, y: 0 });
@@ -287,7 +356,21 @@ const UpcomingSessions = () => {
   const [showButton, setShowButton] = useState(false);
   const [classId, setClassId] = useState("");
   const [currentPageAttendance, setCurrentPageAttendance] = useState(1);
-  const usersPerPage = 10;
+  const usersPerPage = 5;
+
+  const filteredUsers = (userList || [])
+    .filter((user) => user?.status === "Active")
+    .filter((user) => {
+      if (!attendanceSearchTerm) return true;
+      return (
+        user?.userName
+          ?.toLowerCase()
+          .includes(attendanceSearchTerm.toLowerCase()) ||
+        user?.emailId
+          ?.toLowerCase()
+          .includes(attendanceSearchTerm.toLowerCase())
+      );
+    });
 
   useEffect(() => {
     const activeUsers = userList.filter((user) => user.status === "Active");
@@ -353,24 +436,23 @@ const UpcomingSessions = () => {
       );
     }
   };
-  const filteredUsers = filterUsers();
+  // const filteredUsers = filterUsers();
 
-  // Sort the filteredUsers array based on attendance status
-  filteredUsers.sort((a, b) => {
-    if (
-      attendanceStatus[a.cognitoId] === "Attended" &&
-      attendanceStatus[b.cognitoId] !== "Attended"
-    ) {
-      return -1; // attended users first
-    } else if (
-      attendanceStatus[a.cognitoId] !== "Attended" &&
-      attendanceStatus[b.cognitoId] === "Attended"
-    ) {
-      return 1; // non-attended users last
-    } else {
-      return 0; // maintain the current order
-    }
-  });
+  // filteredUsers.sort((a, b) => {
+  //   if (
+  //     attendanceStatus[a.cognitoId] === "Attended" &&
+  //     attendanceStatus[b.cognitoId] !== "Attended"
+  //   ) {
+  //     return -1;
+  //   } else if (
+  //     attendanceStatus[a.cognitoId] !== "Attended" &&
+  //     attendanceStatus[b.cognitoId] === "Attended"
+  //   ) {
+  //     return 1;
+  //   } else {
+  //     return 0;
+  //   }
+  // });
 
   const [cognitoIds, setCognitoIds] = useState("");
   const [emailIds, setEmailIds] = useState("");
@@ -759,7 +841,7 @@ const UpcomingSessions = () => {
                 </Button>
               </div>
 
-              <div className={`flex flex-col-reverse my-2`}>
+              <div className={`flex flex-col-reverse my-2 `}>
                 <div className={`filters ${showFilters ? "show" : ""}`}>
                   <div className={`w-[95%] flex justify-end m-[0.8rem] gap-3`}>
                     <label
@@ -829,7 +911,7 @@ const UpcomingSessions = () => {
                 )
               ) : (
                 <div
-                  className="flex justify-between border-b-2 items-center h-[4rem]"
+                  className="flex mb-5 justify-between border-b-2 items-center h-[4rem]"
                   style={{
                     borderColor: InstitutionData.PrimaryColor,
                     backgroundColor: InstitutionData.LightestPrimaryColor,
@@ -877,125 +959,132 @@ const UpcomingSessions = () => {
                   </button>
                 </div>
               )}
-              {/* <ul
-                className={`h-[28rem] relative pb-[3rem] flex flex-col overflow-auto pt-6 ${
-                  (Ctx.userData.userType === "admin" ||
-                    Ctx.userData.userType === "instructor") &&
-                  (attendanceList
-                    ? "h-[32rem] relative pb-[3rem]"
-                    : "h-[28rem] relative pb-[3rem]")
-                } flex flex-col overflow-auto pt-6`}
 
-              > */}
-                <div className="">
-                  {!attendanceList ? (
-                    <div className="">
-                      <Table hoverable striped>
-                        <Table.Head
-                          className="font-semibold text-center"
-                        >
-                          <Table.HeadCell className="font-semibold ">
-                            Date
-                          </Table.HeadCell>
-                          <Table.HeadCell className="font-semibold ">
-                            Instructor
-                          </Table.HeadCell>
-                          <Table.HeadCell className="font-semibold">
-                            Description
-                          </Table.HeadCell>
-                          <Table.HeadCell className="font-semibold">
-                            Time
-                          </Table.HeadCell>
-                          <Table.HeadCell className="text-center w-[80px] ">
-                            {sortedFilteredClasses[0]?.zoomLink
-                              ? "Join"
-                              : "Attendance"}
-                          </Table.HeadCell>
-                          {(Ctx.userData.userType === "admin" ||
-                            Ctx.userData.userType === "instructor") && (
-                            <Table.HeadCell className="w-16"></Table.HeadCell>
-                          )}
-                        </Table.Head>
+              <div className="">
+                {!attendanceList ? (
+                  <div className="">
+                    <Table hoverable striped>
+                      <Table.Head
+                        className="font-semibold text-white text-center"
+                        style={{
+                          backgroundColor: InstitutionData.PrimaryColor,
+                        }}
+                      >
+                        <Table.HeadCell className="font-semibold ">
+                          Date
+                        </Table.HeadCell>
+                        <Table.HeadCell className="font-semibold ">
+                          Instructor
+                        </Table.HeadCell>
+                        <Table.HeadCell className="font-semibold">
+                          Description
+                        </Table.HeadCell>
+                        <Table.HeadCell className="font-semibold">
+                          Time
+                        </Table.HeadCell>
 
-                        <Table.Body  className="divide-y">
-                          {sortedFilteredClasses
-                            .slice(startIndex, endIndex)
-                            .map((clas, i) => (
-                              <Table.Row
-                                key={clas.classId}
-                                className="bg-white hover:bg-gray-50 transition-colors duration-200"
-                              >
-                                <Table.Cell className="text-gray-700 font-semibold text-center">
-                                  {formatDate(parseInt(clas.date))}
-                                </Table.Cell>
-                                <Table.Cell className="text-gray-700 font-semibold text-center">
+                        <Table.HeadCell className="text-center w-[80px] ">
+                          {sortedFilteredClasses[0]?.zoomLink
+                            ? "Join"
+                            : "Attendance"}
+                        </Table.HeadCell>
+                      </Table.Head>
+
+                      <Table.Body className="divide-y">
+                        {sortedFilteredClasses
+                          .slice(startIndex, endIndex)
+                          .map((clas, i) => (
+                            <Table.Row
+                              key={clas.classId}
+                              className="bg-white hover:bg-gray-50 transition-colors duration-200"
+                            >
+                              <Table.Cell className="text-gray-700 text-xs font-semibold text-center">
+                                {formatDate(parseInt(clas.date))}
+                              </Table.Cell>
+                              <Table.Cell className="text-gray-700 text-xs font-semibold text-center">
+                                {Ctx.userData.userType === "admin" ||
+                                Ctx.userData.userType === "instructor" ? (
+                                  <select
+                                  className="w-[70%] h-8 px-2 rounded-[0.5rem] focus:outline-none focus:border-blue-500 text-xs border-nonetext-center font-semibold"
+                                  style={{
+                                    backgroundColor: "transparent",
+                                    border: "1px solid #d1d5db",
+
+                                  }}
+                                  value={getInstructor(clas.instructorNames)?.name}
+                                  onChange={(e) => {
+                                    onClassUpdated(
+                                      clas.classId,
+                                      getInstructor(e.target.value).name,
+                                      clas.classType,
+                                      getInstructor(e.target.value).instructorId,
+                                      clas.date
+                                    );
+                                  }}
+                                >
+                                  {Ctx.instructorList
+                                    .sort((a, b) => a.name.localeCompare(b.name))
+                                    .filter((i) => i.name !== "Cancelled")
+                                    .map((i) => (
+                                      <option
+
+                                      key={i.name} value={i.name}>
+                                        {i.name}
+                                      </option>
+                                    ))}
+                                </select>
+
+                                ) : (
+                                  <p className="h-10 flex items-center justify-center rounded text-[14px] ">
+                                    {getInstructor(clas.instructorNames)?.name}
+                                  </p>
+                                )}
+                              </Table.Cell>
+
+                              <Table.Cell className="text-gray-700 font-semibold text-center md:table-cell  w-32 lg:w-48">
+                                <div className="w-full flex justify-center">
+                                  <div
+                                    className="flex items-center justify-center gap-4 w-28 h-7 text-white rounded-lg"
+                                    style={{
+                                      backgroundColor:
+                                        InstitutionData.LightPrimaryColor,
+                                    }}
+                                  >
+                                    {clas.classType}
+                                  </div>
+                                </div>
+                              </Table.Cell>
+
+                              <Table.Cell className="text-gray-700 font-semibold text-center">
+                                <div className="text-center">
                                   {Ctx.userData.userType === "admin" ||
                                   Ctx.userData.userType === "instructor" ? (
-                                    <select
-                                      className="w-full h-10 px-2 rounded focus:outline-none focus:border-blue-500 text-sm"
-                                      style={{
-                                        backgroundColor: "transparent",
-                                      }}
-                                      value={
-                                        getInstructor(clas.instructorNames)
-                                          ?.name
-                                      }
-                                      onChange={(e) => {
-                                        onClassUpdated(
-                                          clas.classId,
-                                          getInstructor(e.target.value).name,
-                                          clas.classType,
-                                          getInstructor(e.target.value)
-                                            .instructorId,
-                                          clas.date
-                                        );
-                                      }}
-                                    >
-                                      {Ctx.instructorList
-                                        .sort((a, b) =>
-                                          a.name.localeCompare(b.name)
-                                        )
-                                        .filter((i) => i.name !== "Cancelled")
-                                        .map((i) => (
-                                          <option key={i.name} value={i.name}>
-                                            {i.name}
-                                          </option>
-                                        ))}
-                                    </select>
-                                  ) : (
-                                    <p className="h-10 flex items-center justify-center rounded text-md">
-                                      {
-                                        getInstructor(clas.instructorNames)
-                                          ?.name
-                                      }
-                                    </p>
-                                  )}
-                                </Table.Cell>
-                                <Table.Cell className="text-gray-700 font-semibold text-center md:table-cell hidden">
-                                  {clas.classType}
-                                </Table.Cell>
-                                <Table.Cell className="text-gray-700 font-semibold text-center">
-                                  {Ctx.userData.userType === "admin" ||
-                                  Ctx.userData.userType === "instructor" ? (
-                                    <input
-                                      value={getTime(clas.date)}
-                                      type="time"
-                                      className="w-full h-10 px-2 rounded bg-transparent text-center focus:outline-none focus:border-blue-500 text-sm"
-                                      onChange={(e) => {
-                                        onClassUpdated(
-                                          clas.classId,
-                                          getInstructor(clas.instructorNames)
-                                            ?.name,
-                                          clas.classType,
-                                          clas.instructorId,
-                                          new Date(
-                                            `${getDate(clas.date)}T${
-                                              e.target.value
-                                            }`
-                                          ).getTime()
-                                        );
-                                      }}
-                                    />
+                                    <div className="relative flex items-center justify-center text-center">
+                                      <input
+                                        value={getTime(clas.date)}
+                                        type="time"
+                                        className="w-full h-10  rounded bg-transparent text-center border-none outline-none"
+                                        onChange={(e) => {
+                                          onClassUpdated(
+                                            clas.classId,
+                                            getInstructor(clas.instructorNames)
+                                              ?.name,
+                                            clas.classType,
+                                            clas.instructorId,
+                                            new Date(
+                                              `${getDate(clas.date)}T${
+                                                e.target.value
+                                              }`
+                                            ).getTime()
+                                          );
+                                        }}
+                                      />
+                                      <FaEdit
+                                        className="absolute
+                                      translate-x-5
+                                      text-gray-500 cursor-pointer "
+                                      />
+                                    </div>
                                   ) : (
                                     <p className="h-10 flex items-center justify-center text-md">
                                       {new Date(
@@ -1006,144 +1095,264 @@ const UpcomingSessions = () => {
                                       })}
                                     </p>
                                   )}
-                                </Table.Cell>
-                                <Table.Cell className="text-gray-700 font-semibold text-center">
-                                  <button
-                                    className="flex items-center text-black px-2 md:w-auto lg:w-40 py-2 rounded transition-colors duration-200 text-sm border border-black"
-                                    style={{ backgroundColor: "transparent" }}
-                                    onClick={() => {
-                                      if (clas.zoomLink) {
-                                        window.open(
-                                          clas.zoomLink,
-                                          "_blank",
-                                          "noreferrer"
-                                        );
-                                        onJoinClass(
-                                          InstitutionData.InstitutionId
-                                        );
-                                      } else {
-                                        markAttendance(clas.classId);
-                                      }
-                                    }}
-                                  >
+                                </div>
+                              </Table.Cell>
 
-                                    {clas.zoomLink
-                                      ? "Join"
-                                      : attendanceStatus[clas.classId] ||
-                                        "Mark Attendance"}
-                                  </button>
-                                </Table.Cell>
-                                {(Ctx.userData.userType === "admin" ||
-                                  Ctx.userData.userType === "instructor") && (
-                                  <Table.Cell className="text-gray-700 font-semibold text-center">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth={1.5}
-                                      stroke="currentColor"
-                                      className="w-6 h-6 cursor-pointer"
-                                      onClick={() =>
-                                        showMembersAttended(clas.classId)
-                                      }
+                              <Table.Cell className="text-gray-700 w-48 font-semibold text-center">
+                                <div className="flex items-center">
+                                  {(Ctx.userData.userType === "admin" ||
+                                    Ctx.userData.userType === "instructor" ||
+                                    Ctx.userData.userType === "member") && (
+                                    <Button
+                                      onClick={() => {
+                                        if (clas.zoomLink) {
+                                          window.open(
+                                            clas.zoomLink,
+                                            "_blank",
+                                            "noreferrer"
+                                          );
+                                          onJoinClass(
+                                            InstitutionData.InstitutionId
+                                          );
+                                        }
+                                        if (
+                                          Ctx.userData.userType === "admin"
+                                          // ||
+                                          // Ctx.userData.userType === "member"
+                                        ) {
+                                          handleAttendanceClick(clas.classId);
+                                        }
+                                      }}
+                                      size="xs"
+                                      style={{
+                                        backgroundColor: "transparent",
+                                      }}
+                                      className="flex items-center gap-3 text-black w-full"
                                     >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"
-                                      />
-                                    </svg>
-                                  </Table.Cell>
-                                )}
-                              </Table.Row>
-                            ))}
-                        </Table.Body>
-                      </Table>
+                                      <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth="2"
+                                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                        />
+                                      </svg>
+                                      {clas.zoomLink
+                                        ? "Join"
+                                        : attendanceStatus[clas.classId] ||
+                                          "Mark Attendance"}
+                                    </Button>
+                                  )}
+                                </div>
+                              </Table.Cell>
+
+                              {/* {(Ctx.userData.userType === "admin" ||
+                                Ctx.userData.userType === "instructor") && (
+                                <Table.Cell className="text-gray-700 font-semibold text-center">
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    onClick={() =>
+                                      showMembersAttended(clas.classId)
+                                    }
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                    />
+                                  </svg>
+                                </Table.Cell>
+                              )} */}
+                            </Table.Row>
+                          ))}
+                      </Table.Body>
+                    </Table>
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-6 text-black text-[1.1rem] font-[600] ml-8">
+                      <p>User Name</p>
+                      <p className="col-span-2">Email ID</p>
+                      <p>Phone Number</p>
+                      <p>Attendance Status</p>
+                      <div></div>
                     </div>
-                  ) : (
-                    <>
-                      <div className="grid grid-cols-6 text-black text-[1.1rem] font-[600] ml-8">
-                        <p>User Name</p>
-                        <p className="col-span-2">Email ID</p>
-                        <p>Phone Number</p>
-                        <p>Attendance Status</p>
-                        <div></div>
-                      </div>
-                      <div className="overflow-y-scroll max-h-[30rem]">
-                        {currentUsers.map((user) => (
-                          <div
-                            key={user.cognitoId}
-                            className="grid grid-cols-6 text-black font-[400] ml-8"
-                          >
-                            <p>{user.userName}</p>
-                            <p className="col-span-2">{user.emailId}</p>
-                            <p>{user.phoneNumber}</p>
-                            <p>{attendanceStatus[user.cognitoId]}</p>
-                            {attendanceStatus[user.cognitoId] !==
-                              "Attended" && (
-                              <label className="custom-checkbox">
-                                <input
-                                  type="checkbox"
-                                  onChange={(event) =>
-                                    event.target.checked
-                                      ? handleCheckboxClick(
-                                          user.cognitoId,
-                                          user.emailId
-                                        )
-                                      : handleCheckboxUnclick(
-                                          user.cognitoId,
-                                          user.emailId
-                                        )
-                                  }
-                                />
-                              </label>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center mb-3">
-                        <Pagination
-                          totalPages={Math.ceil(
-                            activeUsers.length / usersPerPage
+                    <div className="overflow-y-scroll max-h-[30rem]">
+                      {currentUsers.map((user) => (
+                        <div
+                          key={user.cognitoId}
+                          className="grid grid-cols-6 text-black font-[400] ml-8"
+                        >
+                          <p>{user.userName}</p>
+                          <p className="col-span-2">{user.emailId}</p>
+                          <p>{user.phoneNumber}</p>
+                          <p>{attendanceStatus[user.cognitoId]}</p>
+                          {attendanceStatus[user.cognitoId] !== "Attended" && (
+                            <label className="custom-checkbox">
+                              <input
+                                type="checkbox"
+                                onChange={(event) =>
+                                  event.target.checked
+                                    ? handleCheckboxClick(
+                                        user.cognitoId,
+                                        user.emailId
+                                      )
+                                    : handleCheckboxUnclick(
+                                        user.cognitoId,
+                                        user.emailId
+                                      )
+                                }
+                              />
+                            </label>
                           )}
-                          currentPage={currentPageAttendance}
-                          onPageChange={handlePageChange}
-                        />
-                      </div>
-                    </>
-                  )}
-                  {!attendanceList && (
-                    <div
-                      className={`flex items-center justify-between mt-4 px-2`}
-                    >
-                      <div className="text-sm text-gray-700">
-                        Showing{" "}
-                        <span className="font-medium">{startIndex + 1}</span> to{" "}
-                        <span className="font-medium">
-                          {Math.min(endIndex, filteredClasses.length)}
-                        </span>{" "}
-                        of{" "}
-                        <span className="font-medium">
-                          {filteredClasses.length}
-                        </span>{" "}
-                        results
-                      </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 flex justify-center mb-3">
                       <Pagination
-                        className="text-gray-900"
-                        totalPages={totalPages}
-                        currentPage={currentPage}
-                        onPageChange={(value) => setCurrentPage(value)}
-                        showIcons={true}
+                        totalPages={Math.ceil(
+                          activeUsers.length / usersPerPage
+                        )}
+                        currentPage={currentPageAttendance}
+                        onPageChange={handlePageChange}
                       />
                     </div>
-                  )}
-                </div>
-
+                  </>
+                )}
+                {!attendanceList && (
+                  <div
+                    className={`flex items-center justify-between mt-4 px-2`}
+                  >
+                    <div className="text-sm text-gray-700">
+                      Showing{" "}
+                      <span className="font-medium">{startIndex + 1}</span> to{" "}
+                      <span className="font-medium">
+                        {Math.min(endIndex, filteredClasses.length)}
+                      </span>{" "}
+                      of{" "}
+                      <span className="font-medium">
+                        {filteredClasses.length}
+                      </span>{" "}
+                      results
+                    </div>
+                    <Pagination
+                      className="text-gray-900"
+                      totalPages={totalPages}
+                      currentPage={currentPage}
+                      onPageChange={(value) => setCurrentPage(value)}
+                      showIcons={true}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       )}
       {isMobileScreen && <UpcomingSessionsMobile />}
+
+      {showAttendanceModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[600px] max-w-[95%] max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Mark Attendance</h3>
+              <button
+                onClick={() => setShowAttendanceModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search users..."
+                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                value={attendanceSearchTerm}
+                onChange={(e) => setAttendanceSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-4 mb-6 max-h-[50vh] overflow-y-auto">
+              {filteredUsers.map((user) => (
+                <div
+                  key={user.cognitoId}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                >
+                  <div>
+                    <p className="font-medium">{user.userName}</p>
+                    <p className="text-sm text-gray-600">{user.emailId}</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={selectedUsers[user.cognitoId] || false}
+                      onChange={() => handleToggleAttendance(user.cognitoId)}
+                    />
+                    <div
+                      className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer
+                            ${
+                              selectedUsers[user.cognitoId]
+                                ? "bg-green-600"
+                                : "bg-gray-200"
+                            }
+                            peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px]
+                            after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
+                            after:transition-all`}
+                    ></div>
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button
+                color="gray"
+                onClick={() => {
+                  setShowAttendanceModal(false);
+                  setSelectedClassForAttendance(null);
+                  setSelectedUsers({});
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveAttendance}
+                style={{
+                  backgroundColor: InstitutionData.LightPrimaryColor,
+                }}
+              >
+                Save Attendance
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
