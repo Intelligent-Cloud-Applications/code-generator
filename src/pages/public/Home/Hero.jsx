@@ -40,13 +40,17 @@ const Hero = () => {
 
   const initiateMultipartUpload = async (file) => {
     try {
-      const response = await API.post("main", "/admin/upload-hero-videos/happyprancer", {
-        body: {
-          operation: "INITIATE_VIDEO_UPLOAD",
-          fileName: file.name,
-          contentType: file.type
+      const response = await API.post(
+        "main",
+        `/admin/upload-hero-videos/${InstitutionData.InstitutionId}`,
+        {
+          body: {
+            operation: "INITIATE_VIDEO_UPLOAD",
+            fileName: file.name,
+            contentType: file.type,
+          },
         }
-      });
+      );
       return response;
     } catch (error) {
       console.error("Error initiating upload:", error);
@@ -56,14 +60,18 @@ const Hero = () => {
 
   const getUploadUrl = async (uploadId, partNumber, key) => {
     try {
-      const response = await API.post("main", "/admin/upload-hero-videos/Bworkz", {
-        body: {
-          operation: "GET_VIDEO_UPLOAD_URL",
-          uploadId,
-          partNumber,
-          key
+      const response = await API.post(
+        "main",
+        `/admin/upload-hero-videos/${InstitutionData.InstitutionId}`,
+        {
+          body: {
+            operation: "GET_VIDEO_UPLOAD_URL",
+            uploadId,
+            partNumber,
+            key,
+          },
         }
-      });
+      );
       return response.presignedUrl;
     } catch (error) {
       console.error("Error getting upload URL:", error);
@@ -74,15 +82,15 @@ const Hero = () => {
   const uploadPart = async (presignedUrl, part) => {
     try {
       const response = await fetch(presignedUrl, {
-        method: 'PUT',
+        method: "PUT",
         body: part,
         headers: {
-          'Content-Type': 'application/octet-stream'
-        }
+          "Content-Type": "application/octet-stream",
+        },
       });
-      
-      const etag = response.headers.get('ETag');
-      return etag ? etag.replaceAll('"', '') : null;
+
+      const etag = response.headers.get("ETag");
+      return etag ? etag.replaceAll('"', "") : null;
     } catch (error) {
       console.error("Error uploading part:", error);
       throw error;
@@ -91,14 +99,18 @@ const Hero = () => {
 
   const completeMultipartUpload = async (uploadId, key, parts) => {
     try {
-      const response = await API.post("main", "/admin/upload-hero-videos/Bworkz", {
-        body: {
-          operation: "COMPLETE_VIDEO_UPLOAD",
-          uploadId,
-          key,
-          parts
+      const response = await API.post(
+        "main",
+        `/admin/upload-hero-videos/${InstitutionData.InstitutionId}`,
+        {
+          body: {
+            operation: "COMPLETE_VIDEO_UPLOAD",
+            uploadId,
+            key,
+            parts,
+          },
         }
-      });
+      );
       return response;
     } catch (error) {
       console.error("Error completing upload:", error);
@@ -135,7 +147,7 @@ const Hero = () => {
 
         parts.push({
           PartNumber: partNumber,
-          ETag: etag
+          ETag: etag,
         });
 
         // Update progress
@@ -144,13 +156,12 @@ const Hero = () => {
 
       // Step 3: Complete multipart upload
       const result = await completeMultipartUpload(uploadId, key, parts);
-      
+
       // Update video URL
       setVideoURL(result.videoUrl);
       toast.success("Video uploaded successfully!", {
         className: "custom-toast",
       });
-
     } catch (error) {
       console.error("Error during file upload:", error);
       toast.error("Error uploading video. Please try again.", {
@@ -216,8 +227,8 @@ const Hero = () => {
               {uploadProgress > 0 && uploadProgress < 100 && (
                 <div className="mt-2">
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div 
-                      className="bg-blue-600 h-2.5 rounded-full" 
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full"
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
@@ -274,12 +285,15 @@ const Hero = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      <div className={`flex items-center justify-center h-[30rem] pb-20 relative`}>
+      <div
+        className={`flex items-center justify-center h-[30rem] relative`}
+      >
         {isAdmin && (
           <Button
-            color={"primary"}
-            className="absolute top-4 right-4"
+            style={{
+              backgroundColor: InstitutionData.PrimaryColor,
+            }}
+            className="absolute top-4 right-4 "
             onClick={() => setModalShow(true)}
           >
             <div className="flex gap-2 justify-center items-center">
@@ -288,16 +302,17 @@ const Hero = () => {
             </div>
           </Button>
         )}
-        <div className={`absolute z-10 flex flex-col items-center w-screen content`}>
-          <div className={`w-[auto] text-left flex flex-column`}>
-            <h1 className={`w-full max1250:w-[50%] max536:w-[90vw] max800:w-[80%] text-[5.5rem] max800:text-[3.6rem] max1250:text-[4.2rem] text-white text-center`}>
+        <div className="absolute z-10 flex flex-col items-center justify-center w-screen content top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="w-auto flex flex-col items-center text-center">
+            <h1 className="w-full max1250:w-[50%] max536:w-[90vw] max800:w-[80%] text-[5.5rem] max800:text-[3.6rem] max1250:text-[4.2rem] text-white">
               {InstitutionData.TagLine}
             </h1>
-            <p className={`w-full italic max1250:w-[80%] max1250:ml-14 max536:w-[80vw] max536:text-center max536:ml-6 max800:w-[80%] text-[1.7rem] max800:text-[1.1rem] text-white max536:mt-2`}>
+            <p className="w-full italic max1250:w-[80%] max536:w-[80vw] max800:w-[80%] text-[1.7rem] max800:text-[1.1rem] text-white max536:mt-2">
               {InstitutionData.TagLine1 || ""}
             </p>
           </div>
         </div>
+
         <div className={`-z-10`}>
           {isVideo ? (
             <video
