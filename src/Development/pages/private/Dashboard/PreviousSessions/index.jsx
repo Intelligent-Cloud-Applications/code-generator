@@ -154,10 +154,7 @@ const PreviousSessions = () => {
     setShowAttendanceModal(true);
   };
 
-  const handleCloseAttendanceModal = () => {
-    setShowAttendanceModal(false);
-    setSelectedClassForAttendance(null);
-  };
+  // Removing duplicate handleCloseAttendanceModal function
 
   const handleCloseAttendanceModal = () => {
     setShowAttendanceModal(false);
