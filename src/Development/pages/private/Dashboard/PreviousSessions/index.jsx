@@ -159,6 +159,12 @@ const PreviousSessions = () => {
     setSelectedClassForAttendance(null);
   };
 
+  const handleCloseAttendanceModal = () => {
+    setShowAttendanceModal(false);
+    setSelectedUsers({});
+    setSelectedClassForAttendance(null);
+  };
+
   const filteredUsers = (userList || [])
     .filter((user) => user?.status === "Active")
     .filter((user) => {
@@ -506,6 +512,7 @@ const PreviousSessions = () => {
         </div>
       )}
 
+      {/* TODO: Common component */}
       {/* Attendance Modal */}
       <AttendanceModal
         isOpen={showAttendanceModal}
