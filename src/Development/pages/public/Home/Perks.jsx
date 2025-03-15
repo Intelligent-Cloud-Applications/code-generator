@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import { GrEdit } from "react-icons/gr";
 import {
@@ -31,9 +31,30 @@ const Perks = () => {
     description: "",
     serviceImg: null,
   });
+  const [charCount, setCharCount] = useState(0);
+  const MAX_CHARS = 250;
+  const [validationErrors, setValidationErrors] = useState({
+    title: "",
+    description: "",
+    serviceImg: "",
+  });
 
   const UserCtx = useContext(Context);
   const isAdmin = UserCtx.userData.userType === "admin";
+
+  // Set initial character count when opening the modal
+  useEffect(() => {
+    if (formData.description) {
+      setCharCount(formData.description.length);
+    } else {
+      setCharCount(0);
+    }
+  }, [formData.description, openModal]);
+
+  // Required field indicator component
+  const RequiredIndicator = () => (
+    <span className="text-red-500 ml-1">*</span>
+  );
 
   const handleModalOpen = (mode, service = null) => {
     setModalMode(mode);
@@ -44,6 +65,7 @@ const Perks = () => {
         serviceImg: null,
       });
       setCurrentService(service);
+      setCharCount(service.description ? service.description.length : 0);
     } else {
       setFormData({
         title: "",
@@ -51,7 +73,14 @@ const Perks = () => {
         serviceImg: null,
       });
       setCurrentService(null);
+      setCharCount(0);
     }
+    // Reset validation errors when opening modal
+    setValidationErrors({
+      title: "",
+      description: "",
+      serviceImg: "",
+    });
     setOpenModal(true);
   };
 
@@ -63,14 +92,41 @@ const Perks = () => {
       serviceImg: null,
     });
     setCurrentService(null);
+    setCharCount(0);
+    // Reset validation errors
+    setValidationErrors({
+      title: "",
+      description: "",
+      serviceImg: "",
+    });
   };
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    
+    if (id === "description") {
+      // Only update if we're under the character limit or if we're deleting characters
+      if (value.length <= MAX_CHARS) {
+        setFormData((prev) => ({
+          ...prev,
+          [id]: value,
+        }));
+        setCharCount(value.length);
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [id]: value,
+      }));
+    }
+    
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[id]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [id]: ""
+      }));
+    }
   };
 
   const handleFileChange = (e) => {
@@ -80,8 +136,16 @@ const Perks = () => {
         ...prev,
         serviceImg: file,
       }));
-    } else {
-      alert("File size must be less than 5MB.");
+      // Clear validation error for serviceImg when file is selected
+      setValidationErrors(prev => ({
+        ...prev,
+        serviceImg: ""
+      }));
+    } else if (file) {
+      setValidationErrors(prev => ({
+        ...prev,
+        serviceImg: "File size must be less than 5MB."
+      }));
     }
   };
 
@@ -99,17 +163,47 @@ const Perks = () => {
     }
   };
 
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      title: "",
+      description: "",
+      serviceImg: "",
+    };
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Please enter a title for the service.";
+      isValid = false;
+    }
+    
+    if (!formData.description.trim()) {
+      newErrors.description = "Please enter a description for the service.";
+      isValid = false;
+    } else if (formData.description.length > MAX_CHARS) {
+      newErrors.description = `Description cannot exceed ${MAX_CHARS} characters.`;
+      isValid = false;
+    }
+    
+    if (!formData.serviceImg && modalMode === "create" && !currentService?.serviceImg) {
+      newErrors.serviceImg = "Please upload an image for the service.";
+      isValid = false;
+    }
+    
+    setValidationErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = async () => {
     try {
+      // Validate the form
+      if (!validateForm()) {
+        return;
+      }
+
       let serviceImgUrl = currentService?.serviceImg;
 
       if (formData.serviceImg) {
         serviceImgUrl = await uploadToS3(formData.serviceImg);
-      }
-
-      if (!serviceImgUrl && modalMode === "create") {
-        alert("Please upload an image.");
-        return;
       }
 
       let serviceData = {
@@ -170,8 +264,6 @@ const Perks = () => {
     }
   };
 
-
-
   const handleDeleteModalOpen = (service) => {
     setCurrentService(service);
     setOpenDeleteModal(true);
@@ -216,32 +308,49 @@ const Perks = () => {
     }
   };
 
-
-
-
   return (
     <>
       <Modal show={openModal} onClose={handleModalClose} size="md" popup>
         <Modal.Header>
-          <div className="text-xl font-medium text-gray-900 dark:text-white">
-            {/* {modalMode === "create" ? "Create a New Service" : "Update Service"} */}
-          </div>
+          {/* <div className="text-xl font-medium text-gray-900 dark:text-white">
+            {modalMode === "create" ? "Create a New Service" : "Update Service"}
+          </div> */}
         </Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="file-upload-helper-text" value="Upload Image" />
+                <Label htmlFor="file-upload-helper-text" value={
+                  <>
+                    Upload Image
+                    {(modalMode === "create" || !currentService?.serviceImg) && <RequiredIndicator />}
+                  </>
+                } />
               </div>
               <FileInput
                 id="file-upload-helper-text"
                 helperText="SVG, PNG, JPG or GIF (Max: 5MB)."
                 onChange={handleFileChange}
               />
+              {validationErrors.serviceImg && (
+                <p className="mt-1 text-sm text-red-500">
+                  {validationErrors.serviceImg}
+                </p>
+              )}
+              {modalMode === "edit" && currentService?.serviceImg && !formData.serviceImg && (
+                <p className="mt-2 text-sm text-gray-500">
+                  Current image will be kept if no new image is uploaded.
+                </p>
+              )}
             </div>
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="title" value="Title" />
+                <Label htmlFor="title" value={
+                  <>
+                    Title
+                    <RequiredIndicator />
+                  </>
+                } />
               </div>
               <TextInput
                 id="title"
@@ -249,26 +358,58 @@ const Perks = () => {
                 onChange={handleInputChange}
                 placeholder="Enter the title of this service"
                 required
+                color={validationErrors.title ? "failure" : undefined}
               />
+              {validationErrors.title && (
+                <p className="mt-1 text-sm text-red-500">
+                  {validationErrors.title}
+                </p>
+              )}
             </div>
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="description" value="Description" />
+                <Label htmlFor="description" value={
+                  <>
+                    Description
+                    <RequiredIndicator />
+                  </>
+                } />
               </div>
               <Textarea
                 id="description"
                 rows={4}
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Enter the description of this service"
+                placeholder="Enter the description of this service (max 250 characters)"
                 required
+                color={validationErrors.description ? "failure" : undefined}
               />
+              <div className="flex justify-end mt-1">
+                <span 
+                  className={`text-sm ${
+                    charCount > MAX_CHARS ? 'text-red-500 font-semibold' : 'text-gray-500'
+                  }`}
+                >
+                  {charCount}/{MAX_CHARS} characters
+                </span>
+              </div>
+              {validationErrors.description && (
+                <p className="mt-1 text-sm text-red-500">
+                  {validationErrors.description}
+                </p>
+              )}
+              {charCount > MAX_CHARS && !validationErrors.description && (
+                <p className="text-red-500 text-sm mt-1">
+                  Description exceeds maximum character limit.
+                </p>
+              )}
             </div>
             <div className="w-full">
               <Button
                 onClick={handleSubmit}
                 style={{ backgroundColor: PrimaryColor }}
                 className="w-full"
+                disabled={charCount > MAX_CHARS}
               >
                 {modalMode === "create" ? "Create Service" : "Update Service"}
               </Button>
