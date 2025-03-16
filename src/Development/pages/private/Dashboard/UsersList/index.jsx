@@ -22,6 +22,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [showUserAdd, setShowUserAdd] = useState(false);
   const { getUserList, userAttendance } = useContext(Context);
   const [userName, setuserName] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [lastName, setLastName] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
   const [email, setEmail] = useState("");
@@ -57,16 +58,17 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   ];
 
   const filter2 = filterUsersByStatus(userStatus);
-
+  console.log("filtter2:", filter2);
   // Search functionality
-  const searchedUserList = filter2.filter((user) => {
+  const searchedUserList = filter2?.filter((user) => {
     return (
-      user?.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (typeof user?.userName === "string" &&
+        user.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
       user?.emailId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user?.phoneNumber?.includes(searchQuery)
     );
   });
-
+  console.log("searched:", searchedUserList);
   const activeUserList = searchedUserList.filter((user) => !user.isArchived);
 
   // Sort functionality
@@ -123,7 +125,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     return `${day}/${month}/${year}`;
   };
 
-
   // Sort functionality
   const requestSort = (key) => {
     let direction = "ascending";
@@ -143,21 +144,29 @@ const UsersList = ({ userCheck, setUserCheck }) => {
 
   //for profile pic
   const getInitials = (name) => {
-    if (!name) return '';
+    if (!name || typeof name !== "string") return "";
     const initials = name
-      .split(' ')
+      .split(" ")
       .map((word) => word.charAt(0).toUpperCase())
-      .join('');
+      .join("");
     return initials;
   };
 
   const getColor = (name) => {
-    if (!name) return '#888888';
+    if (!name) return "#888888";
     const colors = [
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF'
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
     ];
     const index = name.length % colors.length;
     return colors[index];
@@ -208,7 +217,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     filter2,
     setShowDeleteModal,
     showDeleteModal,
-    confirmDelete
+    confirmDelete,
   };
 
   return (
@@ -291,6 +300,8 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 email={email}
                 countryCode={countryCode}
                 name={name}
+                imageUrl={imageUrl}
+                setImageUrl={setImageUrl}
                 setPhoneNumber={setPhoneNumber}
                 setBalance={setBalance}
                 setStatus={setStatus}
@@ -347,9 +358,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                       <div className="w-[21%] font-sans">Joining Date</div>
                       <div className="w-[20%] font-sans">Renew Date</div>
                       <div className="w-[23%] font-sans">Classes Attended</div>
-                      <div className="w-[10%] font-sans">
-                        Balance
-                      </div>
+                      <div className="w-[10%] font-sans">Balance</div>
                       <div></div>
                       {/* Icons */}
                       <div className="w-10 font-sans h-10">
@@ -403,7 +412,9 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                 ) : (
                                   <div
                                     className="h-[35px] w-[35px] rounded-full flex items-center justify-center text-white text-sm font-medium"
-                                    style={{ backgroundColor: getColor(user.userName) }}
+                                    style={{
+                                      backgroundColor: getColor(user.userName),
+                                    }}
                                   >
                                     {getInitials(user.userName)}
                                   </div>

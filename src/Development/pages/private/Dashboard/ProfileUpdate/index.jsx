@@ -15,8 +15,8 @@ import ReferralCode from "../../../../common/ReferralCode/index.jsx";
 import "./index.css";
 import EditableTextArea from "./EditableTextArea.jsx";
 import institutionData from "../../../../constants.js";
-
-// import InsrtuctorReferral from "../../../../common/ReferralCode/InstructorReferral.jsx"
+// import EditProfile from "./EditProfile.jsx";
+import InsrtuctorReferral from "../../../../common/ReferralCode/index.jsx";
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -27,8 +27,10 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [name, setName] = useState(UserCtx.userName);
   const [country] = useState(UserCtx.country);
   const [currentEmail, setCurrentEmail] = useState(UserCtx.emailId);
-  const [about, setAbout] = useState(UserCtx.hasOwnProperty("about") && UserCtx.about)
-
+  const [showForm, setShowForm] = useState(false);
+  const [about, setAbout] = useState(
+    UserCtx.hasOwnProperty("about") && UserCtx.about
+  );
 
   const [image, setImage] = useState(null);
   const [editor, setEditor] = useState(null);
@@ -42,12 +44,20 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
 
   // Add this function right after getInitials
   const getColor = (name) => {
-    if (!name) return '#888888';
+    if (!name) return "#888888";
     const colors = [
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF'
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
+      "#FF5733",
+      "#33FF57",
+      "#5733FF",
     ];
     const index = name.length % colors.length;
     return colors[index];
@@ -78,7 +88,8 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
     // Format day and month with leading zeros if necessary
     const formattedDay = day < 10 ? `0${day}` : day;
     const formattedMonth = month < 10 ? `0${month}` : month;
-    const userLocation = localStorage.getItem("userLocation") || UserCtx?.location?.countryCode;
+    const userLocation =
+      localStorage.getItem("userLocation") || UserCtx?.location?.countryCode;
     return userLocation === "IN"
       ? `${formattedDay}/${formattedMonth}/${year}`
       : `${formattedMonth}/${formattedDay}/${year}`;
@@ -98,13 +109,13 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const [phoneCode, setPhoneCode] = useState("");
   const [isPhoneChange, setIsPhoneChange] = useState(false);
   const [isPhoneCode, setIsPhoneCode] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  // const [name, setName] = useState("John Doe"); // Default name
+  const [useEditableInput, setUseEditableInput] = useState(true);
 
   const [tempDob, setTempDob] = useState(
     dob ? new Date(Number(dob)).toISOString().split("T")[0] : ""
   );
-
-
-
 
   const ifDataChanged = () => {
     return !(
@@ -116,7 +127,6 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
       address.trim() === UserCtx.address
     );
   };
-
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -163,7 +173,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
       // Upload the file to S3 with the filename as Cognito User ID
       const response = await Storage.put(
         `${InstitutionData.InstitutionId}/${cognitoId}/profile.jpg?v=` +
-        new Date().getTime(),
+          new Date().getTime(),
         blob,
         {
           level: "public", // or "protected" depending on your access needs
@@ -191,7 +201,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
       console.log(apiResponse);
       // setProfileImageUrl(imageUrl);
       const tempUser = { ...UserCtx, imgUrl: imageUrl };
-      console.log(tempUser)
+      console.log(tempUser);
       Ctx.setUserData(tempUser);
       // setImageKey(Date.now());
     } catch (error) {
@@ -356,7 +366,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
       className={`relative w-[calc(100vw-16rem)] max1050:w-screen flex flex-col items-center  `}
     >
       <div
-        className={`w-[75%] max1050:w-[100%] max-w-[36rem] rounded-3xl p-3 flex flex-col items-center max536:w-[90%] mt-[1rem] max536:mt-[4rem] relative bg-[#eceaeac7]`}
+        className={`w-[75%] max1050:w-[100%] max-w-[36rem] rounded-3xl p-3 flex flex-col items-center max536:w-[90%] mt-[1rem] max536:mt-[4rem] relative bg-white shadow-md`}
       >
         <FaArrowLeft
           className="absolute left-2 top-2 min1050:hidden"
@@ -418,9 +428,56 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
         {!isPhoneChange ? (
           <>
             {!isChangePassword ? (
-              <div className={`flex flex-col items-center mb-4`}>
+              <div className="flex flex-col items-center mb-4 w-full max-w-4xl mx-auto">
+                <div className="text-black text-xl font-bold text-left pb-[10px]">
+                  My Account
+                </div>
+
+                <div className="flex items-center justify-between w-full mb-6">
+                  <h1 className="text-2xl font-bold">Profile Overview</h1>
+                  <div className="flex gap-2">
+                    {showForm ? (
+                      <>
+                        <button
+                          onClick={() => setShowForm(false)}
+                          className="bg-primaryColor text-white px-3 py-1 text-sm rounded-md"
+                        >
+                          Update Changes
+                        </button>
+                        <button
+                          onClick={() => setShowForm(false)}
+                          className="bg-red-500 text-white px-3 py-1 text-sm rounded-md"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => setShowForm(true)}
+                        className="bg-primaryColor text-white px-3 py-1 text-sm rounded-md flex items-center gap-1"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                          />
+                        </svg>
+                        Edit Profile
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 <div className="relative w-[10rem] h-[10rem] mx-auto mb-6">
-                  <div className="relative w-full h-full rounded-full flex items-center justify-center border-[3px] border-solid border-t1 shadow-md shadow-black/40">
+                  <div className="relative w-full h-full rounded-full flex items-center justify-center border-[3px] border-solid border-t1  shadow-black/40">
                     {UserCtx.imgUrl ? (
                       <img
                         alt="profile"
@@ -448,196 +505,155 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                       className="hidden"
                     />
                     <div
-                      className="absolute bottom-0 right-0 w-10 h-10 text-white flex items-center justify-center cursor-pointer "
+                      className="absolute bottom-0 right-0 w-10 h-10 text-white flex items-center justify-center cursor-pointer rounded-full"
                       onClick={handleEditClick}
+                      style={{
+                        background: InstitutionData.PrimaryColor,
+                      }}
                     >
-                      <i
-                        className=" rounded-full fa-solid fa-pencil pencil-icon"
-                        style={{
-                          background: InstitutionData.PrimaryColor,
-                        }}
-                      ></i>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
+                        />
+                      </svg>
                     </div>
                   </div>
                 </div>
-
                 <>
-                  {
-                    UserCtx.userType === "instructor" && (
-
-                      <div className="flex flex-col gap-4 justify-center bg-gray-100 p-4 rounded-lg shadow-md w-full">
-                        {referralLink && (
-                          <div className="flex flex-col gap-2">
-                            <label className="ml-2 text-sm font-semibold text-gray-700">
-                              Hybrid Page Link
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                className="bg-white px-4 py-2 rounded-lg w-full border border-gray-300 shadow-sm text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-                                type="text"
-                                value={referralLink}
-                                readOnly
-                              />
-                              <Tooltip
-                                content="Go to Link"
-                                position="top"
-                                arrow={false}
+                  {UserCtx.userType === "instructor" && (
+                    <div className="flex flex-col gap-4 justify-center bg-gray-100 p-4 rounded-lg shadow-md w-full">
+                      {referralLink && (
+                        <div className="flex flex-col gap-2">
+                          <label className="ml-2 text-sm font-semibold text-gray-700">
+                            Hybrid Page Link
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              className="bg-white px-4 py-2 rounded-lg w-full border border-gray-300 shadow-sm text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                              type="text"
+                              value={referralLink}
+                              readOnly
+                            />
+                            <Tooltip
+                              content="Go to Link"
+                              position="top"
+                              arrow={false}
+                            >
+                              <button
+                                className="bg-primaryColor text-white rounded-lg py-2 px-4 shadow-md hover:bg-lightPrimaryColor hover:shadow-lg transition-transform transform hover:scale-105"
+                                onClick={() => {
+                                  window.location.href = referralLink;
+                                }}
                               >
-                                <button
-                                  className="bg-primaryColor text-white rounded-lg py-2 px-4 shadow-md hover:bg-lightPrimaryColor hover:shadow-lg transition-transform transform hover:scale-105"
-                                  onClick={() => {
-                                    window.location.href = referralLink;
-                                  }}
-                                >
-                                  <FaArrowCircleRight className="h-6" />
-                                </button>
-                              </Tooltip>
-                            </div>
+                                <FaArrowCircleRight className="h-6" />
+                              </button>
+                            </Tooltip>
                           </div>
-                        )}
-                      </div>
-                    )
-                  }
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </>
-                <form className={`mt-6 flex flex-col gap-8 max560:w-full`}>
-                  <div
-                    className={`grid grid-cols-2 gap-4 max536:grid-cols-1 max536:w-full`}
-                  >
-                    <div className={`flex flex-col gap-1 justify-center`}>
-                      <label className={`ml-2`}>Name</label>
-                      <EditableInput
-                        className={`bg-inputBgColor px-4 py-2 rounded-lg w-full`}
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                    </div>
-                    <div className={`flex flex-col gap-1`}>
-                      <label className={`ml-2`}>Phone Number</label>
-                      <input
-                        className={`  bg-inputBgColor  px-4 py-2 rounded-lg w-full`}
-                        type="text"
-                        value={phoneNumber}
-                        readOnly
-                      />
-                    </div>
-                  </div>
-                  <div
-                    className={`grid grid-cols-2 gap-4 w-full max536:grid-cols-1 max536:w-full`}
-                  >
-                    <div className={`flex flex-col gap-1 justify-center`}>
-                      <label className={`ml-2`}>Country</label>
-                      <input
-                        className={`bg-inputBgColor px-4 py-2 rounded-lg w-full`}
-                        type="text"
-                        value={country}
-                        readOnly
-                      />
-                    </div>
-                    <div className={`flex flex-col gap-1`}>
-                      <label className={`ml-2`}>Joining Date</label>
-                      <input
-                        className={`bg-inputBgColor px-4 py-2 rounded-lg w-full`}
-                        type="text"
-                        value={joiningDate}
-                        readOnly
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1 justify-center">
-                    <label className="ml-2">Email</label>
+                <form className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-lg shadow-md">
+                  <div className="flex flex-col">
+                    <label className="text-gray-600 font-medium">Name</label>
                     <input
-                      className="bg-inputBgColor rounded-lg py-2 w-full pl-4"
+                      className={`px-4 py-2 rounded-md w-full ${
+                        showForm ? "bg-inputBgColor" : "bg-gray-100"
+                      }`}
+                      type="text"
+                      value={name}
+                      readOnly={!showForm}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="text-gray-600 font-medium">Email</label>
+                    <input
+                      className="bg-gray-100 px-4 py-2 rounded-md"
                       type="email"
                       value={currentEmail}
                       readOnly
                     />
                   </div>
-                  <div className="w-full">
-                    <div className="mb-2 block">
-                      <Label value="Date of Birth" />
-                    </div>
-                    {dob ? (
-                      // This is else cannot be editable
+
+                  <div className="flex flex-col">
+                    <label className="text-gray-600 font-medium">
+                      Phone Number
+                    </label>
+                    <input
+                      className="bg-gray-100 px-4 py-2 rounded-md"
+                      type="text"
+                      value={phoneNumber}
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="text-gray-600 font-medium">DOB</label>
+
+                    {showForm ? (
                       <input
-                        className="bg-inputBgColor px-4 py-2 rounded-lg w-full"
-                        style={{ backgroundColor: "#c2bfbf81" }}
+                        type="date"
+                        className="bg-inputBgColor px-4 py-2 rounded-md"
+                        value={tempDob || ""}
+                        onChange={(e) => setTempDob(e.target.value)}
+                      />
+                    ) : (
+                      <input
+                        className="bg-gray-100 px-4 py-2 rounded-md"
                         type="text"
                         value={formatDate(dob) || ""}
                         readOnly
                       />
-                    ) : (
-                      // This is for first time editable dob
-
-                      <TextInput
-                        icon={FaCalendarAlt}
-                        style={{ backgroundColor: "#c2bfbf81" }}
-                        placeholder="Select DOB"
-                        type={"date"}
-                        value={tempDob || ""}
-                        onChange={(e) => {
-                          setTempDob(e.target.value);
-                        }}
-                      />
                     )}
                   </div>
-                  <div className="w-full">
-                    <div className="mb-2 block">
-                      {UserCtx.userType === "admin" ? (
-                        <Label value="Institution Addrress" />
-                      ) : (
-                        <Label value="Address" />
-                      )}
-                    </div>
-                    <EditableTextArea
-                      placeholder={`Enter ${UserCtx.userType === "admin" && "Institution"
-                        } Address`}
-                      type={"text"}
-                      className=" bg-inputBgColor min-w-full rounded-lg pl-4 py-2"
-                      minimumHeight={"min-h-16"}
+
+                  <div className="flex flex-col col-span-2">
+                    <label className="text-gray-600 font-medium">Address</label>
+                    <textarea
+                      className={`px-4 py-2 rounded-md resize-none w-full ${
+                        showForm ? "bg-inputBgColor" : "bg-gray-100"
+                      }`}
+                      rows={3}
                       value={address}
+                      readOnly={!showForm}
                       onChange={(e) => setAddress(e.target.value)}
                     />
                   </div>
+
                   {UserCtx.userType === "instructor" && (
-                    <div className="w-full">
-                      <div className="mb-2 block">
-                        <Label value="About" />
+                      <div className="flex flex-col col-span-2">
+                        <label className="text-gray-600 font-medium">
+                          About
+                        </label>
+                        <textarea
+                          className={`px-4 py-2 rounded-md resize-none w-full ${
+                            showForm ? "bg-inputBgColor" : "bg-gray-100"
+                          }`}
+                          rows={3}
+                          value={about}
+                          readOnly={!showForm}
+                          onChange={(e) => setAbout(e.target.value)}
+                        />
                       </div>
-                      <EditableTextArea
-                        placeholder={`Enter About`}
-                        type={"text"}
-                        className=" bg-inputBgColor min-w-full rounded-lg pl-4 py-2 "
-                        minimumHeight={"min-h-28"}
-                        maxLength={300}
-                        value={about}
-                        onChange={(e) => setAbout(e.target.value)}
-                      />
-                    </div>
+                    
                   )}
-                  {/* <button
-                    className={`rounded-lg py-2 bg-[#c2bfbf81]`}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setErr('')
-                      setIsPhoneChange(true)
-                    }}
-                  >
-                    Change Phone Number
-                  </button> */}
-                  {/* <button
-                    className={`rounded-lg py-2 bg-[#c2bfbf81]`}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setErr('')
-                      setIsChangePassword(true)
-                    }}
-                  >
-                    Change Password
-                  </button> */}
-                  <div className={`flex justify-center`}>
-                    <Button2 data={"Update"} fn={onProfileUpdate} w="8rem" />
-                  </div>
                 </form>
               </div>
             ) : (
@@ -817,19 +833,17 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
 
       {(userData.userType === "instructor" ||
         userData.userType === "admin") && (
-          <>
+        <>
+          <div>
+            <ReferralCode />
+          </div>
+          {/* {userData.userType === "instructor" && (
             <div>
-              <ReferralCode />
+              <HybridReferral />
             </div>
-            {
-              userData.userType === "instructor" && (
-                <div>
-                  <HybridReferral />
-                </div>
-              )
-            }
-          </>
-        )}
+          )} */}
+        </>
+      )}
     </div>
   );
 };
