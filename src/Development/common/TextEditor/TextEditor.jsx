@@ -15,8 +15,9 @@ const TextEditor = ({
   value,
   onChange,
   onSave,
+  onCancel,
   showSaveButton = true,
-  saveButtonText = "Save Changes",
+  saveButtonText = "Save",
   saveButtonClassName = "",
   saveButtonStyle = {},
   editorClassName = "",
@@ -24,6 +25,7 @@ const TextEditor = ({
   folder = "",
   ...rest
 }) => {
+  const { class: extraClass } = rest;
   const inputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -147,10 +149,17 @@ const TextEditor = ({
         placeholder={placeholder}
       />
       {showSaveButton && onSave && (
-        <div className="flex justify-end mt-5">
+        <div className="flex justify-end gap-3 mt-5">
+          <button
+            onClick={onCancel}
+            className={`${extraClass} md:w-[15rem] text-white rounded-[8px] mb-4 h-[3rem] text-[1.2rem] tracking-[0.8px] ${saveButtonClassName} mt-28 md:mt-14 text-center`}
+            style={saveButtonStyle}
+          >
+            Cancel
+          </button>
           <button
             onClick={onSave}
-            className={`w-[15rem] text-white px-12 py-2 rounded-[8px] mb-4 h-[3rem] text-[1.2rem] tracking-[0.8px] ${saveButtonClassName} mt-28 md:mt-14`}
+            className={`${extraClass}  md:w-[15rem] text-white rounded-[8px] mb-4 h-[3rem] text-[1.2rem] tracking-[0.8px] ${saveButtonClassName} mt-28 md:mt-14 text-center`}
             style={saveButtonStyle}
           >
             {saveButtonText}
