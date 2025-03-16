@@ -189,7 +189,7 @@ const LeftBanner = ({ displayAfterClick }) => {
         </div>
       </div>
 
-      {/* for Desktop user view */}
+      {/* for Desktop user view ..*/}
       <div
         className="text-[#E4E4E4] w-[18rem] relative max800:hidden"
         style={{ backgroundColor: InstitutionData.PrimaryColor }}
