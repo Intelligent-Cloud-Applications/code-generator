@@ -7,11 +7,17 @@ import institutionData from "../../../../constants";
 import InstitutionContext from '../../../../Context/InstitutionContext';
 
 const Billing = () => {
-  const {userData, util} = useContext(Context);
+  const {productList, userData, util} = useContext(Context);
   const [renewDate, setRenewDate] = useState(userData.renewDate);
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const [amount, setAmount] = useState('$0');
   const [orderHistory, setOrderHistory] = useState([]);
+
+  const productMap = {}
+  for (const product of productList) {
+    productMap[product.productId] = product;
+  }
+  console.log("productMap", productMap);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,12 +32,13 @@ const Billing = () => {
         const data = response.payments
           .map((object, index) => [
             (new Date(object.paymentDate)).toLocaleDateString(),
-            response.profile.products[index].S,
+            productMap[object.productId].heading,
             // 'hello',
             object.paymentMode,
             `${object.currency === 'USD' ? '$' : '₹'}${object.amount / 100}`
           ])
           // .flatMap(item => Array(6).fill(item));
+        console.log("Data:", data);
         setOrderHistory(data);
         setAmount(data.slice(-1)[0][3]);
         setRenewDate(response.payments[0].renewDate)

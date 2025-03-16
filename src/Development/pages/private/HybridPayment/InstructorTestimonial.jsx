@@ -1,11 +1,14 @@
-import { API } from "aws-amplify";
-import React, { useContext, useEffect, useState } from "react";
+import Amplify, { API } from "aws-amplify";
+import React, { createElement, useContext, useEffect, useState } from "react";
 import { FaPencilAlt, FaRegSave, FaRegWindowClose } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import TextEditor from "../../../common/TextEditor/TextEditor";
+import fileUpload from "../../../common/utils/upload-file";
 import Context from "../../../Context/Context";
 import InstitutionContext from "../../../Context/InstitutionContext";
+import "../../public/AboutUs/AboutUs.css";
 import AboutInstructor from "./AboutInstructor";
 
 const InstructorTestimonial = () => {
@@ -19,9 +22,11 @@ const InstructorTestimonial = () => {
   const [editing, setEditing] = useState(false);
   const [about, setAbout] = useState("");
   const [imgUrl, setImgUrl] = useState("");
+  const [imageLoading, setImageLoading] = useState(false);
   const Navigate = useNavigate();
   const Util = Ctx.util;
-
+  const [fileName, setFileName] = useState(null);
+  const fileInputRef = React.useRef(null);
   // console.log("UserCtx: ", UserCtx);
 
   const location = useLocation();
@@ -34,7 +39,6 @@ const InstructorTestimonial = () => {
   const queryParams = getQueryParams(location.search);
   const referral = queryParams.get("referral");
   const institution = queryParams.get("institution");
-  const cognitoId = queryParams.get("cognitoId");
 
   // console.log("Referral:", referral);
   // console.log("Institution:", institution);
@@ -140,7 +144,7 @@ const InstructorTestimonial = () => {
     };
 
     fetchInstructor();
-  }, [institution, cognitoId, currentInstructor]);
+  }, [institution, UserCtx.cognitoId, currentInstructor]);
   useEffect(() => {
     if (instructor?.instructorProfile?.imgUrl || instructor?.image) {
       setImgUrl(instructor?.instructorProfile?.imgUrl || instructor?.image);
@@ -213,6 +217,54 @@ const InstructorTestimonial = () => {
     }
   };
 
+  const handleProfileImageUpload = () => {
+    // Trigger the hidden file input so the user can select a file
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    // Change the image name as profile
+    const file = e.target.files[0];
+    if (!file) return;
+    // Use the fileUpload function with the selected file
+    try {
+      setImageLoading(true);
+      // Bucket Name
+      const bucketName = "institution-utils";
+      // Region
+      const region = "us-east-1";
+      // Folder
+      const folder = `${InstitutionData.InstitutionId}/${UserCtx.cognitoId}/profile`;
+
+      const fileUrl = await fileUpload({
+        bucket: bucketName,
+        region,
+        folder,
+        file,
+      });
+      console.log("File URL:", fileUrl);
+      setImgUrl(fileUrl);
+      // (Optionally update the context with the new URL)
+      const apiResponse = await API.put(
+        "main",
+        `/user/profile/img/${InstitutionData.InstitutionId}`,
+        {
+          body: {
+            imgUrl: fileUrl,
+          },
+        }
+      );
+      console.log("API Response:", apiResponse);
+      const tempUser = { ...UserCtx, imgUrl: fileUrl };
+      Ctx.setUserData(tempUser);
+      console.log("User Data:", tempUser);
+    } catch (error) {
+      console.error("Error uploading profile picture: ", error);
+    } finally {
+      setImageLoading(false);
+    }
+  };
+
   function capitalizeWords(str) {
     return str
       ?.split(" ")
@@ -234,24 +286,43 @@ const InstructorTestimonial = () => {
     return (
       <>
         <div className="flex flex-col md:flex-row items-center md:items-start w-11/12 md:w-11/12 md:max-w-[980px] mx-auto my-12 p-6 border border-gray-200 rounded-lg bg-neutral-50 shadow-lg gap-6">
-          {/* Image Section */}
-          {imgUrl ? (
-            <img
-              className="w-[90%] md:w-[18rem] h-[18rem] md:h-[29rem] object-cover rounded-md"
-              alt="Profile"
-              src={imgUrl}
-            />
-          ) : (
-            <div className="w-[90%] md:w-[18rem] h-[15rem] md:h-[29rem] bg-gray-300 flex items-center justify-center rounded-md">
-              <p className="text-3xl font-bold text-gray-700">
-                {getInitials(
-                  instructor?.instructorProfile?.userName ||
-                    instructor?.referralCode ||
-                    instructor?.name
-                )}
-              </p>
+          <div className="relative">
+            {imageLoading && (
+              <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center rounded-md">
+                <p className="text-white text-lg font-bold">Uploading...</p>
+              </div>
+            )}
+            {!imageLoading && imgUrl ? (
+              <img
+                className="w-[90%] md:w-[18rem] h-[18rem] md:h-[29rem] object-cover rounded-md"
+                alt="Profile"
+                src={imgUrl}
+              />
+            ) : (
+              <div className="w-[90%] md:w-[18rem] h-[15rem] md:h-[29rem] bg-gray-300 flex items-center justify-center rounded-md">
+                <p className="text-3xl font-bold text-gray-700">
+                  {getInitials(
+                    instructor?.instructorProfile?.userName ||
+                      instructor?.referralCode ||
+                      instructor?.name
+                  )}
+                </p>
+              </div>
+            )}
+            <div
+              className={`absolute top-2 right-2 border-2 border-[${InstitutionData.PrimaryColor}] rounded-full p-2 cursor-pointer bg-[${InstitutionData.PrimaryColor}] p-1`}
+              onClick={handleProfileImageUpload}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+              />
+              <FaPencilAlt className="text-xl text-gray-500" />
             </div>
-          )}
+          </div>
 
           {/* Info Section */}
           <div className="flex-1">
@@ -274,20 +345,39 @@ const InstructorTestimonial = () => {
                     borderColor: InstitutionData.PrimaryColor,
                   }}
                 >
-                  <AboutInstructor
+                  {/* <AboutInstructor
                     aboutText={
                       instructor?.instructorProfile?.about?.trim() ||
                       "No bio available."
                     }
+                  /> */}
+                  <div
+                    className="about-us-content mt-5 text-gray-800 leading-relaxed text-[1.2rem]"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        instructor?.instructorProfile?.about?.trim() ||
+                        "<p>No content available.</p>",
+                    }}
                   />
                 </p>
               ) : (
-                <textarea
-                  className="w-full h-48 p-4 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
-                  onChange={(e) => setAbout(e.target.value)}
+                // <textarea
+                //   className="w-full h-48 p-4 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                //   onChange={(e) => setAbout(e.target.value)}
+                //   value={about}
+                //   maxLength={500}
+                //   placeholder="Write something about yourself..."
+                // />
+                <TextEditor
                   value={about}
-                  maxLength={500}
-                  placeholder="Write something about yourself..."
+                  onChange={setAbout}
+                  onSave={() => onProfileUpdate(about)}
+                  onCancel={() => setEditing(false)}
+                  folder={""}
+                  editorClassName=" text-gray-800 leading-relaxed text-[1.2rem] w-full about-us-content"
+                  saveButtonStyle={{
+                    backgroundColor: institutionData?.LightPrimaryColor,
+                  }}
                 />
               )}
             </div>
@@ -299,24 +389,26 @@ const InstructorTestimonial = () => {
                 <div className="flex gap-4">
                   {editing ? (
                     <>
-                      <button
+                      {/* <button
                         className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded-lg shadow-md flex items-center"
                         onClick={() => setEditing(false)}
                       >
                         <FaRegWindowClose className="mr-2" /> Cancel
-                      </button>
-                      <button
+                      </button> */}
+                      {/* <button
                         className={`bg-gradient-to-r from-${InstitutionData.PrimaryColor} to-${InstitutionData.LightPrimaryColor} hover:from-${InstitutionData.LightPrimaryColor} hover:to-${InstitutionData.PrimaryColor} text-white py-2 px-4 rounded-lg shadow-md flex items-center`}
                         onClick={() => onProfileUpdate(about)}
                       >
                         <FaRegSave className="mr-2" /> Save
-                      </button>
+                      </button> */}
                     </>
                   ) : (
                     <button
-                      className={`bg-gradient-to-r from-${InstitutionData.PrimaryColor} to-${InstitutionData.LightPrimaryColor} hover:from-${InstitutionData.LightPrimaryColor} hover:to-${InstitutionData.PrimaryColor} text-white py-2 px-4 rounded-lg shadow-md flex items-center`}
+                      style={{ backgroundColor: InstitutionData.PrimaryColor }}
+                      className={` text-white py-2 px-4 rounded-lg shadow-md flex items-center`}
                       onClick={() => setEditing(true)}
                     >
+                      {console.log(InstitutionData.PrimaryColor)}
                       <FaPencilAlt className="mr-2" /> Edit
                     </button>
                   )}

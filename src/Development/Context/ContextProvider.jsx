@@ -146,6 +146,16 @@ const ContextProvider = (props) => {
       // }
     }
   };
+
+  const getUserAttendance = async () => {
+    try {
+      const response = await API.get("main", apiPaths.listAttendance);
+      setUserAttendance(response.attendanceByUser);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   const getUserList = async () => {
     try {
       const list = await API.get("main", apiPaths.getMembers);
@@ -530,6 +540,7 @@ const ContextProvider = (props) => {
     isProductInCart,
     userAttendance,
     setUserAttendance,
+    getUserAttendance,
     videos,
     setVideos,
     error,

@@ -23,6 +23,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [showUserAdd, setShowUserAdd] = useState(false);
   const { getUserList, userAttendance } = useContext(Context);
   const [userName, setuserName] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [lastName, setLastName] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
   const [email, setEmail] = useState("");
@@ -58,16 +59,17 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   ];
 
   const filter2 = filterUsersByStatus(userStatus);
-
+  console.log("filtter2:", filter2);
   // Search functionality
-  const searchedUserList = filter2.filter((user) => {
+  const searchedUserList = filter2?.filter((user) => {
     return (
-      user?.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (typeof user?.userName === "string" &&
+        user.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
       user?.emailId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user?.phoneNumber?.includes(searchQuery)
     );
   });
-
+  console.log("searched:", searchedUserList);
   const activeUserList = searchedUserList.filter((user) => !user.isArchived);
 
   // Sort functionality
@@ -143,7 +145,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
 
   //for profile pic
   const getInitials = (name) => {
-    if (!name) return "";
+    if (!name || typeof name !== "string") return "";
     const initials = name
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase())
@@ -200,6 +202,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     filter2,
     setShowDeleteModal,
     showDeleteModal,
+    confirmDelete,
     confirmDelete,
   };
 
@@ -283,6 +286,8 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 email={email}
                 countryCode={countryCode}
                 name={name}
+                imageUrl={imageUrl}
+                setImageUrl={setImageUrl}
                 setPhoneNumber={setPhoneNumber}
                 setBalance={setBalance}
                 setStatus={setStatus}

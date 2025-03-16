@@ -7,16 +7,19 @@ import Context from "../../../../Context/Context";
 import { toast } from "react-toastify";
 import InputComponent from "../../../../common/InputComponent";
 import { API } from "aws-amplify";
+import fileUpload from "../../../../common/utils/upload-file.js";
 
 function CreateUser({
   phoneNumber,
   amount,
   name,
+  imageUrl,
   email,
   status,
   cognitoId,
   setStatus,
   balance,
+  setImageUrl,
   setShowUserAdd,
   setPhoneNumber,
   createButton,
@@ -91,12 +94,21 @@ function CreateUser({
     UtilCtx.setLoader(true);
     const formattedPhoneNumber = createButton ? `${countryCode}${phoneNumber}` : phoneChange ? `${countryCode}${phoneNumber}` : phoneNumber;
 
+    let imgUrl = imageUrl
+      ? await fileUpload({
+          bucket: "institution-utils",
+          region: "us-east-1",
+          folder: `profile/${email}`,
+          file: imageUrl,
+        })
+      : null;
     const data = {
       institution: InstitutionData.InstitutionId,
       cognitoId,
       emailId: email,
       userName: name,
       name: name,
+      imgUrl: imgUrl,
       phoneNumber: formattedPhoneNumber,
       status,
       productType,
@@ -161,6 +173,7 @@ function CreateUser({
       setStatus("InActive");
       setPhoneNumber("");
       setBalance("");
+      setImageUrl(null);
       setProductType("");
       setSelectedProductAmount("");
 
@@ -202,10 +215,31 @@ function CreateUser({
           <X size={25} />
         </span>
 
-        <div className="flex flex-col gap-4 w-full px-4 sm:gap-6" style={{ paddingTop: '20px' }}>
+        <div className="w-[80%] p-0 flex flex-col gap-4 mt-6">
+          <InputComponent
+            width={100}
+            label="Upload Image"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const maxSize = 5 * 1024 * 1024; // 5 MB in bytes
+                if (file.size > maxSize) {
+                  alert(
+                    "File size exceeds the 5 MB limit. Please upload a smaller file."
+                  );
+                } else {
+                  setImageUrl(file);
+                }
+              } else {
+                alert("No file selected.");
+              }
+            }}
+            className="p-0"
+          />
 
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full">
+          <div className="flex gap-1 max850:flex-col max850:space-y-4">
             <InputComponent
               width={100}
               label="Full Name"
