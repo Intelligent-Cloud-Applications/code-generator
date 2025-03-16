@@ -27,7 +27,7 @@ const LeftBanner = ({ displayAfterClick }) => {
   const Navigate = useNavigate()
   const UserCtx = useContext(Context)
   const InstitutionData = useContext(InstitutionContext).institutionData
-  
+
   const isMember = UserCtx.userData.userType === 'member'
   const isAdmin = UserCtx.userData.userType === 'admin'
   const isInstructor = UserCtx.userData.userType === 'instructor'
@@ -94,7 +94,7 @@ const LeftBanner = ({ displayAfterClick }) => {
     )
   }
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     try {
       setLoading(true);
       await Auth.signOut();
@@ -180,12 +180,12 @@ const LeftBanner = ({ displayAfterClick }) => {
             text={'Contact'}
             onClickFn={() => Navigate('/query')}
           />
-          
-          <ListItemMobile
+
+          {/* <ListItemMobile
             icon={<FaSignOutAlt size={20} />}
             text={'Logout'}
             onClickFn={handleLogout}
-          />
+          /> */}
         </div>
       </div>
 
@@ -278,23 +278,23 @@ const LeftBanner = ({ displayAfterClick }) => {
               />
             )}
 
-            <ListItem
-              icon={
-                isAdmin ? <FaEdit size={18} /> : <FaShoppingCart size={18} />
-              }
-              text="Subscriptions"
-              onClickFn={() => {
-                const baseUrl =
-                  process.env.NODE_ENV === "development" ?
-                    "http://localhost:3000" :
-                    process.env.REACT_APP_STAGE === 'PROD'
-                      ? institutionData.PROD_DOMAIN
-                      : institutionData.BETA_DOMAIN
+            {isAdmin && (
+              <ListItem
+                icon={<FaEdit size={18} />}
+                text="Subscriptions"
+                onClickFn={() => {
+                  const baseUrl =
+                    process.env.NODE_ENV === "development"
+                      ? "http://localhost:3000"
+                      : process.env.REACT_APP_STAGE === 'PROD'
+                        ? institutionData.PROD_DOMAIN
+                        : institutionData.BETA_DOMAIN;
 
-                const url = `${baseUrl}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor.replace('#', ''))}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor.replace('#', ''))}`
-                window.open(url, '_blank', 'noopener,noreferrer')
-              }}
-            />
+                  const url = `${baseUrl}/allpayment/${institutionData.InstitutionId}/${UserCtx.cognitoId}/${UserCtx.emailId}?primary=${encodeURIComponent(InstitutionData.PrimaryColor.replace('#', ''))}&secondary=${encodeURIComponent(InstitutionData.SecondaryColor.replace('#', ''))}`;
+                  window.open(url, '_blank', 'noopener,noreferrer');
+                }}
+              />
+            )}
 
             <ListItem
               icon={<FaUser size={18} />}
@@ -308,32 +308,40 @@ const LeftBanner = ({ displayAfterClick }) => {
             <ListItem
               icon={<FaEnvelope size={18} />}
               text="Contact us ?"
-              onClickFn={() => Navigate('/query')}  
+              onClickFn={() => Navigate('/query')}
             />
-            <button 
-          className=" bottom-2 mt-12 flex gap-1  items-center text-[1.1rem]  w-[75%] p-2 font-bold text-white rounded-md cursor-pointer  transition max1050:w-[25%]" 
-          
-          onClick={handleLogout}
-          disabled={loading}
-        >
-          {loading ? (
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              <p className="ml-2 max1050:text-[9.5px] max1050:font-[400] mb-0">Logging out...</p>
-            </div>
-          ) : (
-            <>
-              <BsBoxArrowRight size={'1.9rem'} className="mr-2 text-white" />
-              <p className="text-sm max1050:font-[400] mb-0">Logout</p>
-            </>
-          )}
-        </button>
+            <button
+              className={`flex gap-1 items-center text-[1.1rem] w-[75%] font-bold text-white rounded-md cursor-pointer transition 
+    ${UserCtx.userData.userType === 'member'
+                  ? 'mt-36'
+                  : UserCtx.userData.userType === 'instructor'
+                    ? 'mt-48'
+                    : 'mt-16'
+                }`}
+              onClick={handleLogout}
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <p className="ml-2 max1050:text-[9.5px] max1050:font-[400] mb-0">
+                    Logging out...
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <BsBoxArrowRight size={'1.7rem'} className="mr-2 text-white" />
+                  <p className="text-sm max1050:font-[400] mb-0">Logout</p>
+                </>
+              )}
+            </button>
+
           </ul>
         </nav>
-       
+
       </div>
     </>
   )
 }
 
-export default LeftBanner
+export default LeftBanner;

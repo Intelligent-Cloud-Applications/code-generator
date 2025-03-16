@@ -321,7 +321,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
               />
             </div>
             {selectedOption === "Members List" ? (
-              <div className=" pt-6">
+              <div className="w-[94.5%] overflow-auto mt-4 pt-6">
                 {/* <ul className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-colrounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] ">
 
                   <div className="overflow-auto w-full"> */}
@@ -333,7 +333,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                     <Table.HeadCell>Renew Date</Table.HeadCell>
                     <Table.HeadCell>Classes Attended</Table.HeadCell>
                     <Table.HeadCell>Balance</Table.HeadCell>
-                    <Table.HeadCell></Table.HeadCell>
+                    <Table.HeadCell>Action</Table.HeadCell>
                   </Table.Head>
                   <Table.Body className="divide-y">
                     {filteredUserList.map((user) => {
@@ -388,7 +388,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                             </Table.Cell>
                             <Table.Cell className="flex items-center gap-3 text-gray-700 font-semibold text-center px-4 py-4">
                               <button
-                                className="p-2 hover:bg-transparent rounded-md"
+                                className="p-3 hover:bg-transparent rounded-md"
                                 onClick={() => {
                                   setIsUserAdd(false);
                                   setIsModalOpen(true);
@@ -400,7 +400,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                   setBalance(user.balance);
                                 }}
                               >
-                                <FaEye size={20} />
+                                <FaEye size={15} />
                               </button>
                               <button
                                 className="p-2 hover:bg-transparent rounded-md"
@@ -412,7 +412,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                   viewBox="0 0 24 24"
                                   strokeWidth={1.5}
                                   stroke="currentColor"
-                                  className="size-6"
+                                  className="size-4"
                                 >
                                   <path
                                     strokeLinecap="round"
