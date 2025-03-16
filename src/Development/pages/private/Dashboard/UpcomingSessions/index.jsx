@@ -13,6 +13,11 @@ import Streak from "./Streak";
 import { onJoinClass } from "./StreakFunctions";
 import { toast } from "react-toastify";
 
+import DateFormatter from "../../../../common/utils/DateFormatter";
+import PaginationComponent from "../../../../common/Pagination";
+import AttendanceModal from "../../../../common/AttendanceModal";
+import formatTime from "../../../../common/utils/format-time";
+
 import { Button, Label, Modal, TextInput, Select } from "flowbite-react";
 import { FaUserTie, FaCalendarAlt, FaClock } from "react-icons/fa";
 import { HiOutlineLink } from "react-icons/hi";
@@ -76,15 +81,28 @@ const UpcomingSessions = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const [showFilters, setShowFilters] = useState(false);
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   // const instructorNamesArray = Ctx.instructorList;
   const classTypeNameArray = InstitutionData.ClassTypes;
   const [count, setCount] = useState(0);
   const [modal, setModal] = useState(false);
+
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
   const [selectedClassForAttendance, setSelectedClassForAttendance] =
     useState(null);
-  const [attendanceSearchTerm, setAttendanceSearchTerm] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState({});
+
+  const handleAttendanceClick = (classId) => {
+    setSelectedClassForAttendance(classId);
+    setShowAttendanceModal(true);
+  };
+
+  const handleCloseAttendanceModal = () => {
+    setShowAttendanceModal(false);
+    setSelectedClassForAttendance(null);
+  };
 
   // if (Ctx.userData.status === "InActive" && Ctx.userData.userType === "member") {
   //   Navigate("/subscription");
@@ -219,7 +237,7 @@ const UpcomingSessions = () => {
             instructorId: selectedInstructor.instructorId,
             instructorNames: selectedInstructor.name,
             classDescription: "",
-            zoomLink: zoomLink || "", // Provide an empty string if no Zoom link is provided
+            zoomLink: zoomLink || "",
             date: new Date(datePicker + "T" + time).getTime(),
           },
         }
@@ -251,71 +269,70 @@ const UpcomingSessions = () => {
     setTime("00:00:00");
   }
 
-  const handleAttendanceClick = async (classId) => {
-    setSelectedClassForAttendance(classId);
-    setShowAttendanceModal(true);
+  // const handleAttendanceClick = async (classId) => {
+  //   setSelectedClassForAttendance(classId);
+  //   setShowAttendanceModal(true);
 
-    try {
-      const response = await API.get(
-        "main",
-        `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}`
-      );
-      const attendedUsers = response.Items || [];
-      const initialSelectedUsers = {};
+  //   try {
+  //     const response = await API.get(
+  //       "main",
+  //       `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}`
+  //     );
+  //     const attendedUsers = response.Items || [];
+  //     const initialSelectedUsers = {};
 
-      // Initialize with currently attended users
-      attendedUsers.forEach((user) => {
-        initialSelectedUsers[user.cognitoId] = true;
-      });
+  //     // Initialize with currently attended users
+  //     attendedUsers.forEach((user) => {
+  //       initialSelectedUsers[user.cognitoId] = true;
+  //     });
 
-      setSelectedUsers(initialSelectedUsers);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to fetch attendance data");
-    }
-  };
+  //     setSelectedUsers(initialSelectedUsers);
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Failed to fetch attendance data");
+  //   }
+  // };
 
-  const handleToggleAttendance = (cognitoId) => {
-    setSelectedUsers((prev) => ({
-      ...prev,
-      [cognitoId]: !prev[cognitoId],
-    }));
-  };
+  // const handleToggleAttendance = (cognitoId) => {
+  //   setSelectedUsers((prev) => ({
+  //     ...prev,
+  //     [cognitoId]: !prev[cognitoId],
+  //   }));
+  // };
 
-  const handleSaveAttendance = async () => {
-    UtilCtx.setLoader(true);
-    try {
-      // Get all selected users
-      const selectedUserIds = Object.entries(selectedUsers)
-        .filter(([_, isSelected]) => isSelected)
-        .map(([cognitoId]) => cognitoId);
+  // const handleSaveAttendance = async () => {
+  //   UtilCtx.setLoader(true);
+  //   try {
+  //     // Get all selected users
+  //     const selectedUserIds = Object.entries(selectedUsers)
+  //       .filter(([_, isSelected]) => isSelected)
+  //       .map(([cognitoId]) => cognitoId);
 
-      // Make API call to update attendance
-      await API.post(
-        "main",
-        `/admin/put-attendance/${UserCtx.userData.institution}`,
-        {
-          body: {
-            classId: selectedClassForAttendance,
-            attendedUsers: selectedUserIds,
-          },
-        }
-      );
+  //     // Make API call to update attendance
+  //     await API.post(
+  //       "main",
+  //       `/admin/put-attendance/${UserCtx.userData.institution}`,
+  //       {
+  //         body: {
+  //           classId: selectedClassForAttendance,
+  //           attendedUsers: selectedUserIds,
+  //         },
+  //       }
+  //     );
 
-      toast.success("Attendance updated successfully");
-      setShowAttendanceModal(false);
-      setSelectedClassForAttendance(null);
-      setSelectedUsers({});
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to update attendance");
-    } finally {
-      UtilCtx.setLoader(false);
-    }
-  };
+  //     toast.success("Attendance updated successfully");
+  //     setShowAttendanceModal(false);
+  //     setSelectedClassForAttendance(null);
+  //     setSelectedUsers({});
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Failed to update attendance");
+  //   } finally {
+  //     UtilCtx.setLoader(false);
+  //   }
+  // };
 
   const [showForm, setShowForm] = useState(false);
-  // eslint-disable-next-line
   const [formPosition, setFormPosition] = useState({ x: 0, y: 0 });
   const [openedOnce, setOpenedOnce] = useState(false);
   const formRef = useRef(null);
@@ -356,20 +373,6 @@ const UpcomingSessions = () => {
   const [classId, setClassId] = useState("");
   const [currentPageAttendance, setCurrentPageAttendance] = useState(1);
   const usersPerPage = 5;
-
-  const filteredUsers = (userList || [])
-    .filter((user) => user?.status === "Active")
-    .filter((user) => {
-      if (!attendanceSearchTerm) return true;
-      return (
-        user?.userName
-          ?.toLowerCase()
-          .includes(attendanceSearchTerm.toLowerCase()) ||
-        user?.emailId
-          ?.toLowerCase()
-          .includes(attendanceSearchTerm.toLowerCase())
-      );
-    });
 
   useEffect(() => {
     const activeUsers = userList.filter((user) => user.status === "Active");
@@ -615,19 +618,23 @@ const UpcomingSessions = () => {
         emailId: UserCtx.userData.emailId,
       };
 
-      const response = await API.post(
-        "main",
-        `/user/put-attendance/${UserCtx.userData.institution}`,
-        {
-          body: data,
-        }
-      );
+      try {
+        const response = await API.post(
+          "main",
+          `/user/put-attendance/${UserCtx.userData.institution}`,
+          {
+            body: data,
+          }
+        );
+      } catch {
+        toast.error("Too early to give attendance");
+      }
 
       console.log(response);
       toast.success("Attendance Marked Successfully");
     } catch (error) {
       console.error(error);
-      toast, error("An error occurred while marking attendance");
+      toast.error("An error occurred while marking attendance");
     }
   };
 
@@ -1005,9 +1012,10 @@ const UpcomingSessions = () => {
                         </Table.HeadCell>
 
                         <Table.HeadCell className="text-center w-[80px] ">
-                          {sortedFilteredClasses[0]?.zoomLink
+                          {/* {sortedFilteredClasses[0]?.zoomLink
                             ? "Join"
-                            : "Attendance"}
+                            : "Attendance"} */}
+                          Attendance
                         </Table.HeadCell>
                       </Table.Head>
 
@@ -1020,41 +1028,43 @@ const UpcomingSessions = () => {
                               className="bg-white hover:bg-gray-50 transition-colors duration-200"
                             >
                               <Table.Cell className="text-gray-700 text-xs font-semibold text-center">
-                                {formatDate(parseInt(clas.date))}
+                                {/* {formatDate(parseInt(clas.date))} */}
+                                <DateFormatter epochDate={clas.date} />
                               </Table.Cell>
                               <Table.Cell className="text-gray-700 text-xs font-semibold text-center">
                                 {Ctx.userData.userType === "admin" ||
                                 Ctx.userData.userType === "instructor" ? (
                                   <select
-                                  className="w-[70%] h-8 px-2 rounded-[0.5rem] focus:outline-none focus:border-blue-500 text-xs border-nonetext-center font-semibold"
-                                  style={{
-                                    backgroundColor: "transparent",
-                                    border: "1px solid #d1d5db",
-
-                                  }}
-                                  value={getInstructor(clas.instructorNames)?.name}
-                                  onChange={(e) => {
-                                    onClassUpdated(
-                                      clas.classId,
-                                      getInstructor(e.target.value).name,
-                                      clas.classType,
-                                      getInstructor(e.target.value).instructorId,
-                                      clas.date
-                                    );
-                                  }}
-                                >
-                                  {Ctx.instructorList
-                                    .sort((a, b) => a.name.localeCompare(b.name))
-                                    .filter((i) => i.name !== "Cancelled")
-                                    .map((i) => (
-                                      <option
-
-                                      key={i.name} value={i.name}>
-                                        {i.name}
-                                      </option>
-                                    ))}
-                                </select>
-
+                                    className="w-[70%] h-8 px-2 rounded-[0.5rem] focus:outline-none focus:border-blue-500 text-xs border-nonetext-center font-semibold"
+                                    style={{
+                                      backgroundColor: "transparent",
+                                      border: "1px solid #d1d5db",
+                                    }}
+                                    value={
+                                      getInstructor(clas.instructorNames)?.name
+                                    }
+                                    onChange={(e) => {
+                                      onClassUpdated(
+                                        clas.classId,
+                                        getInstructor(e.target.value).name,
+                                        clas.classType,
+                                        getInstructor(e.target.value)
+                                          .instructorId,
+                                        clas.date
+                                      );
+                                    }}
+                                  >
+                                    {Ctx.instructorList
+                                      .sort((a, b) =>
+                                        a.name.localeCompare(b.name)
+                                      )
+                                      .filter((i) => i.name !== "Cancelled")
+                                      .map((i) => (
+                                        <option key={i.name} value={i.name}>
+                                          {i.name}
+                                        </option>
+                                      ))}
+                                  </select>
                                 ) : (
                                   <p className="h-10 flex items-center justify-center rounded text-[14px] ">
                                     {getInstructor(clas.instructorNames)?.name}
@@ -1107,18 +1117,13 @@ const UpcomingSessions = () => {
                                     </div>
                                   ) : (
                                     <p className="h-10 flex items-center justify-center text-md">
-                                      {new Date(
-                                        parseInt(clas.date)
-                                      ).toLocaleString("en-US", {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      })}
+                                      {formatTime(clas.date)}
                                     </p>
                                   )}
                                 </div>
                               </Table.Cell>
 
-                              <Table.Cell className="text-gray-700 w-48 font-semibold text-center">
+                              {/* <Table.Cell className="text-gray-700 w-48 font-semibold text-center">
                                 <div className="flex items-center">
                                   {(Ctx.userData.userType === "admin" ||
                                     Ctx.userData.userType === "instructor" ||
@@ -1165,6 +1170,70 @@ const UpcomingSessions = () => {
                                       </svg>
                                       {clas.zoomLink
                                         ? "Join"
+                                        : attendanceStatus[clas.classId] ||
+                                          "Mark Attendance"}
+                                    </Button>
+                                  )}
+                                </div>
+                              </Table.Cell> */}
+
+                              <Table.Cell className="text-gray-700 w-48 font-semibold text-center">
+                                <div className="flex items-center">
+                                  {(Ctx.userData.userType === "admin" ||
+                                    Ctx.userData.userType === "instructor" ||
+                                    Ctx.userData.userType === "member") && (
+                                    <Button
+                                      onClick={() => {
+                                        if (
+                                          Ctx.userData.userType === "member"
+                                        ) {
+                                          if (clas.zoomLink) {
+                                            window.open(
+                                              clas.zoomLink,
+                                              "_blank",
+                                              "noreferrer"
+                                            );
+                                          }
+                                          markAttendance(clas.classId);
+                                        } else if (
+                                          Ctx.userData.userType === "admin" ||
+                                          Ctx.userData.userType === "instructor"
+                                        ) {
+                                          // if (clas.zoomLink) {
+                                          //   window.open(
+                                          //     clas.zoomLink,
+                                          //     "_blank",
+                                          //     "noreferrer"
+                                          //   );
+                                          // }
+                                          handleAttendanceClick(clas.classId);
+                                        }
+                                      }}
+                                      size="xs"
+                                      style={{ backgroundColor: "transparent" }}
+                                      className="flex items-center gap-3 text-black w-full"
+                                    >
+                                      <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth="2"
+                                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                        />
+                                      </svg>
+                                      {Ctx.userData.userType === "member"
+                                        ? clas.zoomLink
+                                          ? attendanceStatus[clas.classId] ===
+                                            "Joined"
+                                            ? "Joined"
+                                            : "Join"
+                                          : "Mark Attendance"
                                         : attendanceStatus[clas.classId] ||
                                           "Mark Attendance"}
                                     </Button>
@@ -1251,128 +1320,28 @@ const UpcomingSessions = () => {
                   </>
                 )}
                 {!attendanceList && (
-                  <div
-                    className={`flex items-center justify-between mt-4 px-2`}
-                  >
-                    <div className="text-sm text-gray-700">
-                      Showing{" "}
-                      <span className="font-medium">{startIndex + 1}</span> to{" "}
-                      <span className="font-medium">
-                        {Math.min(endIndex, filteredClasses.length)}
-                      </span>{" "}
-                      of{" "}
-                      <span className="font-medium">
-                        {filteredClasses.length}
-                      </span>{" "}
-                      results
-                    </div>
-                    <Pagination
-                      className="text-gray-900"
-                      totalPages={totalPages}
-                      currentPage={currentPage}
-                      onPageChange={(value) => setCurrentPage(value)}
-                      showIcons={true}
-                    />
-                  </div>
+                  <PaginationComponent
+                    showIcons={true}
+                    data={filteredClasses}
+                    itemsPerPage={5}
+                    currentPage={currentPage}
+                    onPageChange={onPageChange}
+                  />
                 )}
               </div>
             </div>
           </div>
         </div>
       )}
+
       {isMobileScreen && <UpcomingSessionsMobile />}
 
-      {showAttendanceModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-[600px] max-w-[95%] max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Mark Attendance</h3>
-              <button
-                onClick={() => setShowAttendanceModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Search users..."
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                value={attendanceSearchTerm}
-                onChange={(e) => setAttendanceSearchTerm(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-4 mb-6 max-h-[50vh] overflow-y-auto">
-              {filteredUsers.map((user) => (
-                <div
-                  key={user.cognitoId}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium">{user.userName}</p>
-                    <p className="text-sm text-gray-600">{user.emailId}</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={selectedUsers[user.cognitoId] || false}
-                      onChange={() => handleToggleAttendance(user.cognitoId)}
-                    />
-                    <div
-                      className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer
-                            ${
-                              selectedUsers[user.cognitoId]
-                                ? "bg-green-600"
-                                : "bg-gray-200"
-                            }
-                            peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px]
-                            after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
-                            after:transition-all`}
-                    ></div>
-                  </label>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button
-                color="gray"
-                onClick={() => {
-                  setShowAttendanceModal(false);
-                  setSelectedClassForAttendance(null);
-                  setSelectedUsers({});
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSaveAttendance}
-                style={{
-                  backgroundColor: InstitutionData.LightPrimaryColor,
-                }}
-              >
-                Save Attendance
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AttendanceModal
+        isOpen={showAttendanceModal}
+        onClose={handleCloseAttendanceModal}
+        classId={selectedClassForAttendance}
+        institutionId={InstitutionData.InstitutionId}
+      />
     </>
   );
 };
