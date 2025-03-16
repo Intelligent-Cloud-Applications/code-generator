@@ -354,14 +354,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                       {/* List header content */}
                       <div className="w-[12%]"></div>
                       <div className="w-[24%]">Name</div>
-                      {/*<div*/}
-                      {/*  className="w-[13%] email-hover"*/}
-                      {/*  onClick={() => requestSort("email")}*/}
-                      {/*  style={{ cursor: "pointer" }}*/}
-                      {/*>*/}
-                      {/*  Email*/}
-                      {/*</div>*/}
-                      {/*<div className="w-[11%] font-sans ml-[0.5rem]">Phone</div>*/}
+                     
                       <div className="w-[21%] font-sans">Joining Date</div>
                       <div className="w-[20%] font-sans">Renew Date</div>
                       <div className="w-[23%] font-sans">Classes Attended</div>

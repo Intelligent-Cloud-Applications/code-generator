@@ -84,7 +84,7 @@ const AuthPage = () => {
         <EmailInput name='email' className='rounded w-full'/>
         <PasswordInput name='password' className='rounded w-full'/>
         <Link to={'/forgot-password'}>Forgot password?</Link>
-        <PrimaryButton>Continue</PrimaryButton>
+        <PrimaryButton className="hover:opacity-[90%]">Continue</PrimaryButton>
         {productId === "1000007" && (
         <p>Dont have an account? <Link to={'/signup'}>Signup</Link></p>
         )}

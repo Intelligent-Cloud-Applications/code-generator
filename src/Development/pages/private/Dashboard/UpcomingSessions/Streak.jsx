@@ -41,7 +41,7 @@ const Streak = () => {
   return (
     <>
       <div
-        className="w-[100%] flex flex-row p-[2rem] px-[1.5rem] items-center justify-between border h-[15%] main"
+        className="w-[100%] flex flex-row p-[2rem] px-[1.5rem] items-center justify-between border h-[15%] main mb-2 rounded-md"
         style={{
           backgroundColor: InstitutionData.LightestPrimaryColor
         }}

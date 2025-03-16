@@ -1,428 +1,141 @@
 import { API } from "aws-amplify";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Context from "../../../../Context/Context";
-import { Button, Pagination } from "flowbite-react";
+import { Button, Table } from "flowbite-react";
 import PreviousSessionsMobile from "./mobile";
 import { useMediaQuery } from "../../../../utils/helpers";
 import { Button2 } from "../../../../common/Inputs";
 import InstitutionContext from "../../../../Context/InstitutionContext";
 import { toast } from "react-toastify";
+import DateFormatter from "../../../../common/utils/DateFormatter";
+import PaginationComponent from "../../../../common/Pagination";
+import AttendanceModal from "../../../../common/AttendanceModal";
+import formatTime from "../../../../common/utils/format-time";
 
-// import { useNavigate } from "react-router-dom";
-
-const formatDate = (epochDate) => {
-  const date = new Date(epochDate);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed, so we add 1 to get the correct month
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-};
 
 const PreviousSessions = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
-  const [classId, setClassId] = useState("");
   const [recordingLink, setRecordingLink] = useState("");
-  const UserCtx = useContext(Context);
+  const [classId, setClassId] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const Ctx = useContext(Context);
   const UtilCtx = useContext(Context).util;
-  // const Navigate = useNavigate()
-
-  // const instructorNamesOptions = Ctx.instructorList.map((i) => i.name)
   const [classTypeFilter, setClassTypeFilter] = useState("");
   const [instructorTypeFilter, setinstructorTypeFilter] = useState("");
-  const filteredClasses = Ctx.previousClasses.filter(
-    (clas) =>
-      instructorTypeFilter === "" ||
-      clas.instructorNames === instructorTypeFilter
-  );
-
-  const classTypes = Array.from(
-    new Set(filteredClasses.map((clas) => clas.classType))
-  );
-
-  const getInstructor = (name) => {
-    return Ctx.instructorList.find(
-      (i) => i.name?.toString().trim() === name?.toString().trim()
-    );
-  };
-
-  const isMobileScreen = useMediaQuery("(max-width: 600px)");
-  const itemsPerPage = 8;
-  const [currentPage, setCurrentPage] = useState(1);
-  let totalPages = Math.ceil(Ctx.previousClasses.length / itemsPerPage);
-  let startIndex = (currentPage - 1) * itemsPerPage;
-  let endIndex = startIndex + itemsPerPage;
   const [showFilters, setShowFilters] = useState(false);
 
-  const onInstructorNameChange = async (
-    newInstructorName,
-    instructorId,
-    classType,
-    classId
-  ) => {
-    UtilCtx.setLoader(true);
+  const sortedPreviousClasses = Ctx.previousClasses.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  // Then apply filters
+  const filteredClasses = sortedPreviousClasses
+    .filter((clas) => {
+      if (instructorTypeFilter === "") {
+        return true;
+      }
+      return clas.instructorNames === instructorTypeFilter;
+    })
+    .filter((clas) => {
+      if (classTypeFilter === "") {
+        return true;
+      }
+      return clas.classType === classTypeFilter;
+    });
 
-    try {
-      await API.put(
-        "main",
-        `/admin/edit-schedule-name/${InstitutionData.InstitutionId}`,
-        {
-          body: {
-            classId: classId,
-            instructorNames: newInstructorName,
-            instructorId: instructorId,
-            classType: classType,
-          },
-        }
-      );
+  const classTypes = Array.from(
+    new Set(sortedPreviousClasses.map((clas) => clas.classType))
+  );
 
-      const updatedClasses = Ctx.previousClasses.map((clas) => {
-        if (clas.classId === classId) {
-          return {
-            ...clas,
-            instructorNames: newInstructorName,
-            instructorId: instructorId,
-          };
-        }
-        return clas;
-      });
-
-      Ctx.setPreviousClasses(updatedClasses);
-
-      UtilCtx.setLoader(false);
-    } catch (e) {
-      alert(e.message);
-      UtilCtx.setLoader(false);
-    }
+  // Pagination logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const onPageChange = (page) => {
+    setCurrentPage(page);
   };
+
+  // Get current page classes
+  const currentClasses = filteredClasses.slice(startIndex, endIndex);
 
   const onRecordingUpdate = async (e) => {
     e.preventDefault();
     UtilCtx.setLoader(true);
 
     try {
-      if (classId.length === 0 && recordingLink.length === 0) {
-        alert("Invalid Details");
+      if (!selectedClassId || !recordingLink) {
+        toast.error("Invalid Details");
         UtilCtx.setLoader(false);
-      } else {
-        await API.put(
-          "main",
-          `/admin/edit-schedule-recording/${InstitutionData.InstitutionId}`,
-          {
-            body: {
-              classId: classId,
-              recordingLink: recordingLink,
-            },
-          }
-        );
-        toast.success("Recording Link Updated Successfully");
-
-        setClassId("");
-
-        const updatedClasses = Ctx.previousClasses.map((clas) => {
-          if (clas.classId === classId) {
-            return {
-              ...clas,
-              recordingLink: recordingLink,
-            };
-          }
-          return clas;
-        });
-
-        Ctx.setPreviousClasses(updatedClasses);
-
-        UtilCtx.setLoader(false);
+        return;
       }
+
+      await API.put(
+        "main",
+        `/admin/edit-schedule-recording/${InstitutionData.InstitutionId}`,
+        {
+          body: {
+            classId: selectedClassId,
+            recordingLink: recordingLink,
+          },
+        }
+      );
+
+      toast.success("Recording Link Updated Successfully");
+
+      const updatedClasses = Ctx.previousClasses.map((clas) => {
+        if (clas.classId === selectedClassId) {
+          return {
+            ...clas,
+            recordingLink: recordingLink,
+          };
+        }
+        return clas;
+      });
+
+      Ctx.setPreviousClasses(updatedClasses);
+      setSelectedClassId(null);
+      setRecordingLink("");
+      setShowUpdateModal(false);
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message);
+    } finally {
       UtilCtx.setLoader(false);
     }
   };
-  const sortedPreviousClasses = Ctx.previousClasses.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
 
-  //attendance
-  const { userList, userAttendance } = useContext(Context);
-  const [attendedUsers, setAttendedUsers] = useState([]);
-  const [attendanceStatus, setAttendanceStatus] = useState({});
-  const [activeUsers, setActiveUsers] = useState([]);
-  const [classId2, setClassId2] = useState("");
-  const [attendanceList, setAttendanceList] = useState(false);
-  const [currentPageAttendance, setCurrentPageAttendance] = useState(1);
-  const usersPerPage = 10;
-  useEffect(() => {
-    const activeUsers = userList.filter((user) => user.status === "Active");
-    setActiveUsers(activeUsers.toSorted((a, b) => {
-      const x = userAttendance[a.cognitoId] || 0;
-      const y = userAttendance[b.cognitoId] || 0;
-      return y - x;
-    }));
-    const attendedIds = attendedUsers.map((user) => user.cognitoId);
-    const updatedStatus = {};
-    activeUsers.forEach((user) => {
-      updatedStatus[user.cognitoId] = attendedIds.includes(user.cognitoId)
-        ? "Attended"
-        : "Not Attended";
-    });
-    setAttendanceStatus(updatedStatus);
-    console.log(activeUsers);
-    // eslint-disable-next-line
-  }, [UserCtx]);
-  const indexOfLastUser = currentPageAttendance * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = activeUsers.slice(indexOfFirstUser, indexOfLastUser);
-
-  const handlePageChange = (value) => {
-    setCurrentPageAttendance(value);
+  const handleUpdateClick = (classId, currentLink) => {
+    setSelectedClassId(classId);
+    setRecordingLink(currentLink || "");
+    setShowUpdateModal(true);
   };
 
-  const showMembersAttended = async (classId) => {
-    console.log(classId);
-    try {
-      const response = await API.get(
-        "main",
-        `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}`
-      );
-      setAttendedUsers(response.Items);
-      setAttendanceList(true);
-      setClassId2(classId);
-      console.log(response);
-      // Update attendance status based on fetched attendance records
-      const updatedStatus = {};
-      activeUsers.forEach((user) => {
-        updatedStatus[user.cognitoId] = response.Items.some(
-          (attendedUser) => attendedUser.cognitoId === user.cognitoId
-        )
-          ? "Attended"
-          : "Not Attended";
-      });
-      setAttendanceStatus(updatedStatus);
-    } catch (error) {
-      console.log(error);
-    }
+  const isMobileScreen = useMediaQuery("(max-width: 600px)");
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [selectedClassForAttendance, setSelectedClassForAttendance] =
+    useState(null);
+
+  const handleAttendanceClick = (classId) => {
+    setSelectedClassForAttendance(classId);
+    setShowAttendanceModal(true);
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showButton, setShowButton] = useState(false);
-
-  // Function to filter users based on search term
-  const filterUsers = () => {
-    if (!searchTerm) {
-      return activeUsers;
-    } else {
-      return activeUsers.filter((user) =>
-        user.userName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+  const handleCloseAttendanceModal = () => {
+    setShowAttendanceModal(false);
+    setSelectedClassForAttendance(null);
   };
-  const filteredUsers = filterUsers();
-
-  // Sort the filteredUsers array based on attendance status
-  filteredUsers.sort((a, b) => {
-    if (
-      attendanceStatus[a.cognitoId] === "Attended" &&
-      attendanceStatus[b.cognitoId] !== "Attended"
-    ) {
-      return -1; // attended users first
-    } else if (
-      attendanceStatus[a.cognitoId] !== "Attended" &&
-      attendanceStatus[b.cognitoId] === "Attended"
-    ) {
-      return 1; // non-attended users last
-    } else {
-      return 0; // maintain the current order
-    }
-  });
-
-  const [cognitoIds, setCognitoIds] = useState("");
-  const [emailIds, setEmailIds] = useState("");
-  const blurClass = "blur";
-  const handleCheckboxClick = async (clickedCognitoId, clickedEmailId) => {
-    // Add the clicked ids to the arrays
-    setShowButton(true);
-    setCognitoIds(clickedCognitoId);
-    setEmailIds(clickedEmailId);
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-
-    // Loop through checkboxes
-    checkboxes.forEach((checkbox) => {
-      // Check if checkbox is checked
-      if (checkbox.checked) {
-        // Remove blur class from checked checkbox's parent container
-        checkbox.closest(".grid").classList.remove(blurClass);
-      } else {
-        // Apply blur class to unchecked checkbox's parent container
-        checkbox.closest(".grid").classList.add(blurClass);
-        checkbox.disabled = true;
-      }
-    });
-  };
-
-  const handleCheckboxUnclick = async (
-    unclickedCognitoId,
-    unclickedEmailId
-  ) => {
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    setShowButton(false); // Hide the button if there are no more ids
-    setCognitoIds("");
-    setEmailIds("");
-    checkboxes.forEach((checkbox) => {
-      checkbox.closest(".grid").classList.remove(blurClass);
-      checkbox.disabled = false;
-    });
-  };
-
-  useEffect(() => {
-    handleCheckboxUnclick("", "");
-  }, [currentPageAttendance]);
-
-  const adminPutAttendance = async () => {
-    try {
-      const body = {
-        cognitoId: cognitoIds,
-        emailId: emailIds,
-        classId: classId2,
-      };
-
-      // Make API request to mark attendance
-      await API.post(
-        "main",
-        `/admin/put-attendance/${UserCtx.userData.institution}`,
-        { body: body }
-      );
-
-      // Update attended status for the user
-      const updatedAttendanceStatus = { ...attendanceStatus };
-      updatedAttendanceStatus[cognitoIds] = "Attended";
-      setAttendanceStatus(updatedAttendanceStatus);
-
-      // Deselect checkbox and reset cognitoIds and emailIds
-      handleCheckboxUnclick();
-
-      alert("Attendance marked successfully");
-    } catch (error) {
-      console.log(error);
-      alert("An error occurred while putting Attendance");
-    } finally {
-      showMembersAttended(classId2);
-    }
-  };
-
-  const markAttendance = async (ChoosenClassId) => {
-    try {
-      const data = {
-        classId: ChoosenClassId,
-        emailId: UserCtx.userData.emailId,
-      };
-
-      const response = await API.post(
-        "main",
-        `/user/put-attendance/${UserCtx.userData.institution}`,
-        {
-          body: data,
-        }
-      );
-
-      console.log(response);
-      alert("Attendance Marked Successfully");
-      fetchAttendance();
-    } catch (error) {
-      console.error(error);
-      alert("An error occurred while marking attendance");
-    }
-  };
-
-  const fetchAttendance = async () => {
-    const sortedClasses = [...sortedPreviousClasses];
-
-    // Prepare initial attendance status
-    const initialStatus = {};
-    sortedClasses.forEach(({ classId }) => {
-      initialStatus[classId] = "Loading..."; // Show loading initially
-    });
-    setAttendanceStatus(initialStatus);
-
-    const updateAttendanceStatus = (classId, status) => {
-      setAttendanceStatus((prevAttendanceStatus) => ({
-        ...prevAttendanceStatus,
-        [classId]: status,
-      }));
-    };
-
-    // Fetch attendance for classes scheduled today
-    for (const { classId } of sortedClasses) {
-      try {
-        const response = await API.get(
-          "main",
-          `/admin/query-attendance/${UserCtx.userData.institution}?classId=${classId}&userId=${UserCtx.userData.cognitoId}`
-        );
-        if (response.Items.length > 0) {
-          const { cognitoId } = response.Items[0];
-
-          if (cognitoId === UserCtx.userData.cognitoId) {
-            updateAttendanceStatus(classId, "Attended");
-          } else {
-            updateAttendanceStatus(classId, "Mark Attendance");
-          }
-        } else {
-          updateAttendanceStatus(classId, "Mark Attendance"); // Default to 'Mark Attendance'
-        }
-      } catch (error) {
-        console.error(error);
-        updateAttendanceStatus(classId, "Mark Attendance"); // Handle error case
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchAttendance();
-    // eslint-disable-next-line
-  }, [UserCtx]);
-  let classes = sortedPreviousClasses
-    .filter((clas) => {
-      if (instructorTypeFilter === "") {
-        return true;
-      } else {
-        return clas.instructorNames === instructorTypeFilter;
-      }
-    })
-    .filter((clas) => {
-      if (classTypeFilter === "") {
-        return true;
-      } else {
-        return clas.classType === classTypeFilter;
-      }
-    });
-  totalPages = Math.ceil(classes.length / itemsPerPage);
-
-  if (classes.length < itemsPerPage) {
-    startIndex = 0;
-    endIndex = classes.length;
-  } else {
-    startIndex = (currentPage - 1) * itemsPerPage;
-    endIndex = startIndex + itemsPerPage;
-  }
 
   return (
     <>
       {!isMobileScreen && (
         <>
           <div className={`w-[100%] flex flex-col items-center pt-6 gap-3`}>
+            {/* Header Section */}
             <h2 className={`text-[1.6rem] sans-sarif font-[700]`}>
               Previous Sessions
             </h2>
-            {/* <div className={`w-[80%] flex justify-start`}>
-              <button
-                className={`filter-button w-[8rem] tracking-[1.3px] text-[1.1rem] m-[1rem] mr-0 ml-12 rounded-[0.2rem] text-white`}
-                onClick={() => setShowFilters(!showFilters)}
-                style={{
-                  backgroundColor: InstitutionData.PrimaryColor
-                }}
-              >
-                Filter
-              </button>
-            </div> */}
+
+            {/* Filter Section */}
             <div className="w-[75%] flex justify-end">
               <Button
                 style={{
@@ -492,6 +205,7 @@ const PreviousSessions = () => {
               </div>
             </div>
 
+            {/* Recording Link Update Section */}
             {(Ctx.userData.userType === "admin" ||
               Ctx.userData.userType === "instructor") &&
               classId && (
@@ -509,336 +223,248 @@ const PreviousSessions = () => {
                 </form>
               )}
 
-            <ul
-              className={`relative pb-[3rem] w-[75%] min-h-[62vh] flex flex-col rounded-3 items-center justify-start pt-6`}
-              style={{
-                backgroundColor: InstitutionData.LightestPrimaryColor,
-              }}
-            >
-              {!attendanceList ? (
-                <li
-                  className={`w-[96%] flex flex-col items-center justify-center p-2`}
-                >
-                  <div
-                    className={`flex w-[85%] justify-between  mb-3 font-bold`}
-                  >
-                    <p className={`w-[25%] overflow-hidden`}>Instructor</p>
-                    <p
-                      className={`w-[20%] text-left overflow-hidden ml-[-4rem]`}
+            <div className="w-[75%]">
+              <Table hoverable striped>
+                <Table.Head>
+                  <Table.HeadCell className="font-semibold">
+                    Instructor
+                  </Table.HeadCell>
+                  <Table.HeadCell className="font-semibold">
+                    Date
+                  </Table.HeadCell>
+                  <Table.HeadCell className="font-semibold">
+                    Time
+                  </Table.HeadCell>
+                  <Table.HeadCell className="font-semibold">
+                    Recording Link
+                  </Table.HeadCell>
+                  {(Ctx.userData.userType === "admin" ||
+                    Ctx.userData.userType === "instructor") && (
+                    <Table.HeadCell className="font-semibold">
+                      Attendance
+                    </Table.HeadCell>
+                  )}
+                </Table.Head>
+                <Table.Body className="divide-y">
+                  {currentClasses.map((clas) => (
+                    <Table.Row
+                      key={clas.classId}
+                      className="bg-white hover:bg-gray-50 transition-colors duration-200"
                     >
-                      Class
-                    </p>
-                    <p className={`overflow-hidden w-[3.7rem] ml-[-1rem] `}>
-                      Date
-                    </p>
-                    <p
-                      className={
-                        UserCtx.userData.userType === "member"
-                          ? "w-[7.3rem] mr-0"
-                          : `w-[7.3rem] mr-[3.5rem]`
-                      }
-                    >
-                      Recording Link
-                    </p>
-                  </div>
-                </li>
-              ) : (
-                <div
-                  className="flex w-full ml-[-2rem] mb-3 mt-[-1rem] justify-between border-b-2 items-center h-[4rem]"
-                  style={{
-                    borderColor: InstitutionData.PrimaryColor,
-                    backgroundColor: InstitutionData.LightestPrimaryColor,
-                  }}
-                >
-                  <div
-                    className="text-[2.5rem] px-4 cursor-pointer"
-                    onClick={() => setAttendanceList(false)}
-                  >
-                    ←
-                  </div>
-                  <div className="flex ">
-                    <input
-                      type="text"
-                      placeholder="Search by user name"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ height: "2rem" }} // Apply height style here
-                      className="focus:outline-none  px-4 py-2 w-[25rem] "
-                    />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="gray"
-                      className="w-6 h-6 relative right-8 top-1"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                      />
-                    </svg>
-                  </div>
-                  <button
-                    className={
-                      showButton
-                        ? "bg-[#1b7571] text-white p-1 px-2 mr-3 rounded-[3px]"
-                        : "bg-transparent text-transparent"
-                    }
-                    onClick={adminPutAttendance}
-                  >
-                    Mark Attendance
-                  </button>
-                </div>
-              )}
-              <div
-                className={`overflow-auto flex flex-col gap-2 w-[100%] items-center`}
-              >
-                {!attendanceList ? (
-                  <div
-                    className={`overflow-auto flex flex-col gap-2 w-[100%] items-center`}
-                  >
-                    {classes.slice(startIndex, endIndex).map((clas, i) => {
-                      return (
-                        <li
-                          key={clas.classId}
-                          className={`w-[96%] flex flex-col items-center justify-center p-2`}
-                        >
-                          <div
-                            className={`flex w-[85%] justify-between items-center relative`}
-                          >
-                            <div className={`w-[25%] overflow-hidden relative`}>
-                              {Ctx.userData.userType === "admin" ||
-                                Ctx.userData.userType === "instructor" ? (
-                                <select
-                                  className={`rounded-[0.51rem] pr-[1.5rem] pl-[0rem]`}
-                                  style={{
-                                    backgroundColor: InstitutionData.LightestPrimaryColor,
-                                  }}
-                                  value={clas.instructorNames}
-                                  onChange={(e) =>
-                                    onInstructorNameChange(
-                                      e.target.value,
-                                      getInstructor(e.target.value).name,
-                                      clas.classType,
-                                      clas.classId
-                                    )
-                                  }
-                                >
-                                  {Ctx.instructorList
-                                    .sort((a, b) => {
-                                      if (a.name < b.name) return -1;
-                                      if (a.name > b.name) return 1;
-                                      return 0;
-                                    })
-                                    .map((i) =>
-                                      i.name !== "cancelled" && (
-                                        <option
-                                          key={i.name}
-                                          value={i.name}
-                                        >
-                                          {i.name}
-                                        </option>
-                                      )
-                                    )}
-                                </select>
-                              ) : (
-                                clas.instructorNames
-                              )}
-                            </div>
-                            <p
-                              className={`w-[25%] text-left overflow-hidden m-0`}
-                            >
-                              {clas.classType}
-                            </p>
-                            <p className={`overflow-hidden w-[5.7rem] m-0`}>
-                              {formatDate(parseInt(clas.date))}
-                            </p>
-                            <div
-                              className={
-                                !(UserCtx.userData.userType === "member")
-                                  ? "flex gap-5"
-                                  : ""
-                              }
-                            >
-                              <div
-                                className={`w-[9rem] rounded-[4px] max-h-[1.8rem] self-center flex justify-center items-center`}
+                      <Table.Cell className="text-gray-700 font-semibold">
+                        {clas.instructorNames}
+                      </Table.Cell>
+                      <Table.Cell className="text-gray-700 font-semibold">
+                      <DateFormatter epochDate={clas.date} />
+                      </Table.Cell>
+                      <Table.Cell className="text-gray-700 font-semibold">
+                        {formatTime(clas.date)}
+                      </Table.Cell>
+                      <Table.Cell className="text-gray-700 font-semibold">
+                        <div className="flex items-center gap-2 w-fit">
+                          {clas.recordingLink ? (
+                            <>
+                              <Button
+                                href={clas.recordingLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                size="xs"
                                 style={{
-                                  backgroundColor: InstitutionData.PrimaryColor,
+                                  backgroundColor:
+                                    InstitutionData.LightPrimaryColor,
                                 }}
-                              >
-                                {clas.recordingLink ? (
-                                  <a
-                                    href={clas.recordingLink}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className={`no-underline px-2 text-center w-[9rem] sans-sarif text-white`}
-                                  >
-                                    Watch
-                                  </a>
-                                ) : (
-                                  <div className="w-[9rem] rounded-[4px] px-2 max-h-[1.8rem] self-center flex justify-center items-start">
-                                    {Ctx.userData.userType === "admin" ||
-                                      Ctx.userData.userType === "instructor" ? (
-                                      <div>
-                                        {classId === clas.classId ? (
-                                          <button
-                                            className={`px-2 py-1 sans-sarif text-[0.9rem] text-white`}
-                                            onClick={() => {
-                                              setClassId("");
-                                              setRecordingLink("");
-                                            }}
-                                          >
-                                            Cancel
-                                          </button>
-                                        ) : (
-                                          <button
-                                            className={`w-[3rem] px-2 py-1 sans-sarif text-white`}
-                                            onClick={() => {
-                                              setClassId(clas.classId);
-                                              setRecordingLink(
-                                                clas.recordingLink
-                                              );
-                                            }}
-                                          >
-                                            Add
-                                          </button>
-                                        )}
-                                      </div>
-                                    ) : !clas.zoomLink ? (
-                                      <button
-                                        className="w-[9rem] max-h-[1.8rem] text-white no-underline rounded-1"
-                                        style={{
-                                          backgroundColor:
-                                            InstitutionData.PrimaryColor,
-                                        }}
-                                        onClick={() =>
-                                          markAttendance(clas.classId)
-                                        }
-                                      >
-                                        {attendanceStatus[clas.classId]}
-                                      </button>
-                                    ) : (
-                                      <button
-                                        className="w-[9rem] max-h-[1.8rem] text-white no-underline rounded-1"
-                                        style={{
-                                          backgroundColor:
-                                            InstitutionData.PrimaryColor,
-                                        }}
-                                        onClick={() =>
-                                          markAttendance(clas.classId)
-                                        }
-                                      >
-                                        No Link
-                                      </button>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                              <div
-                                className={
-                                  "w-fit" +
-                                  (UserCtx.userData.userType === "member"
-                                    ? " hidden"
-                                    : " ")
-                                }
+                                className="flex items-center justify-center gap-4"
                               >
                                 <svg
-                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="w-4 h-4"
                                   fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={1.5}
                                   stroke="currentColor"
-                                  className="w-6 h-6 cursor-pointer"
-                                  onClick={() =>
-                                    showMembersAttended(clas.classId)
-                                  }
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
                                 >
                                   <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"
+                                    strokeWidth="2"
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
                                   />
                                 </svg>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <>
-                    <div className="w-full grid grid-cols-6 text-black text-[1.1rem] font-[600]">
-                      <p>User Name</p>
-                      <p className="col-span-2">Email ID</p>
-                      <p>Phone Number</p>
-                      <p>Attendance Status</p>
-                      <div></div>
-                    </div>
-                    <div className="w-full max-h-[30rem]">
-                      {currentUsers.map((user) => (
-                        <div
-                          key={user.cognitoId}
-                          className="grid grid-cols-6 text-black font-[400]"
-                        >
-                          <p>{user.userName}</p>
-                          <p className="col-span-2">{user.emailId}</p>
-                          <p>{user.phoneNumber}</p>
-                          <p>{attendanceStatus[user.cognitoId]}</p>
-                          {attendanceStatus[user.cognitoId] !== "Attended" && (
-                            <label className="custom-checkbox">
-                              <input
-                                type="checkbox"
-                                onChange={(event) =>
-                                  event.target.checked
-                                    ? handleCheckboxClick(
-                                      user.cognitoId,
-                                      user.emailId
+                                View Recording
+                              </Button>
+                              {(Ctx.userData.userType === "admin" ||
+                                Ctx.userData.userType === "instructor") && (
+                                <button
+                                  onClick={() =>
+                                    handleUpdateClick(
+                                      clas.classId,
+                                      clas.recordingLink
                                     )
-                                    : handleCheckboxUnclick(
-                                      user.cognitoId,
-                                      user.emailId
-                                    )
-                                }
-                              />
-                            </label>
+                                  }
+                                  className="text-gray-600 hover:text-gray-800"
+                                >
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    />
+                                  </svg>
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              {Ctx.userData.userType === "admin" ||
+                              Ctx.userData.userType === "instructor" ? (
+                                <Button
+                                  onClick={() =>
+                                    handleUpdateClick(clas.classId, "")
+                                  }
+                                  size="xs"
+                                  style={{
+                                    backgroundColor: "transparent",
+                                    border: "1px solid #000",
+                                  }}
+                                  className="flex items-center gap-2 text-black"
+                                >
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                    />
+                                  </svg>
+                                  Add Recording
+                                </Button>
+                              ) : (
+                                <p className="ml-2 text-gray-500">
+                                  No Recording
+                                </p>
+                              )}
+                            </>
                           )}
                         </div>
-                      ))}
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 flex justify-center mb-3">
-                      <Pagination
-                        totalPages={Math.ceil(
-                          activeUsers.length / usersPerPage
-                        )}
-                        currentPage={currentPageAttendance}
-                        onPageChange={handlePageChange}
-                      />
-                    </div>
-                  </>
-                )}
-                {!attendanceList && (
-                  <div
-                    className={`absolute bottom-0 left-0 right-0 flex justify-center mb-4`}
-                  >
-                    <Pagination
-                      totalPages={totalPages}
-                      currentPage={currentPage}
-                      onPageChange={(value) => setCurrentPage(value)}
-                    />
-                  </div>
-                )}
-              </div>
-            </ul>
+                      </Table.Cell>
+                      {(Ctx.userData.userType === "admin" ||
+                        Ctx.userData.userType === "instructor") && (
+                        <Table.Cell className="text-gray-700 font-semibold">
+                          <div className="flex items-center gap-4">
+                            {(Ctx.userData.userType === "admin" ||
+                              Ctx.userData.userType === "instructor") && (
+                              <Button
+                                onClick={() =>
+                                  handleAttendanceClick(clas.classId)
+                                }
+                                size="xs"
+                                style={{
+                                  backgroundColor: "transparent",
+                                  border: "1px solid #000",
+                                }}
+                                className="flex items-center gap-3 text-black"
+                              >
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                  />
+                                </svg>
+                                Mark Attendance
+                              </Button>
+                            )}
+                          </div>
+                        </Table.Cell>
+                      )}
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+
+              {/* Common components */}
+              <PaginationComponent
+                data={filteredClasses}
+                itemsPerPage={6}
+                currentPage={currentPage}
+                onPageChange={onPageChange}
+              />
+            </div>
           </div>
-          {/* ) */}
         </>
       )}
 
       {/* Conditionally render the PreviousSessionsMobile component */}
       {isMobileScreen && <PreviousSessionsMobile />}
+
+      {/* Update Recording Modal */}
+      {showUpdateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[500px] max-w-[90%]">
+            <h3 className="text-lg font-semibold mb-4">
+              Update Recording Link
+            </h3>
+            <form onSubmit={onRecordingUpdate} className="space-y-4">
+              <div>
+                <input
+                  type="url"
+                  placeholder="Enter recording link"
+                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  value={recordingLink}
+                  onChange={(e) => setRecordingLink(e.target.value)}
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button
+                  color="gray"
+                  onClick={() => {
+                    setShowUpdateModal(false);
+                    setSelectedClassId(null);
+                    setRecordingLink("");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  style={{
+                    backgroundColor: InstitutionData.LightPrimaryColor,
+                  }}
+                >
+                  Update
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Attendance Modal */}
+      <AttendanceModal
+        isOpen={showAttendanceModal}
+        onClose={handleCloseAttendanceModal}
+        classId={selectedClassForAttendance}
+        institutionId={InstitutionData.InstitutionId}
+      />
     </>
   );
 };

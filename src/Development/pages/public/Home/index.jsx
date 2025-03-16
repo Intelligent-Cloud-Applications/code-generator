@@ -7,6 +7,8 @@ import FAQs from "./FAQs";
 import Footer from "../../../components/Footer";
 import {Auth} from "aws-amplify";
 import {useEffect} from "react";
+import config from "../../../config";
+import {jwtDecode} from "jwt-decode";
 
 function Home() {
   async function initializeGoogleOneTap() {
@@ -32,11 +34,23 @@ function Home() {
     console.log("Google Token:", response.credential);
 
     try {
-      const user = await Auth.federatedSignIn({
-        provider: 'Google',
-        token: response.credential,
+      const googleIdToken = response.credential;
+      const cognitoDomain = `https://${config.Auth.oauth.domain}`;
+      const clientId = config.Auth.userPoolWebClientId;
+      const redirectUri = config.Auth.oauth.redirectSignIn;
+      const decodedToken = await jwtDecode(response.credential);
+
+      const authorizeUrl = `${cognitoDomain}/oauth2/authorize?` + new URLSearchParams({
+        response_type: "code",
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        identity_provider: "Google",
+        id_token: googleIdToken,
+        scope: "openid profile email",
+        login_hint: decodedToken.email
       });
-      console.log("Signed in user:", user);
+
+      window.location.href = authorizeUrl;
     } catch (error) {
       console.error("Sign-in failed", error);
     }

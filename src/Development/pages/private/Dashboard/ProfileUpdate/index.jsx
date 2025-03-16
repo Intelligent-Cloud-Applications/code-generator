@@ -17,6 +17,8 @@ import EditableTextArea from "./EditableTextArea.jsx";
 import institutionData from "../../../../constants.js";
 // import EditProfile from "./EditProfile.jsx";
 import InsrtuctorReferral from "../../../../common/ReferralCode/index.jsx";
+// import EditProfile from "./EditProfile.jsx";
+import InsrtuctorReferral from "../../../../common/ReferralCode/index.jsx";
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
