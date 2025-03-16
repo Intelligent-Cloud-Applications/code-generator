@@ -1,8 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import Context from '../../../../Context/Context';
 
 function InstructorList() {
-  const { instructorList } = useContext(Context);
+  const { instructorList, getInstructorList } = useContext(Context);
+  useEffect(() => {
+    getInstructorList();
+  }, []);
   console.log(instructorList);
 
   return (
