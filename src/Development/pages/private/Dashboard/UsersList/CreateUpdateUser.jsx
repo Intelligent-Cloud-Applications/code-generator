@@ -92,7 +92,11 @@ function CreateUser({
   const onCreateUser = async (e) => {
     e.preventDefault();
     UtilCtx.setLoader(true);
-    const formattedPhoneNumber = createButton ? `${countryCode}${phoneNumber}` : phoneChange ? `${countryCode}${phoneNumber}` : phoneNumber;
+    const formattedPhoneNumber = createButton
+      ? `${countryCode}${phoneNumber}`
+      : phoneChange
+      ? `${countryCode}${phoneNumber}`
+      : phoneNumber;
 
     let imgUrl = imageUrl
       ? await fileUpload({
@@ -114,16 +118,23 @@ function CreateUser({
       productType,
       amount: selectedProductAmount,
       userType,
-      instructorPaymentType: userType === "instructor" ? instructorPaymentType : "",
-      instructorPaymentAmount: userType === "instructor" ? instructorPaymentAmount : "",
+      instructorPaymentType:
+        userType === "instructor" ? instructorPaymentType : "",
+      instructorPaymentAmount:
+        userType === "instructor" ? instructorPaymentAmount : "",
       trialPeriod: status === "Trial" ? trialPeriod : "",
-      classType: userType === "instructor" ? selectedClassTypes.map((type) => type.value) : [],
-      product: selectedProduct.heading
+      classType:
+        userType === "instructor"
+          ? selectedClassTypes.map((type) => type.value)
+          : [],
+      product: selectedProduct.heading,
     };
 
     try {
       if (createButton) {
-        const response = await API.post("main", `/admin/create-user`, { body: data });
+        const response = await API.post("main", `/admin/create-user`, {
+          body: data,
+        });
         const createdCognitoId = response.user.cognitoId;
 
         if (userType === "instructor") {
@@ -136,30 +147,38 @@ function CreateUser({
 
         toast.success("User Created Successfully");
       } else {
-        await API.put("main", `/admin/update-user/${InstitutionData.InstitutionId}`, { body: data });
+        await API.put(
+          "main",
+          `/admin/update-user/${InstitutionData.InstitutionId}`,
+          { body: data }
+        );
         if (userType === "instructor") {
           await API.put("main", "/admin/member-to-instructor", { body: data });
           window.localStorage.removeItem(
             `instructorList_${InstitutionData.InstitutionId}`
           );
         }
-        if (status === 'Active') {
+        if (status === "Active") {
           const pdate = new Date(paymentDate).getTime();
-          await API.post('main', `/admin/user-payment-update/${InstitutionData.InstitutionId}`, {
-            body: {
-              cognitoId,
-              status,
-              institution: InstitutionData.InstitutionId,
-              productType,
-              amount: selectedProductAmount,
-              paymentDate: pdate,
-              emailId: email,
-              currency: selectedProduct.currency,
-              productId: selectedProduct.productId,
-              planId: selectedProduct.planId,
-              subscriptionType: selectedProduct.subscriptionType,
+          await API.post(
+            "main",
+            `/admin/user-payment-update/${InstitutionData.InstitutionId}`,
+            {
+              body: {
+                cognitoId,
+                status,
+                institution: InstitutionData.InstitutionId,
+                productType,
+                amount: selectedProductAmount,
+                paymentDate: pdate,
+                emailId: email,
+                currency: selectedProduct.currency,
+                productId: selectedProduct.productId,
+                planId: selectedProduct.planId,
+                subscriptionType: selectedProduct.subscriptionType,
+              },
             }
-          });
+          );
         }
 
         toast.success("User Updated Successfully");
@@ -176,12 +195,14 @@ function CreateUser({
       setImageUrl(null);
       setProductType("");
       setSelectedProductAmount("");
-
     } catch (error) {
       console.error("Error creating/updating user:", error);
       const errorMessage = error.response?.data?.message;
 
-      if (error.response?.data?.message === "Email already exists in the database.") {
+      if (
+        error.response?.data?.message ===
+        "Email already exists in the database."
+      ) {
         toast.error("This email is already registered in the system");
       } else if (error.response?.data?.message?.includes("phone number")) {
         toast.error("This phone number is already registered");
@@ -190,7 +211,9 @@ function CreateUser({
       } else if (error.response?.status === 500) {
         toast.error("Server error. Please try again later");
       } else {
-        toast.error(errorMessage || "Error processing request. Please try again");
+        toast.error(
+          errorMessage || "Error processing request. Please try again"
+        );
       }
     } finally {
       setShowUserAdd(false);
@@ -201,9 +224,10 @@ function CreateUser({
 
   return (
     <div>
-      <div className="bg-white px-4 py-4 rounded-lg flex flex-col justify-start items-center gap-4 w-full max-w-[800px] mx-auto relative overflow-y-auto max-h-[85vh] sm:px-6 sm:py-8" style={{ marginTop: '20px', marginBottom: '20px' }}>
-
-
+      <div
+        className="bg-white px-4 py-4 rounded-lg flex flex-col justify-start items-center gap-4 w-full max-w-[800px] mx-auto relative overflow-y-auto max-h-[85vh] sm:px-6 sm:py-8"
+        style={{ marginTop: "20px", marginBottom: "20px" }}
+      >
         <span
           className="absolute top-5 right-5 cursor-pointer"
           onClick={() => {
@@ -216,7 +240,8 @@ function CreateUser({
         </span>
 
         <div className="w-[80%] p-0 flex flex-col gap-4 mt-6">
-          <InputComponent
+          <input
+            className="p-0 border-2  rounded-lg"
             width={100}
             label="Upload Image"
             type="file"
@@ -236,7 +261,6 @@ function CreateUser({
                 alert("No file selected.");
               }
             }}
-            className="p-0"
           />
 
           <div className="flex gap-1 max850:flex-col max850:space-y-4">
@@ -260,20 +284,23 @@ function CreateUser({
               name="countryCode"
               className="border-[1px] px-4 py-2 rounded-lg w-full border-gray-300"
               onChange={(e) => setCountryCode(e.target.value.toString())}
-              style={{ maxHeight: '100px' }}
+              style={{ maxHeight: "100px" }}
             >
               {<Country />}
             </select>
             <InputComponent
               width={100}
               label="Phone Number"
-              value={phoneNumber.replace(countryCode, '')}
-              onChange={(e) => { setPhoneChange(true); setPhoneNumber(e.target.value) }}
+              value={phoneNumber.replace(countryCode, "")}
+              onChange={(e) => {
+                setPhoneChange(true);
+                setPhoneNumber(e.target.value);
+              }}
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full">
-            {userType === 'member' && (
+            {userType === "member" && (
               <div className="flex flex-col w-full">
                 <label className="font-medium mb-1">User Status</label>
                 <select
@@ -326,7 +353,9 @@ function CreateUser({
             <div className="w-full">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full">
                 <div className="flex flex-col w-full">
-                  <label className="font-medium mb-1">Select Product Type</label>
+                  <label className="font-medium mb-1">
+                    Select Product Type
+                  </label>
                   <select
                     required
                     className="border-[1px] px-4 py-2 rounded-lg w-full"
@@ -340,11 +369,11 @@ function CreateUser({
                     ))}
                   </select>
                 </div>
-              <div className="mt-4 mb-2 w-full">
-                <InputComponent
-                  width="full"
-                  label="Amount"
-                  value={selectedProductAmount/100}
+                <div className="mt-4 mb-2 w-full">
+                  <InputComponent
+                    width="full"
+                    label="Amount"
+                    value={selectedProductAmount / 100}
                     readOnly
                   />
                 </div>
@@ -379,7 +408,9 @@ function CreateUser({
             <div className="flex flex-col gap-6 w-full">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full">
                 <div className="flex flex-col w-full">
-                  <label className="font-medium mb-1">Instructor Payment Type</label>
+                  <label className="font-medium mb-1">
+                    Instructor Payment Type
+                  </label>
                   <select
                     className="border-[1px] px-4 py-2 rounded-lg w-full"
                     value={instructorPaymentType}

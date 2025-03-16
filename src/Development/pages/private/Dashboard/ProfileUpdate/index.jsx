@@ -570,11 +570,17 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 </>
                 <form className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-lg shadow-md">
                   <div className="flex flex-col">
-                    <label className="text-gray-600 font-medium">Name</label>
+                    <label
+                      className={`text-gray-600 font-medium ${
+                        !showForm ? "opacity-70" : ""
+                      }`}
+                    >
+                      Name
+                    </label>
                     <input
                       className={`px-4 py-2 rounded-md w-full ${
-                        showForm ? "bg-inputBgColor" : "bg-gray-100"
-                      }`}
+                        showForm ? "" : "bg-gray-100"
+                      } ${!showForm ? "opacity-70" : ""}`}
                       type="text"
                       value={name}
                       readOnly={!showForm}
@@ -583,9 +589,15 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                   </div>
 
                   <div className="flex flex-col">
-                    <label className="text-gray-600 font-medium">Email</label>
+                    <label
+                      className={`text-gray-600 font-medium ${
+                        !showForm ? "opacity-70" : ""
+                      }`}
+                    >
+                      Email
+                    </label>
                     <input
-                      className="bg-gray-100 px-4 py-2 rounded-md"
+                      className="bg-gray-100 px-4 py-2 rounded-md opacity-70"
                       type="email"
                       value={currentEmail}
                       readOnly
@@ -593,11 +605,15 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                   </div>
 
                   <div className="flex flex-col">
-                    <label className="text-gray-600 font-medium">
+                    <label
+                      className={`text-gray-600 font-medium ${
+                        !showForm ? "opacity-70" : ""
+                      }`}
+                    >
                       Phone Number
                     </label>
                     <input
-                      className="bg-gray-100 px-4 py-2 rounded-md"
+                      className="bg-gray-100 px-4 py-2 rounded-md opacity-70"
                       type="text"
                       value={phoneNumber}
                       readOnly
@@ -605,18 +621,25 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                   </div>
 
                   <div className="flex flex-col">
-                    <label className="text-gray-600 font-medium">DOB</label>
-
+                    <label
+                      className={`text-gray-600 font-medium ${
+                        !showForm ? "opacity-70" : ""
+                      }`}
+                    >
+                      DOB
+                    </label>
                     {showForm ? (
                       <input
                         type="date"
-                        className="bg-inputBgColor px-4 py-2 rounded-md"
+                        className={` px-4 py-2 rounded-md ${
+                          !showForm ? "opacity-70" : ""
+                        }`}
                         value={tempDob || ""}
                         onChange={(e) => setTempDob(e.target.value)}
                       />
                     ) : (
                       <input
-                        className="bg-gray-100 px-4 py-2 rounded-md"
+                        className="bg-gray-100 px-4 py-2 rounded-md opacity-70"
                         type="text"
                         value={formatDate(dob) || ""}
                         readOnly
@@ -625,11 +648,17 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                   </div>
 
                   <div className="flex flex-col col-span-2">
-                    <label className="text-gray-600 font-medium">Address</label>
+                    <label
+                      className={`text-gray-600 font-medium ${
+                        !showForm ? "opacity-70" : ""
+                      }`}
+                    >
+                      Address
+                    </label>
                     <textarea
                       className={`px-4 py-2 rounded-md resize-none w-full ${
-                        showForm ? "bg-inputBgColor" : "bg-gray-100"
-                      }`}
+                        showForm ? "" : "bg-gray-100"
+                      } ${!showForm ? "opacity-70" : ""}`}
                       rows={3}
                       value={address}
                       readOnly={!showForm}
@@ -638,21 +667,24 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                   </div>
 
                   {UserCtx.userType === "instructor" && (
-                      <div className="flex flex-col col-span-2">
-                        <label className="text-gray-600 font-medium">
-                          About
-                        </label>
-                        <textarea
-                          className={`px-4 py-2 rounded-md resize-none w-full ${
-                            showForm ? "bg-inputBgColor" : "bg-gray-100"
-                          }`}
-                          rows={3}
-                          value={about}
-                          readOnly={!showForm}
-                          onChange={(e) => setAbout(e.target.value)}
-                        />
-                      </div>
-                    
+                    <div className="flex flex-col col-span-2">
+                      <label
+                        className={`text-gray-600 font-medium ${
+                          !showForm ? "opacity-70" : ""
+                        }`}
+                      >
+                        About
+                      </label>
+                      <textarea
+                        className={`px-4 py-2 rounded-md resize-none w-full ${
+                          showForm ? "opacity-70" : ""
+                        } `}
+                        rows={3}
+                        value={about}
+                        readOnly={!showForm}
+                        onChange={(e) => setAbout(e.target.value)}
+                      />
+                    </div>
                   )}
                 </form>
               </div>
