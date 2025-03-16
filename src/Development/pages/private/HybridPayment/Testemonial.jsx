@@ -38,7 +38,7 @@ const Testemonial = () => {
 
   return (
     <>
-      <div className="mb-7">
+      <div className="mb-">
         <h1 className="hybrid-heading text-3xl font-bold text-center mt-8 text-[3rem] mb-4"
         style={{ color: InstitutionData.PrimaryColor }}
         >

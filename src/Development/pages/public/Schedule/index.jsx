@@ -6,14 +6,11 @@ import { API } from "aws-amplify";
 import "./Schedule.css";
 import Context from "../../../Context/Context";
 import Footer from "../../../components/Footer";
+import Skeleton from "react-loading-skeleton";
 
 const groupScheduleByDay = (scheduleData) => {
   const groupedSchedule = {};
-  const currentDay = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-  });
 
-  // Group classes by day of the week
   scheduleData.forEach((classInfo) => {
     const date = new Date(classInfo.startTime);
     const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" });
@@ -29,7 +26,6 @@ const groupScheduleByDay = (scheduleData) => {
     groupedSchedule[dayOfWeek].push({ ...classInfo, startTime });
   });
 
-  // Define the order of days starting from Monday
   const daysOfWeek = [
     "Monday",
     "Tuesday",
@@ -40,7 +36,6 @@ const groupScheduleByDay = (scheduleData) => {
     "Sunday",
   ];
 
-  // Sort the days so that the order starts from Monday
   const sortedSchedule = {};
   daysOfWeek.forEach((day) => {
     if (groupedSchedule[day]) {
@@ -51,9 +46,8 @@ const groupScheduleByDay = (scheduleData) => {
   return sortedSchedule;
 };
 
-
 const Schedule = () => {
-  const [schedule, setSchedule] = useState({});
+  const [schedule, setSchedule] = useState([]);
   const { institutionData } = useContext(InstitutionContext);
   const [loaderInitialized, setLoaderInitialized] = useState(false);
   const UtilCtx = useContext(Context).util;
@@ -64,26 +58,13 @@ const Schedule = () => {
         UtilCtx.setLoader(true);
         setLoaderInitialized(true);
       }
-      const currentDate = new Date();
-      const today = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-        currentDate.getDate()
-      );
-      const nextWeekStartDate = new Date(today);
-      console.log(nextWeekStartDate);
-      const nextWeekEndDate = new Date(today);
-      nextWeekEndDate.setDate(nextWeekEndDate.getDate() + 7);
-
       const response = await API.get(
         "main",
         `/user/schedule/${institutionData.InstitutionId}`
       );
-      const nextWeekClasses = response.filter((classInfo) => {
-        const classDate = new Date(classInfo.startTime);
-        return classDate >= today && classDate < nextWeekEndDate;
-      });
-      const groupedSchedule = groupScheduleByDay(nextWeekClasses);
+      // console.log("groupoject in shcedule:",response);
+      const groupedSchedule = groupScheduleByDay(response);
+      console.log("groupoject in shcedule:",groupedSchedule);
       setSchedule(groupedSchedule);
     } catch (error) {
       console.error("Error fetching schedule:", error);
@@ -97,6 +78,7 @@ const Schedule = () => {
   }, [fetchSchedule]);
 
   const isEmptySchedule = Object.keys(schedule).length === 0;
+  console.log("oject in shcedule:",schedule);
   return (
     <>
       <NavBar />
