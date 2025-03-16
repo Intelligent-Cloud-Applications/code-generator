@@ -7,6 +7,9 @@ import InstitutionContext from "../../../../Context/InstitutionContext";
 import Context from "../../../../Context/Context";
 import { Table } from "flowbite-react";
 import Skeleton from "react-loading-skeleton";
+import formatTime from "../../../../common/utils/format-time";
+import DateFormatter from "../../../../common/utils/DateFormatter";
+import PaginationComponent from "../../../../common/Pagination";
 
 export default function DashboardRating() {
   const [ratings, setRatings] = useState([]);
@@ -114,6 +117,9 @@ export default function DashboardRating() {
   const totalPages = Math.ceil(allRatings.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   function renderStarRating(averageRating) {
     const stars = [];
@@ -199,7 +205,8 @@ export default function DashboardRating() {
                               className="text-center bg-white hover:bg-gray-100"
                             >
                               <Table.Cell className="text-black">
-                                {date}
+                                {/* {date} */}
+                                <DateFormatter epochDate={parseInt(rating.timestamp)} />
                               </Table.Cell>
                               <Table.Cell>
                                 {renderStarRating(
@@ -222,11 +229,11 @@ export default function DashboardRating() {
                   of <span className="font-medium">{allRatings.length}</span>{" "}
                   results
                 </div>
-                <Pagination
-                  totalPages={totalPages}
+                <PaginationComponent
+                  data={allRatings}
+                  itemsPerPage={6}
                   currentPage={currentPage}
-                  onPageChange={(value) => setCurrentPage(value)}
-                  style={{ margin: "0" }}
+                  onPageChange={onPageChange}
                 />
               </div>
             </div>
@@ -245,7 +252,7 @@ export default function DashboardRating() {
         <div className="min-h-screen ml-[6rem] max1050:ml-[0] max1050:mt-0">
           <div className="w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-4">
             <div className="w-full h-full relative">
-              <div className="w-full pb-16">
+              <div className="w-full">
                 <Table striped>
                   <Table.Head
                     className="rounded-3xl"
@@ -303,17 +310,19 @@ export default function DashboardRating() {
                                 {rating.instructorName}
                               </Table.Cell>
                               <Table.Cell className="text-gray-700 font-semibold text-center">
-                                {new Date(
+                                {/* {new Date(
                                   parseInt(rating.timestamp)
-                                ).toLocaleDateString()}
+                                ).toLocaleDateString()} */}
+                                <DateFormatter epochDate={parseInt(rating.timestamp)} />
                               </Table.Cell>
                               <Table.Cell className="text-gray-700 font-semibold text-center">
-                                {new Date(
+                                {/* {new Date(
                                   parseInt(rating.timestamp)
                                 ).toLocaleTimeString("en-US", {
                                   hour: "2-digit",
                                   minute: "2-digit",
-                                })}
+                                })} */}
+                                {formatTime(parseInt(rating.timestamp))}
                               </Table.Cell>
                               <Table.Cell className="text-gray-700 font-semibold text-center">
                                 <div className="flex items-center justify-center">
@@ -336,23 +345,12 @@ export default function DashboardRating() {
                   </Table.Body>
                 </Table>
               </div>
-              <div className="absolute bottom-0 w-full flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{startIndex + 1}</span>{" "}
-                  to{" "}
-                  <span className="font-medium">
-                    {Math.min(endIndex, allRatings.length)}
-                  </span>{" "}
-                  of <span className="font-medium">{allRatings.length}</span>{" "}
-                  results
-                </div>
-                <Pagination
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                  onPageChange={(value) => setCurrentPage(value)}
-                  style={{ margin: "0" }}
-                />
-              </div>
+              <PaginationComponent
+                data={allRatings}
+                itemsPerPage={7}
+                currentPage={currentPage}
+                onPageChange={onPageChange}
+              />
             </div>
           </div>
         </div>
@@ -361,7 +359,7 @@ export default function DashboardRating() {
   }
 
   return (
-    <div className="admin-dashboard-container w-full">
+    <div className=" w-full">
       <h2 className="pl-5 font-sans text-[1.4rem] max536:mb-3 max536:text-[1.7rem] sans-serif max536:text-[bg-[#1b7571] font-bold text-center mt-4 w-[80%] mx-auto">
         Reviews
       </h2>
@@ -433,11 +431,9 @@ export default function DashboardRating() {
           </div>
         </div>
 
-        <div
-          className={`w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-4`}
-        >
+        <div className="w-[85%] min-h-[35rem] max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%] mt-4">
           <div className="w-full h-full relative">
-            <div className="w-full pb-16">
+            <div className="w-full">
               <Table striped>
                 <Table.Head
                   className="rounded-3xl"
@@ -508,17 +504,19 @@ export default function DashboardRating() {
                               {rating.instructorName}
                             </Table.Cell>
                             <Table.Cell className="text-gray-700 font-semibold text-center">
-                              {new Date(
+                              {/* {new Date(
                                 parseInt(rating.timestamp)
-                              ).toLocaleDateString()}
+                              ).toLocaleDateString()} */}
+                              <DateFormatter epochDate={parseInt(rating.timestamp)} />
                             </Table.Cell>
                             <Table.Cell className="text-gray-700 font-semibold text-center">
-                              {new Date(
+                              {/* {new Date(
                                 parseInt(rating.timestamp)
                               ).toLocaleTimeString("en-US", {
                                 hour: "2-digit",
                                 minute: "2-digit",
-                              })}
+                              })} */}
+                              {formatTime(parseInt(rating.timestamp))}
                             </Table.Cell>
                             <Table.Cell className="text-gray-700 font-semibold text-center">
                               <div className="flex items-center justify-center">
@@ -544,23 +542,12 @@ export default function DashboardRating() {
                 </Table.Body>
               </Table>
             </div>
-            <div className="absolute bottom-0 w-full flex items-center justify-between ">
-                <div className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{startIndex + 1}</span>{" "}
-                  to{" "}
-                  <span className="font-medium">
-                    {Math.min(endIndex, allRatings.length)}
-                  </span>{" "}
-                  of <span className="font-medium">{allRatings.length}</span>{" "}
-                  results
-                </div>
-                <Pagination
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                  onPageChange={(value) => setCurrentPage(value)}
-                  style={{ margin: "0" }}
-                />
-              </div>
+            <PaginationComponent
+              data={allRatings}
+              itemsPerPage={7}
+              currentPage={currentPage}
+              onPageChange={onPageChange}
+            />
           </div>
         </div>
       </div>

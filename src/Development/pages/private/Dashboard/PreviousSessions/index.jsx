@@ -255,7 +255,7 @@ const PreviousSessions = () => {
                         {clas.instructorNames}
                       </Table.Cell>
                       <Table.Cell className="text-gray-700 font-semibold">
-                        <DateFormatter epochDate={clas.date} />
+                      <DateFormatter epochDate={clas.date} />
                       </Table.Cell>
                       <Table.Cell className="text-gray-700 font-semibold">
                         {formatTime(clas.date)}
