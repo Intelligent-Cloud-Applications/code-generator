@@ -641,25 +641,39 @@ const UpcomingSessions = () => {
   const handleTimeChange = (e, classId) => {
     setEditingTime({
       ...editingTime,
-      [classId]: e.target.value
+      [classId]: e.target.value,
     });
   };
 
-  const handleTimeBlur = (classId, instructorNames, classType, instructorId, date, newTime) => {
+  const handleTimeBlur = (
+    classId,
+    instructorNames,
+    classType,
+    instructorId,
+    date,
+    newTime
+  ) => {
     // Only call API if time has changed
     if (newTime && newTime !== getTime(date)) {
       const newDate = new Date(`${getDate(date)}T${newTime}`).getTime();
-      onClassUpdated(classId, instructorNames, classType, instructorId, newDate);
+      onClassUpdated(
+        classId,
+        instructorNames,
+        classType,
+        instructorId,
+        newDate
+      );
     }
-    
+
     // Reset the editing state for this class
-    setEditingTime(prev => {
-      const updated = {...prev};
+    setEditingTime((prev) => {
+      const updated = { ...prev };
       delete updated[classId];
       return updated;
     });
   };
 
+  const [isFocused, setIsFocused] = useState(false);
   return (
     <>
       {/*  Create a new class modal */}
@@ -1012,9 +1026,6 @@ const UpcomingSessions = () => {
                         </Table.HeadCell>
 
                         <Table.HeadCell className="text-center w-[80px] ">
-                          {/* {sortedFilteredClasses[0]?.zoomLink
-                            ? "Join"
-                            : "Attendance"} */}
                           Attendance
                         </Table.HeadCell>
                       </Table.Head>
@@ -1074,13 +1085,7 @@ const UpcomingSessions = () => {
 
                               <Table.Cell className="text-gray-700 font-semibold text-center md:table-cell  w-32 lg:w-48">
                                 <div className="w-full flex justify-center">
-                                  <div
-                                    className="flex items-center justify-center gap-4 w-28 h-7 text-white rounded-lg"
-                                    style={{
-                                      backgroundColor:
-                                        InstitutionData.LightPrimaryColor,
-                                    }}
-                                  >
+                                  <div className="flex items-center justify-center gap-4 w-28  text-gray-700 rounded-lg">
                                     {clas.classType}
                                   </div>
                                 </div>
@@ -1092,27 +1097,42 @@ const UpcomingSessions = () => {
                                   Ctx.userData.userType === "instructor" ? (
                                     <div className="relative flex items-center justify-center text-center">
                                       <input
-                                        value={editingTime[clas.classId] || getTime(clas.date)}
+                                        value={
+                                          editingTime[clas.classId] ||
+                                          getTime(clas.date)
+                                        }
                                         type="time"
-                                        className={`w-full h-10 rounded text-center outline-none z-10 relative ${
-                                          editingTime[clas.classId] ? 
-                                          'border border-blue-500 bg-blue-50' : 
-                                          'bg-transparent border-none'
+                                        className={`w-full h-10 text-xs rounded text-center outline-none z-10 relative ${
+                                          editingTime[clas.classId]
+                                            ? "border border-blue-500 bg-blue-50"
+                                            : "bg-transparent border-none"
                                         }`}
-                                        onChange={(e) => handleTimeChange(e, clas.classId)}
-                                        onBlur={(e) => handleTimeBlur(
-                                          clas.classId,
-                                          getInstructor(clas.instructorNames)?.name,
-                                          clas.classType,
-                                          clas.instructorId,
-                                          clas.date,
-                                          e.target.value
-                                        )}
+                                        onFocus={(e) => {
+                                          e.target.showPicker();
+                                          setIsFocused(true);
+                                        }}
+                                        onBlur={(e) => {
+                                          setIsFocused(false);
+                                          handleTimeBlur(
+                                            clas.classId,
+                                            getInstructor(clas.instructorNames)
+                                              ?.name,
+                                            clas.classType,
+                                            clas.instructorId,
+                                            clas.date,
+                                            e.target.value
+                                          );
+                                        }}
+                                        onChange={(e) =>
+                                          handleTimeChange(e, clas.classId)
+                                        }
                                       />
                                       <FaEdit
-                                        className="absolute
-                                      translate-x-8
-                                      text-gray-500 cursor-pointer"
+                                        className={`absolute translate-x-8 text-gray-500 cursor-pointer  ${
+                                          isFocused
+                                            ? "opacity-0"
+                                            : "opacity-100"
+                                        }`}
                                       />
                                     </div>
                                   ) : (
