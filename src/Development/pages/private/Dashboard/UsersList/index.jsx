@@ -14,6 +14,8 @@ import { toast } from "react-toastify";
 import { API } from "aws-amplify";
 import InstructorList from "./InstructorList";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { Table } from "flowbite-react";
+import { Table } from "flowbite-react";
 
 const UsersList = ({ userCheck, setUserCheck }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -22,6 +24,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [showUserAdd, setShowUserAdd] = useState(false);
   const { getUserList, userAttendance } = useContext(Context);
   const [userName, setuserName] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [lastName, setLastName] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
   const [email, setEmail] = useState("");
@@ -40,7 +43,8 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Members List");
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
+  const itemsPerPage = 5;
   const isMobileScreen = useMediaQuery("(max-width: 600px)");
 
   // Filter functions
@@ -57,16 +61,17 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   ];
 
   const filter2 = filterUsersByStatus(userStatus);
-
+  console.log("filtter2:", filter2);
   // Search functionality
-  const searchedUserList = filter2.filter((user) => {
+  const searchedUserList = filter2?.filter((user) => {
     return (
-      user?.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (typeof user?.userName === "string" &&
+        user.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
       user?.emailId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user?.phoneNumber?.includes(searchQuery)
     );
   });
-
+  console.log("searched:", searchedUserList);
   const activeUserList = searchedUserList.filter((user) => !user.isArchived);
 
   // Sort functionality
@@ -80,16 +85,29 @@ const UsersList = ({ userCheck, setUserCheck }) => {
 
   // Delete functionality
   const handleDelete = async (institution, cognitoId) => {
-    const response = await API.put("main", "/admin/delete-user", {
-      body: {
-        institution: institution,
-        cognitoId,
-      },
-    });
-    if (response.status === 200) {
-      toast.success("Deleted successfully!", { autoClose: 3000 });
+    try {
+      const response = await API.put("main", "/admin/delete-user", {
+        body: {
+          institution: institution,
+          cognitoId: cognitoId
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log("Delete response:", response); // Add this for debugging
+      
+      if (response) {
+        toast.success("User deleted successfully!", { autoClose: 3000 });
+        await getUserList(); // Refresh the user list
+        return true;
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete user. Please try again.", { autoClose: 3000 });
+      return false;
     }
-    getUserList();
   };
 
   const handleCancel = () => {
@@ -100,21 +118,28 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [userToDelete, setUserToDelete] = useState(null);
 
   const handleDeleteUser = (institution, cognitoId) => {
+    if (!institution || !cognitoId) {
+      toast.error("Invalid user data for deletion");
+      return;
+    }
     setUserToDelete({ institution, cognitoId });
-    setShowDeleteModal(true); // Open the modal
+    setShowDeleteModal(true);
+    setShowDeleteModal(true);
   };
 
   const confirmDelete = async () => {
     if (userToDelete) {
-      await handleDelete(userToDelete.institution, userToDelete.cognitoId);
-      setShowDeleteModal(false);
-      setUserToDelete(null);
-      toast.success("User deleted successfully!");
+      const success = await handleDelete(userToDelete.institution, userToDelete.cognitoId);
+      if (success) {
+        setShowDeleteModal(false);
+        setUserToDelete(null);
+      }
     }
   };
 
   const formatDate = (epochDate) => {
-    if (!epochDate || isNaN(new Date(epochDate))) return "NA"; // Handle null, undefined, or invalid dates
+    if (!epochDate || isNaN(new Date(epochDate))) return "NA";
+    if (!epochDate || isNaN(new Date(epochDate))) return "NA";
 
     const date = new Date(epochDate);
     const day = String(date.getDate()).padStart(2, "0");
@@ -122,7 +147,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
-
 
   // Sort functionality
   const requestSort = (key) => {
@@ -143,24 +167,18 @@ const UsersList = ({ userCheck, setUserCheck }) => {
 
   //for profile pic
   const getInitials = (name) => {
-    if (!name) return '';
+    if (!name || typeof name !== "string") return "";
     const initials = name
-      .split(' ')
+      .split(" ")
       .map((word) => word.charAt(0).toUpperCase())
-      .join('');
+      .join("");
     return initials;
   };
 
-  const getColor = (name) => {
-    if (!name) return '#888888';
-    const colors = [
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF',
-      '#FF5733', '#33FF57', '#5733FF'
-    ];
-    const index = name.length % colors.length;
-    return colors[index];
+  const getColor = () => {
+    return InstitutionData.PrimaryColor;
+  const getColor = () => {
+    return InstitutionData.PrimaryColor;
   };
 
   const mobileProps = {
@@ -208,7 +226,9 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     filter2,
     setShowDeleteModal,
     showDeleteModal,
-    confirmDelete
+    confirmDelete,
+    confirmDelete,
+    confirmDelete,
   };
 
   return (
@@ -291,6 +311,8 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 email={email}
                 countryCode={countryCode}
                 name={name}
+                imageUrl={imageUrl}
+                setImageUrl={setImageUrl}
                 setPhoneNumber={setPhoneNumber}
                 setBalance={setBalance}
                 setStatus={setStatus}
@@ -304,16 +326,11 @@ const UsersList = ({ userCheck, setUserCheck }) => {
           </div>
           <div
             className={`w-[85%]  max536:bg-transparent max536:w-[100%] rounded-3xl p-2 flex flex-col items-center max1050:w-[94vw] mx-[2.5%] max1440:w-[95%]`}
-            style={{
-              backgroundColor: InstitutionData.LightestPrimaryColor,
-            }}
           >
-            {/* Step 4: Create and integrate the search bar */}
             <div
               className={`flex w-[94.5%] mt-4 rounded-md overflow-hidden gap-2`}
-              style={{
-                backgroundColor: InstitutionData.LightestPrimaryColor,
-              }}
+
+
             >
               <input
                 className={`flex-1 p-2 outline-none rounded-md`}
@@ -335,135 +352,121 @@ const UsersList = ({ userCheck, setUserCheck }) => {
               />
             </div>
             {selectedOption === "Members List" ? (
-              <div className="overflow-x-auto w-full">
-                <ul className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-col max536:bg-primaryColor rounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] max536:bg-gradient-to-b max536:from-[#dad7c6] max536:to-[#fdd00891]">
-                  {/* List header */}
-                  <li className="w-full flex flex-col items-center justify-center p-2 max536:pt-5 max536:rounded-2xl">
-                    <div className="d-flex justify-content-between w-[98%] max1050:w-[100%] mb-3 font-bold">
-                      {/* List header content */}
-                      <div className="w-[12%]"></div>
-                      <div className="w-[24%]">Name</div>
-                      {/*<div*/}
-                      {/*  className="w-[13%] email-hover"*/}
-                      {/*  onClick={() => requestSort("email")}*/}
-                      {/*  style={{ cursor: "pointer" }}*/}
-                      {/*>*/}
-                      {/*  Email*/}
-                      {/*</div>*/}
-                      {/*<div className="w-[11%] font-sans ml-[0.5rem]">Phone</div>*/}
-                      <div className="w-[21%] font-sans">Joining Date</div>
-                      <div className="w-[20%] font-sans">Renew Date</div>
-                      <div className="w-[23%] font-sans">Classes Attended</div>
-                      <div className="w-[10%] font-sans">
-                        Balance
-                      </div>
-                      <div></div>
-                      {/* Icons */}
-                      <div className="w-10 font-sans h-10">
-                        <img
-                          src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/userName.png`}
-                          alt=""
-                          className="min536:hidden w-full h-full"
-                        />
-                      </div>
-                      <img
-                        src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/userName.png`}
-                        alt=""
-                        className="min536:hidden w-10 h-10"
-                      />
-                      <img
-                        src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/details.png`}
-                        alt=""
-                        className="min536:hidden w-10 h-10"
-                      />
-                      <img
-                        src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/attendance.png`}
-                        alt=""
-                        className="min536:hidden w-10 h-10"
-                      />
-                      <img
-                        src={`https://institution-utils.s3.amazonaws.com/institution-common/images/UsersList/due.png`}
-                        alt=""
-                        className="min536:hidden w-10 h-10"
-                      />
-                    </div>
-                  </li>
-
-                  {/* Render list of members */}
-                  <div className="overflow-auto max536:w-[96%] w-full">
-                    {filteredUserList.map((user, i) => {
+              <div className="w-[94.5%] overflow-auto mt-4 pt-6">
+                <Table striped>
+                  <Table.Head className="font-semibold text-center">
+                    <Table.HeadCell></Table.HeadCell>
+                    <Table.HeadCell>Name</Table.HeadCell>
+                    <Table.HeadCell>Joining Date</Table.HeadCell>
+                    <Table.HeadCell>Renew Date</Table.HeadCell>
+                    <Table.HeadCell>Classes Attended</Table.HeadCell>
+                    <Table.HeadCell>Balance</Table.HeadCell>
+                    <Table.HeadCell>Action</Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body className="divide-y">
+                    {filteredUserList.map((user) => {
                       if (!user.isArchived) {
                         return (
-                          <li
-                            key={user.cognitoId}
-                            className="w-full flex flex-col gap-[4px] items-center justify-center p-2 max536:bg-primaryColor max536:pt-6 max536:rounded-2xl Sansita max536:text-[0.8rem]"
-                          >
-                            <div className="flex justify-between w-[100%] items-center">
-                              {/* Profile picture - shifted left and made circular */}
-                              <div className="w-[4%] h-8 flex justify-start items-center mr-3">
-                                {user.imgUrl ? (
-                                  <img
-                                    src={user.imgUrl}
-                                    alt={user.userName}
-                                    className="h-[35px] w-[35px] rounded-full object-cover"
-                                  />
-                                ) : (
-                                  <div
-                                    className="h-[35px] w-[35px] rounded-full flex items-center justify-center text-white text-sm font-medium"
-                                    style={{ backgroundColor: getColor(user.userName) }}
-                                  >
-                                    {getInitials(user.userName)}
-                                  </div>
-                                )}
-                              </div>
-                              <div className="w-[18%] font-[400] mr-2 font-sans truncate">
-                                {user.userName}
-                              </div>
-                              {/*<div*/}
-                              {/*  className="w-[16%] font-[400] font-sans email-hover"*/}
-                              {/*  onClick={() => requestSort("email")}*/}
-                              {/*  style={{ cursor: "pointer" }}*/}
-                              {/*  title={user.emailId}*/}
-                              {/*>*/}
-                              {/*  {user.emailId?.split("@")[0]}@*/}
-                              {/*</div>*/}
-                              {/*<div className="w-[18%] font-[400] font-sans ml-[3.2rem]">*/}
-                              {/*  {user.phoneNumber}*/}
-                              {/*</div>*/}
-                              <div className="w-[12%] font-[400] font-sans">
-                                {formatDate(user.joiningDate)}
-                              </div>
-                              <div className="w-[12%] font-[400] font-sans text-center">
-                                {formatDate(user.renewDate)}
-                              </div>
-                              <div className="w-[15%] font-[400] font-sans overflow-hidden text-center mr-2">
-                                {/*{user.currentMonthZPoints*/}
-                                {/*  ? user.currentMonthZPoints*/}
-                                {/*  : 0}*/}
-                                {/*/*/}
-                                {/*{user.lastMonthZPoints*/}
-                                {/*  ? user.lastMonthZPoints*/}
-                                {/*  : 0}*/}
-                                {userAttendance[user.cognitoId] || 0}
-                              </div>
-                              <div
-                                className="w-[7%] h-7 rounded px-2 text-center"
-                                style={{
-                                  color:
-                                    parseFloat(user.balance) < 0
-                                      ? "red"
-                                      : "black",
-                                }}
-                              >
-                                {user.balance}
-                              </div>
+                          <Table.Row key={user.cognitoId}>
+                            <Table.Cell>
+                              {user.imgUrl ? (
+                                <img
+                                  src={user.imgUrl}
+                                  alt={user.userName}
+                                  className="h-10 w-10 rounded-full object-cover text-gray-700 font-semibold"
+                                />
+                              ) : (
+                                <div
+                                  className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                                  style={{
+                                    backgroundColor: getColor(
+                                      user.userName
+                                    ),
+                                  }}
+                                >
+                                  {getInitials(user.userName)}
+                                </div>
+                              )}
+                            </Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center"
+                            >{user.userName}</Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center">
+                              {formatDate(user.joiningDate)}
+                            </Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center"
+                            >
+                              {formatDate(user.renewDate)}
+                            </Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center"
+                            >
+                              {userAttendance[user.cognitoId] || 0}
+                            </Table.Cell>
+                            <Table.Cell
+                              className={
+                                parseFloat(user.balance) < 0
+                                  ? "text-red-500 "
+                                  : "text-gray-700 font-semibold text-center"
+                              }
+                            >
+                              {user.balance}
+                            </Table.Cell>
+                            <Table.Cell className="flex items-center gap-3 text-gray-700 font-semibold text-center px-4 py-4">
+                          <Table.Row key={user.cognitoId}>
+                            <Table.Cell>
+                              {user.imgUrl ? (
+                                <img
+                                  src={user.imgUrl}
+                                  alt={user.userName}
+                                  className="h-10 w-10 rounded-full object-cover text-gray-700 font-semibold"
+                                />
+                              ) : (
+                                <div
+                                  className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                                  style={{
+                                    backgroundColor: getColor(
+                                      user.userName
+                                    ),
+                                  }}
+                                >
+                                  {getInitials(user.userName)}
+                                </div>
+                              )}
+                            </Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center"
+                            >{user.userName}</Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center">
+                              {formatDate(user.joiningDate)}
+                            </Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center"
+                            >
+                              {formatDate(user.renewDate)}
+                            </Table.Cell>
+                            <Table.Cell
+                              className="text-gray-700 font-semibold text-center"
+                            >
+                              {userAttendance[user.cognitoId] || 0}
+                            </Table.Cell>
+                            <Table.Cell
+                              className={
+                                parseFloat(user.balance) < 0
+                                  ? "text-red-500 "
+                                  : "text-gray-700 font-semibold text-center"
+                              }
+                            >
+                              {user.balance}
+                            </Table.Cell>
+                            <Table.Cell className="flex items-center gap-3 text-gray-700 font-semibold text-center px-4 py-4">
                               <button
-                                className="pl-[0.4rem]"
+                                className="p-3 hover:bg-transparent rounded-md"
+                                className="p-3 hover:bg-transparent rounded-md"
                                 onClick={() => {
-                                  console.log(
-                                    "User data before opening modal:",
-                                    user
-                                  );
                                   setIsUserAdd(false);
                                   setIsModalOpen(true);
                                   setCognitoId(user.cognitoId);
@@ -472,60 +475,70 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                   setPhoneNumber(user.phoneNumber);
                                   setStatus(user.status);
                                   setBalance(user.balance);
-                                  setSelectedProductAmount(user.amount || 0);
-                                  setProductType(user.productType || "Select Product Type");
-                                
                                 }}
                               >
-                                <FaEye size={20} />
+                                <FaEye size={15} />
+                                <FaEye size={15} />
                               </button>
                               <button
-                                className="absolute -right-6 mt-1"
-                                onClick={() =>
-                                  handleDeleteUser(
-                                    user.institution,
-                                    user.cognitoId
-                                  )
-                                }
+                                className="p-2 hover:bg-transparent rounded-md"
+                                onClick={() => handleDeleteUser(user.institution, user.cognitoId)}
+                                className="p-2 hover:bg-transparent rounded-md"
+                                onClick={() => handleDeleteUser(user.institution, user.cognitoId)}
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  fill="none"
                                   viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  className="w-5"
+                                  strokeWidth={1.5}
+                                  stroke="currentColor"
+                                  className="size-4"
+                                  strokeWidth={1.5}
+                                  stroke="currentColor"
+                                  className="size-4"
                                 >
                                   <path
-                                    fillRule="evenodd"
-                                    d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
-                                    clipRule="evenodd"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
                                   />
                                 </svg>
                               </button>
-                            </div>
-                          </li>
+                            </Table.Cell>
+
+                          </Table.Row>
+                            </Table.Cell>
+
+                          </Table.Row>
                         );
                       }
-                      return null; // Ensure a return in the else case
+                      return null;
                     })}
-                    <ConfirmDeleteModal
-                      show={showDeleteModal}
-                      onHide={() => setShowDeleteModal(false)}
-                      onConfirm={confirmDelete}
-                    />
-                    <div
-                      className={`absolute bottom-0 flex justify-center items-center w-full`}
-                    >
-                      <Pagination
-                        totalPages={Math.ceil(
-                          searchedUserList.length / itemsPerPage
-                        )}
-                        currentPage={currentPage}
-                        onPageChange={(value) => setCurrentPage(value)}
-                        style={{ margin: "0 auto" }}
-                      />
-                    </div>
+                  </Table.Body>
+                </Table>
+                {/* Corrected Pagination */}
+                <div className="flex items-center justify-between mt-4">
+                  <div className="text-sm text-gray-700">
+                    Showing {startIndex + 1} to {Math.min(endIndex, activeUserList.length)} of {activeUserList.length} results
                   </div>
-                </ul>
+                  <div className="flex overflow-x-auto sm:justify-end">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={Math.ceil(activeUserList.length / itemsPerPage)}
+                      onPageChange={(page) => {
+                        setCurrentPage(page);
+                        window.scrollTo(0, 0);
+                      }}
+                      showIcons
+                      layout="pagination"
+                      className="text-gray-500 font-medium"
+                    />
+                  </div>
+                </div>
               </div>
             ) : (
               <InstructorList />
@@ -533,6 +546,12 @@ const UsersList = ({ userCheck, setUserCheck }) => {
           </div>
         </div>
       )}
+      <ConfirmDeleteModal
+        showModal={showDeleteModal}
+        setShowModal={setShowDeleteModal}
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </>
   );
 };

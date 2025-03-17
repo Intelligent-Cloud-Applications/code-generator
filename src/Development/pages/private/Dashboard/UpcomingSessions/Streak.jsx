@@ -1,86 +1,252 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { fetchStreakCount } from './StreakFunctions'
-import './Streak.css'
-import InstitutionContext from '../../../../Context/InstitutionContext'
-import {API} from "aws-amplify";
-import {MdInfo} from "react-icons/md";
-import {Modal, Popover} from "flowbite-react";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { fetchStreakCount } from "./StreakFunctions";
+import "./Streak.css";
+import InstitutionContext from "../../../../Context/InstitutionContext";
+import { API } from "aws-amplify";
+import { MdInfo, MdClose } from "react-icons/md";
+import { Modal, Popover, Button } from "flowbite-react";
 
 const Streak = () => {
-  const [streakData, setStreakData] = useState({ streakCount: 0, level: 0, attendance: 0, attendanceByClassTypes: {} })
+  const [streakData, setStreakData] = useState({
+    streakCount: 0,
+    level: 0,
+    attendance: 0,
+    attendanceByClassTypes: {},
+  });
   const [openModal, setOpenModal] = useState(false);
-  const InstitutionData = useContext(InstitutionContext).institutionData
+  const InstitutionData = useContext(InstitutionContext).institutionData;
+  const modalRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         let data = await fetchStreakCount(InstitutionData.InstitutionId);
-        console.log('STREAK DATA', data);
+        console.log("STREAK DATA", data);
         const attendance = await API.get(
-          'main',
+          "main",
           `/user/list-attendance/${InstitutionData.InstitutionId}`,
           {}
         );
         let attendanceByClassTypes = {};
         for (let classType of InstitutionData.ClassTypes) {
-          attendanceByClassTypes[classType] = attendance.Items.reduce((acc, item) => acc + (item.classType === classType ? 1 : 0), 0);
+          attendanceByClassTypes[classType] = attendance.Items.reduce(
+            (acc, item) => acc + (item.classType === classType ? 1 : 0),
+            0
+          );
         }
         console.log(attendanceByClassTypes);
         data.attendance = attendance.Count;
         data.attendanceByClassTypes = attendanceByClassTypes;
-        console.log('STREAK DATA', data);
-        setStreakData(data)
+        console.log("STREAK DATA", data);
+        setStreakData(data);
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    // Add event listener to handle clicks outside the modal
+    const handleClickOutside = (event) => {
+      if (
+        openModal &&
+        modalRef.current &&
+        !modalRef.current.contains(event.target)
+      ) {
+        setOpenModal(false);
+      }
+    };
+
+    // Add the event listener when the modal is open
+    if (openModal) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
-    fetchData()
-  }, [])
+    // Clean up the event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openModal]);
 
   return (
     <>
       <div
-        className="w-[100%] flex flex-row p-[2rem] px-[1.5rem] items-center justify-between border h-[15%] main"
+        className="w-[100%] flex flex-row p-8 items-center justify-between rounded-md shadow-md transition-all duration-300 hover:shadow-xl relative overflow-hidden mb-4"
         style={{
-          backgroundColor: InstitutionData.LightestPrimaryColor
+          background: InstitutionData.LightestPrimaryColor,
         }}
       >
-        <div className="flex flex-col">
-          <h2 className="stkm font-bold">Track Your Progress:</h2>
-          <p className="mov">
-          Keep the energy alive and rise higher with your performance and milstones
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full transform translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full transform -translate-x-24 translate-y-24"></div>
+
+        <div className="flex flex-col z-10 flex-1 mr-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Track Your Progress 🎯
+          </h2>
+          <p className="text-gray-600 text-lg leading-relaxed max-w-md">
+            Keep the energy alive and rise higher with your performance and
+            milestones
           </p>
         </div>
-        <div className="flex flex-col text-[17px] text-center lev">
-          ATTENDANCE
-          <p className="text-[35px] stk flex justify-center items-center gap-2">
-            {streakData.attendance}
-            <MdInfo className="inline" size={24} onClick={() => setOpenModal(true)}/>
-          </p>
-        </div>
-        <div className="flex flex-col text-[17px] text-center lev">
-          LEVEL
-          <p className="text-[35px] stk">{streakData.level}</p>
-        </div>
-        <div className="flex flex-col text-[17px] text-center stk mr-6">
-          STREAK
-          <p className="text-[35px] stk">{streakData.streakCount}</p>
+
+        <div className="flex items-center gap-12 z-10">
+          <div className="flex flex-col items-center px-6 py-3 rounded-md bg-white bg-opacity-20 backdrop-blur-sm transition-transform hover:scale-105">
+            <span className="text-gray-700 font-medium mb-1">ATTENDANCE</span>
+            <div className="flex items-center gap-2">
+              <p className="text-2xl font-bold text-gray-800">
+                {streakData.attendance}
+              </p>
+              <MdInfo
+                className="text-primaryColor hover:text-gray-800 cursor-pointer transition-colors"
+                size={24}
+                onClick={() => setOpenModal(true)}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center px-6 py-3 rounded-md bg-white bg-opacity-20 backdrop-blur-sm transition-transform hover:scale-105">
+            <span className="text-gray-700 font-medium mb-1">LEVEL</span>
+            <p className="text-2xl font-bold text-gray-800">
+              {streakData.level}
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center px-6 py-3 rounded-md bg-white bg-opacity-20 backdrop-blur-sm transition-transform hover:scale-105">
+            <span className="text-gray-700 font-medium mb-1">STREAK</span>
+            <div className="flex items-center gap-2">
+              <p className="text-2xl font-bold text-gray-800">
+                {streakData.streakCount}
+              </p>
+              <span className="text-yellow-500">🔥</span>
+            </div>
+          </div>
         </div>
       </div>
-      <Modal show={openModal} onClose={() => setOpenModal(false)}>
-        <Modal.Header className="p-2">Attendance</Modal.Header>
-        <Modal.Body className="flex justify-center gap-4">
-          {Object.getOwnPropertyNames(streakData.attendanceByClassTypes).map(a =>
-            <div key={a} className="p-4 flex flex-col items-center gap-2 border-2">
-              <h4>{a}</h4>
-              <p>{streakData.attendanceByClassTypes[a]}</p>
+      <Modal
+        show={openModal}
+        onClose={() => setOpenModal(false)}
+        dismissible={true}
+        popup={false}
+        ref={modalRef}
+        root={document.body}
+      >
+        <Modal.Header
+          className="border-b-0 pb-0 flex items-center justify-between"
+          style={{ backgroundColor: InstitutionData.LightestPrimaryColor }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: InstitutionData.PrimaryColor }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
             </div>
-          )}
+            <h3 className="text-xl font-bold text-gray-800">
+              Your Attendance Summary
+            </h3>
+          </div>
+        </Modal.Header>
+        <Modal.Body
+          className="pt-0 pb-6 px-6"
+          style={{ backgroundColor: InstitutionData.LightestPrimaryColor }}
+        >
+          <p className="text-gray-600 my-4 ml-6">Classes attended by type</p>
+
+          <div className="bg-white rounded-lg shadow-sm p-5 mb-4">
+            <div className="grid grid-cols-2 gap-4">
+              {Object.getOwnPropertyNames(
+                streakData.attendanceByClassTypes
+              ).map((classType, index) => {
+                // Create an array of colors for variety
+
+                return (
+                  <div
+                    key={classType}
+                    className="bg-gray-50 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium text-gray-800 truncate max-w-[120px]">
+                          {classType}
+                        </h4>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-end">
+                      <span className="text-xs text-gray-500">
+                        Classes Attended
+                      </span>
+                      <span
+                        className="text-2xl font-bold"
+                        style={{ color: InstitutionData.PrimaryColor }}
+                      >
+                        {streakData.attendanceByClassTypes[classType]}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: InstitutionData.PrimaryColor }}
+                >
+                  <span className="text-white text-2xl">🏆</span>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-500 block">
+                    Total Classes Attended
+                  </span>
+                  <p
+                    className="text-3xl font-bold"
+                    style={{ color: InstitutionData.PrimaryColor }}
+                  >
+                    {streakData.attendance}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-sm font-medium text-gray-500 block">
+                  Current Streak
+                </span>
+                <div className="flex items-center gap-1">
+                  <p className="text-2xl font-bold text-gray-800">
+                    {streakData.streakCount}
+                  </p>
+                  <span className="text-yellow-500">🔥</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </Modal.Body>
+        <Modal.Footer
+          className="border-t-0 flex justify-center pt-0"
+          style={{ backgroundColor: InstitutionData.LightestPrimaryColor }}
+        ></Modal.Footer>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default Streak
+export default Streak;

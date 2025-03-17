@@ -10,12 +10,15 @@ import Facebook from "../../utils/Png/Facebook.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
 import { API } from "aws-amplify";
 import institutionData from "../../constants";
+import { Modal, Table  } from "flowbite-react";
 
 function ReferralCode() {
   const { userData } = useContext(Context);
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const [shareClicked, setShareClicked] = useState(false);
   const [members, setMembers] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [memberDetails, setMemberDetails] = useState([]);
 
   const { number } = useSpring({
     from: { number: 0 },
@@ -36,6 +39,22 @@ function ReferralCode() {
   } else if (userData.userType === "admin") {
     referralLink = `${domain}/signup?referral=${userData.institution}`;
   }
+
+  const fetchMemberDetails = async () => {
+    try {
+      const response = await API.get(
+        "main",
+        `/instructor/referred-members/${userData.referral_code}`
+      );
+
+      setMemberDetails(response.referredMembers);
+
+      setShowModal(true);
+      console.log("Modal state after clicking:", showModal);
+    } catch (error) {
+      console.error("Error fetching members:", error);
+    }
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(referralLink);
@@ -136,21 +155,89 @@ function ReferralCode() {
             </div>
           </div>
         </div>
+
         <div className="flex flex-col gap-2">
           <div className="w-[15rem] bg-white shadow-md h-[50%]">
             <div
-              className="text-center text-white"
+              className="flex items-center justify-between text-white px-4 py-2"
               style={{ backgroundColor: InstitutionData.PrimaryColor }}
             >
-              MEMBERS
+              <span className="text-center w-full">MEMBERS</span>
+              <button onClick={fetchMemberDetails} className="ml-auto">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                  />
+                </svg>
+              </button>
             </div>
+
             <animated.div
               className="text-[2rem] p-2 text-center font-bold Inter"
               style={{ color: InstitutionData.PrimaryColor }}
             >
               {number.to((n) => n.toFixed(0))}
             </animated.div>
+
+            {showModal && (
+              <>
+                {console.log("Modal state before rendering:", showModal)}
+                <Modal show={showModal} onClose={() => setShowModal(false)}>
+                  <Modal.Header>Referred Members</Modal.Header>
+                  <Modal.Body>
+                    {memberDetails.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <Table striped hoverable>
+                          <Table.Head>
+                            <Table.HeadCell>#</Table.HeadCell>
+                            <Table.HeadCell>Name</Table.HeadCell>
+                            <Table.HeadCell>Email</Table.HeadCell>
+                          </Table.Head>
+                          <Table.Body className="divide-y">
+                            {memberDetails.map((member, index) => (
+                              <Table.Row
+                                key={index}
+                                className="bg-white border-b"
+                              >
+                                <Table.Cell className="font-medium text-gray-900">
+                                  {index + 1}
+                                </Table.Cell>
+                                <Table.Cell>{member.userName}</Table.Cell>
+                                <Table.Cell>{member.emailId}</Table.Cell>
+                              </Table.Row>
+                            ))}
+                          </Table.Body>
+                        </Table>
+                      </div>
+                    ) : (
+                      <p className="text-center text-gray-500">
+                        No referred members found.
+                      </p>
+                    )}
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                    >
+                      Close
+                    </button>
+                  </Modal.Footer>
+                </Modal>
+                ;
+              </>
+            )}
           </div>
+
           <div className="w-[15rem] bg-white shadow-sm h-[50%]">
             <div
               className="text-center text-white"
