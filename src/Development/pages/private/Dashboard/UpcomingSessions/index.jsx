@@ -641,20 +641,33 @@ const UpcomingSessions = () => {
   const handleTimeChange = (e, classId) => {
     setEditingTime({
       ...editingTime,
-      [classId]: e.target.value
+      [classId]: e.target.value,
     });
   };
 
-  const handleTimeBlur = (classId, instructorNames, classType, instructorId, date, newTime) => {
+  const handleTimeBlur = (
+    classId,
+    instructorNames,
+    classType,
+    instructorId,
+    date,
+    newTime
+  ) => {
     // Only call API if time has changed
     if (newTime && newTime !== getTime(date)) {
       const newDate = new Date(`${getDate(date)}T${newTime}`).getTime();
-      onClassUpdated(classId, instructorNames, classType, instructorId, newDate);
+      onClassUpdated(
+        classId,
+        instructorNames,
+        classType,
+        instructorId,
+        newDate
+      );
     }
-    
+
     // Reset the editing state for this class
-    setEditingTime(prev => {
-      const updated = {...prev};
+    setEditingTime((prev) => {
+      const updated = { ...prev };
       delete updated[classId];
       return updated;
     });
@@ -782,61 +795,9 @@ const UpcomingSessions = () => {
 
       {!isMobileScreen && (
         <div className={`w-[100%] flex flex-col items-center`}>
-          {Ctx.userData.userType === "admin" ||
-            Ctx.userData.userType === "instructor" || (
-              <div
-                className={`w-[90%] h-[13rem] rounded-[2.5rem] p-2  flex items-center justify-between max1050:px-2`}
-                style={{
-                  backgroundColor: InstitutionData.LightestPrimaryColor,
-                }}
-              >
-                <div className={`ml-20 max1050:ml-5`}>
-                  {Ctx.isAuth ? (
-                    <h2 className={`text-[2rem] max500:text-[1.4rem]`}>
-                      Hello {Ctx.userData.userName}
-                    </h2>
-                  ) : (
-                    <h2 className={`text-[2rem] max500:text-[1.3rem]`}>
-                      Hello Simon
-                    </h2>
-                  )}
-
-                  {Ctx.userData.status === "Active" ||
-                  Ctx.userData.status === "Trial" ? (
-                    <p className={`text-[1.4rem] font-bold max500:text-[1rem]`}>
-                      {Ctx.userData.status === "Trial"
-                        ? `Your trial period ends in ${Math.ceil(
-                            (new Date(Ctx.userData.trialEndDate) - new Date()) /
-                              (1000 * 60 * 60 * 24)
-                          )} days`
-                        : "Be Regular and Work Hard to Achieve Goals"}
-                    </p>
-                  ) : (
-                    <div>
-                      <p
-                        className={`text-[1.4rem] font-bold cursor-pointer`}
-                        onClick={() => {
-                          Navigate("/subscription");
-                        }}
-                      >
-                        Please Upgrade to start your Instructor training
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <div className={`mr-20 max1050:mr-5 `}>
-                  <img
-                    alt="Why"
-                    src={`https://institution-utils.s3.amazonaws.com/happyprancer/images/why-bworkz-img.svg`}
-                    className={`w-72`}
-                  />
-                </div>
-              </div>
-            )}
-
           <div className={`mt-8 w-[80%] max1050:w-[92%] flex justify-between`}>
             <div className={`w-[100%]`}>
-              <h3 className={`text-center text-[1.7rem] pl-3 mb-4 font-bold`}>
+              <h3 className={`text-center text-[2rem] my-4 font-bold`}>
                 Upcoming Classes
               </h3>
 
@@ -1092,22 +1053,30 @@ const UpcomingSessions = () => {
                                   Ctx.userData.userType === "instructor" ? (
                                     <div className="relative flex items-center justify-center text-center">
                                       <input
-                                        value={editingTime[clas.classId] || getTime(clas.date)}
+                                        value={
+                                          editingTime[clas.classId] ||
+                                          getTime(clas.date)
+                                        }
                                         type="time"
                                         className={`w-full h-10 rounded text-center outline-none z-10 relative ${
-                                          editingTime[clas.classId] ? 
-                                          'border border-blue-500 bg-blue-50' : 
-                                          'bg-transparent border-none'
+                                          editingTime[clas.classId]
+                                            ? "border border-blue-500 bg-blue-50"
+                                            : "bg-transparent border-none"
                                         }`}
-                                        onChange={(e) => handleTimeChange(e, clas.classId)}
-                                        onBlur={(e) => handleTimeBlur(
-                                          clas.classId,
-                                          getInstructor(clas.instructorNames)?.name,
-                                          clas.classType,
-                                          clas.instructorId,
-                                          clas.date,
-                                          e.target.value
-                                        )}
+                                        onChange={(e) =>
+                                          handleTimeChange(e, clas.classId)
+                                        }
+                                        onBlur={(e) =>
+                                          handleTimeBlur(
+                                            clas.classId,
+                                            getInstructor(clas.instructorNames)
+                                              ?.name,
+                                            clas.classType,
+                                            clas.instructorId,
+                                            clas.date,
+                                            e.target.value
+                                          )
+                                        }
                                       />
                                       <FaEdit
                                         className="absolute

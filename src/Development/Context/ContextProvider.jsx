@@ -147,6 +147,15 @@ const ContextProvider = (props) => {
     }
   };
 
+  const getInstructorList = async () => {
+    try {
+      const list = await API.get("main", apiPaths.getInstructors);
+      setInstructorList(list);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const getUserAttendance = async () => {
     try {
       const response = await API.get("main", apiPaths.listAttendance);
@@ -512,6 +521,7 @@ const ContextProvider = (props) => {
     instructorList: instructorList,
     setInstructorList: () => { },
     setProductList: () => { },
+    getInstructorList: getInstructorList,
     checkSubscriptionStatus: checkSubscriptionStatus,
     streakData: streakData,
     setStreakData: setStreakDataFn,

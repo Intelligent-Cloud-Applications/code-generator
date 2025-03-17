@@ -6,6 +6,8 @@ import InstitutionContext from "../../../Context/InstitutionContext";
 import HappyprancerPaypalHybrid from "../Subscription/HappyprancerPaypalHybrid";
 import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly";
 import institutionData from "../../../constants";
+import {API} from "aws-amplify";
+import {toast} from "react-toastify";
 
 const getLocationFromIP = async () => {
   try {
@@ -22,7 +24,7 @@ const getLocationFromIP = async () => {
 const Subscription = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const institutionProductId = useContext(InstitutionContext).institutionData?.productId;
-  const { isAuth, productList, userData: UserCtx } = useContext(Context);
+  const { util, isAuth, productList, userData: UserCtx } = useContext(Context);
   const [products, setProducts] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const Navigate = useNavigate();
@@ -179,16 +181,36 @@ const Subscription = () => {
     );
   };
 
+  const handleSubscriptionCancel = async () => {
+    util.setLoader(true);
+    try {
+      const response = await API.post(
+        'main',
+        `/user/cancel-subscription/${institutionData.institution}`,
+        {}
+      );
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+      toast.error('Could not cancel subscription.');
+    } finally {
+      util.setLoader(false);
+    }
+  }
+
   const renderSubscribedButton = () => {
     const primaryColor = InstitutionData.PrimaryColor;
 
     return (
       <button
         type="button"
-        className={`mt-4 relative inline-flex w-full justify-center rounded-lg cursor-not-allowed px-5 py-2.5 text-center text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900`}
-        style={{ backgroundColor: primaryColor }}
+        className={`bg-white text-black border-2 mt-4 relative inline-flex w-full justify-center rounded-lg cursor-not-allowed px-5 py-2.5 text-center text-sm font-medium focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900`}
+        // style={{ backgroundColor: primaryColor }}
+        style={{ borderColor: primaryColor }}
+        onClick={handleSubscriptionCancel}
       >
-        Already Subscribed
+        {/*Already Subscribed*/}
+        Cancel Subscription
       </button>
     );
   };
