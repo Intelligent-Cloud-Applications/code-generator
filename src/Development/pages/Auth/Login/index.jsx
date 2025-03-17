@@ -15,6 +15,7 @@ const customTheme = {
 
 const AuthPage = () => {
   const { setLoader } = useContext(Context).util;
+  const data = useContext(InstitutionContext).institutionData;
   const { InstitutionId, productId } = useContext(InstitutionContext).institutionData;
   const navigate = useNavigate();
 
@@ -59,15 +60,41 @@ const AuthPage = () => {
 
   return (
     <FormWrapper heading='Login'>
+            {/* Background Blur Effects */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Left blob */}
+        <div
+          className="absolute w-[15rem] h-[15rem] -left-8 top-1/3 opacity-30 blur-3xl rounded-full z-[-1]"
+          style={{ backgroundColor: data.PrimaryColor }}
+        ></div>
+
+        {/* Right blob */}
+        <div
+          className="absolute w-[18rem] h-[18rem] -right-10 top-1/4 opacity-25 blur-3xl rounded-full z-[-1]"
+          style={{ backgroundColor: data.PrimaryColor }}
+        ></div>
+
+        {/* Top blob */}
+        <div
+          className="absolute w-[12rem] h-[12rem] top-0 left-1/3 opacity-20 blur-3xl rounded-full z-[-1]"
+          style={{ backgroundColor: data.PrimaryColor }}
+        ></div>
+
+        {/* Bottom blob */}
+        <div
+          className="absolute w-[14rem] h-[14rem] -bottom-10 right-1/4 opacity-30 blur-3xl rounded-full z-[-1]"
+          style={{ backgroundColor: data.PrimaryColor }}
+        ></div>
+      </div>
       <form
         onSubmit={handleLogin}
-        className='flex flex-col items-center gap-6 w-full'
+        className='flex flex-col items-center gap-3 w-full max-w-md'
       >
         
         {productId === "1000007" && (
           <>
         <button
-          className="flex items-center bg-white text-black px-4 py-2 border rounded-md"
+          className="flex items-center bg-white w-full justify-center text-black px-4 py-2 border rounded-md"
           type='button'
           onClick={() => Auth.federatedSignIn({provider: CognitoHostedUIIdentityProvider.Google})}
         >
