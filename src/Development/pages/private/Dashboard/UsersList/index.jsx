@@ -15,7 +15,6 @@ import { API } from "aws-amplify";
 import InstructorList from "./InstructorList";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { Table } from "flowbite-react";
-import { Table } from "flowbite-react";
 
 const UsersList = ({ userCheck, setUserCheck }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -43,7 +42,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Members List");
 
-  const itemsPerPage = 5;
   const itemsPerPage = 5;
   const isMobileScreen = useMediaQuery("(max-width: 600px)");
 
@@ -124,7 +122,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     }
     setUserToDelete({ institution, cognitoId });
     setShowDeleteModal(true);
-    setShowDeleteModal(true);
   };
 
   const confirmDelete = async () => {
@@ -138,7 +135,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   };
 
   const formatDate = (epochDate) => {
-    if (!epochDate || isNaN(new Date(epochDate))) return "NA";
     if (!epochDate || isNaN(new Date(epochDate))) return "NA";
 
     const date = new Date(epochDate);
@@ -175,8 +171,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     return initials;
   };
 
-  const getColor = () => {
-    return InstitutionData.PrimaryColor;
   const getColor = () => {
     return InstitutionData.PrimaryColor;
   };
@@ -226,7 +220,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     filter2,
     setShowDeleteModal,
     showDeleteModal,
-    confirmDelete,
     confirmDelete,
     confirmDelete,
   };
@@ -330,7 +323,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
             <div
               className={`flex w-[94.5%] mt-4 rounded-md overflow-hidden gap-2`}
 
-
             >
               <input
                 className={`flex-1 p-2 outline-none rounded-md`}
@@ -415,56 +407,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                               {user.balance}
                             </Table.Cell>
                             <Table.Cell className="flex items-center gap-3 text-gray-700 font-semibold text-center px-4 py-4">
-                          <Table.Row key={user.cognitoId}>
-                            <Table.Cell>
-                              {user.imgUrl ? (
-                                <img
-                                  src={user.imgUrl}
-                                  alt={user.userName}
-                                  className="h-10 w-10 rounded-full object-cover text-gray-700 font-semibold"
-                                />
-                              ) : (
-                                <div
-                                  className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium"
-                                  style={{
-                                    backgroundColor: getColor(
-                                      user.userName
-                                    ),
-                                  }}
-                                >
-                                  {getInitials(user.userName)}
-                                </div>
-                              )}
-                            </Table.Cell>
-                            <Table.Cell
-                              className="text-gray-700 font-semibold text-center"
-                            >{user.userName}</Table.Cell>
-                            <Table.Cell
-                              className="text-gray-700 font-semibold text-center">
-                              {formatDate(user.joiningDate)}
-                            </Table.Cell>
-                            <Table.Cell
-                              className="text-gray-700 font-semibold text-center"
-                            >
-                              {formatDate(user.renewDate)}
-                            </Table.Cell>
-                            <Table.Cell
-                              className="text-gray-700 font-semibold text-center"
-                            >
-                              {userAttendance[user.cognitoId] || 0}
-                            </Table.Cell>
-                            <Table.Cell
-                              className={
-                                parseFloat(user.balance) < 0
-                                  ? "text-red-500 "
-                                  : "text-gray-700 font-semibold text-center"
-                              }
-                            >
-                              {user.balance}
-                            </Table.Cell>
-                            <Table.Cell className="flex items-center gap-3 text-gray-700 font-semibold text-center px-4 py-4">
                               <button
-                                className="p-3 hover:bg-transparent rounded-md"
                                 className="p-3 hover:bg-transparent rounded-md"
                                 onClick={() => {
                                   setIsUserAdd(false);
@@ -478,22 +421,15 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                 }}
                               >
                                 <FaEye size={15} />
-                                <FaEye size={15} />
                               </button>
                               <button
-                                className="p-2 hover:bg-transparent rounded-md"
-                                onClick={() => handleDeleteUser(user.institution, user.cognitoId)}
                                 className="p-2 hover:bg-transparent rounded-md"
                                 onClick={() => handleDeleteUser(user.institution, user.cognitoId)}
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   fill="none"
-                                  fill="none"
                                   viewBox="0 0 24 24"
-                                  strokeWidth={1.5}
-                                  stroke="currentColor"
-                                  className="size-4"
                                   strokeWidth={1.5}
                                   stroke="currentColor"
                                   className="size-4"
@@ -502,15 +438,9 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
                                   />
                                 </svg>
                               </button>
-                            </Table.Cell>
-
-                          </Table.Row>
                             </Table.Cell>
 
                           </Table.Row>
