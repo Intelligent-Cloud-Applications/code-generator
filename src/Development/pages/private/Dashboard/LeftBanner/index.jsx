@@ -183,7 +183,7 @@ const LeftBanner = ({ displayAfterClick }) => {
 
           {/* <ListItemMobile
             icon={<FaSignOutAlt size={20} />}
-            text={'Logout'}
+            text={'Logout'}`
             onClickFn={handleLogout}
           /> */}
         </div>

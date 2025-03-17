@@ -83,16 +83,29 @@ const UsersList = ({ userCheck, setUserCheck }) => {
 
   // Delete functionality
   const handleDelete = async (institution, cognitoId) => {
-    const response = await API.put("main", "/admin/delete-user", {
-      body: {
-        institution: institution,
-        cognitoId,
-      },
-    });
-    if (response.status === 200) {
-      toast.success("Deleted successfully!", { autoClose: 3000 });
+    try {
+      const response = await API.put("main", "/admin/delete-user", {
+        body: {
+          institution: institution,
+          cognitoId: cognitoId
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log("Delete response:", response); // Add this for debugging
+      
+      if (response) {
+        toast.success("User deleted successfully!", { autoClose: 3000 });
+        await getUserList(); // Refresh the user list
+        return true;
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete user. Please try again.", { autoClose: 3000 });
+      return false;
     }
-    getUserList();
   };
 
   const handleCancel = () => {
@@ -103,16 +116,21 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [userToDelete, setUserToDelete] = useState(null);
 
   const handleDeleteUser = (institution, cognitoId) => {
+    if (!institution || !cognitoId) {
+      toast.error("Invalid user data for deletion");
+      return;
+    }
     setUserToDelete({ institution, cognitoId });
     setShowDeleteModal(true);
   };
 
   const confirmDelete = async () => {
     if (userToDelete) {
-      await handleDelete(userToDelete.institution, userToDelete.cognitoId);
-      setShowDeleteModal(false);
-      setUserToDelete(null);
-      toast.success("User deleted successfully!");
+      const success = await handleDelete(userToDelete.institution, userToDelete.cognitoId);
+      if (success) {
+        setShowDeleteModal(false);
+        setUserToDelete(null);
+      }
     }
   };
 
@@ -327,9 +345,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
             </div>
             {selectedOption === "Members List" ? (
               <div className="w-[94.5%] overflow-auto mt-4 pt-6">
-                {/* <ul className="relative px-0 pb-[3rem] w-[95%] max-w-[1700px] mx-auto flex flex-colrounded-3xl items-center justify-start pt-6 max536:gap-3 max536:h-[calc(100vh-16rem)] ">
-
-                  <div className="overflow-auto w-full"> */}
                 <Table striped>
                   <Table.Head className="font-semibold text-center">
                     <Table.HeadCell></Table.HeadCell>
@@ -435,18 +450,25 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                     })}
                   </Table.Body>
                 </Table>
-                {/* Pagination */}
-                <div className="flex justify-center items-center w-full mt-4">
-                  <Pagination
-                    totalPages={Math.ceil(
-                      searchedUserList.length / itemsPerPage
-                    )}
-                    currentPage={currentPage}
-                    onPageChange={(value) => setCurrentPage(value)}
-                  />
+                {/* Corrected Pagination */}
+                <div className="flex items-center justify-between mt-4">
+                  <div className="text-sm text-gray-700">
+                    Showing {startIndex + 1} to {Math.min(endIndex, activeUserList.length)} of {activeUserList.length} results
+                  </div>
+                  <div className="flex overflow-x-auto sm:justify-end">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={Math.ceil(activeUserList.length / itemsPerPage)}
+                      onPageChange={(page) => {
+                        setCurrentPage(page);
+                        window.scrollTo(0, 0);
+                      }}
+                      showIcons
+                      layout="pagination"
+                      className="text-gray-500 font-medium"
+                    />
+                  </div>
                 </div>
-                {/* </div>
-                </ul> */}
               </div>
             ) : (
               <InstructorList />
@@ -454,6 +476,12 @@ const UsersList = ({ userCheck, setUserCheck }) => {
           </div>
         </div>
       )}
+      <ConfirmDeleteModal
+        showModal={showDeleteModal}
+        setShowModal={setShowDeleteModal}
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </>
   );
 };
