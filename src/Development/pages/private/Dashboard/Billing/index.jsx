@@ -56,10 +56,15 @@ const Billing = () => {
     <div className='mx-8 p-8 bg-gray-100 font-family'>
       <h2 className='text-2xl font-bold'>Membership Details</h2>
       <div className='bg-white my-4 p-4'>
-        <p className='text-white font-bold w-fit -ml-6 my-2 py-2 px-4 rounded-r-full'
-        style={{ backgroundColor: InstitutionData?.PrimaryColor }}
-        >Member since {(new Date(userData.joiningDate).toDateString())}</p>
-        <p className='text-xl font-bold'>{userData.products?.slice(-1)[0].S}</p>
+        <div className='flex justify-between'>
+          <p className='text-white font-bold w-fit -ml-6 my-2 py-2 px-4 rounded-r-full'
+             style={{ backgroundColor: InstitutionData?.PrimaryColor }}
+          >Member since {(new Date(userData.joiningDate).toDateString())}</p>
+          {/*<button className='text-white bg-red-600 font-bold w-fit -mr-6 my-2 py-2 px-4 rounded-l-full'>*/}
+          {/*  Cancel*/}
+          {/*</button>*/}
+        </div>
+        <p className='text-xl font-bold'>{productMap[userData.productId]?.heading}</p>
         <p className='text-lg'>{amount}</p>
         <br />
         <p className='text-xl font-bold'>Next billing date</p>

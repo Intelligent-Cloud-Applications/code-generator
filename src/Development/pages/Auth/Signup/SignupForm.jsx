@@ -7,10 +7,19 @@ import {
   PrimaryButton,
   BaseTextInputWithValue
 } from "../../../common/Inputs";
-import { useEffect,useState } from "react";
+import {useContext, useEffect, useState} from "react";
 import { useLocation } from "react-router-dom";
+import {Auth} from "aws-amplify";
+import {CognitoHostedUIIdentityProvider} from "@aws-amplify/auth";
+import {HR} from "flowbite-react";
+import InstitutionContext from "../../../Context/InstitutionContext";
+
+const customTheme = {
+  "hrLine": "my-4 h-px w-64 border-0 bg-gray-700 dark:bg-gray-200"
+}
 
 const SignupForm = ({ handler }) => {
+  const { productId } = useContext(InstitutionContext).institutionData;
   const [referral_code, setReferralCode] = useState('');
   const location = useLocation();
   useEffect(() => {
@@ -33,6 +42,23 @@ const SignupForm = ({ handler }) => {
         w-full`
       }
     >
+      {productId === "1000007" && (
+        <>
+          <button
+            className="flex items-center bg-white text-black px-4 py-2 border rounded-md"
+            type='button'
+            onClick={() => Auth.federatedSignIn({provider: CognitoHostedUIIdentityProvider.Google})}
+          >
+            <img
+              className="w-6 h-6 mr-2"
+              src="https://www.gstatic.com/images/branding/product/1x/gsa_48dp.png"
+              alt="Google Icon"
+            />
+            Sign up with Google
+          </button>
+          <HR.Text text='or' theme={customTheme}/>
+        </>
+      )}
       <BaseTextInput name='name' className='rounded w-full' placeholder='Name' pattern='[A-Za-z\ ]' value={name}
                      onChange={(e) => {if (/^[^0-9]*$/.test(e.target.value)) setName(e.target.value)}}/>
       <EmailInput name='email' className='rounded w-full'/>
