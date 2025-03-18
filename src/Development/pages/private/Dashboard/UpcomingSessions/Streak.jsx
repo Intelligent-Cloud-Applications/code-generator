@@ -73,7 +73,7 @@ const Streak = () => {
   return (
     <>
       <div
-        className="w-[100%] flex flex-row p-8 items-center justify-between rounded-md shadow-md transition-all duration-300 hover:shadow-xl relative overflow-hidden mb-4"
+        className="w-[100%] flex flex-row p-8 items-center justify-between rounded-md shadow-md bg-opacity-90 backdrop-blur-sm transition-all duration-300 hover:shadow-xl relative overflow-hidden mb-4"
         style={{
           background: InstitutionData.LightestPrimaryColor,
         }}
@@ -133,39 +133,14 @@ const Streak = () => {
         ref={modalRef}
         root={document.body}
       >
-        <Modal.Header
-          className="border-b-0 pb-0 flex items-center justify-between"
-          style={{ backgroundColor: InstitutionData.LightestPrimaryColor }}
-        >
+        <Modal.Header className="border-b-0 pb-0 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: InstitutionData.PrimaryColor }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
-            </div>
             <h3 className="text-xl font-bold text-gray-800">
               Your Attendance Summary
             </h3>
           </div>
         </Modal.Header>
-        <Modal.Body
-          className="pt-0 pb-6 px-6"
-          style={{ backgroundColor: InstitutionData.LightestPrimaryColor }}
-        >
+        <Modal.Body className="pt-0 pb-6 px-6">
           <p className="text-gray-600 my-4 ml-6">Classes attended by type</p>
 
           <div className="bg-white rounded-lg shadow-sm p-5 mb-4">
@@ -240,10 +215,7 @@ const Streak = () => {
             </div>
           </div>
         </Modal.Body>
-        <Modal.Footer
-          className="border-t-0 flex justify-center pt-0"
-          style={{ backgroundColor: InstitutionData.LightestPrimaryColor }}
-        ></Modal.Footer>
+        <Modal.Footer className="border-t-0 flex justify-center pt-0"></Modal.Footer>
       </Modal>
     </>
   );
