@@ -14,16 +14,15 @@ import InstitutionContext from "../../../Context/InstitutionContext";
 import Footer from "../../../components/Footer";
 import BirthdayModal from "./ProfileUpdate/BirthdayModal";
 import Choreography from "./Choreography";
+import { Auth } from "aws-amplify";
 
 const DashBoard = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const Navigate = useNavigate();
   const [click, setClick] = useState(0);
   const [userCheck, setUserCheck] = useState(0);
+  const [loading, setLoading] = useState(false);
   const Ctx = useContext(Context);
-  const unpaidUser = {
-    text: "Embrace a world of possibilities. Unlock exclusive features. Subscribe now and elevate your experience with our extraordinary offerings.",
-  };
 
   const displayAfterClick = () => {
     switch (click) {
@@ -70,10 +69,10 @@ const DashBoard = () => {
   return (
     <>
       <NavBar />
-      <div className={`flex flex-col items-center w-screen `}>
-        {
-          Ctx?.userData && Ctx.userData.hasOwnProperty("dob") && Ctx.userData.dob && (<BirthdayModal />)
-        }
+      <div className={`flex flex-col items-center w-screen`}>
+        {Ctx?.userData &&
+          Ctx.userData.hasOwnProperty("dob") &&
+          Ctx.userData.dob && <BirthdayModal />}
         <div
           className={`w-full rounded-3xl flex max1050:w-screen max1050:ml-0 max536:rounded-none items-top ml-0 h-full relative`}
         >
@@ -90,48 +89,55 @@ const DashBoard = () => {
             !isProfileSection ? (
               <div className={`relative`}>
                 <div
-                  className={`absolute z-10 top-[30%] right-[15%] max1050:w-[92%] flex justify-between rounded-[0.51rem]`}
+                  className={`absolute z-10 top-0 left-0 right-0 bottom-0 flex items-center justify-center`}
                 >
-                  <div className={`w-[100%]`}>
+                  <div
+                    className={`flex flex-col items-center justify-center max-w-4xl w-full text-center p-8`}
+                  >
                     <div
-                      className={`locked-screen relative flex items-center justify-center text-center mt-[3.5rem]`}
+                      className={`sm:flex-row items-center justify-center gap-4 sm:gap-6`}
                     >
-                      <div className={`unlock-button`}>
-                        <h2
-                          className={`w-[fit-content] text-[1.5rem] max500:text-[1.2rem] ml-[5rem]`}
+                      <button
+                        className={`flex items-center justify-center px-6 py-3 rounded-full text-white font-medium transition-all hover:shadow-lg`}
+                        onClick={() => Navigate("/subscription")}
+                        style={{
+                          backgroundColor: InstitutionData.PrimaryColor,
+                        }}
+                      >
+                        <img
+                          src={`https://institution-utils.s3.amazonaws.com/institution-common/images/Dashboard/lock.svg`}
+                          alt=""
+                          className={`w-5 h-5 mr-2`}
+                        />
+                        <span>SUBSCRIBE AND UNLOCK</span>
+                      </button>
+                    </div>
+                    <div className="mt-4 flex items-center gap-2">
+                      <span className="text-gray-600">
+                        Already have a{" "}
+                        <span
+                          className="font-bold"
+                          style={{ color: InstitutionData.PrimaryColor }}
                         >
-                          {unpaidUser.text}
-                        </h2>
-                        <div
-                          className={`Subscribe-button ml-[8rem] w-[8rem] h-[3rem] m-[2rem] rounded-[1.5rem] text-white`}
-                          onClick={() => {
-                            // Redirect the user to the subscription page
-                            Navigate("/subscription");
-                          }}
-                          style={{
-                            backgroundColor: InstitutionData.PrimaryColor,
-                          }}
-                        >
-                          <img
-                            src={`https://institution-utils.s3.amazonaws.com/institution-common/images/Dashboard/lock.svg`} // Provide the source for the lock image
-                            alt=""
-                            className={`top-7 right-10 w-[32px] translate-x-[-2%] absolute fa-4x mb-4`}
-                            onClick={() => {
-                              // Redirect the user to the subscription page
-                              Navigate("/subscription");
-                            }}
-                          />
-
-                          {/*<span className={`Latch`}>*/}
-                          {/*  <span className={`Lock`}></span>*/}
-                          {/*</span>*/}
-                          <div className={`UnlockText`}>UNLOCK</div>
-                        </div>
-                      </div>
+                          subscription
+                        </span>{" "}
+                        with a different email?
+                      </span>
+                      <button
+                        className={`underline hover:text-blue-800 font-medium transition-colors`}
+                        onClick={() => {
+                          // Redirect the user to the subscription page
+                          Navigate("/logout");
+                        }}
+                        disabled={loading}
+                        style={{ color: InstitutionData.PrimaryColor }}
+                      >
+                        {loading ? "Processing..." : "Switch Account"}
+                      </button>
                     </div>
                   </div>
                 </div>
-                <div className={`opacity-[20%]`}>{displayAfterClick()}</div>
+                <div className={`opacity-20`}>{displayAfterClick()}</div>
               </div>
             ) : (
               <div>{displayAfterClick()} </div>
