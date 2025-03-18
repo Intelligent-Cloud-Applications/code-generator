@@ -673,6 +673,7 @@ const UpcomingSessions = () => {
     });
   };
 
+  const [isFocused, setIsFocused] = useState(false);
   return (
     <>
       {/*  Create a new class modal */}
@@ -795,9 +796,61 @@ const UpcomingSessions = () => {
 
       {!isMobileScreen && (
         <div className={`w-[100%] flex flex-col items-center`}>
+          {Ctx.userData.userType === "admin" ||
+            Ctx.userData.userType === "instructor" || (
+              <div
+                className={`w-[90%] h-[13rem] rounded-[2.5rem] p-2  flex items-center justify-between max1050:px-2`}
+                style={{
+                  backgroundColor: InstitutionData.LightestPrimaryColor,
+                }}
+              >
+                <div className={`ml-20 max1050:ml-5`}>
+                  {Ctx.isAuth ? (
+                    <h2 className={`text-[2rem] max500:text-[1.4rem]`}>
+                      Hello {Ctx.userData.userName}
+                    </h2>
+                  ) : (
+                    <h2 className={`text-[2rem] max500:text-[1.3rem]`}>
+                      Hello Simon
+                    </h2>
+                  )}
+
+                  {Ctx.userData.status === "Active" ||
+                  Ctx.userData.status === "Trial" ? (
+                    <p className={`text-[1.4rem] font-bold max500:text-[1rem]`}>
+                      {Ctx.userData.status === "Trial"
+                        ? `Your trial period ends in ${Math.ceil(
+                            (new Date(Ctx.userData.trialEndDate) - new Date()) /
+                              (1000 * 60 * 60 * 24)
+                          )} days`
+                        : "Be Regular and Work Hard to Achieve Goals"}
+                    </p>
+                  ) : (
+                    <div>
+                      <p
+                        className={`text-[1.4rem] font-bold cursor-pointer`}
+                        onClick={() => {
+                          Navigate("/subscription");
+                        }}
+                      >
+                        Please Upgrade to start your Instructor training
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className={`mr-20 max1050:mr-5 `}>
+                  <img
+                    alt="Why"
+                    src={`https://institution-utils.s3.amazonaws.com/happyprancer/images/why-bworkz-img.svg`}
+                    className={`w-72`}
+                  />
+                </div>
+              </div>
+            )}
+
           <div className={`mt-8 w-[80%] max1050:w-[92%] flex justify-between`}>
             <div className={`w-[100%]`}>
-              <h3 className={`text-center text-[2rem] my-4 font-bold`}>
+              <h3 className={`text-center text-[1.7rem] pl-3 mb-4 font-bold`}>
                 Upcoming Classes
               </h3>
 
@@ -973,9 +1026,6 @@ const UpcomingSessions = () => {
                         </Table.HeadCell>
 
                         <Table.HeadCell className="text-center w-[80px] ">
-                          {/* {sortedFilteredClasses[0]?.zoomLink
-                            ? "Join"
-                            : "Attendance"} */}
                           Attendance
                         </Table.HeadCell>
                       </Table.Head>
@@ -1035,13 +1085,7 @@ const UpcomingSessions = () => {
 
                               <Table.Cell className="text-gray-700 font-semibold text-center md:table-cell  w-32 lg:w-48">
                                 <div className="w-full flex justify-center">
-                                  <div
-                                    className="flex items-center justify-center gap-4 w-28 h-7 text-white rounded-lg"
-                                    style={{
-                                      backgroundColor:
-                                        InstitutionData.LightPrimaryColor,
-                                    }}
-                                  >
+                                  <div className="flex items-center justify-center gap-4 w-28  text-gray-700 rounded-lg">
                                     {clas.classType}
                                   </div>
                                 </div>
@@ -1058,15 +1102,17 @@ const UpcomingSessions = () => {
                                           getTime(clas.date)
                                         }
                                         type="time"
-                                        className={`w-full h-10 rounded text-center outline-none z-10 relative ${
+                                        className={`w-full h-10 text-xs rounded text-center outline-none z-10 relative ${
                                           editingTime[clas.classId]
                                             ? "border border-blue-500 bg-blue-50"
                                             : "bg-transparent border-none"
                                         }`}
-                                        onChange={(e) =>
-                                          handleTimeChange(e, clas.classId)
-                                        }
-                                        onBlur={(e) =>
+                                        onFocus={(e) => {
+                                          e.target.showPicker();
+                                          setIsFocused(true);
+                                        }}
+                                        onBlur={(e) => {
+                                          setIsFocused(false);
                                           handleTimeBlur(
                                             clas.classId,
                                             getInstructor(clas.instructorNames)
@@ -1075,13 +1121,18 @@ const UpcomingSessions = () => {
                                             clas.instructorId,
                                             clas.date,
                                             e.target.value
-                                          )
+                                          );
+                                        }}
+                                        onChange={(e) =>
+                                          handleTimeChange(e, clas.classId)
                                         }
                                       />
                                       <FaEdit
-                                        className="absolute
-                                      translate-x-8
-                                      text-gray-500 cursor-pointer"
+                                        className={`absolute translate-x-8 text-gray-500 cursor-pointer  ${
+                                          isFocused
+                                            ? "opacity-0"
+                                            : "opacity-100"
+                                        }`}
                                       />
                                     </div>
                                   ) : (
