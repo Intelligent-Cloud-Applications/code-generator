@@ -17,8 +17,7 @@ import EditableTextArea from "./EditableTextArea.jsx";
 import institutionData from "../../../../constants.js";
 // import EditProfile from "./EditProfile.jsx";
 import InsrtuctorReferral from "../../../../common/ReferralCode/index.jsx";
-// import EditProfile from "./EditProfile.jsx";
-import InsrtuctorReferral from "../../../../common/ReferralCode/index.jsx";
+
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -437,7 +436,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
 
                 <div className="flex items-center justify-between w-full mb-6">
                   <h1 className="text-2xl font-bold">Profile Overview</h1>
-                  <div className="flex gap-2">
+                  {/* <div className="flex gap-2">
                     {showForm ? (
                       <>
                         <button
@@ -475,7 +474,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                         Edit Profile
                       </button>
                     )}
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="relative w-[10rem] h-[10rem] mx-auto mb-6">
@@ -585,7 +584,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                       } ${!showForm ? "opacity-70" : ""}`}
                       type="text"
                       value={name}
-                      readOnly={!showForm}
+                      // readOnly={!showForm}
                       onChange={(e) => setName(e.target.value)}
                     />
                   </div>
@@ -618,7 +617,8 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                       className="bg-gray-100 px-4 py-2 rounded-md opacity-70"
                       type="text"
                       value={phoneNumber}
-                      readOnly
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      // readOnly
                     />
                   </div>
 
@@ -630,7 +630,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                     >
                       DOB
                     </label>
-                    {showForm ? (
+                    {/* {showForm ? ( */}
                       <input
                         type="date"
                         className={` px-4 py-2 rounded-md ${
@@ -639,14 +639,14 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                         value={tempDob || ""}
                         onChange={(e) => setTempDob(e.target.value)}
                       />
-                    ) : (
+                    {/* ) : (
                       <input
                         className="bg-gray-100 px-4 py-2 rounded-md opacity-70"
                         type="text"
                         value={formatDate(dob) || ""}
-                        readOnly
+                        // readOnly
                       />
-                    )}
+                    )} */}
                   </div>
 
                   <div className="flex flex-col col-span-2">
@@ -663,7 +663,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                       } ${!showForm ? "opacity-70" : ""}`}
                       rows={3}
                       value={address}
-                      readOnly={!showForm}
+                      // readOnly={!showForm}
                       onChange={(e) => setAddress(e.target.value)}
                     />
                   </div>
@@ -683,7 +683,7 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                         } `}
                         rows={3}
                         value={about}
-                        readOnly={!showForm}
+                        // readOnly={!showForm}
                         onChange={(e) => setAbout(e.target.value)}
                       />
                     </div>

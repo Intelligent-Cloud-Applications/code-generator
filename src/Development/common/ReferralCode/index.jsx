@@ -10,7 +10,7 @@ import Facebook from "../../utils/Png/Facebook.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
 import { API } from "aws-amplify";
 import institutionData from "../../constants";
-import { Modal, Table  } from "flowbite-react";
+import { Modal, Table } from "flowbite-react";
 
 function ReferralCode() {
   const { userData } = useContext(Context);
@@ -112,7 +112,7 @@ function ReferralCode() {
   }, [userData.referral_code]);
 
   return (
-    <div className="Poppins w-full flex flex-col justify-center items-center">
+    <div className="relative Poppins w-full flex flex-col justify-center items-center">
       <div className="flex mt-4 gap-4">
         <div
           className={`w-[85%] max1050:w-[100%] max-w-[40rem] p-7 flex flex-col items-center max536:w-[90%] relative bg-[#ffffffe1]`}
@@ -156,8 +156,8 @@ function ReferralCode() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <div className="w-[15rem] bg-white shadow-md h-[50%]">
+        <div className="flex  flex-col gap-2">
+          <div className="relative w-[15rem] bg-white shadow-md h-[50%]">
             <div
               className="flex items-center justify-between text-white px-4 py-2"
               style={{ backgroundColor: InstitutionData.PrimaryColor }}
@@ -182,60 +182,11 @@ function ReferralCode() {
             </div>
 
             <animated.div
-              className="text-[2rem] p-2 text-center font-bold Inter"
+              className="relative text-[2rem] p-2 text-center font-bold Inter"
               style={{ color: InstitutionData.PrimaryColor }}
             >
               {number.to((n) => n.toFixed(0))}
             </animated.div>
-
-            {showModal && (
-              <>
-                {console.log("Modal state before rendering:", showModal)}
-                <Modal show={showModal} onClose={() => setShowModal(false)}>
-                  <Modal.Header>Referred Members</Modal.Header>
-                  <Modal.Body>
-                    {memberDetails.length > 0 ? (
-                      <div className="overflow-x-auto">
-                        <Table striped hoverable>
-                          <Table.Head>
-                            <Table.HeadCell>#</Table.HeadCell>
-                            <Table.HeadCell>Name</Table.HeadCell>
-                            <Table.HeadCell>Email</Table.HeadCell>
-                          </Table.Head>
-                          <Table.Body className="divide-y">
-                            {memberDetails.map((member, index) => (
-                              <Table.Row
-                                key={index}
-                                className="bg-white border-b"
-                              >
-                                <Table.Cell className="font-medium text-gray-900">
-                                  {index + 1}
-                                </Table.Cell>
-                                <Table.Cell>{member.userName}</Table.Cell>
-                                <Table.Cell>{member.emailId}</Table.Cell>
-                              </Table.Row>
-                            ))}
-                          </Table.Body>
-                        </Table>
-                      </div>
-                    ) : (
-                      <p className="text-center text-gray-500">
-                        No referred members found.
-                      </p>
-                    )}
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <button
-                      onClick={() => setShowModal(false)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                    >
-                      Close
-                    </button>
-                  </Modal.Footer>
-                </Modal>
-                ;
-              </>
-            )}
           </div>
 
           <div className="w-[15rem] bg-white shadow-sm h-[50%]">
@@ -298,6 +249,57 @@ function ReferralCode() {
             </div>
           </div>
         </div>
+      )}
+      {showModal && (
+        <>
+          {console.log("Modal state before rendering:", showModal)}
+          <Modal
+            show={showModal}
+            onClose={() => setShowModal(false)}
+            className="relative h-screen w-[100%] m-0 rounded-lg "
+            // position="right-end"
+          >
+            <div className="absolute bg-white -top-80 -right-96">
+              <Modal.Header>Referred Members</Modal.Header>
+              <Modal.Body>
+                {memberDetails.length > 0 ? (
+                  <div className="space-y-3">
+                    {memberDetails.map((member, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg shadow-md"
+                      >
+                        <div>
+                          <p className="font-medium">{member.userName}</p>
+                          <p className="text-sm text-gray-600">
+                            {member.emailId}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {member.phoneNumber}
+                          </p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer"></label>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-gray-500">
+                    No referred members found.
+                  </p>
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                >
+                  Close
+                </button>
+              </Modal.Footer>
+            </div>
+          </Modal>
+          ;
+        </>
       )}
     </div>
   );
