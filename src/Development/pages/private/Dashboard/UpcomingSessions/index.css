@@ -11,3 +11,12 @@
 ::-webkit-scrollbar {
   display: none;
 }
+
+/* Ensure time inputs are visible */
+input[type="time"] {
+  appearance: auto !important;
+  -webkit-appearance: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}

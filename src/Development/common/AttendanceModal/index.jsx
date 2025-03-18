@@ -22,6 +22,17 @@ const AttendanceModal = ({ isOpen, onClose, classId, institutionId }) => {
           ?.toLowerCase()
           .includes(attendanceSearchTerm.toLowerCase())
       );
+    })
+    .sort((a, b) => {
+      // Sort by attendance status (marked first)
+      const aIsMarked = selectedUsers[a.cognitoId] || false;
+      const bIsMarked = selectedUsers[b.cognitoId] || false;
+      
+      if (aIsMarked && !bIsMarked) return -1;
+      if (!aIsMarked && bIsMarked) return 1;
+      
+      // If both have same attendance status, sort alphabetically by name
+      return a.userName?.localeCompare(b.userName || '');
     });
 
   // Fetch attendance data when modal opens

@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import InputComponent from "../../../../common/InputComponent";
 import { API } from "aws-amplify";
 import fileUpload from "../../../../common/utils/upload-file.js";
+import institutionData from "../../../../constants.js";
 
 function CreateUser({
   phoneNumber,
@@ -115,7 +116,7 @@ function CreateUser({
       imgUrl: imgUrl,
       phoneNumber: formattedPhoneNumber,
       status,
-      productType,
+      productType: userType === "member" ? productType : "",
       amount: selectedProductAmount,
       userType,
       instructorPaymentType:
@@ -129,7 +130,6 @@ function CreateUser({
           : [],
       product: selectedProduct.heading,
     };
-
     try {
       if (createButton) {
         const response = await API.post("main", `/admin/create-user`, {
@@ -195,6 +195,11 @@ function CreateUser({
       setImageUrl(null);
       setProductType("");
       setSelectedProductAmount("");
+      setInstructorPaymentType("");
+      setInstructorPaymentAmount("");
+      setTrialPeriod("");
+      setSelectedClassTypes([]);
+      setSelectedProduct({});
     } catch (error) {
       console.error("Error creating/updating user:", error);
       const errorMessage = error.response?.data?.message;

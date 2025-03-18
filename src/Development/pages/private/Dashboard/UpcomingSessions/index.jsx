@@ -109,6 +109,7 @@ const UpcomingSessions = () => {
   // }
   const [instructorClassTypes, setInstructorClassTypes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingTime, setEditingTime] = useState({});
 
   useEffect(() => {
     const fetchInstructorData = async () => {
@@ -176,8 +177,6 @@ const UpcomingSessions = () => {
           : c
       );
 
-      // Update the state with the new classes
-
       // Now, you can make the API call to update the class on the server
       await API.put(
         "main",
@@ -195,7 +194,7 @@ const UpcomingSessions = () => {
       Ctx.setUpcomingClasses(updatedClasses);
 
       setEditingIndex(-1);
-
+      toast.success("Class updated successfully");
       UtilCtx.setLoader(false);
     } catch (e) {
       toast.error(e.message);
@@ -639,6 +638,42 @@ const UpcomingSessions = () => {
     }
   };
 
+  const handleTimeChange = (e, classId) => {
+    setEditingTime({
+      ...editingTime,
+      [classId]: e.target.value,
+    });
+  };
+
+  const handleTimeBlur = (
+    classId,
+    instructorNames,
+    classType,
+    instructorId,
+    date,
+    newTime
+  ) => {
+    // Only call API if time has changed
+    if (newTime && newTime !== getTime(date)) {
+      const newDate = new Date(`${getDate(date)}T${newTime}`).getTime();
+      onClassUpdated(
+        classId,
+        instructorNames,
+        classType,
+        instructorId,
+        newDate
+      );
+    }
+
+    // Reset the editing state for this class
+    setEditingTime((prev) => {
+      const updated = { ...prev };
+      delete updated[classId];
+      return updated;
+    });
+  };
+
+  const [isFocused, setIsFocused] = useState(false);
   return (
     <>
       {/*  Create a new class modal */}
@@ -991,9 +1026,6 @@ const UpcomingSessions = () => {
                         </Table.HeadCell>
 
                         <Table.HeadCell className="text-center w-[80px] ">
-                          {/* {sortedFilteredClasses[0]?.zoomLink
-                            ? "Join"
-                            : "Attendance"} */}
                           Attendance
                         </Table.HeadCell>
                       </Table.Head>
@@ -1053,13 +1085,7 @@ const UpcomingSessions = () => {
 
                               <Table.Cell className="text-gray-700 font-semibold text-center md:table-cell  w-32 lg:w-48">
                                 <div className="w-full flex justify-center">
-                                  <div
-                                    className="flex items-center justify-center gap-4 w-28 h-7 text-white rounded-lg"
-                                    style={{
-                                      backgroundColor:
-                                        InstitutionData.LightPrimaryColor,
-                                    }}
-                                  >
+                                  <div className="flex items-center justify-center gap-4 w-28  text-gray-700 rounded-lg">
                                     {clas.classType}
                                   </div>
                                 </div>
@@ -1071,28 +1097,42 @@ const UpcomingSessions = () => {
                                   Ctx.userData.userType === "instructor" ? (
                                     <div className="relative flex items-center justify-center text-center">
                                       <input
-                                        value={getTime(clas.date)}
+                                        value={
+                                          editingTime[clas.classId] ||
+                                          getTime(clas.date)
+                                        }
                                         type="time"
-                                        className="w-full h-10  rounded bg-transparent text-center border-none outline-none"
-                                        onChange={(e) => {
-                                          onClassUpdated(
+                                        className={`w-full h-10 text-xs rounded text-center outline-none z-10 relative ${
+                                          editingTime[clas.classId]
+                                            ? "border border-blue-500 bg-blue-50"
+                                            : "bg-transparent border-none"
+                                        }`}
+                                        onFocus={(e) => {
+                                          e.target.showPicker();
+                                          setIsFocused(true);
+                                        }}
+                                        onBlur={(e) => {
+                                          setIsFocused(false);
+                                          handleTimeBlur(
                                             clas.classId,
                                             getInstructor(clas.instructorNames)
                                               ?.name,
                                             clas.classType,
                                             clas.instructorId,
-                                            new Date(
-                                              `${getDate(clas.date)}T${
-                                                e.target.value
-                                              }`
-                                            ).getTime()
+                                            clas.date,
+                                            e.target.value
                                           );
                                         }}
+                                        onChange={(e) =>
+                                          handleTimeChange(e, clas.classId)
+                                        }
                                       />
                                       <FaEdit
-                                        className="absolute
-                                      translate-x-5
-                                      text-gray-500 cursor-pointer "
+                                        className={`absolute translate-x-8 text-gray-500 cursor-pointer  ${
+                                          isFocused
+                                            ? "opacity-0"
+                                            : "opacity-100"
+                                        }`}
                                       />
                                     </div>
                                   ) : (
