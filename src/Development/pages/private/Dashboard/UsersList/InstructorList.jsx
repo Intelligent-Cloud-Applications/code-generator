@@ -92,6 +92,9 @@ function InstructorList() {
                     rounded
                     size="md"
                     className="w-12 h-12"
+                    rounded
+                    size="md"
+                    className="w-12 h-12"
                   />
                   <div className="font text-gray-700 font-medium">{instructor.name}</div>
                 </Table.Cell>
