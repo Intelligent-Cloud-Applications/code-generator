@@ -1,22 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import apiPaths from "../../utils/api-paths";
 import { API } from "aws-amplify";
+import context from "../../Context/Context";
 
 const DateFormatter = ({ epochDate }) => {
-  const [location, setLocation] = useState("IN");
+  const { userData } = useContext(context);
+  const [location, setLocation] = useState(userData?.location?.countryCode);
   const [formattedDate, setFormattedDate] = useState("");
 
   useEffect(() => {
-    const fetchLocationData = async () => {
-      try {
-        const data = await API.get("main", apiPaths?.getUserLocation);
-        setLocation(data?.countryCode);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    fetchLocationData();
-  }, []);
+    setLocation(userData?.location?.countryCode);
+  }, [userData?.location?.countryCode]);
 
   useEffect(() => {
     if (!epochDate) {

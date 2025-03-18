@@ -101,31 +101,60 @@ const DashBoard = () => {
                           className={`w-[fit-content] text-[1.5rem] max500:text-[1.2rem] ml-[5rem]`}
                         >
                           {unpaidUser.text}
+                          <br />
+                          If this is unexpected, you may have created a new account. Try switching to a different account.
                         </h2>
-                        <div
-                          className={`Subscribe-button ml-[8rem] w-[8rem] h-[3rem] m-[2rem] rounded-[1.5rem] text-white`}
-                          onClick={() => {
-                            // Redirect the user to the subscription page
-                            Navigate("/subscription");
-                          }}
-                          style={{
-                            backgroundColor: InstitutionData.PrimaryColor,
-                          }}
-                        >
-                          <img
-                            src={`https://institution-utils.s3.amazonaws.com/institution-common/images/Dashboard/lock.svg`} // Provide the source for the lock image
-                            alt=""
-                            className={`top-7 right-10 w-[32px] translate-x-[-2%] absolute fa-4x mb-4`}
+                        <div className='flex flex-col items-center'>
+                          <button
+                            className={`Subscribe-button ml-[8rem] w-[8rem] h-[3rem] m-[2rem] rounded-[1.5rem] text-white`}
                             onClick={() => {
                               // Redirect the user to the subscription page
                               Navigate("/subscription");
                             }}
-                          />
+                            style={{
+                              backgroundColor: InstitutionData.PrimaryColor,
+                            }}
+                          >
+                            <img
+                              src={`https://institution-utils.s3.amazonaws.com/institution-common/images/Dashboard/lock.svg`} // Provide the source for the lock image
+                              alt=""
+                              className={`top-7 right-10 w-[32px] translate-x-[-2%] absolute fa-4x mb-4`}
+                              onClick={() => {
+                                // Redirect the user to the subscription page
+                                Navigate("/subscription");
+                              }}
+                            />
 
-                          {/*<span className={`Latch`}>*/}
-                          {/*  <span className={`Lock`}></span>*/}
-                          {/*</span>*/}
-                          <div className={`UnlockText`}>UNLOCK</div>
+                            {/*<span className={`Latch`}>*/}
+                            {/*  <span className={`Lock`}></span>*/}
+                            {/*</span>*/}
+                            <div className={`UnlockText`}>UNLOCK</div>
+                          </button>
+                          <button
+                            className={`Subscribe-button ml-[8rem] w-[14rem] h-[3rem] m-[2rem] rounded-[1.5rem] text-white`}
+                            onClick={() => {
+                              // Redirect the user to the subscription page
+                              Navigate("/logout");
+                            }}
+                            style={{
+                              backgroundColor: InstitutionData.PrimaryColor,
+                            }}
+                          >
+                            {/*<img*/}
+                            {/*  src={`https://institution-utils.s3.amazonaws.com/institution-common/images/Dashboard/lock.svg`} // Provide the source for the lock image*/}
+                            {/*  alt=""*/}
+                            {/*  className={`top-7 right-10 w-[32px] translate-x-[-2%] absolute fa-4x mb-4`}*/}
+                            {/*  onClick={() => {*/}
+                            {/*    // Redirect the user to the subscription page*/}
+                            {/*    Navigate("/subscription");*/}
+                            {/*  }}*/}
+                            {/*/>*/}
+
+                            {/*<span className={`Latch`}>*/}
+                            {/*  <span className={`Lock`}></span>*/}
+                            {/*</span>*/}
+                            <div className={`UnlockText`}>SWITCH ACCOUNT</div>
+                          </button>
                         </div>
                       </div>
                     </div>

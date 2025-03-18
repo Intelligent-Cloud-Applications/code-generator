@@ -5,6 +5,9 @@ import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 import Context from "../../../../Context/Context";
 import RevenueSection from "./RevenueCard";
 
+import DateFormatter from "../../../../common/utils/DateFormatter";
+import PaginationComponent from "../../../../common/Pagination";
+
 function PaymentDetails() {
   const [currentPage, setCurrentPage] = useState(1);
   const [cashoutAmount, setCashoutAmount] = useState(null);
@@ -15,7 +18,7 @@ function PaymentDetails() {
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [sortConfig, setSortConfig] = useState({
     key: null,
-    direction: null
+    direction: null,
   });
 
   const months = useMemo(
@@ -48,13 +51,17 @@ function PaymentDetails() {
     <span className="inline-flex flex-col ml-1 relative h-4 w-3">
       <IoMdArrowDropup
         className={`absolute top-0 ${
-          isActive && direction === 'ascending' ? 'text-blue-600' : 'text-gray-400'
+          isActive && direction === "ascending"
+            ? "text-blue-600"
+            : "text-gray-400"
         }`}
         size={12}
       />
       <IoMdArrowDropdown
         className={`absolute bottom-0 ${
-          isActive && direction === 'descending' ? 'text-blue-600' : 'text-gray-400'
+          isActive && direction === "descending"
+            ? "text-blue-600"
+            : "text-gray-400"
         }`}
         size={12}
       />
@@ -86,10 +93,13 @@ function PaymentDetails() {
   }, [userData?.institution]);
 
   const handleSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    } else if (
+      sortConfig.key === key &&
+      sortConfig.direction === "descending"
+    ) {
       key = null;
       direction = null;
     }
@@ -103,38 +113,46 @@ function PaymentDetails() {
       let aValue, bValue;
 
       switch (sortConfig.key) {
-        case 'userName':
-          aValue = a.userDetails?.userName?.toLowerCase() || '';
-          bValue = b.userDetails?.userName?.toLowerCase() || '';
+        case "userName":
+          aValue = a.userDetails?.userName?.toLowerCase() || "";
+          bValue = b.userDetails?.userName?.toLowerCase() || "";
           break;
-        case 'phoneNumber':
-          aValue = a.userDetails?.phoneNumber || '';
-          bValue = b.userDetails?.phoneNumber || '';
+        case "phoneNumber":
+          aValue = a.userDetails?.phoneNumber || "";
+          bValue = b.userDetails?.phoneNumber || "";
           break;
-        case 'products':
+        case "products":
           aValue = a.userDetails?.products?.length || 0;
           bValue = b.userDetails?.products?.length || 0;
           break;
-        case 'amount':
+        case "amount":
           aValue = Number(a.amount) || 0;
           bValue = Number(b.amount) || 0;
           break;
-        case 'paymentDate':
+        case "paymentDate":
           aValue = new Date(a.paymentDate || 0).getTime();
           bValue = new Date(b.paymentDate || 0).getTime();
           break;
         default:
-          aValue = (a[sortConfig.key]?.toLowerCase?.() || a[sortConfig.key] || '').toString();
-          bValue = (b[sortConfig.key]?.toLowerCase?.() || b[sortConfig.key] || '').toString();
+          aValue = (
+            a[sortConfig.key]?.toLowerCase?.() ||
+            a[sortConfig.key] ||
+            ""
+          ).toString();
+          bValue = (
+            b[sortConfig.key]?.toLowerCase?.() ||
+            b[sortConfig.key] ||
+            ""
+          ).toString();
       }
 
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return sortConfig.direction === 'ascending'
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        return sortConfig.direction === "ascending"
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       }
 
-      return sortConfig.direction === 'ascending'
+      return sortConfig.direction === "ascending"
         ? aValue - bValue
         : bValue - aValue;
     });
@@ -142,7 +160,7 @@ function PaymentDetails() {
 
   const filteredPayments = useMemo(() => {
     if (!revenue) return [];
-    
+
     let filtered = sortData;
     if (selectedYear !== "All time") {
       filtered = sortData?.filter((payment) => {
@@ -163,21 +181,31 @@ function PaymentDetails() {
 
   const { totalOnlineAmount, totalOfflineAmount } = useMemo(() => {
     return {
-      totalOnlineAmount: filteredPayments
-        ?.filter(payment => payment.paymentMode === 'online')
-        .reduce((total, payment) => total + (Number(payment.amount) || 0), 0) || 0,
-      totalOfflineAmount: filteredPayments
-        ?.filter(payment => payment.paymentMode === 'offline')
-        .reduce((total, payment) => total + (Number(payment.amount) || 0), 0) || 0
+      totalOnlineAmount:
+        filteredPayments
+          ?.filter((payment) => payment.paymentMode === "online")
+          .reduce(
+            (total, payment) => total + (Number(payment.amount) || 0),
+            0
+          ) || 0,
+      totalOfflineAmount:
+        filteredPayments
+          ?.filter((payment) => payment.paymentMode === "offline")
+          .reduce(
+            (total, payment) => total + (Number(payment.amount) || 0),
+            0
+          ) || 0,
     };
   }, [filteredPayments]);
 
   const selectedPayments = useMemo(() => {
-    return filteredPayments?.slice((currentPage - 1) * 7, currentPage * 7) || [];
+    return (
+      filteredPayments?.slice((currentPage - 1) * 7, currentPage * 7) || []
+    );
   }, [filteredPayments, currentPage]);
 
   const handleRowClick = (payment) => {
-    console.log('Payment details:', payment);
+    console.log("Payment details:", payment);
   };
 
   const formatEpochToReadableDate = (epoch) => {
@@ -198,30 +226,30 @@ function PaymentDetails() {
   }, [selectedYear, currentYear, currentMonth, months]);
 
   const tableHeaders = [
-    { key: 'userName', label: 'Name', className: 'w-32' },
-    { key: 'phoneNumber', label: 'Phone Number', className: 'w-32' },
-    // { key: 'products', label: 'Products', className: 'w-48' },
-    { key: 'subscriptionType', label: 'Subscription Type', className: 'w-36' },
-    { key: 'paymentMode', label: 'Payment Mode', className: 'w-32' },
-    { key: 'paymentDate', label: 'Payment Date', className: 'w-32' },
-    { key: 'renewDate', label: 'Renew Date', className: 'w-32' },
-    { key: 'amount', label: 'Amount', className: 'w-32' }
+    { key: "userName", label: "Name", className: "w-32" },
+    { key: "phoneNumber", label: "Phone Number", className: "w-32" },
+    { key: "paymentDate", label: "Payment Date", className: "w-32" },
+    { key: "paymentMode", label: "Payment Mode", className: "w-32" },
+    { key: "renew date", label: "renew date", className: "w-32" },
+    { key: "amount", label: "Amount", className: "w-32" },
   ];
 
-  const CustomTableHeadCell = React.memo(({ onClick, children, sortKey, className }) => (
-    <Table.HeadCell
-      className={`h-14 px-6 py-2 text-center text-xs font-medium text-white uppercase cursor-pointer ${className}`}
-      onClick={onClick}
-    >
-      <div className="flex items-center justify-center gap-1 h-full">
-        <span className="truncate">{children}</span>
-        <SortIcon
-          isActive={sortConfig.key === sortKey}
-          direction={sortConfig.direction}
-        />
-      </div>
-    </Table.HeadCell>
-  ));
+  const CustomTableHeadCell = React.memo(
+    ({ onClick, children, sortKey, className }) => (
+      <Table.HeadCell
+        className={`h-14 px-6 py-2 text-center text-xs font-medium text-white uppercase cursor-pointer ${className}`}
+        onClick={onClick}
+      >
+        <div className="flex items-center justify-center gap-1 h-full">
+          <span className="truncate">{children}</span>
+          <SortIcon
+            isActive={sortConfig.key === sortKey}
+            direction={sortConfig.direction}
+          />
+        </div>
+      </Table.HeadCell>
+    )
+  );
 
   return (
     <div className="p-4 Inter max850:p-1">
@@ -234,7 +262,10 @@ function PaymentDetails() {
                   All time
                 </Dropdown.Item>
                 {years?.map((year) => (
-                  <Dropdown.Item key={year} onClick={() => setSelectedYear(year)}>
+                  <Dropdown.Item
+                    key={year}
+                    onClick={() => setSelectedYear(year)}
+                  >
                     {year}
                   </Dropdown.Item>
                 ))}
@@ -291,30 +322,18 @@ function PaymentDetails() {
                   >
                     <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
                       <div className="truncate px-2">
-                        {payment.userDetails?.userName || 'N/A'}
+                        {payment.userDetails?.userName || "N/A"}
                       </div>
                     </Table.Cell>
                     <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
                       <div className="truncate px-2">
-                        {payment.userDetails?.phoneNumber || 'N/A'}
+                        {payment.userDetails?.phoneNumber || "N/A"}
                       </div>
                     </Table.Cell>
-                    {/*<Table.Cell className="h-12 text-sm text-gray-500 text-center w-48 overflow-hidden">*/}
-                    {/*  <div className="max-h-24 overflow-y-auto px-2">*/}
-                    {/*    {payment.userDetails?.products?.length > 0*/}
-                    {/*      ? payment.userDetails.products?.map(*/}
-                    {/*        (product, index) => (*/}
-                    {/*          <div key={index} className="truncate">*/}
-                    {/*            {product.S}*/}
-                    {/*          </div>*/}
-                    {/*        )*/}
-                    {/*      )*/}
-                    {/*      : "N/A"}*/}
-                    {/*  </div>*/}
-                    {/*</Table.Cell>*/}
-                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-36 overflow-hidden">
+                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
                       <div className="truncate px-2">
-                        {payment.subscriptionType || 'N/A'}
+                        {/* {formatEpochToReadableDate(payment.paymentDate)} */}
+                        <DateFormatter epochDate={payment.paymentDate} />
                       </div>
                     </Table.Cell>
                     <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32">
@@ -325,22 +344,25 @@ function PaymentDetails() {
                             : "bg-green-100 text-green-600"
                         }`}
                       >
-                        {payment.paymentMode === "offline" ? "Offline" : "Online"}
+                        {payment.paymentMode === "offline"
+                          ? "Offline"
+                          : "Online"}
                       </span>
                     </Table.Cell>
+
                     <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
                       <div className="truncate px-2">
-                        {formatEpochToReadableDate(payment.paymentDate)}
+                        {/* {formatEpochToReadableDate(payment.renewDate)} */}
+                        <DateFormatter epochDate={payment.renewDate} />
                       </div>
                     </Table.Cell>
+
                     <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
                       <div className="truncate px-2">
-                        {formatEpochToReadableDate(payment.renewDate)}
-                      </div>
-                    </Table.Cell>
-                    <Table.Cell className="h-12 text-sm text-gray-500 text-center w-32 overflow-hidden">
-                      <div className="truncate px-2">
-                        {formatAmountWithCurrency(payment.amount, payment.currency)}
+                        {formatAmountWithCurrency(
+                          payment.amount,
+                          payment.currency
+                        )}
                       </div>
                     </Table.Cell>
                   </Table.Row>
@@ -349,8 +371,8 @@ function PaymentDetails() {
             </Table>
           </div>
 
-          <div className="py-4 flex justify-between items-center px-6 border-t">
-            <div className="text-sm text-gray-600">
+          {/* <div className="py-4 flex justify-between items-center px-6 border-t"> */}
+          {/* <div className="text-sm text-gray-600">
               Showing {Math.min((currentPage - 1) * 7 + 1, filteredPayments?.length || 0)}-
               {Math.min(currentPage * 7, filteredPayments?.length || 0)}{" "}
               of {filteredPayments?.length || 0}
@@ -360,8 +382,15 @@ function PaymentDetails() {
               totalPages={Math.ceil((filteredPayments?.length || 0) / 7)}
               onPageChange={setCurrentPage}
               className="flex justify-end"
-            />
-          </div>
+            /> */}
+          {/* </div> */}
+          <PaginationComponent
+            showIcons={true}
+            data={filteredPayments}
+            itemsPerPage={7}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
     </div>
