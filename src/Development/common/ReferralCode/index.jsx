@@ -113,7 +113,7 @@ function ReferralCode() {
 
   return (
     <div className="Poppins w-full flex flex-col justify-center items-center">
-      <div className="flex mt-4 gap-4">
+      <div className="flex mt-4 gap-4 max600:flex-col items-center justify-center">
         <div
           className={`w-[85%] max1050:w-[100%] max-w-[40rem] p-7 flex flex-col items-center max536:w-[90%] relative bg-[#ffffffe1]`}
           style={{
