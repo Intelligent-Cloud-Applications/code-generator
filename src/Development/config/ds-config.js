@@ -13,7 +13,7 @@ export const dsProd = {
             redirectSignIn: process.env.NODE_ENV === 'development' ?
               'http://localhost:3000/redirect' : institutionData.PROD_DOMAIN + '/redirect',
             redirectSignOut: process.env.NODE_ENV === 'development' ?
-              'http://localhost:3000' : institutionData.PROD_DOMAIN,
+              'http://localhost:3000/login' : institutionData.PROD_DOMAIN,
             responseType: 'code',
         }
     },
@@ -63,7 +63,7 @@ export const dsDev = {
             redirectSignIn: process.env.NODE_ENV === 'development' ?
               'http://localhost:3000/redirect' : institutionData.BETA_DOMAIN + '/redirect',
             redirectSignOut: process.env.NODE_ENV === 'development' ?
-              'http://localhost:3000' : institutionData.BETA_DOMAIN,
+              'http://localhost:3000/login' : institutionData.BETA_DOMAIN,
             responseType: 'code',
         }
     },
