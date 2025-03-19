@@ -5,7 +5,6 @@ import { Modal, Button } from "flowbite-react";
 const ConfirmDeleteModal = ({ showModal, setShowModal, onConfirm, onCancel }) => {
   return (
     <Modal show={showModal} onClose={() => setShowModal(false)} size="md">
-      <Modal.Header>Confirm Delete</Modal.Header>
       <Modal.Body>
         <div className="text-center">
           <h3 className="mb-5 text-lg font-normal text-gray-500">

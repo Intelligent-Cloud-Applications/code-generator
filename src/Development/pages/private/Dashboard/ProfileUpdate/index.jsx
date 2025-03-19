@@ -17,6 +17,7 @@ import EditableTextArea from "./EditableTextArea.jsx";
 import institutionData from "../../../../constants.js";
 // import EditProfile from "./EditProfile.jsx";
 import InsrtuctorReferral from "../../../../common/ReferralCode/index.jsx";
+import { useNavigate } from 'react-router-dom';
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -361,489 +362,193 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
     }
   };
 
+  const navigate = useNavigate();
+
+  const handleChangePassword = () => {
+    navigate('/forgot-password');
+  };
+
   return (
-    <div
-      className={`relative w-[calc(100vw-16rem)] max1050:w-screen flex flex-col items-center  `}
-    >
-      <div
-        className={`w-[75%] max1050:w-[100%] max-w-[36rem] rounded-3xl p-3 flex flex-col items-center max536:w-[90%] mt-[1rem] max536:mt-[4rem] relative bg-white shadow-md`}
-      >
-        <FaArrowLeft
-          className="absolute left-2 top-2 min1050:hidden"
-          size={"1.7rem"}
-          color="grey"
-          onClick={() => {
-            setClick(0);
-            displayAfterClick(0);
-          }}
-        />
-        <div className="avatar-editor-container flex flex-row justify-center">
-          <input
-            type="file"
-            onChange={handleImageChange}
-            ref={fileInputRef}
-            style={{ display: "none" }}
-          />
-          {image && (
-            <div className="absolute mt-20 max450:mt-14 top-[25%]">
-              <div className="flex justify-end">
-                <button
-                  className=" border-none cursor-pointer"
-                  onClick={handleCancel}
-                >
-                  <span className="text-2xl">⨯</span>
-                </button>
-              </div>
-              <AvatarEditor
-                ref={(ref) => setEditor(ref)}
-                image={image}
-                width={200}
-                height={200}
-                border={50}
-                borderRadius={100}
-                scale={scale}
-              />
-              <div className="controls">
-                <input
-                  type="range"
-                  min="1"
-                  max="2"
-                  step="0.01"
-                  value={scale}
-                  onChange={(e) => setScale(parseFloat(e.target.value))}
-                />
-                <button
-                  className="rounded-md w-[4rem] h-8 text-white ml-4"
-                  style={{
-                    backgroundColor: InstitutionData.PrimaryColor,
-                  }}
-                  onClick={handleSave}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          )}
+    <div className="relative w-[calc(100vw-16rem)] max1050:w-screen min-h-screen bg-[#f0f2f5] p-8">
+      {/* Main Container */}
+      <div className="max-w-[1400px] mx-auto">
+        {/* Top Banner */}
+        <div className="relative rounded-xl p-6" style={{
+        }}>
+          <h1 className="text-3xl font-bold"style={{color:InstitutionData.PrimaryColor}}>Profile Settings</h1>
+          <p className="text-white/80 "style={{color:InstitutionData.PrimaryColor}}>Manage your account information and settings</p>
         </div>
-        {!isPhoneChange ? (
-          <>
-            {!isChangePassword ? (
-              <div className="flex flex-col items-center mb-4 w-full max-w-4xl mx-auto">
-                <div className="text-black text-xl font-bold text-left pb-[10px]">
-                  My Account
-                </div>
 
-                <div className="flex items-center justify-between w-full mb-6">
-                  <h1 className="text-2xl font-bold">Profile Overview</h1>
-                  <div className="flex gap-2">
-                    {showForm ? (
-                      <>
-                        <button
-                          onClick={() => setShowForm(false)}
-                          className="bg-primaryColor text-white px-3 py-1 text-sm rounded-md"
-                        >
-                          Update Changes
-                        </button>
-                        <button
-                          onClick={() => setShowForm(false)}
-                          className="bg-red-500 text-white px-3 py-1 text-sm rounded-md"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => setShowForm(true)}
-                        className="bg-primaryColor text-white px-3 py-1 text-sm rounded-md flex items-center gap-1"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-4 h-4"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                          />
-                        </svg>
-                        Edit Profile
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="relative w-[10rem] h-[10rem] mx-auto mb-6">
-                  <div className="relative w-full h-full rounded-full flex items-center justify-center border-[3px] border-solid border-t1  shadow-black/40">
+        {/* Profile Content */}
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-6 gap-8">
+          {/* Left Column - Profile Card */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+              {/* Profile Header */}
+              <div className="text-center p-6">
+                <div className="relative inline-block">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg mx-auto">
                     {UserCtx.imgUrl ? (
                       <img
-                        alt="profile"
-                        key={"profileUpdate1" + Date.now()}
                         src={UserCtx.imgUrl}
-                        className="w-full h-full rounded-full object-cover cursor-pointer"
-                        onClick={handleEditClick}
+                        alt="profile"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div
-                        className="w-full h-full rounded-full flex items-center justify-center cursor-pointer"
+                        className="w-full h-full flex items-center justify-center"
                         style={{ backgroundColor: getColor(UserCtx.userName) }}
-                        onClick={handleEditClick}
                       >
-                        <span className="text-[3rem] font-bold text-white">
+                        <span className="text-3xl font-bold text-white">
                           {getInitials(UserCtx.userName)}
                         </span>
                       </div>
                     )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                    <div
-                      className="absolute bottom-0 right-0 w-10 h-10 text-white flex items-center justify-center cursor-pointer rounded-full"
-                      onClick={handleEditClick}
-                      style={{
-                        background: InstitutionData.PrimaryColor,
-                      }}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
-                        />
-                      </svg>
-                    </div>
                   </div>
+                  <button
+                    onClick={handleEditClick}
+                    className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg hover:scale-110 transition-transform"
+                    style={{ color: InstitutionData.PrimaryColor }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                  </button>
                 </div>
-                <>
-                  {UserCtx.userType === "instructor" && (
-                    <div className="flex flex-col gap-4 justify-center bg-gray-100 p-4 rounded-lg shadow-md w-full">
-                      {referralLink && (
-                        <div className="flex flex-col gap-2">
-                          <label className="ml-2 text-sm font-semibold text-gray-700">
-                            Hybrid Page Link
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <input
-                              className="bg-white px-4 py-2 rounded-lg w-full border border-gray-300 shadow-sm text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-                              type="text"
-                              value={referralLink}
-                              readOnly
-                            />
-                            <Tooltip
-                              content="Go to Link"
-                              position="top"
-                              arrow={false}
-                            >
-                              <button
-                                className="bg-primaryColor text-white rounded-lg py-2 px-4 shadow-md hover:bg-lightPrimaryColor hover:shadow-lg transition-transform transform hover:scale-105"
-                                onClick={() => {
-                                  window.location.href = referralLink;
-                                }}
-                              >
-                                <FaArrowCircleRight className="h-6" />
-                              </button>
-                            </Tooltip>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
-                <form className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-lg shadow-md">
-                  <div className="flex flex-col">
-                    <label className="text-gray-600 font-medium">Name</label>
-                    <input
-                      className={`px-4 py-2 rounded-md w-full ${
-                        showForm ? "bg-inputBgColor" : "bg-gray-100"
-                      }`}
-                      type="text"
-                      value={name}
-                      readOnly={!showForm}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label className="text-gray-600 font-medium">Email</label>
-                    <input
-                      className="bg-gray-100 px-4 py-2 rounded-md"
-                      type="email"
-                      value={currentEmail}
-                      readOnly
-                    />
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label className="text-gray-600 font-medium">
-                      Phone Number
-                    </label>
-                    <input
-                      className="bg-gray-100 px-4 py-2 rounded-md"
-                      type="text"
-                      value={phoneNumber}
-                      readOnly
-                    />
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label className="text-gray-600 font-medium">DOB</label>
-
-                    {showForm ? (
-                      <input
-                        type="date"
-                        className="bg-inputBgColor px-4 py-2 rounded-md"
-                        value={tempDob || ""}
-                        onChange={(e) => setTempDob(e.target.value)}
-                      />
-                    ) : (
-                      <input
-                        className="bg-gray-100 px-4 py-2 rounded-md"
-                        type="text"
-                        value={formatDate(dob) || ""}
-                        readOnly
-                      />
-                    )}
-                  </div>
-
-                  <div className="flex flex-col col-span-2">
-                    <label className="text-gray-600 font-medium">Address</label>
-                    <textarea
-                      className={`px-4 py-2 rounded-md resize-none w-full ${
-                        showForm ? "bg-inputBgColor" : "bg-gray-100"
-                      }`}
-                      rows={3}
-                      value={address}
-                      readOnly={!showForm}
-                      onChange={(e) => setAddress(e.target.value)}
-                    />
-                  </div>
-
-                  {UserCtx.userType === "instructor" && (
-                      <div className="flex flex-col col-span-2">
-                        <label className="text-gray-600 font-medium">
-                          About
-                        </label>
-                        <textarea
-                          className={`px-4 py-2 rounded-md resize-none w-full ${
-                            showForm ? "bg-inputBgColor" : "bg-gray-100"
-                          }`}
-                          rows={3}
-                          value={about}
-                          readOnly={!showForm}
-                          onChange={(e) => setAbout(e.target.value)}
-                        />
-                      </div>
-                    
-                  )}
-                </form>
+                <h2 className="text-xl font-bold mt-4">{name}</h2>
+                <p className="text-gray-500 capitalize">{UserCtx.userType}</p>
               </div>
-            ) : (
-              <>
-                <form
-                  className={`flex flex-col items-center my-4 max536:w-[90%]`}
-                >
-                  <p className={`text-[1.3rem]`}>Change Password</p>
-                  <div className={`flex flex-col items-center`}>
-                    <div
-                      className={`flex items-center gap-20 mt-6 max536:flex-col max536:gap-2 max536:items-start`}
-                    >
-                      <label className={`w-20  max536:ml-2`}>
-                        Old Password
-                      </label>
-                      <input
-                        className={`bg-inputBgColor px-4 py-2 rounded-lg`}
-                        value={oldPassword}
-                        onChange={(e) => setOldPassword(e.target.value)}
-                      />
-                    </div>
-                    <div
-                      className={`flex items-center gap-20 mt-6 max536:flex-col max536:gap-2 max536:items-start`}
-                    >
-                      <label className={`w-20 max536:ml-2`}>Password</label>
-                      <input
-                        className={`bg-inputBgColor px-4 py-2 rounded-lg`}
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-                    <div
-                      className={`flex items-center gap-20 mt-6 max536:flex-col max536:gap-2 max536:items-start relative`}
-                    >
-                      <label className={`w-20 max536:ml-2`}>
-                        Confirm Password
-                      </label>
-                      <input
-                        className={`bg-inputBgColor px-4 py-2 rounded-lg`}
-                        type={!passwordVisible ? "password" : "text"}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                      />
-                      {passwordVisible ? (
-                        <AiFillEye
-                          onClick={passwordVisibilityChange}
-                          className={`absolute right-4`}
-                          size={"1.25rem"}
-                        />
-                      ) : (
-                        <AiFillEyeInvisible
-                          onClick={passwordVisibilityChange}
-                          className={`absolute right-4`}
-                          size={"1.25rem"}
-                        />
-                      )}
-                    </div>
-                  </div>
-                  {err && (
-                    <p className={`text-[0.8rem] mt-2 text-red-500`}>{err}</p>
-                  )}
-                  <div className={`flex gap-5`}>
-                    <Button2
-                      data={"Cancel"}
-                      fn={(e) => {
-                        e.preventDefault();
-                        setErr("");
-                        setIsChangePassword(false);
-                      }}
-                      w="8rem"
-                    />
-                    <Button2
-                      data={"Update"}
-                      fn={onPasswordChange}
-                      w="8rem"
-                      className={`mt-8`}
-                    />
-                  </div>
-                </form>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            {!isPhoneCode ? (
-              <div>
-                <form className={`flex flex-col items-center my-4`}>
-                  <p className={`text-[1.3rem]`}>Change Phone Number</p>
-                  <p className={`text-[0.8rem] text-gray-500 mt-2`}>
-                    *Note: Please include the country code before entering the
-                    phone number.
-                  </p>
-                  <div className={`flex flex-col items-center`}>
-                    <div
-                      className={`flex items-center gap-20 mt-5 max536:flex-col max536:gap-2 max536:items-start`}
-                    >
-                      <label className={`w-[9rem]`}>New Phone Number</label>
-                      <input
-                        className={`bg-inputBgColor px-4 py-2 rounded-lg`}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  {err && (
-                    <p className={`text-[0.8rem] mt-2 text-red-500`}>{err}</p>
-                  )}
-                  <div className={`flex gap-5`}>
-                    <Button2
-                      data={"Cancel"}
-                      fn={(e) => {
-                        e.preventDefault();
-                        setPhoneNumber(userData.phoneNumber);
-                        setErr("");
-                        setIsPhoneChange(false);
-                      }}
-                      w="8rem"
-                      className={`mt-8`}
-                    />
-                    <Button2
-                      data={"Send Code"}
-                      fn={onPhoneChange}
-                      w="8rem"
-                      className={`mt-8`}
-                    />
-                  </div>
-                </form>
-              </div>
-            ) : (
-              <div>
-                <form className={`flex flex-col items-center my-4`}>
-                  <p className={`text-[1.3rem]`}>Verify Phone Number</p>
-                  <p className={`my-2 text-[0.8rem]`}>
-                    Code sent to {phoneNumber}
-                  </p>
-                  <div className={`flex flex-col items-center`}>
-                    <div
-                      className={`flex items-center gap-20 mt-5 max536:flex-col max536:gap-2 max536:items-start`}
-                    >
-                      <label className={`w-20`}>Code</label>
-                      <input
-                        className={`bg-inputBgColor px-4 py-2 rounded-lg`}
-                        value={phoneCode}
-                        onChange={(e) => setPhoneCode(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  {err && (
-                    <p className={`text-[0.8rem] mt-2 text-red-500`}>{err}</p>
-                  )}
-                  <div className={`flex gap-5`}>
-                    <Button2
-                      data={"Cancel"}
-                      fn={(e) => {
-                        e.preventDefault();
-                        setPhoneNumber(userData.phoneNumber);
-                        setErr("");
-                        setIsPhoneChange(false);
-                        setIsPhoneCode(false);
-                      }}
-                      w="8rem"
-                      className={`mt-8`}
-                    />
-                    <Button2
-                      data={"Confirm"}
-                      fn={onPhoneCodeConfirm}
-                      w="8rem"
-                      className={`mt-8`}
-                    />
-                  </div>
-                </form>
-              </div>
-            )}
-          </>
-        )}
-      </div>
 
-      {(userData.userType === "instructor" ||
-        userData.userType === "admin") && (
-        <>
-          <div>
-            <ReferralCode />
-          </div>
-          {/* {userData.userType === "instructor" && (
-            <div>
-              <HybridReferral />
+              {/* Quick Stats */}
+              <div className="border-t border-gray-100 px-6 py-4">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-gray-600">Member Since</span>
+                  <span className="font-medium">{formatDate(UserCtx?.joiningDate)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Status</span>
+                  <span className="px-3 py-1 rounded-full text-sm font-medium" 
+                    style={{ 
+                      backgroundColor: `${InstitutionData.PrimaryColor}20`,
+                      color: InstitutionData.PrimaryColor 
+                    }}>
+                    {UserCtx.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="border-t border-gray-100 p-6">
+                <h3 className="text-sm font-medium text-gray-500 mb-4">QUICK ACTIONS</h3>
+                <div className="space-y-2">
+                  <button
+                    onClick={handleChangePassword}
+                    className="w-full p-3 text-left rounded-lg hover:bg-gray-50 transition-all flex items-center gap-3"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    Change Password
+                  </button>
+                </div>
+              </div>
             </div>
-          )} */}
-        </>
-      )}
+          </div>
+
+          {/* Right Column - Form Fields */}
+          <div className="lg:col-span-4 space-y-8">
+            {/* Personal Information */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold">Personal Information</h3>
+                <button
+                  onClick={onProfileUpdate}
+                  className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-all"
+                  style={{ backgroundColor: InstitutionData.PrimaryColor }}
+                >
+                  Save Changes
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primaryColor focus:border-transparent"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    value={currentEmail}
+                    readOnly
+                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+                  <input
+                    type="text"
+                    value={phoneNumber}
+                    readOnly
+                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+                  <input
+                    type="date"
+                    value={tempDob}
+                    onChange={(e) => setTempDob(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primaryColor focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Address */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-bold mb-4">Address Information</h3>
+              <textarea
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primaryColor focus:border-transparent"
+                placeholder="Enter your complete address"
+              />
+            </div>
+
+            {/* About Section for Instructors */}
+            {UserCtx.userType === "instructor" && (
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-bold mb-4">About Me</h3>
+                <textarea
+                  value={about}
+                  onChange={(e) => setAbout(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primaryColor focus:border-transparent"
+                  placeholder="Tell us about yourself..."
+                />
+              </div>
+            )}
+
+            {/* Referral Section */}
+            {(userData.userType === "instructor" || userData.userType === "admin") && (
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <ReferralCode />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

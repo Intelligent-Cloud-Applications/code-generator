@@ -1038,15 +1038,15 @@ const UpcomingSessions = () => {
                               key={clas.classId}
                               className="bg-white hover:bg-gray-50 transition-colors duration-200"
                             >
-                              <Table.Cell className="text-gray-700 text-xs font-semibold text-center">
+                              <Table.Cell className="text-gray-700 text-sm font-semibold text-center">
                                 {/* {formatDate(parseInt(clas.date))} */}
                                 <DateFormatter epochDate={clas.date} />
                               </Table.Cell>
-                              <Table.Cell className="text-gray-700 text-xs font-semibold text-center">
+                              <Table.Cell className="text-gray-700 text-sm font-semibold text-center">
                                 {Ctx.userData.userType === "admin" ||
                                 Ctx.userData.userType === "instructor" ? (
                                   <select
-                                    className="w-[70%] h-8 px-2 rounded-[0.5rem] focus:outline-none focus:border-blue-500 text-xs border-nonetext-center font-semibold"
+                                    className="w-[70%] py-1 px-2 rounded-[0.5rem] focus:outline-none focus:border-blue-500 text-sm border-nonetext-center font-semibold"
                                     style={{
                                       backgroundColor: "transparent",
                                       border: "1px solid #d1d5db",
@@ -1077,7 +1077,7 @@ const UpcomingSessions = () => {
                                       ))}
                                   </select>
                                 ) : (
-                                  <p className="h-10 flex items-center justify-center rounded text-[14px] ">
+                                  <p className=" flex items-center justify-center rounded text-sm ">
                                     {getInstructor(clas.instructorNames)?.name}
                                   </p>
                                 )}
@@ -1102,7 +1102,7 @@ const UpcomingSessions = () => {
                                           getTime(clas.date)
                                         }
                                         type="time"
-                                        className={`w-full h-10 text-xs rounded text-center outline-none z-10 relative ${
+                                        className={`w-full py-1 text-sm rounded text-center outline-none z-10 relative ${
                                           editingTime[clas.classId]
                                             ? "border border-blue-500 bg-blue-50"
                                             : "bg-transparent border-none"
@@ -1136,7 +1136,7 @@ const UpcomingSessions = () => {
                                       />
                                     </div>
                                   ) : (
-                                    <p className="h-10 flex items-center justify-center text-md">
+                                    <p className="p-3 flex items-center justify-center">
                                       {formatTime(clas.date)}
                                     </p>
                                   )}

@@ -8,22 +8,22 @@ import Faq from "react-faq-component";
 import { GrEdit } from "react-icons/gr";
 import { MdDeleteOutline } from "react-icons/md";
 import { Modal, Button } from "flowbite-react";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 export default function FAQ() {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const UserCtx = useContext(Context);
   const isAdmin = UserCtx.userData.userType === "admin";
 
-  const { institutionData, setInstitutionData } = useContext(InstitutionContext);
+  const { institutionData, setInstitutionData } =
+    useContext(InstitutionContext);
   const [editingIndex, setEditingIndex] = useState(null);
   const [faqData, setFaqData] = useState(institutionData?.FAQ || []);
   const [newFaq, setNewFaq] = useState({ title: "", content: "" });
   const { PrimaryColor } = InstitutionData;
 
+
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
-  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const handleEdit = (index) => {
     setEditingIndex(index);
@@ -35,7 +35,7 @@ export default function FAQ() {
     setFaqData(updatedFaq);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (index) => {
     try {
       await API.put("main", "/admin/update-static-data", {
         body: {
@@ -54,7 +54,7 @@ export default function FAQ() {
   };
 
   const handleCancel = () => {
-    setEditingIndex(null);
+    setEditingIndex(null); // Close the editing mode
   };
 
   const handleAddFaq = async () => {
@@ -82,6 +82,40 @@ export default function FAQ() {
     }
   };
 
+
+  const data = {
+    rows: institutionData.FAQ.map((row) => {
+      if (row.content.includes("awsaiapp.com")) {
+        const contentWithLink = row.content.replace(
+          /awsaiapp.com/g,
+          <a
+            href="https://awsaiapp.com/"
+            style="text-decoration: none; color: blue;"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            awsaiapp.com
+          </a>
+        );
+        return { ...row, content: contentWithLink };
+      }
+      return row;
+    }),
+  };
+
+  const styles = {
+    bgColor: "#ffffff",
+    rowTitleColor: "#000",
+    rowContentColor: "#555555",
+    arrowColor: "#000",
+  };
+
+  const config = {
+    animate: true,
+    tabFocus: true,
+  };
+
+
   const handleDeleteModalOpen = (index) => {
     setDeleteIndex(index);
     setOpenDeleteModal(true);
@@ -94,9 +128,7 @@ export default function FAQ() {
 
   const handleDelete = async () => {
     if (deleteIndex === null) return;
-
     const updatedFaqData = faqData.filter((_, i) => i !== deleteIndex);
-
     try {
       await API.put("main", "/admin/update-static-data", {
         body: {
@@ -105,23 +137,16 @@ export default function FAQ() {
           value: updatedFaqData,
         },
       });
-
+      setInstitutionData({ ...institutionData, FAQ: updatedFaqData });
       setFaqData(updatedFaqData);
-      setInstitutionData((prev) => ({ ...prev, FAQ: updatedFaqData }));
-
       toast.success("FAQ deleted successfully");
     } catch (error) {
       console.error("Error deleting FAQ:", error);
       toast.error("Failed to delete FAQ");
     }
-
     handleDeleteModalClose();
   };
 
-  // Toggle expand/collapse
-  const handleToggleExpand = (index) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
-  };
 
   return (
     <div className="home-faq flex flex-col items-center justify-center gap-20 max800:py-[10rem]">
@@ -132,23 +157,27 @@ export default function FAQ() {
       {isAdmin && (
         <div className="w-[75vw] flex flex-col">
           {faqData.map((faq, index) => (
-            <div key={index} className="faq-item border-b p-4">
+            <div key={index} className="border-b py-4">
               {editingIndex === index ? (
                 <div>
                   <input
                     type="text"
                     value={faq.title}
-                    onChange={(e) => handleChange(index, "title", e.target.value)}
+                    onChange={(e) =>
+                      handleChange(index, "title", e.target.value)
+                    }
                     className="border p-2 w-full mb-2"
                   />
                   <textarea
                     value={faq.content}
-                    onChange={(e) => handleChange(index, "content", e.target.value)}
+                    onChange={(e) =>
+                      handleChange(index, "content", e.target.value)
+                    }
                     className="border p-2 w-full"
                   />
                   <div className="flex justify-end gap-4">
                     <button
-                      onClick={handleSave}
+                      onClick={() => handleSave(index)}
                       className="mt-2 px-4 py-2 text-white rounded"
                       style={{ backgroundColor: PrimaryColor }}
                     >
@@ -163,66 +192,93 @@ export default function FAQ() {
                   </div>
                 </div>
               ) : (
-                <div className="relative flex flex-col">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-xl font-semibold text-gray-800">{faq.title}</h3>
-                    <button
-                      onClick={() => handleToggleExpand(index)}
-                      className="text-gray-600"
-                    >
-                      {expandedIndex === index ? (
-                        <IoIosArrowUp size={20} />
-                      ) : (
-                        <IoIosArrowDown size={20} />
-                      )}
-                    </button>
-                  </div>
-                  {expandedIndex === index && (
+                <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between p-4">
+                  <div className="w-full md:w-auto">
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      {faq.title}
+                    </h3>
                     <p className="text-gray-600 mt-2">{faq.content}</p>
-                  )}
-                  <div className="faq-icons flex gap-4 mt-2">
-                    <button onClick={() => handleEdit(index)}>
-                      <GrEdit size={20} style={{ color: PrimaryColor }} />
-                    </button>
-                    <button onClick={() => handleDeleteModalOpen(index)}>
-                      <MdDeleteOutline size={20} className="text-red-500" />
-                    </button>
                   </div>
+
+                  {/* Edit Button - Top Right */}
+                  <button
+                    onClick={() => handleEdit(index)}
+                    className="absolute top-1 right-4 hover:scale-110 transition-transform focus:outline-none"
+                    style={{ color: PrimaryColor }}
+                  >
+                    <GrEdit size={20} />
+                  </button>
+
+                  <button
+                    onClick={() => handleDeleteModalOpen(index)}
+                    className="absolute bottom-1 right-4 hover:scale-110 transition-transform text-red-500"
+                  >
+                    <MdDeleteOutline size={20} />
+                  </button>
                 </div>
               )}
             </div>
           ))}
+
+          {/* Add FAQ Section */}
+          <div className="flex flex-col  py-4 mt-6 border-b">
+            <h3 className="text-xl font-semibold mb-4">Add New FAQ</h3>
+            <input
+              type="text"
+              placeholder="Title"
+              value={newFaq.title}
+              onChange={(e) =>
+                setNewFaq((prev) => ({ ...prev, title: e.target.value }))
+              }
+              className="border p-2 w-full mb-2"
+            />
+            <textarea
+              placeholder="Content"
+              value={newFaq.content}
+              onChange={(e) =>
+                setNewFaq((prev) => ({ ...prev, content: e.target.value }))
+              }
+              className="border p-2 w-full"
+            />
+
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={handleAddFaq}
+                className="mt-2 px-4 py-2 text-white rounded"
+                style={{ backgroundColor: PrimaryColor }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
-      {!isAdmin && (
-        <Faq
-          data={{ rows: faqData }}
-          styles={{
-            bgColor: "#ffffff",
-            rowTitleColor: "#000",
-            rowContentColor: "#555555",
-            arrowColor: "#000",
-          }}
-          config={{ animate: true, tabFocus: true }}
-        />
-      )}
-
-      {/* Delete Modal */}
-      <Modal show={openDeleteModal} onClose={handleDeleteModalClose}>
-        <Modal.Header>Confirm Deletion</Modal.Header>
+      <Modal
+        show={openDeleteModal}
+        onClose={handleDeleteModalClose}
+        size="sm"
+        popup
+      >
+        <Modal.Header />
         <Modal.Body>
-          <p>Are you sure you want to delete this FAQ?</p>
+          <div className="text-center">
+            <h3 className="mb-5 text-lg font-normal text-gray-500">
+              Are you sure you want to delete this FAQ?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleDelete}>
+                Yes, delete
+              </Button>
+              <Button color="gray" onClick={handleDeleteModalClose}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={handleDelete} color="failure">
-            Delete
-          </Button>
-          <Button onClick={handleDeleteModalClose} color="gray">
-            Cancel
-          </Button>
-        </Modal.Footer>
       </Modal>
+
+      {!isAdmin && <Faq data={data} styles={styles} config={config} />}
     </div>
   );
 }
