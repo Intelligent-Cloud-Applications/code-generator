@@ -9,6 +9,7 @@ import {
   Check,
   CreditCard,
   Calendar,
+  Loader,
 } from "lucide-react";
 import Country from "../../../../components_old/Country";
 import InstitutionContext from "../../../../Context/InstitutionContext";
@@ -43,8 +44,11 @@ function CreateUser({
   productType,
   setProductType,
   selectedProductAmount,
+  paymentDate,
+  setPaymentDate,
   setSelectedProductAmount,
 }) {
+  console.log(paymentDate);
   const [userType, setUserType] = useState("member");
   const [instructorPaymentType, setInstructorPaymentType] = useState("");
   const [instructorPaymentAmount, setInstructorPaymentAmount] = useState("");
@@ -55,10 +59,10 @@ function CreateUser({
   const UtilCtx = useContext(Context).util;
   const [selectedClassTypes, setSelectedClassTypes] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState({});
-  const [paymentDate, setPaymentDate] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("paid");
   const [phoneChange, setPhoneChange] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Validation state
   const [errors, setErrors] = useState({});
@@ -221,7 +225,10 @@ function CreateUser({
       return;
     }
 
+    // Set loading state to true
+    setIsLoading(true);
     UtilCtx.setLoader(true);
+
     let apiResponse; // Declare apiResponse here
     const formattedPhoneNumber = createButton
       ? `${countryCode}${phoneNumber}`
@@ -297,6 +304,8 @@ function CreateUser({
       setSelectedProduct({});
       setErrors({});
       setTouched({});
+
+      getUserList();
     } catch (error) {
       console.error("Error creating/updating user:", error);
       const errorMessage = error.response?.data?.message;
@@ -321,6 +330,7 @@ function CreateUser({
     } finally {
       setShowUserAdd(false);
       setIsModalOpen(false);
+      setIsLoading(false);
       UtilCtx.setLoader(false);
     }
 
@@ -366,7 +376,6 @@ function CreateUser({
         console.error("Error updating payment:", paymentError);
         toast.error("Failed to update payment");
       }
-      getUserList();
     } else {
       console.log("Payment update skipped due to conditions not met."); // Debugging
       console.log(
@@ -782,7 +791,7 @@ function CreateUser({
                         value={
                           selectedProductAmount
                             ? (selectedProductAmount / 100).toFixed(2)
-                            : ""
+                            : amount
                         }
                         readOnly
                         placeholder="0.00"
@@ -837,8 +846,16 @@ function CreateUser({
                 boxShadow: `0 4px 6px ${InstitutionData.PrimaryColor}30`,
               }}
               onClick={onCreateUser}
+              disabled={isLoading}
             >
-              {createButton ? "Create User" : "Update User"}
+              {isLoading ? (
+                <>
+                  <Loader size={20} className="animate-spin" />
+                  <span>{createButton ? "Creating..." : "Updating..."}</span>
+                </>
+              ) : (
+                <span>{createButton ? "Create User" : "Update User"}</span>
+              )}
             </button>
           </div>
         </div>
