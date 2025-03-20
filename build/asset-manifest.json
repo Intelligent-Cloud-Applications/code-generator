@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/static/css/main.bceeb5ad.css",
+    "main.js": "/static/js/main.53d8dce7.js",
+    "static/js/209.d23218ac.chunk.js": "/static/js/209.d23218ac.chunk.js",
+    "static/js/52.aeaa1a54.chunk.js": "/static/js/52.aeaa1a54.chunk.js",
+    "static/js/760.62786992.chunk.js": "/static/js/760.62786992.chunk.js",
+    "static/js/239.31d6574b.chunk.js": "/static/js/239.31d6574b.chunk.js",
+    "static/media/dancebg.jpg": "/static/media/dancebg.d6fd5776f0a5dc9c78e7.jpg",
+    "static/media/yoga.png": "/static/media/yoga.93241db67f6c78dc6fbf.png",
+    "static/media/whatsapp.png": "/static/media/whatsapp.965d92ce0d9f486938b6.png",
+    "static/media/check.png": "/static/media/check.3681c0e66d788244dcff.png",
+    "static/media/discount.svg": "/static/media/discount.09e1c2313cd75b001282c582d4336f74.svg",
+    "static/media/Whatsapp.svg": "/static/media/Whatsapp.0890b9c1ecbd4863c9ad9cd0920a6c95.svg",
+    "index.html": "/index.html",
+    "static/media/Telegram.svg": "/static/media/Telegram.381c89a4fcf6e93eb68b42895a1082bd.svg",
+    "static/media/Facebook.svg": "/static/media/Facebook.b043f93046c7c0c80c52535210026915.svg",
+    "static/media/Twitter.svg": "/static/media/Twitter.24075ada578e4e479725fc58c0ea3170.svg"
+  },
+  "entrypoints": [
+    "static/css/main.bceeb5ad.css",
+    "static/js/main.53d8dce7.js"
+  ]
+}
