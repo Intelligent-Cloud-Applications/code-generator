@@ -10,7 +10,7 @@ const EmailForm = ({ handler }) => {
       }
     >
       <EmailInput name='email' className='rounded w-full'/>
-      <PrimaryButton>Send Otp</PrimaryButton>
+      <PrimaryButton>Send OTP</PrimaryButton>
     </form>
   )
 }
