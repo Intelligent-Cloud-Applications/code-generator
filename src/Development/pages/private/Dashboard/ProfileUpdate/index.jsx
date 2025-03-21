@@ -17,7 +17,7 @@ import EditableTextArea from "./EditableTextArea.jsx";
 import institutionData from "../../../../constants.js";
 // import EditProfile from "./EditProfile.jsx";
 import InsrtuctorReferral from "../../../../common/ReferralCode/index.jsx";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
@@ -365,18 +365,93 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
   const navigate = useNavigate();
 
   const handleChangePassword = () => {
-    navigate('/forgot-password');
+    navigate("/forgot-password");
   };
 
   return (
     <div className="relative w-[calc(100vw-16rem)] max1050:w-screen min-h-screen bg-[#f0f2f5] p-8">
+      {/* Hidden file input for profile image upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageChange}
+        accept="image/*"
+        style={{ display: "none" }}
+      />
+
+      {/* Image edit modal */}
+      {image && (
+        <Modal show={true} onClose={handleCancel}>
+          <Modal.Header>Edit Profile Picture</Modal.Header>
+          <Modal.Body>
+            <div className="flex flex-col items-center">
+              <AvatarEditor
+                ref={(editor) => setEditor(editor)}
+                image={image}
+                width={250}
+                height={250}
+                border={50}
+                borderRadius={125}
+                color={[255, 255, 255, 0.6]}
+                scale={scale}
+                rotate={0}
+              />
+              <div className="mt-4 w-full">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Zoom
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="2"
+                  step="0.01"
+                  value={scale}
+                  onChange={(e) => setScale(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button
+              className="p-1 px-4 rounded-md text-black"
+              onClick={handleCancel}
+              style={{
+                border: `2px solid ${InstitutionData.PrimaryColor}`,
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="p-1 px-4 rounded-md  text-white"
+              onClick={handleSave}
+              style={{
+                backgroundColor: InstitutionData.PrimaryColor,
+                border: `2px solid ${InstitutionData.PrimaryColor}`,
+              }}
+            >
+              Save
+            </button>
+          </Modal.Footer>
+        </Modal>
+      )}
+
       {/* Main Container */}
       <div className="max-w-[1400px] mx-auto">
         {/* Top Banner */}
-        <div className="relative rounded-xl p-6" style={{
-        }}>
-          <h1 className="text-3xl font-bold"style={{color:InstitutionData.PrimaryColor}}>Profile Settings</h1>
-          <p className="text-white/80 "style={{color:InstitutionData.PrimaryColor}}>Manage your account information and settings</p>
+        <div className="relative rounded-xl p-6" style={{}}>
+          <h1
+            className="text-3xl font-bold"
+            style={{ color: InstitutionData.PrimaryColor }}
+          >
+            Profile Settings
+          </h1>
+          <p
+            className="text-white/80 "
+            style={{ color: InstitutionData.PrimaryColor }}
+          >
+            Manage your account information and settings
+          </p>
         </div>
 
         {/* Profile Content */}
@@ -410,7 +485,12 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                     className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg hover:scale-110 transition-transform"
                     style={{ color: InstitutionData.PrimaryColor }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
                       <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                     </svg>
                   </button>
@@ -423,15 +503,19 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
               <div className="border-t border-gray-100 px-6 py-4">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-gray-600">Member Since</span>
-                  <span className="font-medium">{formatDate(UserCtx?.joiningDate)}</span>
+                  <span className="font-medium">
+                    {formatDate(UserCtx?.joiningDate)}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Status</span>
-                  <span className="px-3 py-1 rounded-full text-sm font-medium" 
-                    style={{ 
+                  <span
+                    className="px-3 py-1 rounded-full text-sm font-medium"
+                    style={{
                       backgroundColor: `${InstitutionData.PrimaryColor}20`,
-                      color: InstitutionData.PrimaryColor 
-                    }}>
+                      color: InstitutionData.PrimaryColor,
+                    }}
+                  >
                     {UserCtx.status}
                   </span>
                 </div>
@@ -439,14 +523,25 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
 
               {/* Quick Actions */}
               <div className="border-t border-gray-100 p-6">
-                <h3 className="text-sm font-medium text-gray-500 mb-4">QUICK ACTIONS</h3>
+                <h3 className="text-sm font-medium text-gray-500 mb-4">
+                  QUICK ACTIONS
+                </h3>
                 <div className="space-y-2">
                   <button
                     onClick={handleChangePassword}
                     className="w-full p-3 text-left rounded-lg hover:bg-gray-50 transition-all flex items-center gap-3"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-gray-500"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     Change Password
                   </button>
@@ -472,7 +567,9 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Full Name
+                  </label>
                   <input
                     type="text"
                     value={name}
@@ -483,7 +580,9 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
                   <input
                     type="email"
                     value={currentEmail}
@@ -493,7 +592,9 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Phone Number
+                  </label>
                   <input
                     type="text"
                     value={phoneNumber}
@@ -503,7 +604,9 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Date of Birth
+                  </label>
                   <input
                     type="date"
                     value={tempDob}
@@ -541,7 +644,8 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
             )}
 
             {/* Referral Section */}
-            {(userData.userType === "instructor" || userData.userType === "admin") && (
+            {(userData.userType === "instructor" ||
+              userData.userType === "admin") && (
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <ReferralCode />
               </div>
@@ -549,6 +653,50 @@ const ProfileUpdate = ({ setClick, displayAfterClick }) => {
           </div>
         </div>
       </div>
+
+      {/* Phone Change Modal */}
+      {isPhoneChange && (
+        <Modal show={true} onClose={() => setIsPhoneChange(false)}>
+          <Modal.Header>Change Phone Number</Modal.Header>
+          <Modal.Body>
+            {!isPhoneCode ? (
+              <form onSubmit={onPhoneChange}>
+                <div className="mb-4">
+                  <Label htmlFor="phoneNumber" value="New Phone Number" />
+                  <TextInput
+                    id="phoneNumber"
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    required
+                  />
+                </div>
+                {err && <p className="text-red-500 text-sm mb-4">{err}</p>}
+                <div className="flex justify-end">
+                  <Button2 type="submit">Send Verification Code</Button2>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={onPhoneCodeConfirm}>
+                <div className="mb-4">
+                  <Label htmlFor="phoneCode" value="Verification Code" />
+                  <TextInput
+                    id="phoneCode"
+                    type="text"
+                    value={phoneCode}
+                    onChange={(e) => setPhoneCode(e.target.value)}
+                    required
+                  />
+                </div>
+                {err && <p className="text-red-500 text-sm mb-4">{err}</p>}
+                <div className="flex justify-end">
+                  <Button2 type="submit">Verify Code</Button2>
+                </div>
+              </form>
+            )}
+          </Modal.Body>
+        </Modal>
+      )}
     </div>
   );
 };

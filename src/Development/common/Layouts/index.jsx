@@ -5,7 +5,6 @@ export const FormWrapper = ({ children, heading }) => {
     <div>
       <Header/>
       <div className='flex flex-col items-center justify-center h-[calc(100vh-8rem)]'>
-      <div className='flex flex-col items-center justify-center h-[calc(100vh-8rem)]'>
         <div className={
           `bg-white flex flex-col max-w-4xl w-[25rem] items-center gap-4
           shadow-xl sm:px-20 px-4 py-8 sm-w-[480px] rounded-xl border`

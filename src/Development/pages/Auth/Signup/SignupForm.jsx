@@ -6,7 +6,6 @@ import {
   PhoneInput,
   PrimaryButton,
   BaseTextInputWithValue,
-  BaseTextInputWithValue,
 } from "../../../common/Inputs";
 import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -25,7 +24,6 @@ const SignupForm = ({ handler }) => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const referral = params?.get("referral");
     const referral = params?.get("referral");
     if (referral) {
       setReferralCode(referral);

@@ -7,7 +7,6 @@ import OtpForm from "./OtpForm";
 import countries from "../../../common/Inputs/countries.json";
 import InstitutionContext from "../../../Context/InstitutionContext";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import Context from "../../../Context/Context";
 import { FormWrapper } from "../../../common/Layouts";
 
@@ -15,11 +14,8 @@ const Signup = () => {
   const { setLoader } = useContext(Context).util;
   const { InstitutionId } = useContext(InstitutionContext).institutionData;
   const [formState, setFormState] = useState("signup");
-  const [formState, setFormState] = useState("signup");
   const [userData, setUserData] = useState({});
   const [password, setPassword] = useState("");
-  const [searchParams] = useSearchParams();
-  const productId = searchParams.get("productId");
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("productId");
   const navigate = useNavigate();
@@ -45,12 +41,7 @@ const Signup = () => {
   const handleSignup = async (event) => {
     event.preventDefault();
     const email = event.target.email.value.toLowerCase();
-    const email = event.target.email.value.toLowerCase();
 
-    if (
-      event.target.password.value !== event.target.password_confirmation.value
-    ) {
-      toast.error("Passwords do not match");
     if (
       event.target.password.value !== event.target.password_confirmation.value
     ) {
@@ -59,10 +50,8 @@ const Signup = () => {
     }
 
     let userCountry = "";
-    let userCountry = "";
     for (let country of countries) {
       if (country.value === event.target.country.value) {
-        userCountry = country.name.split(" (")[0];
         userCountry = country.name.split(" (")[0];
         break;
       }
@@ -72,14 +61,12 @@ const Signup = () => {
     try {
       await Auth.signUp({
         username: email,
-        username: email,
         password: event.target.password.value,
       });
 
       // Prepare user data including trial status and period
       const userPayload = {
         userName: event.target.name.value,
-        emailId: email,
         emailId: email,
         phoneNumber: `+${event.target.country.value}${event.target.phone.value}`,
         country: userCountry,
@@ -92,15 +79,8 @@ const Signup = () => {
       setUserData(userPayload);
       setPassword(event.target.password.value);
       setFormState("confirm");
-      setFormState("confirm");
     } catch (e) {
       console.log(e);
-      if (e.name === 'UsernameExistsException')
-        toast.error("User already exists.");
-      else if (e.name === 'InvalidPasswordException')
-        toast.error(e.message);
-      else
-        toast.error("Error signing up");
       if (e.name === 'UsernameExistsException')
         toast.error("User already exists.");
       else if (e.name === 'InvalidPasswordException')
@@ -122,8 +102,6 @@ const Signup = () => {
       // Send user data to API
       await API.post("main", `/user/profile/${InstitutionId}`, {
         queryStringParameters: {
-      await API.post("main", `/user/profile/${InstitutionId}`, {
-        queryStringParameters: {
           trial: trial,
           trialPeriod: trialPeriod,
           hybrid: hybridPath,
@@ -134,19 +112,8 @@ const Signup = () => {
           trialPeriod: trialPeriod,
         },
       });
-        body: {
-          ...userData,
-          trial: trial,
-          trialPeriod: trialPeriod,
-        },
-      });
 
       setLoader(false);
-      if(productId){
-        navigate(`/redirect?productId=${productId}`);
-      }else{
-        navigate(`/redirect`);
-      }
       if(productId){
         navigate(`/redirect?productId=${productId}`);
       }else{
