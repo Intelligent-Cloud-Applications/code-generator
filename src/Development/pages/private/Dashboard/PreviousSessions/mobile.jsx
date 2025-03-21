@@ -92,7 +92,6 @@ const PreviousSessionsMobile = () => {
           }
         );
         alert("Updated");
-
         // After successful update, update the local state
         setClassId("");
         const updatedClasses = Ctx.previousClasses.map((clas) => {
@@ -415,10 +414,41 @@ const PreviousSessionsMobile = () => {
     }
   };
 
+  // Adding useEffect to log all recording links
+  // useEffect(() => {
+  //   // Log all recording links when classes are loaded
+  //   if (Ctx.previousClasses && Ctx.previousClasses.length > 0) {
+  //     console.log("All recording links:");
+  //     Ctx.previousClasses.forEach((clas) => {
+  //       console.log(`Class ID: ${clas.classId}, Recording Link: ${clas.recordingLink || "No link available"}`);
+  //     });
+  //   }
+  // }, [Ctx.previousClasses]);
+
   useEffect(() => {
     fetchAttendance();
     // eslint-disable-next-line
   }, [UserCtx]);
+
+  // Function to handle watch link click
+  const handleWatchLink = (e, link) => {
+    if (!link) {
+      e.preventDefault();
+      console.log("No recording link available");
+      return;
+    }
+    
+    // Validate URL format
+    if (!link.startsWith('http://') && !link.startsWith('https://')) {
+      e.preventDefault();
+      // console.log("Invalid URL format:", link);
+      const correctedLink = `https://${link}`;
+      // console.log("Attempting to open with corrected URL:", correctedLink);
+      window.open(correctedLink, '_blank');
+    } else {
+      // console.log("Opening recording link:", link);
+    }
+  };
 
   let classes = sortedPreviousClasses
     .filter((clas) => {
@@ -547,7 +577,8 @@ const PreviousSessionsMobile = () => {
                             <select
                               className={`rounded-[0.51rem] px-1 attractive-dropdown" // Add the CSS class "attractive-dropdown`}
                               style={{
-                                backgroundColor: InstitutionData.LightestPrimaryColor,
+                                backgroundColor:
+                                  InstitutionData.LightestPrimaryColor,
                               }}
                               value={clas.instructorNames}
                               onChange={(e) =>
@@ -597,7 +628,7 @@ const PreviousSessionsMobile = () => {
                           </p>
                         )}
                       </div>
-                      {UserCtx.userData.userType === "admin" &&
+                      { !clas.recordingLink && UserCtx.userData.userType === "admin" &&
                         (showUpdateContainer && classId === clas.classId ? (
                           <button
                             className={`sans-sarif rounded-lg py-1 w-[4.8rem] bg-black text-white`}
@@ -633,21 +664,22 @@ const PreviousSessionsMobile = () => {
                         </p>
                       </div>
                     )}
-                    {clas.recordingLink && (
-                      <div className={`mb-2`}>
-                        Recording Link:{" "}
-                        {clas.recordingLink ? (
-                          <a
-                            href={clas.recordingLink}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Watch
-                          </a>
-                        ) : (
-                          "No Link"
-                        )}
-                      </div>
+                    {clas.recordingLink ? (
+                      <button
+                      className={`sans-sarif font-[400] rounded-lg py-1 w-[4.8rem] bg-black text-white mt-1`}>
+                      <a
+                        href={clas.recordingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className=" z-10 relative"
+                        onClick={(e) => handleWatchLink(e, clas.recordingLink)}
+                        // onMouseOver={() => console.log(`Hovering over link: ${clas.recordingLink}`)}
+                      >
+                        Watch
+                      </a>
+                      </button>
+                    ) : (
+                      <p className="text-red-500">No Link</p>
                     )}
                     {!clas.zoomLink &&
                       UserCtx.userData.userType === "member" && (
@@ -740,6 +772,7 @@ const PreviousSessionsMobile = () => {
                   {filteredUsers.map((user) => (
                     // <div key={user.cognitoId} className='grid grid-cols-3 text-black font-[400] text-center'>
                     <div
+                      key={user.cognitoId}
                       className={`rounded-lg p-3 md:p-4 shadow-md relative mb-4`}
                       style={{
                         background: InstitutionData.LightestPrimaryColor,

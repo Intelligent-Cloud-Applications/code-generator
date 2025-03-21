@@ -23,6 +23,7 @@ import institutionData from "../../../../constants.js";
 function CreateUser({
   phoneNumber,
   amount,
+  amount,
   name,
   imageUrl,
   email,
@@ -99,6 +100,7 @@ function CreateUser({
 
     fetchProducts();
   }, [InstitutionData.InstitutionId]);
+
 
   const handleProductTypeChange = (e) => {
     const selectedProduct = productDetails.find(
@@ -245,6 +247,8 @@ function CreateUser({
         })
       : null;
     const data = {
+      institution: InstitutionData.InstitutionId,
+      cognitoId,
       institution: InstitutionData.InstitutionId,
       cognitoId,
       emailId: email,

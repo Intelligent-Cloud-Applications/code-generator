@@ -9,6 +9,10 @@ import {Auth} from "aws-amplify";
 import {useEffect} from "react";
 import config from "../../../config";
 import {jwtDecode} from "jwt-decode";
+import {Auth} from "aws-amplify";
+import {useEffect} from "react";
+import config from "../../../config";
+import {jwtDecode} from "jwt-decode";
 
 function Home() {
   async function initializeGoogleOneTap() {
@@ -62,6 +66,17 @@ function Home() {
 
   return (
     <div className={` overflow-hidden`}>
+      <Header/>
+      <div
+        id="google-one-tap-container"
+        className="fixed top-24 right-4 z-50 flex items-center justify-center"
+      ></div>
+      <Hero/>
+      <Perks/>
+      <Testimonials/>
+      <Subscriptions/>
+      <FAQs/>
+      <Footer/>
       <Header/>
       <div
         id="google-one-tap-container"
