@@ -20,22 +20,20 @@ const Signup = () => {
   const productId = searchParams.get("productId");
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(productId);
+  
   // Variables to store trial status and period from URL
   const [trialStatus, setTrialStatus] = useState(null);
   const [trialPeriod, setTrialPeriod] = useState(null);
-  // const {trial,trialPeriod} = useParams();
+  
   // Extract trial params from URL
-  console.log(location.pathname);
   const params = new URLSearchParams(location.search);
   const trial = params.get("trial");
   const period = params.get("trialPeriod");
   const hybridPath = params.get("hybrid");
+  
   useEffect(() => {
-    console.log(trial);
     if (trial === "true" && period) {
       setTrialStatus("Trial");
-      // trial = true;
       setTrialPeriod(period); // e.g., 'Monthly', 'Quarterly', etc.
     }
   }, [location.search]);
@@ -96,7 +94,6 @@ const Signup = () => {
 
   const confirmSignup = async (event) => {
     event.preventDefault();
-    // const queryString = `?trial=${trial}&trialPeriod=${period}`;
     setLoader(true);
     try {
       await Auth.confirmSignUp(userData.emailId, event.target.otp.value);
@@ -133,31 +130,8 @@ const Signup = () => {
     await Auth.resendSignUp(userData.emailId);
   };
 
-  // Function to calculate trial end date based on the period
-  const calculateTrialEndDate = (period) => {
-    const currentDate = Date.now();
-    let endDate;
-    switch (period) {
-      case "Monthly":
-        endDate = currentDate + 30 * 24 * 60 * 60 * 1000; // 30 days
-        break;
-      case "Quarterly":
-        endDate = currentDate + 90 * 24 * 60 * 60 * 1000; // 90 days
-        break;
-      case "Half-yearly":
-        endDate = currentDate + 180 * 24 * 60 * 60 * 1000; // 180 days
-        break;
-      case "Yearly":
-        endDate = currentDate + 365 * 24 * 60 * 60 * 1000; // 365 days
-        break;
-      default:
-        endDate = null;
-    }
-    return endDate;
-  };
-
   return (
-    <FormWrapper heading="Signup">
+    <FormWrapper>
       {formState === "signup" ? (
         <SignupForm handler={handleSignup} />
       ) : (
