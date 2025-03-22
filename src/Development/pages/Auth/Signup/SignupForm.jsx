@@ -145,8 +145,7 @@ const SignupForm = ({ handler }) => {
                     name="name"
                     className="rounded w-full text-sm sm:text-base mb-2"
                     placeholder="Full Name"
-                    pattern="[A-Za-z\ ]"
-                    value={name}
+                    pattern="[A-Za-z\s]+" // Changed to accept multiple letters and spaces                    value={name}
                     onChange={(e) => {
                       if (/^[^0-9]*$/.test(e.target.value))
                         setName(e.target.value);
