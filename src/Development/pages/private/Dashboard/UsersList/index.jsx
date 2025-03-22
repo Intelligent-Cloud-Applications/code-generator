@@ -87,15 +87,15 @@ const UsersList = ({ userCheck, setUserCheck }) => {
       const response = await API.put("main", "/admin/delete-user", {
         body: {
           institution: institution,
-          cognitoId: cognitoId
+          cognitoId: cognitoId,
         },
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       console.log("Delete response:", response); // Add this for debugging
-      
+
       if (response) {
         toast.success("User deleted successfully!", { autoClose: 3000 });
         await getUserList(); // Refresh the user list
@@ -103,7 +103,9 @@ const UsersList = ({ userCheck, setUserCheck }) => {
       }
     } catch (error) {
       console.error("Delete error:", error);
-      toast.error("Failed to delete user. Please try again.", { autoClose: 3000 });
+      toast.error("Failed to delete user. Please try again.", {
+        autoClose: 3000,
+      });
       return false;
     }
   };
@@ -126,7 +128,10 @@ const UsersList = ({ userCheck, setUserCheck }) => {
 
   const confirmDelete = async () => {
     if (userToDelete) {
-      const success = await handleDelete(userToDelete.institution, userToDelete.cognitoId);
+      const success = await handleDelete(
+        userToDelete.institution,
+        userToDelete.cognitoId
+      );
       if (success) {
         setShowDeleteModal(false);
         setUserToDelete(null);
@@ -322,7 +327,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
           >
             <div
               className={`flex w-[94.5%] mt-4 rounded-md overflow-hidden gap-2`}
-
             >
               <input
                 className={`flex-1 p-2 outline-none rounded-md`}
@@ -371,30 +375,23 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                 <div
                                   className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium"
                                   style={{
-                                    backgroundColor: getColor(
-                                      user.userName
-                                    ),
+                                    backgroundColor: getColor(user.userName),
                                   }}
                                 >
                                   {getInitials(user.userName)}
                                 </div>
                               )}
                             </Table.Cell>
-                            <Table.Cell
-                              className="text-gray-700 font-semibold text-center"
-                            >{user.userName}</Table.Cell>
-                            <Table.Cell
-                              className="text-gray-700 font-semibold text-center">
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
+                              {user.userName}
+                            </Table.Cell>
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
                               {formatDate(user.joiningDate)}
                             </Table.Cell>
-                            <Table.Cell
-                              className="text-gray-700 font-semibold text-center"
-                            >
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
                               {formatDate(user.renewDate)}
                             </Table.Cell>
-                            <Table.Cell
-                              className="text-gray-700 font-semibold text-center"
-                            >
+                            <Table.Cell className="text-gray-700 font-semibold text-center">
                               {userAttendance[user.cognitoId] || 0}
                             </Table.Cell>
                             <Table.Cell
@@ -424,7 +421,12 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                               </button>
                               <button
                                 className="p-2 hover:bg-transparent rounded-md"
-                                onClick={() => handleDeleteUser(user.institution, user.cognitoId)}
+                                onClick={() =>
+                                  handleDeleteUser(
+                                    user.institution,
+                                    user.cognitoId
+                                  )
+                                }
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -442,7 +444,6 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                 </svg>
                               </button>
                             </Table.Cell>
-
                           </Table.Row>
                         );
                       }
@@ -453,12 +454,16 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 {/* Corrected Pagination */}
                 <div className="flex items-center justify-between mt-4">
                   <div className="text-sm text-gray-700">
-                    Showing {startIndex + 1} to {Math.min(endIndex, activeUserList.length)} of {activeUserList.length} results
+                    Showing {startIndex + 1} to{" "}
+                    {Math.min(endIndex, activeUserList.length)} of{" "}
+                    {activeUserList.length} results
                   </div>
                   <div className="flex overflow-x-auto sm:justify-end">
                     <Pagination
                       currentPage={currentPage}
-                      totalPages={Math.ceil(activeUserList.length / itemsPerPage)}
+                      totalPages={Math.ceil(
+                        activeUserList.length / itemsPerPage
+                      )}
                       onPageChange={(page) => {
                         setCurrentPage(page);
                         window.scrollTo(0, 0);
