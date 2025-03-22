@@ -107,6 +107,8 @@ function App() {
         RefCtx.current.setUserData({});
         UtilCtx.current.setLoader(false);
       } finally {
+        const location = await API.get("main", apiPaths?.getUserLocation);
+        RefCtx.current.setUserData((prev) => ({ ...prev, location }));
         UtilCtx.current.setLoader(false);
       }
     };

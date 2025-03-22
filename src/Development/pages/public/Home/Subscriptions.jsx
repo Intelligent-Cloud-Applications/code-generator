@@ -6,37 +6,31 @@ import InstitutionContext from "../../../Context/InstitutionContext";
 import HappyprancerPaypalHybrid from "../Subscription/HappyprancerPaypalHybrid";
 import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly";
 import institutionData from "../../../constants";
-import {API} from "aws-amplify";
-import {toast} from "react-toastify";
-
-const getLocationFromIP = async () => {
-  try {
-    const response = await fetch("https://ipapi.co/json/");
-    if (!response.ok) throw new Error("Failed to fetch location");
-    const data = await response.json();
-    return data.country_code;
-  } catch (error) {
-    console.error("Error fetching location:", error);
-    return null;
-  }
-};
+import { Button } from "flowbite-react";
+import ProductModal from "./ProductModal";
+import { API } from "aws-amplify";
+import { toast } from "react-toastify";
 
 const Subscription = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
-  const institutionProductId = useContext(InstitutionContext).institutionData?.productId;
+  const institutionProductId =
+    useContext(InstitutionContext).institutionData?.productId;
   const { util, isAuth, productList, userData: UserCtx } = useContext(Context);
   const [products, setProducts] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const Navigate = useNavigate();
   const [bgInView, setBgInView] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
   // Initialize and handle user location
   useEffect(() => {
     const initializeLocation = async () => {
       // Try to get location from context first
       if (UserCtx?.location?.countryCode) {
-        setUserLocation(UserCtx.location.countryCode);
-        localStorage.setItem("userLocation", UserCtx.location.countryCode);
+        setUserLocation(UserCtx?.location?.countryCode);
+        localStorage.setItem("userLocation", UserCtx?.location?.countryCode);
         return;
       }
 
@@ -46,16 +40,11 @@ const Subscription = () => {
         setUserLocation(storedLocation);
         return;
       }
-
-      // If no location found, try IP geolocation
-      const ipLocation = await getLocationFromIP();
-      if (ipLocation) {
+      if (UserCtx?.location?.countryCode) {
+        const ipLocation =
+          UserCtx?.location?.countryCode === "IN" ? "IN" : "US";
         setUserLocation(ipLocation);
         localStorage.setItem("userLocation", ipLocation);
-      } else {
-        // Default to US if all methods fail
-        setUserLocation("US");
-        localStorage.setItem("userLocation", "US");
       }
     };
 
@@ -117,8 +106,12 @@ const Subscription = () => {
 
     const url =
       process.env.REACT_APP_STAGE === "PROD"
-        ? `https://payment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`
-        : `https://betapayment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`;
+        ? `https://payment.happyprancer.com/${
+            institutionData.InstitutionId
+          }/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`
+        : `https://betapayment.happyprancer.com/${
+            institutionData.InstitutionId
+          }/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`;
 
     window.location.href = url;
   };
@@ -144,6 +137,7 @@ const Subscription = () => {
   };
 
   const renderSubscribeButton = (item) => {
+    const { userData: UserCtx } = useContext(Context);
     const userHasSubscription = hasAnySubscription();
     const primaryColor = InstitutionData.PrimaryColor || "#4F46E5";
     return (
@@ -152,13 +146,26 @@ const Subscription = () => {
         className={`mt-4 relative inline-flex w-full justify-center rounded-lg ${
           userHasSubscription ? "opacity-60 cursor-not-allowed" : ""
         } bg-lightPrimaryColor px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primaryColor focus:outline-none focus:ring-2 focus:ring-lighestPrimaryColor dark:focus:ring-cyan-900`}
-        onClick={() => !userHasSubscription && handleSubscribeClick(UserCtx.cognitoId, item.productId)}
+        onClick={(e) => {
+          if (UserCtx.userType === "admin") {
+            e.stopPropagation();
+            setEditingProduct(item);
+            setModalOpen(true);
+            setIsEditing(true);
+          } else {
+            !userHasSubscription &&
+              handleSubscribeClick(UserCtx.cognitoId, item.productId);
+          }
+        }}
         style={{ backgroundColor: primaryColor }}
         disabled={userHasSubscription}
       >
         {userHasSubscription && (
           <div className="absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm bg-black/20">
-            <div className="relative flex items-center justify-center p-1.5 rounded-full" style={{ backgroundColor: `${primaryColor}40` }}>
+            <div
+              className="relative flex items-center justify-center p-1.5 rounded-full"
+              style={{ backgroundColor: `${primaryColor}40` }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 text-white drop-shadow-md"
@@ -176,7 +183,7 @@ const Subscription = () => {
             </div>
           </div>
         )}
-        Subscribe
+        {UserCtx.userType === "admin" ? "Edit" : "Subscribe"}{" "}
       </button>
     );
   };
@@ -185,18 +192,18 @@ const Subscription = () => {
     util.setLoader(true);
     try {
       const response = await API.post(
-        'main',
+        "main",
         `/user/cancel-subscription/${institutionData.institution}`,
         {}
       );
       window.location.reload();
     } catch (e) {
       console.error(e);
-      toast.error('Could not cancel subscription.');
+      toast.error("Could not cancel subscription.");
     } finally {
       util.setLoader(false);
     }
-  }
+  };
 
   const renderSubscribedButton = () => {
     const primaryColor = InstitutionData.PrimaryColor;
@@ -362,9 +369,35 @@ const Subscription = () => {
         </h3>
       </div>
 
+      {/* Create a new Subscription */}
+      {UserCtx.userType === "admin" && (
+        <div className="flex justify-end mt-8 px-8 md:px-16 w-full">
+          <Button
+            color="primary"
+            onClick={() => {
+              setModalOpen(true);
+              setIsEditing(false);
+            }}
+          >
+            Create New Subscription
+          </Button>
+        </div>
+      )}
+
       <div className="flex flex-row gap-8 justify-center flex-wrap max850:!flex-col max-w-[90vw]">
         {products.map((item, index) => renderProductCard(item, index))}
       </div>
+
+      {modalOpen && (
+        <ProductModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          isEditing={isEditing}
+          initialData={editingProduct}
+          userLocation={userLocation}
+          setProducts={setProducts}
+        />
+      )}
     </div>
   );
 };
