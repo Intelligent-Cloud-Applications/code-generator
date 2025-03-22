@@ -10,7 +10,7 @@ const ProductModal = ({
   isEditing,
   initialData,
   setProducts,
-  userLocation
+  userLocation,
 }) => {
   const institution = useContext(InstitutionContext).institutionData;
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,8 +19,8 @@ const ProductModal = ({
     frequencyValue: initialData?.interval || 1,
     frequencyUnit: "month",
     amount: initialData?.amount ? initialData.amount / 100 : "",
-    currency: userLocation === "IN"?  "INR": "USD",
-    country: userLocation === "IN"? "IN" : "US",
+    currency: userLocation === "IN" ? "INR" : "USD",
+    country: userLocation === "IN" ? "IN" : "US",
     provides:
       Array.isArray(initialData?.provides) && initialData.provides.length > 0
         ? initialData.provides
@@ -28,7 +28,6 @@ const ProductModal = ({
     duration: initialData?.duration || 30,
     productId: initialData?.productId || "",
   });
-
 
   useEffect(() => {
     if (initialData) {
@@ -43,8 +42,8 @@ const ProductModal = ({
         frequencyValue: frequencyValue || 1,
         frequencyUnit: frequencyUnit || "month",
         amount: initialData?.amount ? initialData.amount / 100 : "",
-        currency: userLocation === "IN"?  "INR": "USD",
-        country: userLocation === "IN"? "IN" : "US",
+        currency: userLocation === "IN" ? "INR" : "USD",
+        country: userLocation === "IN" ? "IN" : "US",
         provides: Array.isArray(initialData?.provides)
           ? initialData.provides
           : [""],
@@ -52,7 +51,7 @@ const ProductModal = ({
         productId: initialData?.productId || "",
       });
     }
-  }, [initialData,userLocation]);
+  }, [initialData, userLocation]);
 
   // Helper function for input changes
   const handleInputChange = (e) => {

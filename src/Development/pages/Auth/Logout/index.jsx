@@ -30,7 +30,7 @@ const Logout = () => {
     onLoad();
   }, [])
 
-  return <div>Logging out...</div>
+  return <div></div>
 }
 
 export default Logout

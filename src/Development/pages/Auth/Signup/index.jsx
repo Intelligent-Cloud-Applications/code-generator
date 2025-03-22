@@ -42,13 +42,6 @@ const Signup = () => {
     event.preventDefault();
     const email = event.target.email.value.toLowerCase();
 
-    if (
-      event.target.password.value !== event.target.password_confirmation.value
-    ) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
     let userCountry = "";
     for (let country of countries) {
       if (country.value === event.target.country.value) {

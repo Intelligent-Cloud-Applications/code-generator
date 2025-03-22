@@ -10,7 +10,7 @@ import Facebook from "../../utils/Png/Facebook.svg";
 import Whatsapp from "../../utils/Png/Whatsapp.svg";
 import { API } from "aws-amplify";
 import institutionData from "../../constants";
-import { Modal, Table  } from "flowbite-react";
+import { Modal, Table } from "flowbite-react";
 
 function ReferralCode() {
   const { userData } = useContext(Context);
@@ -113,7 +113,7 @@ function ReferralCode() {
 
   return (
     <div className="Poppins w-full flex flex-col justify-center items-center">
-      <div className="flex mt-4 gap-4">
+      <div className="flex mt-4 gap-4 max600:flex-col items-center justify-center">
         <div
           className={`w-[85%] max1050:w-[100%] max-w-[40rem] p-7 flex flex-col items-center max536:w-[90%] relative bg-[#ffffffe1]`}
           style={{
@@ -189,52 +189,80 @@ function ReferralCode() {
             </animated.div>
 
             {showModal && (
-              <>
-                {console.log("Modal state before rendering:", showModal)}
-                <Modal show={showModal} onClose={() => setShowModal(false)}>
-                  <Modal.Header>Referred Members</Modal.Header>
-                  <Modal.Body>
-                    {memberDetails.length > 0 ? (
-                      <div className="overflow-x-auto">
-                        <Table striped hoverable>
-                          <Table.Head>
-                            <Table.HeadCell>#</Table.HeadCell>
-                            <Table.HeadCell>Name</Table.HeadCell>
-                            <Table.HeadCell>Email</Table.HeadCell>
-                          </Table.Head>
-                          <Table.Body className="divide-y">
-                            {memberDetails.map((member, index) => (
-                              <Table.Row
-                                key={index}
-                                className="bg-white border-b"
-                              >
-                                <Table.Cell className="font-medium text-gray-900">
-                                  {index + 1}
-                                </Table.Cell>
-                                <Table.Cell>{member.userName}</Table.Cell>
-                                <Table.Cell>{member.emailId}</Table.Cell>
-                              </Table.Row>
-                            ))}
-                          </Table.Body>
-                        </Table>
-                      </div>
-                    ) : (
-                      <p className="text-center text-gray-500">
-                        No referred members found.
-                      </p>
-                    )}
-                  </Modal.Body>
-                  <Modal.Footer>
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="w-full max-w-md mx-4 bg-white rounded-lg shadow-lg overflow-hidden">
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 py-3 bg-gray-50">
+                    <h3 className="text-lg font-medium text-gray-800">
+                      Referred Members
+                    </h3>
                     <button
                       onClick={() => setShowModal(false)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Body */}
+                  <div className="max-h-80 overflow-y-auto">
+                    {memberDetails.length > 0 ? (
+                      <ul className="divide-y divide-gray-200">
+                        {memberDetails.map((member, index) => (
+                          <li
+                            key={index}
+                            className="px-4 py-3 hover:bg-gray-50"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                              <div className="mb-1 sm:mb-0">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {member.userName}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  {member.emailId}
+                                </p>
+                              </div>
+                              <p className="text-sm text-gray-600">
+                                {member.phoneNumber}
+                              </p>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className="py-8 px-4 text-center">
+                        <p className="text-gray-500">
+                          No referred members found.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="px-4 py-3 bg-gray-50 text-right">
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="px-3 py-1.5 text-white text-sm rounded-md"
+                      style={{backgroundColor:InstitutionData.PrimaryColor}}
                     >
                       Close
                     </button>
-                  </Modal.Footer>
-                </Modal>
-                ;
-              </>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 

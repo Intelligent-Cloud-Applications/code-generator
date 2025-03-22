@@ -33,6 +33,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [productType, setProductType] = useState("Product Type");
   const [selectedProductAmount, setSelectedProductAmount] = useState("");
   const [createButton, setCreateButton] = useState("");
+  const [paymentDate, setPaymentDate] = useState("");
   const [cognitoId, setCognitoId] = useState("");
   const [name, setName] = useState("");
   const [userStatus, setUserStatus] = useState("Active");
@@ -41,7 +42,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Members List");
-
+  const [amount, setAmount] = useState(0);
   const itemsPerPage = 5;
   const isMobileScreen = useMediaQuery("(max-width: 600px)");
 
@@ -195,6 +196,8 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     createButton,
     showUserAdd,
     isModalOpen,
+    setPaymentDate,
+    paymentDate,
     setStatus,
     setCognitoId,
     setShowUserAdd,
@@ -228,7 +231,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
     confirmDelete,
     confirmDelete,
   };
-
+  console.log("ctx", Ctx);
   return (
     <>
       {isMobileScreen ? (
@@ -254,6 +257,7 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                   setBalance("");
                   setProductType("");
                   setShowUserAdd(true);
+                  setPaymentDate("");
                 }}
                 w={"12rem"}
               />
@@ -318,7 +322,10 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                 setCountryCode={setCountryCode}
                 setName={setName}
                 setShowUserAdd={setShowUserAdd}
+                paymentDate={paymentDate}
+                setPaymentDate={setPaymentDate}
                 setIsModalOpen={setIsModalOpen}
+                amount={amount}
               />
             </div>
           </div>
@@ -415,6 +422,15 @@ const UsersList = ({ userCheck, setUserCheck }) => {
                                   setPhoneNumber(user.phoneNumber);
                                   setStatus(user.status);
                                   setBalance(user.balance);
+                                  setAmount(user?.payment?.amount);
+                                  // Check if payment and paymentDate exist, then format
+                                  if (user?.payment?.paymentDate) {
+                                    setPaymentDate(
+                                      user.payment.paymentDate
+                                    );
+                                  } else {
+                                    setPaymentDate("");
+                                  }
                                 }}
                               >
                                 <FaEye size={15} />

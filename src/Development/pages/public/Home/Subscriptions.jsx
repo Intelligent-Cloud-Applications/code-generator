@@ -8,20 +8,21 @@ import HappyprancerPaypalMonthly from "../Subscription/HappyprancerPaypalMonthly
 import institutionData from "../../../constants";
 import { Button } from "flowbite-react";
 import ProductModal from "./ProductModal";
-import {API} from "aws-amplify";
-import {toast} from "react-toastify";
+import { API } from "aws-amplify";
+import { toast } from "react-toastify";
 
 const Subscription = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
-  const institutionProductId = useContext(InstitutionContext).institutionData?.productId;
+  const institutionProductId =
+    useContext(InstitutionContext).institutionData?.productId;
   const { util, isAuth, productList, userData: UserCtx } = useContext(Context);
   const [products, setProducts] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const Navigate = useNavigate();
   const [bgInView, setBgInView] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editingProduct, setEditingProduct] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
   // Initialize and handle user location
   useEffect(() => {
@@ -40,10 +41,9 @@ const Subscription = () => {
         return;
       }
       if (UserCtx?.location?.countryCode) {
-        const ipLocation = UserCtx?.location?.countryCode === "IN" ? "IN" : "US";
-        setUserLocation(
-          ipLocation
-        );
+        const ipLocation =
+          UserCtx?.location?.countryCode === "IN" ? "IN" : "US";
+        setUserLocation(ipLocation);
         localStorage.setItem("userLocation", ipLocation);
       }
     };
@@ -106,8 +106,12 @@ const Subscription = () => {
 
     const url =
       process.env.REACT_APP_STAGE === "PROD"
-        ? `https://payment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`
-        : `https://betapayment.happyprancer.com/${institutionData.InstitutionId}/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`;
+        ? `https://payment.happyprancer.com/${
+            institutionData.InstitutionId
+          }/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`
+        : `https://betapayment.happyprancer.com/${
+            institutionData.InstitutionId
+          }/${productId}/${encodeURIComponent(UserCtx.cognitoId)}`;
 
     window.location.href = url;
   };
@@ -133,7 +137,7 @@ const Subscription = () => {
   };
 
   const renderSubscribeButton = (item) => {
-        const { userData: UserCtx } = useContext(Context);
+    const { userData: UserCtx } = useContext(Context);
     const userHasSubscription = hasAnySubscription();
     const primaryColor = InstitutionData.PrimaryColor || "#4F46E5";
     return (
@@ -188,18 +192,18 @@ const Subscription = () => {
     util.setLoader(true);
     try {
       const response = await API.post(
-        'main',
+        "main",
         `/user/cancel-subscription/${institutionData.institution}`,
         {}
       );
       window.location.reload();
     } catch (e) {
       console.error(e);
-      toast.error('Could not cancel subscription.');
+      toast.error("Could not cancel subscription.");
     } finally {
       util.setLoader(false);
     }
-  }
+  };
 
   const renderSubscribedButton = () => {
     const primaryColor = InstitutionData.PrimaryColor;
