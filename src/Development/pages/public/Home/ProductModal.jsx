@@ -1,8 +1,8 @@
-import InstitutionContext from "../../../Context/InstitutionContext";
 import { API } from "aws-amplify";
 import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Modal, Button } from "flowbite-react";
+import InstitutionContext from "../../../Context/InstitutionContext";
 
 const ProductModal = ({
   isOpen,
@@ -10,6 +10,7 @@ const ProductModal = ({
   isEditing,
   initialData,
   setProducts,
+  userLocation
 }) => {
   const institution = useContext(InstitutionContext).institutionData;
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,12 +19,16 @@ const ProductModal = ({
     frequencyValue: initialData?.interval || 1,
     frequencyUnit: "month",
     amount: initialData?.amount ? initialData.amount / 100 : "",
-    currency: initialData?.currency || "INR",
-    country: initialData?.country || "IN",
-    provides: initialData?.provides || [],
+    currency: userLocation === "IN"?  "INR": "USD",
+    country: userLocation === "IN"? "IN" : "US",
+    provides:
+      Array.isArray(initialData?.provides) && initialData.provides.length > 0
+        ? initialData.provides
+        : [""],
     duration: initialData?.duration || 30,
     productId: initialData?.productId || "",
   });
+
 
   useEffect(() => {
     if (initialData) {
@@ -38,8 +43,8 @@ const ProductModal = ({
         frequencyValue: frequencyValue || 1,
         frequencyUnit: frequencyUnit || "month",
         amount: initialData?.amount ? initialData.amount / 100 : "",
-        currency: initialData.currency || "INR",
-        country: initialData.country || "IN",
+        currency: userLocation === "IN"?  "INR": "USD",
+        country: userLocation === "IN"? "IN" : "US",
         provides: Array.isArray(initialData?.provides)
           ? initialData.provides
           : [""],
@@ -47,7 +52,7 @@ const ProductModal = ({
         productId: initialData?.productId || "",
       });
     }
-  }, [initialData]);
+  }, [initialData,userLocation]);
 
   // Helper function for input changes
   const handleInputChange = (e) => {
@@ -154,8 +159,8 @@ const ProductModal = ({
       subscriptionType: subscriptionType,
       interval: interval,
       period: period,
-      india: formData.country === "IN",
-      provides: formData.provides,
+      india: userLocation === "IN",
+      provides: formData.provides.filter((item) => item.trim() !== ""),
       productId: formData.productId || "", // Will be empty for new products
     };
 
@@ -314,16 +319,22 @@ const ProductModal = ({
               htmlFor="amount"
               className="block text-sm font-medium text-gray-700"
             >
-              Amount (₹)
+              Amount ({userLocation === "IN" ? "₹" : "$"})
             </label>
             <input
               id="amount"
               name="amount"
               type="number"
-              min="0"
-              step="0.01"
-              value={formData.amount}
-              onChange={handleInputChange}
+              min="1"
+              step="1"
+              value={formData.amount === 0 ? "" : formData.amount}
+              onChange={(e) => {
+                const value = e.target.value;
+                setFormData({
+                  ...formData,
+                  amount: value === "" ? "" : parseInt(value) || 0,
+                });
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
               placeholder="Enter amount"
               required
@@ -360,22 +371,84 @@ const ProductModal = ({
             >
               Provides
             </label>
-            <textarea
-              id="provides"
-              name="provides"
-              value={
-                Array.isArray(formData?.provides)
-                  ? formData.provides.join("\n")
-                  : ""
-              }
-              onChange={handleInputChange}
-              className="w-full min-h-14 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-              placeholder="Enter each provide on a new line"
-              required
-            ></textarea>
+
+            <div className="space-y-2">
+              {formData.provides.map((provide, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={provide}
+                    maxLength={100}
+                    onChange={(e) => {
+                      const newProvides = [...formData.provides];
+                      newProvides[index] = e.target.value;
+                      setFormData({ ...formData, provides: newProvides });
+                    }}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    placeholder={`Feature ${index + 1}`}
+                    required={index === 0}
+                  />
+
+                  {formData.provides.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newProvides = [...formData.provides];
+                        newProvides.splice(index, 1);
+                        setFormData({ ...formData, provides: newProvides });
+                      }}
+                      className="p-2 text-red-500 hover:text-red-700"
+                      aria-label="Remove item"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  provides: [...formData.provides, ""],
+                });
+              }}
+              className="mt-2 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2 text-gray-500"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Add Feature
+            </button>
+
             <p className="text-sm text-gray-500">
-              Enter each provide on a new line
+              Add up to 10 features (max 100 characters each)
             </p>
+
+            {formData.provides.length >= 10 && (
+              <p className="text-sm text-amber-600">
+                Maximum number of features reached (10)
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">
@@ -391,7 +464,10 @@ const ProductModal = ({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="rounded bg-blue-600 hover:bg-blue-700 text-white"
+              style={{
+                backgroundColor: institution.PrimaryColor,
+              }}
+              className="rounded text-white"
             >
               {isSubmitting
                 ? "Saving..."

@@ -11,18 +11,6 @@ import ProductModal from "./ProductModal";
 import {API} from "aws-amplify";
 import {toast} from "react-toastify";
 
-const getLocationFromIP = async () => {
-  try {
-    const response = await fetch("https://ipapi.co/json/");
-    if (!response.ok) throw new Error("Failed to fetch location");
-    const data = await response.json();
-    return data.country_code;
-  } catch (error) {
-    console.error("Error fetching location:", error);
-    return null;
-  }
-};
-
 const Subscription = () => {
   const InstitutionData = useContext(InstitutionContext).institutionData;
   const institutionProductId = useContext(InstitutionContext).institutionData?.productId;
@@ -40,8 +28,8 @@ const Subscription = () => {
     const initializeLocation = async () => {
       // Try to get location from context first
       if (UserCtx?.location?.countryCode) {
-        setUserLocation(UserCtx.location.countryCode);
-        localStorage.setItem("userLocation", UserCtx.location.countryCode);
+        setUserLocation(UserCtx?.location?.countryCode);
+        localStorage.setItem("userLocation", UserCtx?.location?.countryCode);
         return;
       }
 
@@ -51,16 +39,12 @@ const Subscription = () => {
         setUserLocation(storedLocation);
         return;
       }
-
-      // If no location found, try IP geolocation
-      const ipLocation = await getLocationFromIP();
-      if (ipLocation) {
-        setUserLocation(ipLocation);
+      if (UserCtx?.location?.countryCode) {
+        const ipLocation = UserCtx?.location?.countryCode === "IN" ? "IN" : "US";
+        setUserLocation(
+          ipLocation
+        );
         localStorage.setItem("userLocation", ipLocation);
-      } else {
-        // Default to US if all methods fail
-        setUserLocation("US");
-        localStorage.setItem("userLocation", "US");
       }
     };
 
@@ -382,17 +366,19 @@ const Subscription = () => {
       </div>
 
       {/* Create a new Subscription */}
-      <div className="flex justify-center mt-8">
-        <Button
-          color="primary"
-          onClick={() => {
-            setModalOpen(true);
-            setIsEditing(false);
-          }}
-        >
-          Create New Subscription
-        </Button>
-      </div>
+      {UserCtx.userType === "admin" && (
+        <div className="flex justify-end mt-8 px-8 md:px-16 w-full">
+          <Button
+            color="primary"
+            onClick={() => {
+              setModalOpen(true);
+              setIsEditing(false);
+            }}
+          >
+            Create New Subscription
+          </Button>
+        </div>
+      )}
 
       <div className="flex flex-row gap-8 justify-center flex-wrap max850:!flex-col max-w-[90vw]">
         {products.map((item, index) => renderProductCard(item, index))}
@@ -404,6 +390,7 @@ const Subscription = () => {
           onClose={() => setModalOpen(false)}
           isEditing={isEditing}
           initialData={editingProduct}
+          userLocation={userLocation}
           setProducts={setProducts}
         />
       )}
